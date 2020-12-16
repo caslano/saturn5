@@ -1,0 +1,20 @@
+
+// (C) Copyright Tobias Schwinger
+//
+// Use modification and distribution are subject to the boost Software License,
+// Version 1.0. (See http://www.boost.org/LICENSE_1_0.txt).
+
+//------------------------------------------------------------------------------
+
+// no include guards, this file is intended for multiple inclusions
+
+#undef callable_builtin
+#undef member
+#undef non_member
+#undef variadic
+#undef non_variadic
+
+
+/* aliases_undef.hpp
+RLf+5Zpn/EPY/AU84+mw/RLwjH8M0R0FfwL4pxDdxldg3AD+OWz+DH4e+Be0v4tluwLf/EqNfw3b1wM/A/wb7F0m7C2Aj7xK49+hu0rodoCfAUbWaV2HtMf8UY1roLu30HWBnwGuhS4udEfBLwKboNstdM2vRvsDroMuJXSHwS8Az4HuAUIXeQ3aC/AW0GWE7iB4xluu0+P4lNDNgz8FXL9Oj2v7ha71tZjfA28F3YzQXf23e5DbxQ2kayJ8uNAdhx3GW0P3SKH7LXjjdRpvsy6kXYHPA88N0R0Bfwx42xDdp8D/Fni7EF3z69GPgBtDdAfB3wy8fYjuFPiWN2i8Q4huH/jDwDuG6I6B/xTwvBDdCfCngHcK0a1/I+oDeH6Ibgf4UeAFIboy+EPA5hDdHPibgReG6I6DPwm8KKze5lFvwItDdDPgjwIvCdEtgD8JvHRd5D9yNb8J+QAa6/S6+zGiH+XAHwHeFbrDcpwEz3g36J4vdBvx+8qMl0H3Sjk/AM94d+je9Jd/77nmxtW4GlfjalyNq3E1rsbVuBpX42pcjatxNa7G1bgaV+NqXI2rcTWuxtW4GlfjalyNq3E1rsbVuBpX42pcjatxNa7G1bgaV+NqXI2rcf37LisbLZSy0ex0xva6M4Vye2trq6sbt0oFs1qxMn3FiRK5u9ltwAPX/kyqmq6aBbNYdQymM9F0LWtVE8WqVZ3VGvhX05VJs2oVJx13Ol4qViulvK15e3yyHLXKsWy20p0vZaYiEdefLFZLxVKhVLNTs/ZArcAk85VSrWpW+rImRTphmRUPXzVnqgOlqpUxkf+ybWYSxSwZolS7ur5kyswYRBheBvrhWrFo5j06eDA/YiNO5l2Pnr3xlEJV4ChvqxrNpJOVEpVRJm5WqhHX37Ymi7vN2WTaqgzPlk2UjcubxUwwDb5cMSfMSsWk7BUKsfyk4CleCj5SzlKNoRoFX6PAxWp8aI/fv1a0a+VyqVI1s4N9PUvjtWvjdqZilatWqThk7q+ZdnUZ3i6Xirbp5ad0ppLpSrpA4YV9yZeX8BVzOpm27XKuktaG4W8VynkrY1WprU1YlcLS/Gr/69NWddgqmEv4UsWaTO7u6zdtOz0JmnmKdDJereS9blWoklc4XJoyi9KfWnVOtdhMulpSrUXy5SkrWRvPE6+KDaaDdbFKJmdNm4NOAXP1SF0pn1XNra8nhC9TkyxlSnlqlhVqJjJf0Vp1okvVAtuXfIaMq8pj/3R+Mpo17c5Wj7tYSlETT1drFdOvy6m2H80VaJywc+k2YiRfLpW1O1MgTZVs2Fwmrr+lxwCUGTjJ08BE3a80EVnKU89ID5mUPIRl/2olXbTTGacisgHhbLOYNSsDpSLGGfhT2WSsskVxgpLh0tlsYqZqFm3Um+RNqovZMnW75GDSl04z2D9fSZPP9Va1aNpB9mgAxpAj/dHp4aYORU3W7cpC77Z16Y/OzST7k53KbJIKCcM//FWl7rGKU0PpYrbE3TOA5wxJnjuwylMskzHL1TQXs6srFaNls2KXiul8D1Vv3Z+GQVXf5uBEt1Wp5nz+5Xw64yPgP+nUc91N8dfoLjY7OBG3qtZDqB5zFkYnXFJHox+1QSQS7TuT5rFA9nXm6S9D+e9D6wXn4TM5urlS2bJC8pN0iyx73HTjNZnfn7HVGDJzXTw1W6ymZ6LTbf5yztBAiV7PbhoUuSylv398T2fHqjSyUn8tlCl9dX2sx1AjrpEC4fqP4ZbJ4Q3cOjEvSdtWZjCeSvqjiXQrf0MRho/hfucwnk4Yr+RpIIQ/NX0Dw2Jat6LxvAkzuMvG6v6IhFnEXyzFcyZPW9z4DPZN6xE6TjOZiQk=
+*/

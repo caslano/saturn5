@@ -1,0 +1,28 @@
+/*
+ * Copyright 2017 Andrey Semashev
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * See http://www.boost.org/LICENSE_1_0.txt
+ *
+ * This header is deprecated, use boost/winapi/basic_types.hpp instead.
+ */
+
+#ifndef BOOST_DETAIL_WINAPI_BASIC_TYPES_HPP
+#define BOOST_DETAIL_WINAPI_BASIC_TYPES_HPP
+
+#include <boost/config/header_deprecated.hpp>
+
+BOOST_HEADER_DEPRECATED("<boost/winapi/basic_types.hpp>")
+
+#include <boost/winapi/basic_types.hpp>
+#include <boost/detail/winapi/detail/deprecated_namespace.hpp>
+
+#ifdef BOOST_HAS_PRAGMA_ONCE
+#pragma once
+#endif
+
+#endif // BOOST_DETAIL_WINAPI_BASIC_TYPES_HPP
+
+/* basic_types.hpp
++hSlPtvpPynQ6m0TqbM0o1a/1QgynnHxh4k7kiwd25MsH5PtWbLVk+18spWRzUW2lB+TLDt/SLK0ku01st1NtnFkO4ls+5BtSTiEQziEg2A+gTmlXXcMm0+I0Dul7Wne3b0SqrQENp7mZs8RTmU/0Cy61YTA0DPt/zk2dsDGIbShw8aci3DRzBwbO2DjCGmjf0xxkoeZEv0DiotGkIeNWktNdgUduakgWS+mkwWj6YNOid9/Uld3Z5Zp0sLBvUcMSnrNIbAINjiv9VGFrI8qDFxbYWCeQJBuF6Q7eOkubqKgcJegcBev8P/ON3rlIfU58qh/sz4N0vhHXVWEelXlQcI77AQT4f2tOtMu+Z91NU3kaoKeZFlEEzkD/fsfkSibe3/zcEWLdQfal+VZLDVHFM2bPK8mydMYPfWxTIvyStCZQI5uVo8qaP0in21fQyLm0ttBXjJPO85p8a8s6upuim5aSs6ixEaXk1iZyUxdK+GmV5bNroyUNYicidbkEoWbPz2dJNR95A46cXBTY40gJ2k7TDmJxxv98ZHkJEUfeaZOcv2gXOAkl5/87d3gzGE7C5Vhbic5qCCTkg7yd6RtVpSlPipO/9aoGNjeU2a8i0l3WGypSaDvR54D6TTm1TFF8zpuIh9s0yhyk858NNNCThJBpqGJfbl6ogi1yAhRkRFYkXE9RW5+RC2yP32XUz8P74yjnVD3PNrRknO4rGNHekiZdnrqWZZ6Alk9VLShppD4yfPGRXamKbts6r5+UkI7PeNLxnMOphH07no8JMJjHRvZGe1/JYfgIAmeBZOi2pVr8XkalSaqwUWP/dcm6z8zaCyPqiynAyW0MStnll6fP7God1NWaRjndzNxa61jYKRCkG4XpDv06eat7z/iatSX+AXlrvxb1OpjpUlVlEVVrMLClc1YVBEW/kD75oo0qR+JtrqZ7GxOalOi1aESasPGqfuPPVGpFs3t9YFRBtssdlrbrApX/m4fkFYlQbGo80VQE7qf3+wnu/nKLqlaNppNOWWpcuWdDygZSEV+9KFMC/08gkiDKkCp1CPro+wdJ3Z3d6v/YKKqjwVRERZPwJLEMbkXLfHfdRz5hyd8RNsFtE36P4Vys+8zKHj/jDKlESXsCyj7wOSsco+fCTShJWT/FfbxRiHZnc12i4lpmVZdyhS2ZaS6lGXZGvd0suldUtH1q7oC05DO3Xo+wSlWjvXf37TblSY0+CdK1fMEfcJTHnTsDMofEZw/6FuecnYcvNzJfrVxudPsGaLlTvfMkFrudNEMYLnTITOA5U65M4DlTj9MB5Y7fTodWO700nRg1VngZ0FplDx/j9kvBReY8PeY89fy99PnN+HvCcG/2oT/NCH/aXL8pyH8pyH8pyH8b0f4347wvx1Y7van9F+hreAV6L/CnL+WP1qg/4oQ/K8w4d8o5N8ox78R4d+I8G9E+Dcg/BsQ/g19rf9KbSG9QP+V5vy1/DEC/VeG4D/GhL9XyN8rx9+L8Pci/L0I/9sQ/rch/G/ra/2P0vxZCPQ/ypy/lj9WoP9RIfhfasJ/qpD/VDn+UxH+UxH+UxH+9Qj/eoR/fV/rv0pzKyPQf5U5fy1/vED/VSH4X2zCf4qQ/xQ5/lMQ/lMQ/lMQ/rci/G9F+N/a1/o/Q/PuJND/Geb8tfyJAv2fEYL/hSb8Jwv5T5bjPxnhPxnhPxnhPwnhPwnhP6mv9T9ac7Im0P9oc/5afptA/6ND8D/fhH+dkH+dHP86hH8dwr8O4T8R4T8R4T+xr/V/vubrUKD/8835a/mTBfo/PwT/c034TxDynyDHfwLCfwLCfwLC/xaE/y0I/1v6Wv8Xay5HBfq/2Jy/lj9VoP8=
+*/

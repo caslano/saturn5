@@ -1,0 +1,23 @@
+
+#ifndef BOOST_CONTRACT_DETAIL_NOOP_HPP_
+#define BOOST_CONTRACT_DETAIL_NOOP_HPP_
+
+// Copyright (C) 2008-2018 Lorenzo Caminiti
+// Distributed under the Boost Software License, Version 1.0 (see accompanying
+// file LICENSE_1_0.txt or a copy at http://www.boost.org/LICENSE_1_0.txt).
+// See: http://www.boost.org/doc/libs/release/libs/contract/doc/html/index.html
+
+// Following must be expressions, not statements (as used with if.., etc.).
+
+#define BOOST_CONTRACT_DETAIL_NOOP ((void)0)
+
+// Following always compiles but never evaluates cond (so check correct syntax).
+#define BOOST_CONTRACT_DETAIL_NOEVAL(cond) \
+    (true || (cond) ? BOOST_CONTRACT_DETAIL_NOOP : BOOST_CONTRACT_DETAIL_NOOP)
+
+#endif // #include guard
+
+
+/* noop.hpp
+/xIHj/7ms2v0//wR+zzT1Rk+/yG0m0bq01Na2hpCzS1dzsYPddfWtTYykUCI8Ls3sx+fWMj6hOuSv/Ne3nNazrdBZ0XnzvN/8XdpX723y3q9j/Pah/krA+OpbnOrkRDgvsp3YyD/DcIfn+HfjUF+hgQz8K5E8N6ns4cOdqymGdvTVu+6Bd7JGRVD5PCf0cfAKlq6a9saWhthGtrMTD+NO3H/uVji9lgiy7Ki/efTBCoz2cyn25Y6fdcytDo6SCZle4LM0tXx3vRAtDWWdPKrlPUr78Qsp4vGoC/Uz8Hrj9kHecxHU3qIN0K8pfL07E0+1FMQPN5A6sFwlfkc5IFs7i2y9hTxmtQc29DvZc5iTMZ6R1hj2aczqh49sI7HdbnUrNM7aZ0+Nw957ljcHB+E/Qj7E5bYPLrbsdTm0VmscsiT+joqbF6Z11GJeXNc/7J9QLG7/Q1KJr8c1s/Z/p4tuqE+a/cud+mGbHqFSzdm0ye6dFM2XePSq7LpOpfuyu7xGrxGx4HZrzUkFnmwP6P0YkivpfQSSK+j9FJI91O6EtLDlF4G6a1eZ3grpHd4nRFMn+d19mL6Qq9zPaYv8TqTw5DeSXBMX0XwGKSvJ3qYvtnrrML23k6vAmL6bq9zMbb/Pkpj+x+mNLb/cUpj+3dRuhzSL1G6AtKve50x5fdQNyfGNQ2k3BZA8g7jPPFEoc00rjW6IRzZpnk0pmk8k620yMukr3fpxdn07S69JJu+z6WXZtOPu3R5Nv2SS1dk0954Sldm0wUuvSybLnXpqmx6kUtXZ9M1Lk3S1HQHpxdn0us4vSSTHub00kx6B6fLM+kLOV3B6SlOThPWsFWq5iL24848HyaWuJcZH3kN7ryTZmfHSV5rOJmqS4TpKZTuOPURjhmANSXigw6aGT8My+yV/KI4nnLhWpxtnBqS8FtBL96XN7KNg/f1xpNew3WpwKT7x2k662u4UfYnBVQfrFvgH6yLkkuLhbNBznD87lgSsVnPpsoah7b/X9ln3NqbEJntZhufThVGyKeXPQKaWSPLMuX9vnV81ni1qYHu/vTQxi63MnakaK+hsOYMfkVGd3Vk8iozNNZm8pZl8NZl8qoyeb371bU06yMg/vozZao92X/Q3MnIbJHi3nKEG/Md8WRK2uqcoJ3xdIrMY8WJziI9Pj5TdrHmF1E9N2fzqX44kzG+i4jRaKGTGvPFRzENxsnd4/e3LTvHbk+OeX13Y2g61cvjnMbQV/F7Aq1hafah6h62NR4hF3oM8iZ6qwbi6yUT9rv5nrgiIG+S1z4UiXqwDpM9Yb7b8Fhnu+K/7J15nM7VHsfP7/cwJGrsaxoS2iyTdRKzm2EwzYJ06zFmnjHDbGbByNqCdqFViepKJe2SVrppuRSl0iKkhK6EFhW673Oe83ueM78ejG53+eN6vbzm+Z1zfmf5nu/y+X7P8nMy/OlN+0r+UzhH4era0KuZQa/NfwBX9zgePY31aCfBXIdu0TeIxyWtLDsY67hG+WEJSXhRBc5aw7UqLbNKWivV/6SsMiOO7WDFM4yx1fj9t/8yq6QYe6Rbq/fUZkM/r+t5LB6brwE9ekl/V/BMytY44XcFowNnsiNU3RVC18u7quO+HFCpU7mTV1sEB9VXj6mNMaa6J4HVJY8666YT4dFHTB41Y1g5PmM/XiDdxD/Kz6sdzEvzZeuYjNYv4cE8hwGN/YP+2LKh7vw8y7gigu9Jd6q0MMsfZ+urv7fSzhj7nSfhq5o6fqTLBkysK6rYjEW1zHyl8Ks8bzDed7DzHk3L9iFsxiFpvx0dn1A0Pr+0WE1oLHHjsZpmHbQuNe1HR9K21a1qP84hbXqjjIKy9IJihzc=
+*/

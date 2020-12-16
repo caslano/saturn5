@@ -1,0 +1,25 @@
+# /* Copyright (C) 2001
+#  * Housemarque Oy
+#  * http://www.housemarque.com
+#  *
+#  * Distributed under the Boost Software License, Version 1.0. (See
+#  * accompanying file LICENSE_1_0.txt or copy at
+#  * http://www.boost.org/LICENSE_1_0.txt)
+#  */
+#
+# /* Revised by Paul Mensonides (2002) */
+#
+# /* See http://www.boost.org for most recent version. */
+#
+# ifndef BOOST_PREPROCESSOR_PUNCTUATION_COMMA_HPP
+# define BOOST_PREPROCESSOR_PUNCTUATION_COMMA_HPP
+#
+# /* BOOST_PP_COMMA */
+#
+# define BOOST_PP_COMMA() ,
+#
+# endif
+
+/* comma.hpp
+XeU8ZF57rpHwG9YFuge+SzF0USSc7qLrFm0p0VSg7jbq68BJ79G66CtntTebKDghaz9hDnnw3Y6PLEbzF4t6/LKPG5ntjER9+JKdwoYLO+Mhgn3jlyhNveFBa2RujC6bzENDCikNZcVDIY82jukymPEanK6naorwJs7UPilHxXRTbPyKtn6Cito2HIf2I6ixzV3d19uNq81V1d+1+eDDen6luzeyfpnksoZbDJeH9d1uixdFdbVL61m7o6al8DjM71GGXBmxIXEqpdflmXJtIq52feye97xncY973KO4173uVYzr1Gb7CTlnEPoxCVbnMyjk6VcI9H1tiYmsCE7FGV/Wib84zupEp5pzhVkTGOrU9ubFRwhK9YYXDfnDD4eRi9V85POUjfN4r1Y3dpOkb2P1pHQcmS15yfusGxVaabUes9EMY3ijsENMFebDR6/7/iGRt8UsAe7mPR50uhDIDMwKsU4hT6T2o06BeWUbnqLxQdMwGp5650c7dcP2Rj5i2FChhuMr2/N6DqEqq5WET9cZUkkGN6r2no4tFY7mH90lAi3fvUIPGuZFiYQAozOTanRQPAG6Rr706FjdNIIerr3Ll8lFNMmP+NjoV8ZIDFm3e3LzD+TBuKDh02E2dwfoPl76xnpDBad2MqSJ7ICX+LStjAlKBR4CfW6LdJQaSe2VqkjAtl8grNOmTBtbj+TzTVHoNITDwlhPPFN2HY9gQTExhoZaSSw17/+72lGE9aizNDjkgH2FErYP3tCSnb+jdPxPY5LSPMMSXc9AA5Wc/2dkkQeoKwy/cjkq3aykpx3kjqO7remaOBWi0boMuxvlwC+jWZZEPVCzQqdVORxsja/qmKsD7kk+lpCPefxWS3lw/XE9CX341p4v7753qrwWXhi7untlLFGdDXaevRXWtNI0nF80EAZeP4QXfEC5TsLHUdDa0pw0FSAcPXbs6NHDeo51UfkKgQbyCxtLCfNcCUCHI3m4tz7MMc5v0NKj3xboTHXsOUgGGM6ko3VbtmQujoU8nJ29cEzluPg+HnHHHbfAsoz3PRVPm4oNPeOJyDgTDsP7hT3rAlr0590tZiQJRlBF5i8zow2D97B6D0WWruNqccTLGKbkqNJ3D10SplvnDSfIB4Xd29Cg0F/ifkTZ637E6hJWrnc2OQ21WoA06cPLEoM7JLSdjre1SGu4UhZPrj9WYwz+msKQ0U25C+5U9hMEWRpWr//p+ld7nIQ+MDnZd/SwxhEYMuKXt9CaCafTagctfgMct6qgY6IqJarS60pEYbM9gKJIfqJS3JVFzvMuRwq5isioGJExQY5/Ejmcre559Re3XIHD1FU3re1UNiJ4lfIfwF11Xqk28f5UXCba7tpe3mgtygSrZ670V5aQMS5x0HWL7o2bKd9fCRWr9Y+8/Zq26WDeeOp0/U4lsZPC8bmp0zqWuiqTKqeiIhArKq571A6kQMRBQ2tuQO9lMm5Q1+7FdXBmPjXNnR3aU5HY5WJZTG122LJSUwvcOafefWR2bWGVNiLcxO/FrXbb9a2e4VkTlb/dgEdTCt3DBmx4esTtbK/uZynUUTyh0NOCaiffwtloaQBOJ2uClExLU8dnWEwdu9c+I5O0cgm065IF2gWMkEqymCqkIXbtKp+Npdo5g/IaPNET/PYcbU/fJCzJPE4qXxJu6HA039ys+2FF5X54tYU6rSsPIFbhiF7xK9bClLbYXelekH7hMj3uUOpKRsta+240eZkWd3drp307CY9WlY6J0hYXV9lQiXSFjiHhvYTQWiWn+XaqSckaX6Zr4eiAwnPf8Xij68NmpZPS9u+B9zgOa7g2OKjIar4uqvxqc1Zed+B9GrGL0JM=
+*/

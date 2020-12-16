@@ -1,0 +1,30 @@
+// Copyright (C) 2018 Alain Miniussi <alain.miniussi -at- oca.eu>.
+
+// Use, modification and distribution is subject to the Boost Software
+// License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+/** @file error_string.hpp
+ *
+ *  Error code to string convertion.
+ */
+#ifndef BOOST_MPI_ERROR_STRING_HPP
+#define BOOST_MPI_ERROR_STRING_HPP
+
+#include <boost/mpi/config.hpp>
+#include <string>
+
+namespace boost { namespace mpi {
+
+/**
+ * @brief Convert a MPI error code to an error string.
+ */
+std::string error_string(int err_code);
+
+} } // end namespace boost::mpi
+
+#endif // BOOST_MPI_ERROR_STRING_HPP
+
+/* error_string.hpp
+r50lHoOzfqA8BpvEY+C+P7PHoP/r7DHosZs8Br9aTxX4QJ7yFbznUyZfwafsvO/aPu752lD7UZyvXW037bsWUL2nHjC7Bcrs6jgUFmjjYwX3OUznazmnOaR5+XztsjURPDH4HSrjNSyztZPBUwxu1XZ5cK0d7nLwQL34jkN749pIJ0mtbd2DU8GF2j08Kb8HD22s3toBiehh3cvJRmI7eaLr6g6iD4R/wktXwQIAQB3FuP1ZQnSwoMq1GOdlF3Dojgot9gPTIcUWqAEbyCBuDvfOLt8B9Wb7W/B4xg4YW2AHHwGpt9OoKUC4swBGwQElv2k9mfjUt1/njJjjp1VU4eFwrWqdMeEd9iKbN/pR9AVXDWHealNe6amQdwUOuSqBefNNeY8UQt6F1Ca60LQiU95ezCulNmdhXuI+lfdJzHP4uo4RVyr+3zfg/pME5LEEYfHWFvGtOQrC4uYgLNFfHc39BaP9x3Ydc/umyOcUDqio1gMFUHo7N1Mzg0eGwOj/XOgfI+1J6MIbsDsXh3qwV7vgr6PaF11FYblVqaUc8tt88wtC5o8dANrlAtOhgGJGWNg1th/Xs+Pogo4jfGvp/R/gYfqK1t8x1JGlYlwXwYnLde7nyjsdyLuy7JRYmcWJXVmYqHHJzQ5O3OPExB9x4ll6Yk82XRrmxN12TtyXQ/yQE5sxEZ/iy8Uh3g8p79VT+lyY8kFImaen9E/ClHdCyj9snDLgxpQLIKVHTxn0YMpMSHlITxmaonPRoekcMIAvavPzBOFAP70T20cvm/fSE4D76Nm+Hno8Go5b76FDg3hsrRGPocBDfm5H7enBj1T1XglxPu6siqBGmaX99gsJPdTH1Q4MV4nF8M6711Y9M1hjKfxNKUxx/YL3UHaVzQuT8xV6M8Ktoi+8YIfUy2H5qbAUXXZ+elL73ncl8liFduAe+k4ve2tY6tN2fnmzZiZculUS7AeAMwmadxcKpUoEUuLJFlcmxShdCeiU8HersPCZ0Jc8zqEuKD4Cer4Um03AxUDAIPsFUYivnP7oc/qo2iCL1lkMj+NB8bgERlmED4DIDeMO3T//NLVLFx8TY1D6WSqdwIqno4f867wJBjW0Sq3+MyoCxCOQkeGZ0I7adfiUDL/QGrTTAD7fSR3xu4djNXBZDv5jL9+Fe23JpbU12h3W0gv00hEqHQNbpTLowPFofZ9NGOGK3MN3AMz6Ofyqp+APzTvOjvamrVSObt+5aW7Dd6u5/cEG/Xv70Sz0/9GPHj/X8vbYH56SGLkZ+d0jX0V+NzQGn2RGp+3flhir4FhH9Trt3I8K1JudFEMI7uRjeBaikNFWmoKLhDN2EGe8za7rE7/Ws4VHdhKPXAnZ1PwzerZwyy7ilrOl8c/p2cI39xDffFWUlQ16tnDQHuKgvxCr8no9u1kYbC5mt8v+8CV69nv17F4XZj8ojc/Ws4XL9hGXvY1aztXzhN/2E7+9jJqNfobzeoQXE+c9h9r8iZ4nPHhQePAg8+BBfkaG77FT0M8+ivzXG/bvawzso6sveHcG7vvQOeQuihnXSYdJ4HSCmzqp/bzo7oVBB4HrvIsmcfh2h/7m8M14/5dZgLx6WgfcAxBQe14jhKz7jjPQsKTEy0zsUNikxSOz+TtUha8cnakEufqTwbGgnSJBj34aCzMX/TGUIx7q4vjc0ULtszVmfo0vhFP4F88TBDKt7zOqdX4dpyVeKD93UUlntYWb38yURs9uaNfsVJyuAjKQL8WBy25SyYupfBxiVnNLtPFYTnFYh2fYSfLz5exYBdW9rkHq5hssOvqiZKP+rfV2qDH/EpfPt0DRUYIKI/tKQBsK1vPdb6jyX83Mj92eCEY=
+*/

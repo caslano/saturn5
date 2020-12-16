@@ -1,0 +1,38 @@
+// Copyright 2008-2010 Gordon Woodhull
+// Distributed under the Boost Software License, Version 1.0. 
+// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_MSM_MPL_GRAPH_INCIDENCE_LIST_GRAPH_HPP_INCLUDED
+#define BOOST_MSM_MPL_GRAPH_INCIDENCE_LIST_GRAPH_HPP_INCLUDED
+
+// graph implementation based on a an mpl sequence of sequences <Edge,Source,Target> 
+
+// incidence_list_graph labels such a sequence as manipulable by the metafunctions
+// in the corresponding implementation header detail/incidence_list_graph.ipp
+// to produce the metadata structures needed by mpl_graph.hpp 
+
+// the public interface
+#include <boost/msm/mpl_graph/mpl_graph.hpp>
+
+// the implementation
+#include <boost/msm/mpl_graph/detail/incidence_list_graph.ipp>
+
+namespace boost {
+namespace msm {
+namespace mpl_graph {
+   
+template<typename EdgeSequence>
+struct incidence_list_graph {
+    typedef detail::incidence_list_tag representation;
+    typedef EdgeSequence data;
+};
+
+}
+}
+}
+
+#endif // BOOST_MSM_MPL_GRAPH_INCIDENCE_LIST_GRAPH_HPP_INCLUDED
+
+/* incidence_list_graph.hpp
+obzJ10M9lp+6SIdxRxwdMSnNg/sIq+qJsGVrMB/Ict5aj6t9S1+4j4W19FO26zGWTfy/6nFM+ZXSeu99azFU2Ycpsr4HMZsYLqrB0V3Kvva9UH1/abnNphdDVMVj1Rvy5QMCS3pWIXN97jAXGGSSob6BHuZ4eouMOzA4aMLAwvZTYL27vDXV33oQkqHJXGe2mEP/3kbW2yQx1iny1/hC/c21gKtbj/lr3Dm+Br09rrzQsD1I0yxOvbut50LylbnqXypL2jGeQlMH4u/nCBG61Ee79bjaB3gkbns4wAiHoj61zaCSV6wXDG81Ij36PFnoyHyO4+oqT5oyj1fu/A+uSdN8w3ztDjj1DfOuOoyYNOob07ndwNWXj2er2hEQtq4uElfs2RmH7An3dYYr337scpb50hsR4erSJNwdJW54tPc/0lu/ieP6/wP3B8LV50vr8s0cd2kH3NOrd+B7MJztI8RYyyjdYu9/wW9tUrrf3RmnyvdpPT13zx3xlo+LOxj2//RrsnEvYP8PvyY3CLfDO8W9Qf9/3ilsnFWmZB/D7Bjgh9ae67l+h4GheBN2lHfXHlqzpXxIww561lAw0S6GsYNmqe8ib020uFx412vnWIqYg8wqbBVh//UY9U0KTsYRMq/ga5hl7/hBNd3npG4IeQfcaVLIW1NX+mqi60g1QzzQIBwJE7m5M2abQApZlMcXtTyCKI7cuGDvedP5ZWweVlyWb+p5tIIYvu7gRA/qL4V7euXFdeX6vsrDQg3GeL2FX2EI3UsvvUo+0v5Szwfu9vEoVGSMZ7q2euLoUWKSdfmDVpcoRqyJZthkLP1smfCyLnepeLidhhZO7ocdxrB9fHGRS9iNt6O9qf5WhbBhYRPmimUuQxZPYDxVGo74DqW6L+4mHi2TvGyDQX9YGM0t4zQuavmxezuCzCD4F2PcGg2h97Z5ejAbb01XB9LBnmFjuJLqPgHdzHWTdtkww0KrZSOuytvXy9th73dB6pftP7g4ZOGDB30KodWYUxw3/TzS9jIYprZSRxU/mrbAH0n1foCOf5FCbbwmjJVT+Sz4Ypvx0FSgRwjSjS3pNCoVCMd8mckDOgyj5gI5OYeQr5e9iYmhM0H5NvBVpMN2vfFa99J42C+//e2BDbYj0TfypbYL52mtTLpOxxctOul0kB8EnS7iKQv6lZJuhz1X70Z3Ekatj6T399h0VS/lukXXfXV9f8Gi97cU+ombVDq1AZ11PmXRuU0fLRSa/WItlvYXuqPeQ8XZ7fp1i67ryhzYa9FnVCbD3vNaPZbKRP4u7gkcjd+yEak85+5FNNlACu93JV1URtJO3FunqX33QUYrR6s6hmQ7HN5X0an8Gv1ztfRlyvvkfSo65U+832U0Nit2yNu/r6DvkPc1otfn7dxP0GXedL8639bvV14HCqtNvJjvHGdvV1atZ2397TxGZA43j4K7e+ao7hr7y/TsjGlR4WOJ7KEfWoM17xpndxHOTFPeC3bCkL6kGD+7geNjxMKquO8zHO9PG6eej/dw3KWdcBT7HjjLlpAOpnSevK0GZ7093QTM/2FzeLUOJw7X0t7Gwlh2iVc5Zse3vP33sOjWGfi9JebSTu1Oe7kf6/4MssJDUM7QedFoNhmsst2/b+nAHx4taP4bWGyCAFZuWzYPnVfOhtr+30aREA0ndjqDy0y7bnMyHSOkx8DKa1HNK3dwznPddhI5kKybXLT/b6h5wXQmb8Uec4DhuVZWlM9rVR7m7DlDeKQ8AI9dOLJDCo14RoEXIA5e4bhr0DMbimgT3jp06USLSDukQtSL7NIQSBUVS5ye5BWctIZU59Lb1HwThEBMWlBGS53lrckAtnCkAlM=
+*/

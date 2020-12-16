@@ -1,0 +1,27 @@
+//  A convenience header for Boost.Signals2, should pull in everying in the library.
+
+//  Copyright (c) 2008-2009 Frank Mori Hess
+
+// Use, modification and
+// distribution is subject to the Boost Software License, Version
+// 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_SIGNALS2_HPP
+#define BOOST_SIGNALS2_HPP
+
+// For documentation, see http://www.boost.org/libs/signals2/
+
+#include <boost/signals2/deconstruct.hpp>
+#include <boost/signals2/deconstruct_ptr.hpp>
+#include <boost/signals2/dummy_mutex.hpp>
+#include <boost/signals2/last_value.hpp>
+#include <boost/signals2/signal.hpp>
+#include <boost/signals2/signal_type.hpp>
+#include <boost/signals2/shared_connection_block.hpp>
+
+#endif
+
+/* signals2.hpp
+WAmpDoJJVar7R4lriahU5+9ZMRNnX+LAd3hl68ZzkkY1/NEeg77pKT3oLLI9dByR+BT9Zqm7AxKfYjFIwNx9hJDfnvlSOGDi+j7FE6sQZKWBGqeLXxlDqvlUm8dZohAso3qtF/pioqr9SA8MH5gU0brcqLUuRqyj1N/O164MOgY4ebHa0inj3/SkNKYqQbzL1kdroeC96XJRvcGYn6vH+2pF3lPMp4oNDYXeZWSNgG6kLhsZSZ7xXrUl3Ti527bPV9i2zwXGdeGVCVKpsbhbSc/GUoB1GYwymN2wnT5+bh0tjGpPrZcPFNZWf++EWdmlfjZSs++vC3mjfM113TFJZ2xlRiFCuJmJWseJrqM9ff1ekUeoqWeL2YGXBeRVNllXtV604OfRkU3VS7e/+wAKRWF9SHuNWeqfqIzB5EAmRN+MZq21UG0MSyGBZj6lMV526V7wk76CNyWOWyU+conBk7vZaYibeYp0QViRnBxoSpeLbEBcfLrjalfYBcSZIe7UJRmcMR3UKODgzV/0UjZ4wsab+1VqP84QZ7Ggow447VVrz3WUH6lokR2ORa+IKwazeBkRpTM1mo+P0warvpH6adsjckP/e5+0Enq9O1RmJahMD1AZUpjVh9Cfk34Ykf8rFxnqcYOHU+3zWB9nW5/lSACrkcnBLsWPmfVpoznRax7H+uSSXUhQC7NtdkF0xVAV27YxXolHt8eE8r4OHGsvITTz/4kkPlw2TV0NvKVYiCg+L+DEI2/jNNhNN3jgMZs/iVctpUGGefYw4vQkdRIgo/5SXg3w9/HWhKMIp5cDJ0PDed6Bs0t9kEU4ORZA5FjojJjFuMehlg/W8R6pcCMQnwYyCUAEsGF6ypeJna6hJPQBDOhHB9dcoA1+VosXG1NSLyS2DvXw+5MtmDu9rdPH/hp8Q/ax/y3o42sqDX0smxdtQkDSo8Yamiyt5RjDU7E5mDCsCqjBGtTaRw0o31al+gAUHYEQjTpx3j0omGuNTWFHbhkmTwMGQCBjA7FvsKcrA3t3DyiqFeXvuA4PWifeFI16gbm/VqJW4i0/CYEbxV4VUkNT1GQE2lGvNA/5Eb5L8MZoaRSNlrAwuquta4kRldEJ9EuidoqBnui/XBhddpdJBtB4APUtH89mRnvUSAPdhG/5Zqk+la5GtnstVDSGWT44hyDYtt+8S5g72pOLK5LiXBKEM1NT9Ezdv9RGjPrq1XNFycAeMTxQoHBEssQW41xVtsNM76KFRYEODzQaFcnqT4MMmX6KM7ox2ljZ0gOVlU4bHXUb6Uvtha2nLkYbgnCurfP7W1n893yIOR7X+/yaDp052NChZcYraB/mPJeUaKfaMVii76ftGlh0dvdARuWURnrq3C+WE3VLA3v38PnMHb7lrwEGGftpWKeXlmhLmJOahrC0MdalT1Gt7rnW+tyOG7S7wXs5RfPa6LcRP8iJ3eCPFauua07RO5kaVUZrEZTq+I5dlgV1uMRsU5COUFapne/ruBZtoIjtqn2KFMufIWzORPNsJjN6NpOMy9EI2R8bgIH+dQvJxbOBA2r7iy6o1XVAbOILfeK69olp9Qa+RHfFX2hBg60TX0go8v3qv8efUTH5xCxs58JcwMgBsRz9XGKUYLNvxQ4drP4vD3NmPiASdx+gQ+Vhyji1/8HH4F33vRB6nHhByF3vexkO3CxyrP0gtMQNsHizQMD2Gyz4AQSskb/jfszBFJp1yfMecw+Shl2/W/SSfJsmc0EaHpethYcca+Mlyz0bEbZ/QZ9o/OwbvWfjgj4x/BbDb7Eq5dlE7Pi+tQBw6kn0nTuvVscteKq2YGctlXe28Jn3SK9ouzXOrCCj1/2zk0aK68E=
+*/

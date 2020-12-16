@@ -1,0 +1,20 @@
+///////////////////////////////////////////////////////////////////////////////
+/// \file functional.hpp
+/// Proto callables for various things
+//
+//  Copyright 2010 Eric Niebler. Distributed under the Boost
+//  Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_PROTO_FUNCTIONAL_HPP_EAN_11_27_2010
+#define BOOST_PROTO_FUNCTIONAL_HPP_EAN_11_27_2010
+
+#include <boost/proto/functional/std.hpp>
+#include <boost/proto/functional/fusion.hpp>
+#include <boost/proto/functional/range.hpp>
+
+#endif
+
+/* functional.hpp
+cB/YQQG8H1OLyiqyFop9f0dy3j9LXs7bLZHXIU+KsAoDhmdvNGFzO6uMBcyH5/Mcz0xURbGk0aZ+m7bvJWbvcFgspapumwBKHeRKjNDa2Ozara1+18IFbQXLVa9Sdk/wo8t7+XbocboC6vBjHjN4i/xvHj0p0qiuZR0nIhkhttjLmrTXX/bTraYRcDeFk2NrJccuH3hOUclNjHzAcxyvQxpfndoxZd+cYmWQDEc7Zy3eD/Gy8Yh6LaZPTCU3MHcDLn8wVqzLVbr3ZPMdbdJri7aulf2e5Mp7lzHYXrfWIPOqp5hnDZ6XO7jVLaSMIeDRgcv39gFHf7zTS4/rVpZ+Ic41lK0enCM51jnlKUOSyzn82qdBHtdjp7W/dSPHftXJqDphrh3cTUNHbk3AKL68vIW03E7uL3w4Gq9VU9Z5ZUq+NWXfdvIvZgeJLZku8TNXBrqkBbgcoGccTqJ1xnzfsd99Ot9yfdUz5nAt7dgy0ktsnYfa70oP4XkSDywdl0DYjOurVdlStYh5hVnZpZV14/rsHd430ybKzqnoGL3lfZNz9OjDzREgNw4P1pAjCjqHWU8fcrBjDmHzrTqaWC+kP7o8yx90ZVq3XO45JRp9eHNT/2d0Z6PaC66ExiIgDfZbs9cu6X3tzVokz/ip9TmTH+xWXh6EPO9kVXaBoBW7tdHLBjMzLuf9/WyeCNTjZxJEkkDGTeHuXhQ5YlN7OGMnM55NnTZntPRwNTjfqrSEw4DFhTOYmNis2gWEa0I94vfqaxxfJZI0q6OoDIQTaP074T2PPmSXpkjBgJNeF9IVHFO09HYTo0vdyj8zslQWcV0UIlIsG7qYf9bRasIu3VztRZW5Bxo9iOOJoQeFUZjHshUgOafGzqGZzOIB0cX9SuafxvgZ3NrPjZUW0BYrHDQXwrm1Zh4IHY8AIFjeiorjwzBFpZRdk8Z9O5vdx/THOzqtxSvfFITVC1w7oZEpbu3LJbJt4HES1eIBTHcDB+KtNDNg35LiOE6XQFElWJJ9Rt1Npj+b9r/KoxmLMEq6soqgwMZLNlo2W0JA7kmyFNu7R6Yy7li/pptwOa4s06poCnX99BCA+28D3pjDRvA8CBOZiXhhoV0ArLcm7wq8/D4rztKubeEcoreVjsM95V8lIO8/YmmWbwzZqZeh17cPljcODvZUfvPtNaXrrqD8skbXbeJI27Hx3dqa4wexb1fTdtMHLMb6m7Exhw9IFy2ctiMvwVhsv2kbMnbeKftN244f9CCiQTb31RsbHsVYlNa/11Cm5AxfzNBxL31dZRdfjsLlYCFddPE0h5SGmulf37wMla3tRnYlWf0LshOVsePY2utQxuURpE/ewu3tFLpmePTdndwRSLkAbQuCCWwuPMfrzBEw63Ax2Trv8rfeawJGCSoUMszzvIpJOBixdg92ISJymskRcNrbzMJUkzDqgGZn6oKDgbv/oygp/bI5ex5sylRT+xTd+DwydR/ul48OWI7zvzk5S29uV7bGaIJVjnZQz9B8pCtbwdXeHiVf5jS/98RetlrbxZG4jyVF13S27MlU1jdTCwFwIzV87eaDmP8KfKTJ04u8R+o7iE3o8hZxfHkoukxGYUyP/I7RMHexOFrTV225WhH0s2z6/2aDZLnPo6Nx4sKC45SiDpMohQv0/4OT7nneemNCSkNZtW2JBw6iKqebDVUGIF62GC9gr/X77h0oswO8vKridfVeejdtDldq99hdr0Df+dA7fenKq9xPLE0iCRW3Rd5TKGyauVnb6R0vP8gRkGVRnFWtuX/Y3t0fPh5+GZvj9Hs8d2ladXUUJ7HYHl/q89+rczjcpaa43kTyqkYsbtABZ7abvb4f65w=
+*/

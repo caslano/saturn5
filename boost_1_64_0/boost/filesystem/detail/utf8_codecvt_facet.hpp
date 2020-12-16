@@ -1,0 +1,28 @@
+// Copyright (c) 2001 Ronald Garcia, Indiana University (garcia@osl.iu.edu)
+// Andrew Lumsdaine, Indiana University (lums@osl.iu.edu).
+
+// Distributed under the Boost Software License, Version 1.0.
+// (See http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_FILESYSTEM_UTF8_CODECVT_FACET_HPP
+#define BOOST_FILESYSTEM_UTF8_CODECVT_FACET_HPP
+
+#include <boost/filesystem/config.hpp>
+
+#define BOOST_UTF8_BEGIN_NAMESPACE \
+     namespace boost { namespace filesystem { namespace detail {
+
+#define BOOST_UTF8_END_NAMESPACE }}}
+#define BOOST_UTF8_DECL BOOST_FILESYSTEM_DECL
+
+#include <boost/detail/utf8_codecvt_facet.hpp>
+
+#undef BOOST_UTF8_BEGIN_NAMESPACE
+#undef BOOST_UTF8_END_NAMESPACE
+#undef BOOST_UTF8_DECL
+
+#endif
+
+/* utf8_codecvt_facet.hpp
+6qpryZ1l4S3Vf4+Le6a6KW7oM+i4vwSi653UGOJ2r3SytaBNj3NYxNkt4mwyzvqKJMwafb9WoANqUkOVoQNq6JpdEAoY8q3fvXIl0mDi37OS8nYnP0MaWJOMyQHKKWmnSHAkrWQJ6KbZXBa7WhaLOLtFnE2JCxUcS01IbgwUjzePor6xHqGuZ1rW+1mylqufWClW/G8FAJwBzjR+lupD7vLO5qjKyiSEr26IY7lsQFUfhEpQuQ1QM2vzXA5U8MU1BnBWLYAWXKC34HJqwXuXW7Tg716DFjwDx18aWMaRNzQcDfbSKDL6kBi+nAi2ELKVQ5cvrtEX2MkmptAwPkygA7XK9s2rcOJKJ3A+sBC0vj/7vG0E+8tPoHqwNHkBeU8MbdLVZTghU7ED25LERAOJlv2wtS6RWvsqpFh9nteMX0CMSu7y9vinsnI5z32eMXeKLDOXyrvzkLO6KRUqtTZlVGWijYlTSHe1owWogEtsBS6UAa+YAiPkapchqbkbCAScD1vzou/hhT7sIINdhkcqjHZUiOnifZh9Qyli5GdQgDoPLqQS9NjfENt/eJTaVHkFbZUY2tQ9+4JhIrkb1t/kHeIgv0cs7ys2xbvsP9sU/8vvv/hTzqNXfRT86c+jq+f/P1LWg+VbYzoP/d7fTeuxHV8Fo5+H1okUs/PvRES6/jU4A/baECTjsWBLD/K9qEtddpXsUlfLLnXWK8zCZ4Sw8GG9Uzhsgw03O5uDJ2k3fiiE0YC8y6vGJSVTNH0l+zBKdmkHm7iDikZpgLSzgWgUsO0mqod9r3CwuwBMiT+4g8fXkCM1IuvzaMM0mjUcocsvglG4CqyFAntFMlj/yuSzKdNvXwgabnforJiL9fwrV6QP0uq3oxWJnCIo/aMveHp7cmCcTNHTmGHDsfuYa8tP1X81Ke3v8JbY9BFzBRJrGw1ZPqH1vfwAbZsr7pmQXCz+ktlC3KET9iJhtD6Up2Hy1PNxL++WOUX3b5Af0Z/u2mC0DOUJunZtyTHW/DvGnv/8o8+/xf7HB3zn6kF4U7Qmfb4Mxn6/zSwigsYZhvFDS36WWn8tp1uonQ9qB3mDCtP/ekkWpYJ66BYx/daad3Yz+Jzc+l00/Y+/Qtz5+QEMdQFIatOOUQv/P7CtqdpfizJQ7mdydzoexTHah6D51N2gXUlu0KaR7VcG/rH745v/pdiqNP+dXtwLaLy8slT6RquT42U/GE6at3PA8wmwgAEuMwJ+1wiA+Er1uQ60d+SdZCBi/powuzHMNCPm04AZOpfQ5gJa9aFehLSUkD70I9LlRqTfI1ImQl1OUI8zqFIj1CKAotoZ9/hRfJRj+Jma8553W+yfZGnxj0eeE/Xpfu276nQfconp3LcQnkBKUmMHW8C5Ar68Ez6yk8xNuoY6BiAC9UulojOGnsd5Pwb/wG7M0Nr/lVv7jdDqtm6/i8ji+Bkz6ETtoZfPoOmUgFANuDRARHss/qjkfnpUe4F571jU9/Q323Z+tzsRofOxBkrXNB7V+d3n9+sEfUaK3RuDsfpvriIqOm6ihd8I0Ll98VwH2y4Lf15ewje4FSrCU1jVE58EFNKW7YAEoLEFIsiSs4OYSp3snb2h6W2+Ygktrqla8oV6JMkRehZVnJS053Y+cpHvUo+WdxdFZEELvY3MC+hAWFa1J40d9RnF3tS1qFeb/hR17CxcPOcHGvMCdqYwBT8lW7XgcfCtpcq/b7fSH+Y+FnU/ZS9skxr8Yb31Csdpqz0P//5GemnaY2+2Sq8m/sAuaAkx2NsPJMraogeChusvmPKjD42zZ18qpepKOc4efgYG/wNSHMZPJE7DpjG9OKAMpHmyM+Bvxxjtx1vpGwI=
+*/

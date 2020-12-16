@@ -1,0 +1,31 @@
+// Copyright Sebastian Ramacher, 2007.
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_PTR_CONTAINER_SERIALIZE_PTR_DEQUE_HPP
+#define BOOST_PTR_CONTAINER_SERIALIZE_PTR_DEQUE_HPP
+
+#include <boost/ptr_container/detail/serialize_reversible_cont.hpp>
+#include <boost/ptr_container/ptr_deque.hpp>
+
+namespace boost 
+{
+
+namespace serialization 
+{
+
+template<class Archive, class T, class CloneAllocator, class Allocator>
+void serialize(Archive& ar, ptr_deque<T, CloneAllocator, Allocator>& c, const unsigned int version)
+{
+   split_free(ar, c, version);
+}
+
+} // namespace serialization
+} // namespace boost
+
+#endif
+
+/* serialize_ptr_deque.hpp
+Ac8my7jmavf3PWWC9Ul6xmhsVZ2WuX71/XxD1zck4oG+kLv+ltArGpc1NNVbMx5p6MN1PxbN5mG26mOl30xJZQ3JaSKD8U5nPTmjxZxX6sLkfo9K2x6x8/f0dnU5sjc6pQ+ngl0+1upHs7u+fCH5cz1Ocp65g8oH97Fdmjq93c468l1zoCwpS5MHt9UXcqS87JjS3pQLmZ2ajhemml1nWto6TEX5R1NnOnWUyZR9756GP5FoqrwWpc7PlDtjz0g3tq7i8Ghmah+60C4rHS31RduWpI2alVqGRiY1u1XayDmj9b12bXgkfU+LTqeroDu82MvQuZ+QlO+9DY1EM6lKR8bmqfUVh/1SZ+UY5ZTDO39iVaKY06Rkf5Wjha8KrXLTtW+DnuSD16JzlcFK88gx5pu5dUVw4YYu19Hbs7In0t+T1MmFht4d9CTr1hiauv9n/JfkkZIWLtPEU/hXa8oUXcpsPfTWcMSvkBU+sz3Q25VS3jDasmGNJH0su99O2O/MpdGUR7kn3B908EvT4P02vVM10RmXc1s82tg149rs9Swxfesy60QxKcvLKKvjtKVKOUUDiSQvlo+2fGobKbCYgXe2nO9PWYO3Fl7Qr1q8nmijd19hu/3KFlYbAyn0LADdri79sRy7TdQxUp60hx2i7IdwYaepp7RI7kd4tMvnUC55uZJyzleTPiINJtvkmN1mH7SgC3rE6EUbDEsIW3CQPcdAVzgQVz0XJffnSHs8LlbHE9Y26HW4y2MhNRVTweFz3PStvFqR6SSiZ+1JX8d0ZCol59E/WmAn7eEDid6YYxNXUc6zLrHeaEKUmnm4MLzEslImBsQYbpxhj3MIdcLFAZftccoPde9rIuIvr3Ns1+GWb4Yqazl6eKSR12hvIi5l8Zcpe6S5kJSJo01Zijz4OwPKt0/50Tr+SBf67u7L8Eh0ZXBqujqyK8Fz7Jg7BjE43+HHsWnqFApcdw/7ZgITjaulPB8/WuDlcDApC7+RdC0vjb4y0ecplEOxitB5qXen6f0xQ4l9PWNQn5UpfZ5FeaXoU8rVamOn+mPhREgZKhZbTj+y/zU2HzjP8PojPSFOoaROn6flLqhNnJSLCwRdtxVtLqJMLwSvGgsMJOXlEiHnuqGZj+z3MtOvLLbLfm/a24HOKqEfV6ToKYer5SHcd8izyfKydsIbxxYdYuuPunNgtsFez5VmD0iVF8k9u8ruMxjuCMWd+teY+rWVfnVBNUm/1tjBnnCwON7jGey/2D+JTe5HBpVNkfx5zcRQ2sbiGOReXmfPJyFckmh7vZQl7ZicshuFXzHLR45MmUuORO/JsW+220fa4tFw0HTh9H+L4H+RruTZRFmom0sDyT2fYcoscipevM0ua+uO6hyAkId1RgYN6tJRXlzM52YpZyxJ6s3N6ddb1ryU9f5gHad8vcA9phLAx5GFO2z84cLHV450cAM2t0vu350pmCiVF3+Q+yfjSOkroUsejSAnLgC/Lpbj3UWf5gzQRqI6x/Zn6Dm03WprYkSTd3tgtJV77Pc4tIegraDezzMc2iOjrbz55Q0WreBH83Oc+swo1nieLJ0rRzd+hJOjc+b9LGP04a+CoA39jLQoe0bLRaQtFMeZ8dCa1LcPKaPJqnDCWueX/PsWeDeJsqGblUs0SSEmmjrPSc48Bf+/VvaAXlQsZFrqSC3PsReucgfX/4Myk1sUMYD2IcB0asYd+rfK71SUJAskvdLrS9LzBJ3rUGXJAngk25RXJUs0n76HtpDSPMq33Fw+YbsG7+du6fjET+GjksbfiRUyx7jzLAZZB8ipmjxcnsjJRCNcvONun9WVw6dh/Iyv1Iqs98EefytBV0GvW08=
+*/

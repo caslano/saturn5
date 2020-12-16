@@ -1,0 +1,28 @@
+#ifndef BOOST_ATOMIC_HPP
+#define BOOST_ATOMIC_HPP
+
+//  Copyright (c) 2011 Helge Bahmann
+//  Copyright (c) 2020 Andrey Semashev
+//
+//  Distributed under the Boost Software License, Version 1.0.
+//  See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
+
+// This header includes all Boost.Atomic public headers
+
+#include <boost/memory_order.hpp>
+#include <boost/atomic/capabilities.hpp>
+#include <boost/atomic/atomic.hpp>
+#include <boost/atomic/atomic_ref.hpp>
+#include <boost/atomic/atomic_flag.hpp>
+#include <boost/atomic/fences.hpp>
+
+#ifdef BOOST_HAS_PRAGMA_ONCE
+#pragma once
+#endif
+
+#endif
+
+/* atomic.hpp
+CcayBzV+adKH9BbCQbPfWWdiu4u6z8XvwA84F06GaZktpG7X03lfB7Dji/wH+0B0XEfqfXM491bEqUosTHfpOcfYEzRpXR1+Ey0BrWIBXUrYy1+s+NEcxfM8aON6HYYk/x/Ivryk/h7QepG7Y8sq+TvV0Koh0v9kBiXJhn2URfePTqBu0yiYmvsCausLnm86FAY00nsuvUe6U1n2wmSyOzNkr8ooHDhY/sQCgCMKCgyyY5WYhTvDT+eazSckuKZ7cJweNy9KoayDlujv7cRPQiaqrEAnmLbwoL+fW9oxHzq4HWqCCNslfaiK3icm6D7Syqm4UvHQO9YaP2f4+RvpPFB8a5L8G3qhZrKXlP16vbfVVeTqJP1ZXoMk6fxmz1hhPSfTwa+a/YoL9T4iD6mDFbX+LCEpG0cbL31APG2o92E39d5nG0wzx9Huw3cQ/7xP2YbfYbV7p/yJl3Se/q73ZufJtn4ClyHaUXvnyT+0ghp/6AywlIPEZJbWS2OwjcX+Sjd9P6ONvWG83ufUh6SW+J3/SX8fP2T8tisAnydc79f0uDT4CNgx0Tqv0vTeQuuvRi5Sn2MAbdNl7/cHRC9GoFPaGo4FtJ5ryZ45bsl+W6/3G1LtK9kCLo/U+7Xpzsi3Vfr9ZsXzqoOYquu97zSd96ILk5BTxS/SC4GmSQd2n0kHj92Ec1cFh4pIcGOdSHd0fDWKR4I2vvL/2cgfO0b+pgQQNcV+QTPpz3KI39+KQE0/Una6NmVGueTf+ELZ3rnav9p53RbJf/rGGX6/zvv1gMaK3EYt1/cu0l/2y43WL5lUT1kiB3YqXlEZbBm9hGmmW/K6i2I26oKdvra7cQviB0cVLyun87mV1t8QOnNET8g8Xml+X1IWG0CZ7z7J0oS6cYVJbVqt/St70O82/f1DAYg79tT3UWqtu5niKboSskL0fUUc4nZ+JH/TPerGyjb4GmmOfPoOLe4FdW1ry/5toPlIA3R7YEV/Zbql6TOyfFGKh+ZWPOXX+xI5er7kp912HaRvHGTs0x+BPa3jJs4bfi90J6/11/c96uVisV9XV/6Dbnp/L59lYwVaCorB60OWel+n94kXYXU/RvevgZ63nwUYl1vvlaUBNMyPuDvykAo4C+ezOocexIKNUQR6YB+k6mvQeu7jrvfF0E1sDQhqS+M2MkEb/HpvpvcWtrn1frct/PJ7msCvEKmiB0g9iLaWPWMEPylAD5dL/5tKan81W+qKs8Ff76ldFF/1BhjpGpvuC7/JOn0u/6b7XIq1/yC9v5LHYWgPqt1cJ/9uG8U/NiDpswUgsj+RXabISm499bkmc2T7Ot0fU/X9lr6A2vEdMCZB9luYBfzqA5YcJnvOWfppTkao5jDFp70VD5CReVRT22Wu7IWlcF4u4vDjikd5kN1hovujEMTrCgBm6YS70FD7rTII10CIl+YCeJQjW0EmY8+dZJtK3dqTrni3nD+LxLTIWMXpZFSn6ChIbEkbaUUUn3Zx/sv3FVreW9PJhkWawk8vqyPTqZa+B/C4i/wHp3R/6AOmhEW08U6H7+YTlK0ro+9Jftf+2E12akmyUfGM88xb8kfoFWE/nVK1Zsi/O037Td3yVj+SK5Daqym7/FPrpYoj8jVTTLML4i7pJ/mkSj6cB6ufY5mKpEu0e+qiFeMni963jc4rrSaja/KPnwJ7Jo++h+0k/7gupSmSYJY428tsrjICkCUxxrpB4jFJ33/8kL4rq7yLUv11u8QpQFZyuvzFMTAd31f9jdX9a0fZrGjFk3MpvjqENq4oDBioo6B4BojdFWktyJwxGD1V7yf7Q9dLq7jkVvk7y9CusZxTi2X7nb0ICHmE9M7N6PQ=
+*/

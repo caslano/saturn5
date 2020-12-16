@@ -1,0 +1,62 @@
+
+// Copyright (C) 2009-2012 Lorenzo Caminiti
+// Distributed under the Boost Software License, Version 1.0
+// (see accompanying file LICENSE_1_0.txt or a copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+// Home at http://www.boost.org/libs/local_function
+
+#ifndef BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_HPP_
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_HPP_
+
+#include <boost/local_function/detail/preprocessor/keyword/facility/is.hpp>
+#include <boost/local_function/detail/preprocessor/keyword/facility/add.hpp>
+#include <boost/local_function/detail/preprocessor/keyword/facility/remove.hpp>
+
+// PRIVATE //
+
+// These are not local macros -- DO NOT #UNDEF.
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_IS_this (1) /* unary */
+#define this_BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_IS (1) /* unary */
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_REMOVE_this /* nothing */
+#define this_BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_REMOVE /* nothing */
+
+// PUBLIC //
+
+// Is.
+
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_IS_THIS_FRONT(tokens) \
+    BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_FACILITY_IS_FRONT(tokens, \
+            BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_IS_)
+
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_IS_THIS_BACK(token) \
+    BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_FACILITY_IS_BACK(token, \
+            _BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_IS)
+
+// Remove.
+
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_REMOVE_FRONT(tokens) \
+    BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_FACILITY_REMOVE_FRONT(tokens, \
+            BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_IS_THIS_FRONT, \
+            BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_REMOVE_)
+
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_REMOVE_BACK(tokens) \
+    BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_FACILITY_REMOVE_BACK(tokens, \
+            BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_IS_THIS_BACK, \
+            _BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_REMOVE)
+
+// Add.
+
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_ADD_FRONT(tokens) \
+    BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_FACILITY_ADD_FRONT(tokens, \
+            BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_IS_THIS_FRONT, this)
+
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_THIS_ADD_BACK(tokens) \
+    BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_FACILITY_ADD_BACK(tokens, \
+            BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_IS_THIS_BACK, this)
+
+#endif // #include guard
+
+
+/* this.hpp
+a9wOtNS3LVyu935/x7itZKwkxdJPsoT1ydMtxu0uJ8s+d6iw9vdVGvzBdTcr+lOsfSLC299Tes88Ytw32vov3pne9xs/m51DqMUJGNOHUZvfkl6+D5OyH9k456fEvsHD/ZGimP5Lrq//UvEcTcufomVp/5/ssjTloOi81sUsJj/rf6qwPeYXnOHuHpbYNxVxRX3XvPszvyP9MnOz8j1aMmEUZg73NjeuTDCn8UoelP8WucSEG0o7Dtj3HZRMiOxd89d6EfPryocVUgCfw03VhDPhPO5rTfx3QYknH6zyTn2ufW74R233prj937Jl47KvGrdJgVPxeUIgxSYfCJ/Yt/CaHxMbo5C/uP3UauZe6gQaO1Vsz73Cx3/uNxn3fPvcg8qrvkmjpmQVI5/Gvov6fdTr524x8YyL6afmemOinU2YLY6Zb1C7HyG50drXB5uRwTokyRKX96f55xrK1gen7ke27NsXkS32dibZonGAop81DmPmW/dFy5YXfXb//EDK4cqg+jW9MavwU2+npS1PmjqjoLi0/FiB6qOpCdMR7ZSgpQ0rTtV5d99YQaTNNDTuPZwu9j4N4a1tztKO5dfXP5iiuf5zMhLv/1j6wxp3Vb5VN/6y9/eJ9h5eXm7/jfBF1rItycktpYQnuiJwVkIym3hsYy/WspNfyXe3LH6efLd9v/vv+fPWJjwzfuF6OBM+it+Fce552tT995uWmbBDg024k1EY654E9rLw5p56feG6XxKoQS1kOeucaoF2zA/VZC1Qpn2fAktb84+ZrDPurYMdnOq29kd4u3xrKrlzh3E/NdiU3I/GdAuGHN8caTfH963exeT9Reu39Ps7o+dtUvDrnz/52Lg39M+/hnVrNCdzhPG/IVDRvM7rO/3zOv40NOdi3JsEK5rX2bRTYfQNv9nYM4MV6QWtNH5OCkbJbt/czzsmHzW9OaoMY3/PJ+uLz3R874sGxn1r4HiegXpGJux/zmeaGDE/pFduPmfLl6kJfWefVpFckUw//ovoOZHCGPslMfa/yL5O9rpfRtv7xthzYuzXxtifxq74o575xu0c8/tI62636x2y/hvLMz+F/bxycici5gqcRPum31jfG9742lbjvs45Wno0aWYMSuHI1XhnjhefrlfYd0ndbXRBsVexPduEtzzbvu+RD437S4x3h5znMGXjRzO98bEsk8Ycn9ssr933MG5F9m8eyZ9tJo3XuOeg8wKmPW26Rpw2PTOD2LWPSadKfAddtzuxtpvIOzHSd96httIKozX5zsKOrifLvIWJsty4kL8NeGMFVUz4Q6zth7h/8biQ/x793zipHcqPC12D315x70fjQrqP2HGhQYSLPy6keL33XPlxof64VzQuRPhfPC5kykL59skv67jQhg4x40Kq7/WBeOXjHxey1/WbhLWPC5l4f/G4UGxdD9G91NPC86Igf6uP8xf87novNd698B0uYeefdKugr5PyPnGxyLIHsmcsxnaPpGefc5Ns+LdxPy3YB9+5GFs7UBz+OTZvH7t3TR5O4h47eH2Ap7ak2ufZFFe8ebbuhPPP1+0jbus8m+KpaH5skAlbL9iA0JZvSoWPP+eRbsIP8veFcjr6xvzHmLw+7CyXHl86tqO3Su9asvl8E8cHYT1DxWF02eV/jXFfHLiR8Sh/Op196Tgmzm6kUkvpYDPXDvH6ZdeaeNYF/HGg+OL1ueYb902+OZAx3jdtqerPlqd4/S2zf6TxNyQ4iGfnAL1L5lagFzPSJzs6YvCr+Yno90yD/bxn+mxN7D1TmTnDeN/F974f/V38WYw9bUu0/dYY+5uyfyt7cGu0vaPP7n9P7OhSfizsSvyMjy8HNRZm/1Y=
+*/

@@ -1,0 +1,42 @@
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+
+// Copyright (c) 2014, Oracle and/or its affiliates.
+
+// Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
+
+// Licensed under the Boost Software License version 1.0.
+// http://www.boost.org/users/license.html
+
+#ifndef BOOST_GEOMETRY_ALGORITHMS_DISPATCH_IS_SIMPLE_HPP
+#define BOOST_GEOMETRY_ALGORITHMS_DISPATCH_IS_SIMPLE_HPP
+
+#include <boost/geometry/core/tag.hpp>
+
+#include <boost/geometry/algorithms/not_implemented.hpp>
+
+
+namespace boost { namespace geometry
+{
+
+#ifndef DOXYGEN_NO_DISPATCH
+namespace dispatch
+{
+
+
+template <typename Geometry, typename Tag = typename tag<Geometry>::type>
+struct is_simple
+    : not_implemented<Geometry>
+{};
+
+
+} // namespace dispatch
+#endif // DOXYGEN_NO_DISPATCH
+
+
+}} // namespace boost::geometry
+
+#endif // BOOST_GEOMETRY_ALGORITHMS_DISPATCH_IS_SIMPLE_HPP
+
+/* is_simple.hpp
+uBXvUomXlRQfAW8jJ1hxyFd76LCemdakZqZ8xLq7mZkuduuZCfHO7uK7m7nqC9InrnW/sCaubcZqf/G6mCm713UdPqPFXz+eZ90gIup7c/O6VG1ep/qv+VeoJ33w91/2l5L30Zf4n3tV9k6U/oTowUbsWISBtrf0WbNgkfBQzlR3MPmLGNXKo+pptzAiUqiuYd6ICb9oZ2ljSq5H37rzXd0tMvC93LNb8hcr26WZiUkv+xuU++4aZRhxZ0BUKtCcnhTGcCphjALEN2rO44hUeGRgGAIVeOYlagmszgYoOW+0xl51Rs7n16DYEWf0I82xQr0IG6uV3IVtkCv+l84kJCN0qFOHzkaowPkepTTeoX9WmwI41VD3xZaT+UcD4/Hlojw1T6OBYM4MljcUMvAL5sS/CZuEWxWjktFxrrW2LcklRSxlCRMj0RlwvhApUL5YTuzCuOxCOvoFy1fOEHWt5hgDUI6ljvrqR7WkRV2j5Kv03dVsNL+Xvu5en0zdLK7c1WmbCXuDZsIKU6ablduR1x3KK1whfUGpoOccYs17ootBEAdyYw73UAYvGEe6AIT/KGXtK5LSFuBbZaOeKVJDniuX3VFJ6IqYK9bhymuiMD/4t190BSt2zJoddJvB4h1VILkZZA1R+9f8eltn8gzyLUqTyuh6LgfNdIR2uIzmMW4ELR8huqx9pYHVTaGKHdEBYMj3/qVTDD8cX8iuqfTd2ax5Y5X1DbvdhA/lKzFwA60g0+Ek5eZO9s/y134xSYg3wMsXkvS1UT+OPLXcIWIuI3yLxTuGUtkMGUu8TnXTFa02FpJKKIFyPaWmMlzu8yDmx0Hsk0pE5bTrbH41bU8nLnUuaoyUYjmjrMqeFQXaQsYo5Y/hlw+kbLPWmR/DRRAGpHLyHtYkTv3r0iSL7gllpgZtRKUA0ZwUGD4sFR7pV52aFNT2ixLDxgylVj8a1UHrGHWbH7kZIc0xRvCvOTaTAwl/uAuK+Pk1JJZ0RkNGc2oGYZcFVes42VTaM8lFzwDDjGTrU/H2nDIM8WihLuEfcmL/Pv5Z9FDxitCDVmj1GzvCEDE0aka6Qahj+ytWM96L5L3AV3c/TxXGt0vc+KEvgzsFEL+1Swzg6sXPu5e+gfJLRy64CVnPRtLysUXzbqii+JIx9mzlGcG2mu+vOcLHKl+g1V+xet54Y2KJsq6v83Yxsb/gjIAx9kIcbGSsQ5MCVyArgVJb3FphVDD8PiJXy3+83JmmeRKbW+CK9hBhiuq6lM2nuMy0S2RIjC3oHxlY8/UL2f6V5CeKLTBf1Y6OfHNeGwkFTtmPzqf6aE0n4323PiZlYMI1H4xZ/miiPi1Vi6KVRKvYHIhz6QZN82Cl6a/F/Poiyp7XdLI75uWYN+K1I8v84iLbEfV5tG14Ng4CuILUC/9VqAkxg0iSWP3XdamNSW5aoMj3lJhSwO7DXyZHIZmpY50z5/W2X9vLWLP9NhJvT/wL/pS8+A0vqv6hMDEEFyOX+n353pTceBBy46LaGjT6j7QN4tMw/wiyUmhnEuFpYuJESk4oNtfr6Pjj+UpAfJnzpOTExZ6q1lfa3mZtxSwDqtrhIrRztA6ned2OzqSyPqp2ZfT5gl/4sBmSml7Ml58CoctaHlT6QuaDuOmgl98V5+rJtEC5lrrq56nJ9EHz1ZscjvR8enjw/T3qHVnzR+cLAltNORfENBOx865UFmEDPiEbNHFQGhynChxqeJrXHhYQRq34sAbhGrUefPdnKRBeMc8UEN7z4ObgtO+i+NdFgrzLK+0ZKLVUOvlbL/anTZ+C1a+UvuARxl7/3gjEl3O8VxttzTUj9eIB6SgYAcmhosb8LwTiDY3KE9k=
+*/

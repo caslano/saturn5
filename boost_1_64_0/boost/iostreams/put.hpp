@@ -1,0 +1,21 @@
+// (C) Copyright 2008 CodeRage, LLC (turkanis at coderage dot com)
+// (C) Copyright 2005-2007 Jonathan Turkanis
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt.)
+
+// See http://www.boost.org/libs/iostreams for documentation.
+
+#ifndef BOOST_IOSTREAMS_PUT_HPP_INCLUDED
+#define BOOST_IOSTREAMS_PUT_HPP_INCLUDED
+
+#if defined(_MSC_VER)
+# pragma once
+#endif
+
+#include <boost/iostreams/write.hpp>
+
+#endif // #ifndef BOOST_IOSTREAMS_PUT_HPP_INCLUDED
+
+/* put.hpp
+Mz4XPqbx8AT8DXwaXq3316r5Br2/Q+fxbtP7B/Xem8f7vNrfDZ+Br8Jn4R/1/kO9/1Tl/qb3B3Serxv4d2BE5+9W0Hm7FVW/st5X0ftqcB+sCV+BtfU+Tc0bqX5TvW+m9831vrXKp8OPYDv4MewAP4WD4edwPPwCZsAD8Fx4EC6GX8GLdV76pXKv5/9632b6TRjnBM7/1XnyRsthTS1Xao/vEi1PFnvz1N58LTcLAvZ2qr0ki70lam8prAGXBc8pVnv1LfZmqr1ZsB6c7dvTdimsZLGXpfamwopwWsBemtqrYbG3Ue3drPXELQF7vY9g7261t03t3QMzys9LKT8v5Uecl/IBc1ETvoqY7qhZqPWoh1FvoszXEZOG6o3K/Pr/c87qLzT+n420OwHgJ43/N2R/5YbumXN93foiOq1gSl5bcXyie8CAMTJHII9KuKv2YGjbBf3oFYPKTcaNCt54i46wjCBIo0bxKj/63vnBb/F9Id3sQvfkGIJ62u0rjLrvenLyrBlzZECHD082qon2lTRuon0eOr5wpcg3svcfVij8doxNlnEW2zemL5foyxXMkYeLnO6FIzKdTW3j2Md0KhSOwyxM9vcPsY/ZVDjy2YZ3iHm8vw9/PpoFKJdzy7D3itcHQlzJd6p+x+q+tFOL7lMbDKv2+S4UffxfLM2Ga1GvpQ9L1TTbbUmzGdEkC6aZNY12lzGNdpeeRtb02H0M6aGy/ryNeTWPvrfjzx3HXv/h7hgj1zIte0vl/EPaYH4c0zuc78ezv0eXYzAK5NevRP58M6KUvSA/D+ZBGRedlT1l0ixr3H9ujUt7vPuymu7BfSBTYW35zhzLt2DIH4NeT8jn4+kFqOvc38Ky5POY6plxJcc7xkjcEh/B8Y4IehpGHe8oNQ1Wa6XXTOumpqhLkE330yBadU5lw9G86aZ4GvjluIPIN7DFv7rl+HNDzqnpqbKPvQfDGfR/K53fUVUtVVH/JxT1v+6XWsL/Nv+qXeeodfzR/JakE6CeC0f99zQ8H9mRoaJ+m52dOdHdPruqX95z08WvOq5dLeLKv+fY/CpuaZ1yrtgdYs3XKldqGbpHzLuHf2di7XtZh6zlwh/7nizmW8N1nApmZbiCfY/rkPVd4I8zzxTzO8NePGDe1ouHFPiOxMNw3VfTMXtixM/UzUnixue4ca64cV3Ajbm5sleiutFS7BTY3dCx9V+LG8sDbsxua9SfBzG/UMyvCFfyzc8unIMgZhPC682DIUk/7r6XZ9TSel/nT6l/1op8ZvhFctuX5qyQ56+pYYmLUC1zXqjQ3hT/Od3E/FXTytRTPcdM8+0sDBX6PXP22W0Lw3+pyEwztucE7eQE7BwQmSvVjvecO0KphpgoDJMklmfn4ojUfTY7gfBk+vIbYqJtjpQS8uNCK0JJ5hXqjnbItahJGvpK9r8VdW7NqFqoamuCKPntmaer/okBPZVTs6L6reF5qK/x4FcpJdwJmglbq5mnf2b1ou6dKNTfWvclHGWMOxJbos7X96zWEVrnnyt6Q7S+D9RJ9vew7L+/NSxumz81id7XjRS9bxdT9P6JwH1wLGW1/CfsYeSU+W49948qReo5Dn+eOyk/y9u33zInSPeqF3tp1roZN21zj6x1nspa5kNZ6jdkLfWjP5/majFfF1rqVDXXO43NbucRex2HnP0MMPveiyqvdb/WiYHnjjVunDd3Yniz3USOeckM8fdUbOfIXCm/7rtO3Hov5NevOm/BP3MnGq/h003YxIWDc/Fy/b2Gn5DnuSfqVDepPLMZyptXOEXsx4Y7mUmh+0LH++8Co3nKq5vmi1xc+MtQTHC+n3/GyA3yjHdoLYTkbIaBcAw=
+*/

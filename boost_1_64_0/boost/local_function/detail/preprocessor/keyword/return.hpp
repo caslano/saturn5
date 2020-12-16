@@ -1,0 +1,62 @@
+
+// Copyright (C) 2009-2012 Lorenzo Caminiti
+// Distributed under the Boost Software License, Version 1.0
+// (see accompanying file LICENSE_1_0.txt or a copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+// Home at http://www.boost.org/libs/local_function
+
+#ifndef BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_HPP_
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_HPP_
+
+#include <boost/local_function/detail/preprocessor/keyword/facility/is.hpp>
+#include <boost/local_function/detail/preprocessor/keyword/facility/add.hpp>
+#include <boost/local_function/detail/preprocessor/keyword/facility/remove.hpp>
+
+// PRIVATE //
+
+// These are not local macros -- DO NOT #UNDEF.
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_IS_return (1) /* unary */
+#define return_BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_IS (1) /* unary */
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_REMOVE_return /*nothing*/
+#define return_BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_REMOVE /*nothing*/
+
+// PUBLIC //
+
+// Is.
+
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_IS_RETURN_FRONT(tokens) \
+    BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_FACILITY_IS_FRONT(tokens, \
+            BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_IS_)
+
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_IS_RETURN_BACK(token) \
+    BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_FACILITY_IS_BACK(token, \
+            _BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_IS)
+
+// Remove.
+
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_REMOVE_FRONT(tokens) \
+    BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_FACILITY_REMOVE_FRONT(tokens, \
+            BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_IS_RETURN_FRONT, \
+            BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_REMOVE_)
+
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_REMOVE_BACK(tokens) \
+    BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_FACILITY_REMOVE_BACK(tokens, \
+            BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_IS_RETURN_BACK, \
+            _BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_REMOVE)
+
+// Add.
+
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_ADD_FRONT(tokens) \
+    BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_FACILITY_ADD_FRONT(tokens, \
+            BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_IS_RETURN_FRONT, return)
+
+#define BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_RETURN_ADD_BACK(tokens) \
+    BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_FACILITY_ADD_BACK(tokens, \
+            BOOST_LOCAL_FUNCTION_DETAIL_PP_KEYWORD_IS_RETURN_BACK, return)
+
+#endif // #include guard
+
+
+/* return.hpp
+4ZgJnTqX1cMFxr2GJ7v/ZtIvDVhlt8olz/hpVL4cJNufMm2jMOhLM9ef5jNfR78z7zbh5wb6IOvrOpLzMt+nGxNP3ss9Wh5n7kce1/omMXnsl7+1YuRvPYv8feWraHm2E7tfXjX7Otr96K+j3S+JsS+Nsa+LsX/4tV3+nXlA2flZDXR+1v34ydphkX/5Ewor6mP3NWHWhY6jvZ1rP0eLeMv3sQ9WXa/+1HVrF6hO3/VQpMQtPImrmT0PBFp4fe6JJnxTu27pjnIy1esjH2fcXggeyOzSy0jCwwL1nT6YCYG+zr2BHs7uwCnOEPrG+cEjnTuCde26qDsq7gcvMO4XhjoQ2qqfqvAx/Vzv3l4z7seG4vVpt3+mPqGepW+x+5+lESb8E6Fy/VnJwC+N+6EhW382Hb5l3Dtb+6O37lDakiNPG3s177m8w9gLQxXJyKt3+Pqb/jgkw28z9qJQRTLwBoWJyKwlxn5OKF5/s7Epo+qezNpm/GeFrDJLcvVk4+f50FRkTFPJmHX14suVs9UfxKgfGH1tmfyU+PqIJSImSh413488Cte5U1Bc/PP6h/HkUbVPouVNToz9Qex+ebIjxr39p9H23jH2kdj94W+JsW+N8R/4LNr9FOx+9wti7M/ILvlmziP0KxFH5HwLzNqO2H+wyDevyZaTcTZZRhySN2p7yDKrXPL7m2385Vrki83fBJscwZ9VDlm+veXXf95LeuJ6mrZ2xX1GtSvy6f/ukN3+3eGvl/HSi4+092aYV6iXbHu9SAwkVi/ZCdZLdoL1km0vb2vdZMeUd2kl9GIrU956jsuV7wiV7z2NlILWO/8bs4TyLUqpXr58zygozRlUVDxtckFeKVrfHJU5rTh/0tTc0oISvNm+ebyxmXNMfEsZQwrZ6sKkp7LTO7lomru0JF262SuN+xjKrhHnJ9T33oWNzLhiL1u9KU5//c705H19E+4A752zwvhtbKlXWzyzvHg6mHhqe/G8qngsdW6J51wvnhNi4vla8VieVcUTv39xpXG/EHuK9+000sTf0MTX2BdfY8Vn+S7zxjRnG/dvnJa0HMv70Dujc5bxt4c6pudFu67imHehf/zDe385+3l/jSe/Fb2/0vz9abUVtX09CzMla2Q3dWZkjeznmjgaW95xT5r7cJxvIn3iGHtqFdn1DjmZZ8m/WOrTQPjPj+Dl+Nn1k0VWmdvIyTuzIO+snPxJJXnFk6bwJHEXln6z6rXuv4kHLcnepPl3UqYfYspF8Xt1qmtx24h55E1cbwZOdapoXXEkzB+9eHStwnNna5h41kd/T+d0UrtzdVTdsprgtcNlxp7l9UXnmfAjYsJ39PJ0rnEfH7D1NdOMW20vrVYm7iZyJ1bjXs1L+2Hj3tzr56Yb9+eIO5L2BO8ZetO4DaOUm1nzbmSW8TPZ9l3rPTtB42dDIJtaKUsn1/v+n2jch/ruH5FaUNaPvUz3qDEN3UMDRkZC6BmOMWls0drrbbD1fsYtNU7J+yb8js9rGv57OuabdOMW1c+stZ/n9GEnsec09hlbzn35n6nnsPufqeP1TK3XM3WwzgM9CHM+fjJ/jP9MMelV7D+v8u5W3rPkvTcOM+Gb295Fijvg7RO0Pj1iEl9rSZpeGfj7M7vUkRmqObIhmAvd/kwF9zOtaJbvPvILSkrLZP0YE+4Ep779O1rxBnwypaQ4zycHhhv3wbTygL3vE1UWflmuskhg7wZTFuF8qz2ojSgvlI+3d/jjB9rre9cPcctHNe3Eretvf4hX14rXd38r68lUYl2tv679bfckfUx8iWmK2Ym51B0z/le8ezE9LFZ5ziiwjp/ofp404V8hzZAzzNqfUhr+voZPbt4=
+*/

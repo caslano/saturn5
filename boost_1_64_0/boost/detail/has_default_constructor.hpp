@@ -1,0 +1,33 @@
+
+//  (C) Copyright Matthias Troyerk 2006.
+//  Use, modification and distribution are subject to the Boost Software License,
+//  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt).
+//
+//  See http://www.boost.org/libs/type_traits for most recent version including documentation.
+
+#ifndef BOOST_DETAIL_HAS_DEFAULT_CONSTRUCTOR_HPP_INCLUDED
+#define BOOST_DETAIL_HAS_DEFAULT_CONSTRUCTOR_HPP_INCLUDED
+
+#include <boost/type_traits/has_trivial_constructor.hpp>
+
+namespace boost { namespace detail {
+
+/// type trait to check for a default constructor
+///
+/// The default implementation just checks for a trivial constructor.
+/// Using some compiler magic it might be possible to provide a better default
+
+template <class T>
+struct has_default_constructor
+ : public has_trivial_constructor<T>
+{};
+
+} } // namespace boost::detail
+
+
+#endif // BOOST_DETAIL_HAS_DEFAULT_CONSTRUCTOR_HPP_INCLUDED
+
+/* has_default_constructor.hpp
+IRUn7PodEQioNjp5QLURAKA3oW+jXQvoALD259RKNuOiHZPHUVRenhsi5LFVyEvV+yiP73kAhHQFCUDPP5VZh+ZoLgkl4KJ7ZH2JFT/U0MoTsC8iPvG4MORH4d0psZ78BbEx3dGD/6A0HvowpbEVaGxlFnwCpXEdpPF8M41zSPyq5xG3+GZHwLKlCHq/le4qeiCG5hlR1lCUrw0GlAeaUU4ClIcQlJS7/Wnp5+dRCrf4GQn+ESY3YCVBNRHgjud6YTFvCik1xXHSuqTeKeEO+M4LDOpvs5GhxA3yS6ff/OsusRBrjXqDYvI9kCB0R0poBRJ6kJnQ898lhHa5+A42/6e9bLmpgVLuNXVDy4E1nbtR9Xm/lKpPQ/TM+2l7h9kSPta5O63zoVKFTJRBnXVQJ7qdWPHE7xl3VZgu11nDH7m2lckJDah+XNSRaJTkJpTknOhFj0Mjy/DjwwHvzIck8YcgEBIx6WsgwnvOpRxTSzGHgahdBKU9Qjl7f2Xg7FgzZ1u+Qzg72kkq3qNmXisNNt1PAAUBUBW7R0tyJhGBDNiLLnqMSA6TUjl4IsrUEazSLricnoQYzKCEl6+skNcOIlw98xjb8BUnnDcsYvLJB6EQHYTQYWij2N4oUXTwpgRb7EiLRO71O5KChc+mhS8pUUikCwqPE2PzjOp4yyrsKUzWQ5EmtHQhg9s06OrETsV6EnqsmXcZbf0NS1K0fj6RdsmuoMrXzLuSlvydBJ/FSBaOvv9JbxyQkzqg/mbqnpIR+zd0T+H7ysy9+f2X3n/Avcleen/v6i91/h4+4eg3FJ/pttNCNmlxoaBwt3BH4vqkmIZIDmGQ1hf9fjG1jEGxs2xT6hY1jqBqW41+A2SMFEON7FUveYF51ShzwViQFn/06d44qFErVaOzvEIHpwk1evh1kMsMfC+rV3tYj2i0hnYH3ytMRmL4cUWGw487Uh7bUChJfbSJuD+xbaWEi7zgZjLGWNqBxIeIoRn4zoX0P1sM9F8G9J8h6P/ttX7Sf1tUTf9Q3PIcWZOyUUHZ2CC2jUThSn5C9b5SwhePE5K3lxLiKxGISTXo3EnJZ33GWct1I2vfDgLWLgXWbkmMf5mylmY/ISy2rIR3zCEPxlaLDWNZzhavnBWAmM6Ttv1pbMn9vhAtWU8WZegwOIH2XTEyeCIw2Jaw/6+i0wdrNcnzBDbXGSxycJgjNxAMYHMoH98TCi52friNzakiyGUTS9/aYBnNsFkL9INq7xC8B4RooXFdygnmGtxWOvOhnmFkrFRqqKlUKxDGi5Gnhct/P5K16Rsw8PKZaPpG0fR3ObHpzysUTX9WYv5H5q50s/uWWEg0Oyk4ERdh+KSAbz8IQbvwcEWQdogvDL56dBsSjFjmLbjWKOQqCVZCRGIpKytRVroLgJVpwEq7YOWXxZyVocJyo8eI1vjh73oz26Cul+9TP5Xl20Enwd9Q2zomQdnZgrJ9F+MkeB8sYRZsJqMNXEYDTEYbWUYjzyjTSbWPZAyEoOn5nfuJgt8c2hOb5At+zxH8Tn1JmvTrJ/wkDbsm/MSyTPqVpH7+sdn0IKkNLir/hpD/OQn5fxFJHWsmFWnj7nSZeGoE53pZ29oq3xsnSA2JVh1OWzWaJ1p1biL+g6TKws2jCbbW9BP2H7aTy/1tWR6+9iOxPAyEsqn3XiD0uOxKXeacngtIs9IZczP/pCjaB4yc+CIl+OuPlOJvWWRIbHWCsbXUDSMh3A2Gu0q4GwJ3OOf4kvGfKyZLUxL8E+emp8xFQI8DixvdOAcqtMwj+yiCmxDBJWYEbz1PEHyIkVcoNZ7SHMFyv9ByU1UVXw3lbnKSu1A3nZBPhLCw5I/l9Ew=
+*/

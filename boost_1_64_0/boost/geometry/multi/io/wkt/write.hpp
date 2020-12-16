@@ -1,0 +1,25 @@
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
+// Use, modification and distribution is subject to the Boost Software License,
+// Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_GEOMETRY_MULTI_IO_WKT_WRITE_HPP
+#define BOOST_GEOMETRY_MULTI_IO_WKT_WRITE_HPP
+
+
+#include <boost/geometry/io/wkt/write.hpp>
+
+
+#endif // BOOST_GEOMETRY_MULTI_IO_WKT_WRITE_HPP
+
+/* write.hpp
+JZ/N1iO+M4A+s5L7iqamZ3xdvU5YHzneMtibVXe8IXvPlCOO/G4bEz+Mca/CWBFBV9EsLbWeaCeXuvN23H59XB85aqx10pWcZ3z4TgZHIiyTSjJipNPnZ+zFZ1t3RJZCM+QXGAM9yvbn67P92ZYu0ovrIgjbN3yrC14TUaRSpz+2znaLX4j+JeqodWM/WoJzj846Mbb1M7uew2S+KsWQN76rP5WuU9JB734OP7uKMAwzr4paenJ62kPcPrwgC+h3n9UHxGUf+stIEx7zlEv2Xn4sw0/gOBk3eK6IvUwu1hOnCuGftugjsQA8d8vEpD+5wWitfYThN5ApstpPM5fji30m1Xo4icmuQ+fw91k/AWz1EaKb5L4h05ap0jvhqXl/jvXma4IGanSxS/976nNDptjzXOvN4QdNkhXdPdCls9PnlOR9Qfu5M9wGdsm8yKKyIfq96Xgmzvdlq5+gcOFIG/rEg+m4biigLF+Plz2Xz2kMAQnXMq0pKxW08jtQY3HBGosGnnU4xXLwQQY2cwMODHuARTvJ0zzEIwy0e0vAK9rqzPmJiQ8TZ5U30BwmLWn5+DbcFwdLeg0wupV4MzahG8egO720vfUm2v08y6ZUYxYRXQHi5L4s/RLJFZL34bA+hGBexbkXZ1P5EMMo+9CyvdlHJVynYr9EbKBQgUk/fJyEls85o5tg/2AN+gXtY16yfmLezlr4lRfhnqwKIkpHt8huZvsXfOR51psmK70q8eMp9I3hH9wxU2fA87h8E9W5j20MG/nqIgVvyV0oTe6WcHpA38NnLH4QkBDAf2QaPzQNg0W1H2fMPvzGESu5hHKP89OvFHYMOXmZ8VLDp7eCN1xFe6I3fZS1p89YMWA+hP4Ub2UKwenTy9Bb/YzlxxYmXhHmOeMBwac0JFas0xlu68k8iBRQy7Wl8rlj+kntf8VoCqUIFEFZ1tg0+5cF6bSv/nx2JnhC7k18QXvygwGeK/o3e75FP/BKl+4mot+7DOjN5Zj9QM7N41r4EnqOSF8r7qRFczFiETCFAc3BMuMnQQBWHYdB5TF+SM07EYt1huHDhwiXfQqxHaKNVIpLT8JNJHXY4fvzHMMtEVNS1V4cFFNomwOxoP38n2/bFtIaNbSI/qRmbmlWrQUTt4KJFKKZBzHFzKQi6W1qH+/nW35/EQIIQwjCo5XR0iqkCMsNXa+XF/C3RghLgFtmYu+z9PG2bmP3Cyz9dxIFCa5fJUZ13l0qRxzfH84L+L2VFkEaRpnDKs53KBta//cCy04GLW0Ek5ODswC05GGgfYu21y1/phHD9+D7keKiL7tzBUStmNltvY4svDJNfQ+P3o4uexgdU2e0fsdZY4soi9zPSjm2MLD5riEnkr/QRyyalVc3iDFJiGa3+Eya91RnDx/bOsbDWdCb9v74vv19boowDIzL5pLYHj2hYmRH+gvDDSGDQQQrEU+s0tzgIaBkOdvuueuFlr3Vq2HEKQJJV7pLi1fISEizEzLwjIUPs0fgwxdC08bGPsmJO3otvdB6JyN+Cs6mrqNcMfttBuQfzPBzB29sN2zQ0dT0QpZ/MMNHDGIM4xO0e5J+jzsYranzL7RiWvMwCkpcLlZqIVsfd/GFE7ofRCnDv9ewaciADvuSWNBrxZ4zF65wJXxk+1ISWe+OwYu4/iuNUj/GVjLoY6JaTe7GYqfP3pR9LGgf4RdZ9i54UdVBmor13UXqy8eT79KZbMhtzousM8TPoxD3AufBnna6Wx/L8F2c6XEZJ1l3cMF3EGq7dhhs3+Qdi+8qrFqXUke91UhOk5pNHk951sS/Txy68BGIavHV9NSO1PowYX18Yxi6Se2XRGuKYR60zTi9b7A=
+*/

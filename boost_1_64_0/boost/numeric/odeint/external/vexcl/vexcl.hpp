@@ -1,0 +1,32 @@
+/*
+  [auto_generated]
+  boost/numeric/odeint/external/vexcl/vexcl.hpp
+
+  [begin_description]
+  includes all headers required for using vexcl in odeint
+  [end_description]
+
+  Copyright 2013 Karsten Ahnert
+  Copyright 2013 Mario Mulansky
+
+  Distributed under the Boost Software License, Version 1.0.
+  (See accompanying file LICENSE_1_0.txt or
+  copy at http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+
+#ifndef BOOST_NUMERIC_ODEINT_EXTERNAL_VEXCL_VEXCL_HPP_DEFINED
+#define BOOST_NUMERIC_ODEINT_EXTERNAL_VEXCL_VEXCL_HPP_DEFINED
+
+#include <boost/numeric/odeint/external/vexcl/vexcl_algebra_dispatcher.hpp>
+#include <boost/numeric/odeint/external/vexcl/vexcl_resize.hpp>
+#include <boost/numeric/odeint/external/vexcl/vexcl_same_instance.hpp>
+#include <boost/numeric/odeint/external/vexcl/vexcl_norm_inf.hpp>
+#include <boost/numeric/odeint/external/vexcl/vexcl_abs.hpp>
+#include <boost/numeric/odeint/external/vexcl/vexcl_copy.hpp>
+
+#endif // BOOST_NUMERIC_ODEINT_EXTERNAL_VEXCL_VEXCL_HPP_DEFINED
+
+/* vexcl.hpp
+yxznSPLimM68A32uAa1Sn9vh3PwomSsQH2DTXniPa201fTPl5WvTjPKOqR5EFi8sSwzxob64IOiL49Vyr8XqdY2xjTbq9Qhtt8QnEKdtbx2xe48N7Tljnh/MRd7Av49VhfecO5lmA/k7H9pmTcT0/AU8uqrDa6Ju8ulRfErHyt/7jrXvNnLsVv/uMzbMs488UwPaVGtPbH2ipy3rtUSF2eb7q7U+Aj2kWa7NoGl9HM88tzDNtBHRvjk7XDvtg6+CZH9rDPnBZjPxhdn49oSOHx3E93Vu9hMInyKJRwL6iUB8qYvvhuPMxJYk+fQifhzKnI1m/5p0/Wsn3Pp52XCltw4RqQ7tM7GGZ+hZJozp8WRSnX3fhHT1fr7uWl8Ql0bcdD+OV+Az/LYifqaLRxOGzhHv+pa9YIwnqL5lto9xPkAzdaTCqKM5eeoVPRwc5igvjCpKj+8nsq7OHKG/nSTj7aDLd7jw3d4C5FiofNdWBT5pe9Z39iT0vk2R18O9OOebIfv3OK+df/t6T/JvX+eb+Lev6/bu5Awvy6sO4U0Shp47N3UnEaZP3OkRPnGh3wTcrsNeEildj7OlHl1bPNijk1VnGD3Z+Hmh+GQ2fkEoflPWHhbhLO96DMtajs8Av9TLaN7Lxq30utPZClF3Klrot3cy6nVv2MJJyhbWBLYlZsB6nIO2uSfb5p3yM32P/dn2u6d3crVt58SZdn6K4Nh3y3pV47apNaLFWV+fp1ZH9W8cJwoCeXT/dlq16hu3Ddw32rRf1n3jNpHxr75sBYqHkfFMf94JbGG0jNH5oaWclbds0fKdw7HvBeAC36Je4DOV2ErmdWRFrh7Pk7wM1uCZ1zeAV7yJjX5X9VuGN7GCN7wvqA6f194n4p3ViwSD8yrRmO9QH2lP9HFf+Ftvq3/dSfaLMX6ofv8SN66gk013J3U/UIR+zrVhjkt+OUqxDtN3v3BPa/26GUGc+L9NxbucI3nx4wMfA85PMcPov3rjiWSsK96aCM3r61S8zyHjp+dS1c7rvVWrG2MrlzQflXUVryOCvptz7Hll4Tn2ZbTty9mvU7fARc+nv0f8lXqORHyl+W5/NbHXVMt3nE+WyZzzugge11ebs9XkcYOZVwCb932XHzDND5nmBal78XfMMOrenxO7SPnWj7W1cy4t52FGqzHgCjePkPH/Kjd/6E+iG8+OZ9cibpw/J4h3uTQ3ujlDW28S3+rIAzbQ5ntx7qfdcc4QLDWM32vYAe6jBbEubrubO0DONjgRpk+60b6/aWUXGOM2J2PAcAjIhvKenZq/bHVsVWJzb1vcPxPkH66Z39Hb2ZZd4+Wjy/zvZqlr/C11fYvEOzu8lfX84+rADn/COruNuLl55Vvt7lb6eYtUJpay3GHyvBNhvT98F/O8m7gjBtBJW2eyEx1Cc09b39YkzoEskYVVXoCeN/1UZMHfopefGRnvo4z3Ui/3U8YHiFs4uIxGNZYgMv3C5P1Lo59fMe8HBYc0IvsOjofOH4Npyw9X42fa8iPk9xvF7w7F7zEjz+NMfyd18QTTP0lcYFciw9NGhmeq/Z/xu0Aezyoejykezxkez1fjZ3j8njxeUDx+pni8ZHj8oRo/w+Nl8thpyvxjUwd/JO5PKq8dJs2rTPNL6uk1pvmLwd1reL9B3JtGXhn3lf+E6jzfOoc09uxS9HeTxz8QPr88nMfb1ULvV3cm+0n/ZzXDlP899b2uPycNz6tXa0z03ab/kG/BWPkGxHEGc2+ZG9v1/Iga4e3mvwWCQTrHe9cartWVfWzg33quW8J5Xgn1r+dRo2rC++uAv8l5lZknR8+r9qjhPDQvXuZleh46ukb2bWy66LxGeXs=
+*/

@@ -1,0 +1,44 @@
+/* Copyright 2006-2008 Joaquin M Lopez Munoz.
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See accompanying file LICENSE_1_0.txt or copy at
+ * http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * See http://www.boost.org/libs/flyweight for library home page.
+ */
+
+#ifndef BOOST_FLYWEIGHT_SET_FACTORY_FWD_HPP
+#define BOOST_FLYWEIGHT_SET_FACTORY_FWD_HPP
+
+#if defined(_MSC_VER)
+#pragma once
+#endif
+
+#include <boost/config.hpp> /* keep it first to prevent nasty warns in MSVC */
+#include <boost/flyweight/detail/not_placeholder_expr.hpp>
+#include <boost/mpl/aux_/na.hpp>
+
+namespace boost{
+
+namespace flyweights{
+
+template<
+  typename Entry,typename Key,
+  typename Compare=mpl::na,typename Allocator=mpl::na
+>
+class set_factory_class;
+
+template<
+  typename Compare=mpl::na,typename Allocator=mpl::na
+  BOOST_FLYWEIGHT_NOT_A_PLACEHOLDER_EXPRESSION
+>
+struct set_factory;
+
+} /* namespace flyweights */
+
+} /* namespace boost */
+
+#endif
+
+/* set_factory_fwd.hpp
+meYVAWmnFgJIfhvm1jCEuTVM+tkt/DM+jm4N45k5XEu24U6KZNJKrpz4ctnEl4sd0OPECxa92NyXGz13cwTOfcqrlF5UZhpSk0dkUXRaoizmEBSsG2KlgqEJN5LNZJLSjwT1kgGqrgLFNEJvEdQyA9TRFAZ1HuFCAAqDy7bmYiaZbMiykbI0JMSmLIFxyK9/EL/Kf0R+jTfyqzRRHnKnkZIamrIdliBP0UlsoGk5TpSdWYykNIXHjTUQj6c/zmhupnfI5KoSrhlx+qL4L5evXiAO8D92EvETTwPRkPCokgCzRaaWeYnDAc/T+C2HPEf0NNxnoEQ7lyyw6Fi+ImbpK7UdTFad7QSC3ksmqSOnIsa5nV7kyHBslC9vSmoFoL2zJRO5o1/Gch6RlyMpslgOEIxpXXyMgWuJgRtgRICsYWTg5AQLBn71YzAGfvSjgYEf/igYuC8LGNgrnLVwXb0Wl26rXIv0kufJSqLlDxxOyw8hFU1WALRX6+mtG99K+4UBAoJO8sg36Uaq2OFyi5H0dAsgaH0NhqoHkEmywYWjXQ5UHq7h7sPyYOhkklLyXz+WYU9kHNtOiKczxE8ZEV/ZwoJjL/4QjGNrfjBwbOUPgmOPXgUExsBPcN5ENW5QLsh8H25LycnE/zM7iVqgR5iuiPm0tLaDCcbD4T/seiuYRACCJdlNhsBatQdQzmztdlTEvADQQldGDYHiEeb1MnwYXBNwLKFTV+hE4jVteXeEOh2Edi7FJ9euSoOgmtS/qYu9SQwbeMpNWkuVYU3jLRh2b3kwhhWWGxh2V7lg2JgrgWGfhQKNRCqqemmY4h8YYjtC5FPb6GktnfLpQrD4dUJGvcbEhfSSSHhLQxKj9sVsqY1Yn3RUBkWhO8cXxQcd9CGqdxnVe8hJrLfPWO/E8y3q/cCpYPWedspQ7ymnRL19faHeR1EDT6QRPLWEqQ9n/VQmHfd+QqSVfm8xOO6NA5SLAcCfHSLqChVfxzuR19iJuiVhJ8rbQp1onexEhg5YYtUBqdNC5g48c4maGWvLNjO+usa+KLgboCqcPmHB3Z3NLbjb8WQw7rY8aeBui5OCuw0ygRX3uYgL2WqLF+/H/s7cdQ69zNTfvyXKbjph0d/bWlH20PfBKJvzvYGy2d8Lygr7AGUnnHxJ+SEFSFzEgvMsYETJwRg+Aue0iYyuU0TX3uMWHFvYzIIuV1C6Tpww0PXtCUHXZ1cAXUOcbK0mSqrokU2b6K6kfybiLjxu0SPLUfEfDkhZUKRi4nXpkZAqUA8v1zu7K5Shfus7C9SPIurVuFaPRVA3gT7znQWLbm9qwaKPjgdj0YHjBha9cVywqLQ3erFOL6kFZcGLy74TE7ujlzqxtzgpzsbSQO5j5pPhbOcbaJ1e0ojyOmXe7eR/4ZIe4hhtxt/QKgGGFUmhHfZqt/4N3k3ZXv6X6v6vz5/5o8Z/bEtGgPNaKf4E/cfKbNjvL+RZB7Gsu7Ru3e36DxxMOYXGDf9Jjan+rAckTi2O6OyeVIs9U0zmQE18SKUHVE+yA+Lh8B/zd8QyZ7n1G4XdhroU82p2PM8shOurZRQ72pRi6tmG6zD4P04mJrWoq/B39jd2+NuJZ9XqEH8/Sbfrbz2X3X9vI/bTn1/I99PAXvOpEAVCdGC16ZJ5FP5x+q7230e+SFDNNlkAIlMpwm2rGKai4Wf9GU4BgIocXFjovBc0sKCInfpxOGNsQuAyCWTA7CGcb9dXcaITboJAfMLIrYDRmown/ERrMtJaXJnWAkFrqlZkwLtIAqi0FphojQt0ISArWjGUBeHkvmN7GQiN8w6nRx7rL5Wq9/IQ1gdTKMaau5jZ+QWisPcCAQltdlE=
+*/

@@ -1,0 +1,27 @@
+//  (C) Copyright Noel Belcourt 2007.
+//  Copyright 2017, NVIDIA CORPORATION.
+//  Use, modification and distribution are subject to the
+//  Boost Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+//  See http://www.boost.org for most recent version.
+
+//  PGI C++ compiler setup:
+
+#define BOOST_COMPILER_VERSION __PGIC__##__PGIC_MINOR__
+#define BOOST_COMPILER "PGI compiler version " BOOST_STRINGIZE(BOOST_COMPILER_VERSION)
+
+// PGI is mostly GNU compatible.  So start with that.
+#include <boost/config/compiler/gcc.hpp>
+
+// Now adjust for things that are different.
+
+// __float128 is a typedef, not a distinct type.
+#undef BOOST_HAS_FLOAT128
+
+// __int128 is not supported.
+#undef BOOST_HAS_INT128
+
+/* pgi.hpp
+XlybDjepZLru+bXp2Mpcort5YW06/i4Z0f3mktp0Rp9E+4fXb3FtOjAJKzDs7UO/e1mPZj1LocdPwTLJ8ZoOM5qoqy8+UoL708mxeAKVm+5rHLkUcbqDQulDl2E6o8Ub1XTXtWWJkh53DXqdA+5A3B2OxX0R6c4q0rH3cRXdpTe1TnYBjnctqPpsCAh7hwJRj0FNtPc+ZzJa1BiTdmjppLSVcYn26Ulp8eqISfvIcyejLcEYb9LuXzYJLb9RQu8obVLvebmCkYjHFbngN2TkNwKepVmdaaW3I1oEThB8c3p/BujwZifqUpLSyzqlg8drkt6X2/8eG0wD7PNCMhqg6ApWRhFDXr5OY2OuoQPj+Ry1e0Jpd8jhw816d+SC370aEP5pm9Q1bSzsdPo90RiL/tHdk5rCP9fhFCffmVuxTr4z5wt6+8Oufoz46w8PcVrfdcJOVsoPOSL97kDIF1Hed8e4H6LIdeoPAkrJQVhpr0CuR8zh8zsxQqfH4Uqk5C1r2utcqM2+6A/zqmSvvF+2SLM6PErvbdutOI9eKI19t7VYadhwYCiBNEYNtVnp6G13qk+g3UqDw570hvn0Wjg3F5Q3uZGOxjKqQ3kmptfSU/Wdp056f4o1hrAjNgXDzmHOFbqKFfCxFbHulfi3tyh02ABq/+bWKkyJw5mdpuKVnFoKxUO7Sn2POdzf1xeRXHJl/dbxO6+l/mtcdoGHw9MpRT5OetPoKvWtq75wOOB39l/we310B1PuLz3uUJ/H7Y05HWuv4napoOtS6GJBV8DtijodPd2cTv5+l2iK97H5RrBOmKzMhHvsKg77/6Oyfo61qbj1XeanVVx6lxm/nYIp7zI/rGDUMSjvR9sVXHmLNzudMGuHoPgZK2aqNOW89TubfUebjbTVsSk+iumGjsiKQXU8Nwdx9NSkcgh7ci5i4FUoYfPE3dIOxJClOd52yTq23hUM+d39To8j7Bzsp+g/NDbLtFd63f0ufGsZ33zBqyDq3eNembY3GA4H+0KBKHjAZSaqYgo6ZNqNMa8n3BeN9jnwQILikyvvHcj07rAjEgtE/JELv6e9ENYgbwS78zRbgxjPzGj8XaulOIaxsXx3Nj+SyMbxei3H3oR5NmAd0F9OrG3M8bfdhrxrXnyg8WWWvTZNEv0QKgXidbQ2HY6HpHOeVgsNonFYQidgU5hXnN5LJlrlcum+eCToQZzeYG6vorPyJBv6yHlpYT5MmnZq5wykl+1jQ/T0Ns9MxCFXdbPRSCW6p+vTYZcn2/DIrHp0dJ+ZeB6YXZcWjVPimZ1Tlw7tAuWdosBcTsuaidOcOQacMzBaOFG84Q4jHXOwj61JeS7Cn4kZ1f3IPDnduk6QfO02qHf3fX5nMIBvpe5gdtHG7E7Vj3OnQu/zuGL9/qgb6Lcx+l4r/ZhMv76vL+Z3B/sDQG+YXTut8QzKMv3aYKwPozwCrccg3En2q0znDjn80T5/2BO74Me9xBh1VCkXXbL6Q24nluyuikV4XKZdF4m5fE53IOpgFiSG9bPGRn9Q4R0O+vwup7/PgdSC1iFoH5Jpe0IRp9cZNOIvEmcz7qZSj3AgFI1EQmEH0nkiNerxsFKPiDcc7ccwkkhN9cBx8Pr5wLsXafHsxAgwhem7IP3MekzH0GW5kX2wxp4D8c1fDOmMMpOnseo38GeBPA7wsGXpCXP8edxWjwbuZMp7VbqFDmdBXA5JNGdakIZ5wUacYa9UmhwLTKFRSqN5uB1ppHlYsgUWGPMwO9aIj8EDRlI/9MwAHN/Dgosqcv98cC5PpzhwPD76PJ6eLiXjKDwJu20Bx+D4U+SjmBCXcAwGPzidozzLFvF07josjznlLgM=
+*/

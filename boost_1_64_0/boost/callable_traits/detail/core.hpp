@@ -1,0 +1,23 @@
+/*
+
+@Copyright Barrett Adair 2016-2017
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
+
+*/
+
+#ifndef BOOST_CLBL_TRTS_DETAIL_CORE_HPP
+#define BOOST_CLBL_TRTS_DETAIL_CORE_HPP
+
+#include <boost/callable_traits/detail/utility.hpp>
+#include <boost/callable_traits/detail/traits.hpp>
+#include <boost/callable_traits/detail/function_object.hpp>
+#include <boost/callable_traits/detail/function.hpp>
+#include <boost/callable_traits/detail/pmf.hpp>
+#include <boost/callable_traits/detail/pmd.hpp>
+
+#endif // #ifndef BOOST_CLBL_TRTS_DETAIL_CORE_HPP
+
+/* core.hpp
++0bDfavh4k3/o/S9SrjauqazpWOH68KusBHsDpvCFDgcDoXZcBjMhcPhNDgCzoMjdaznKLgXjoYPwVT4IsyAL8F0+Kra34Vj4CmYCT+EY2ET0jQFtoD3wKNwO/wb3AlPw30whOt4EIbDh2Ed+ChMhI/BdmrvCA/Abup+DTwI+8DBMA0+4R3DbfpKpH9I8qk5Zo7m08s6hv4V2Bwegy3h+3A0/AhO1bH1M+Hf4EL4CVwGT8MV8FP4BPwcHoZndEx0vpM5BjoG/zt4Fv6k9hgH9QHWhH+HteA3cAb8Hs6BSYR3OilHGAq7we6wB8yGPWEu7AXXw2vhJtgP7oD94SNwAHwNXg9PwsHwXXgDdLooR1gbjoF1YSasD8fBjjAHdoUT4FA4EU6Bk2Gh2mfASXCeui+CU+BK+IGWx0Zvu7C2i5/Re2CFlscCz/nhQtgYLoLN4B1wBLwL5sAtcCK8G06HW+GNcBucB++Be+AO+CC8F74EM13UT123+0O4E36i9lDScD8Mgw/AcLgbJsODcDB8Ao6Az8MF8EX4KHwFPgtfh7+Fb8LT8H3o8tyfMB5anP96GAanwOvgbNgHroN94cNwAHwUJsM/wBT4dzgEfgWHwm/gcFiBfBwJq8IbYFOYCnvBdHit2vvBNJii7sPhGJgGN+uY8dWmjUvaAqV8WmBu1vKZgXx9OBM2g7NhR7gaZsB1cAq8DU6F6+FNcANcDG+HS+FG+Ai8Ax6Em+FxONddlI4t2P8O74Jfq72eg/KG9eFW2AjeA2+Eu+FCuA8ugY/ADfBJuBc+Dw/B1+Gz8CRs6uS+g3fBb+BW+APcCUNIxyswE3ryLQvmw2xYCHPgRjgRHoCT4eMwDz4B8+FrsBD+EU6Dn8EZsLqb/INxcAaso/ZGcBZsDufANnCNS+c2eL/xtQ3jjN/chkXIN4aLYUu4BCbCtTAdrod5cAMshLfDG+FGuBRugsvgHfAgvBM+Be+Cb8Ct8AS8G76l9jgH9xuMh/fAuvBeuAQ+BJfDQzDNSTnAOfBpeCt8Fr4Gn4fH1X4CPgf/ou6n4BH4CVwHLa77KJR6auk3mH7nndFvvZs1P36HXCR8CV4JX4ZN4R9hK/gK7AlfhX3VfRA8BrPgazBX3fPh63AR/D1coe5r4XH4kNh1/xBLv4tgHU2XG8O55SiHHvTwClgRloe1YQV4Vr9p8jR8fw0fiumk4X+weE5CF/Lx0A1bwhDYFobC3rAMZL6KmUtxgvH25zBVFjKHApOMycWswOzCHMWcwrhvpn0H0xeTh7kNc759Cx67+X9nz4JMTMrPNBfjl9yz4CXK5Bym5qJyVg9MLuY2zMOY45hzmCqLKTdMCiZvcelcjNKj9PhvOH6R8f8sli/D///N8f+e8eGtoy2zlyjvTnJ43mtj4X06VnhenrddlhNbAfteVCbRjP94WOwznKOcAfcQVfmWpm/112K/yTnGGWqTzxD5ZCPf3KztulfsNzuzne6g44J/JTLLnEmW0+pn1dE+Ym9cTXTd9hLrTZr1zT/PLxrj4/RdK92M+dk2RdYTZ4WbMNPf/EV+ifHCZo9tl8ivd2yxzphxsU+L/DX2tdHN2vY7NP2TnGEB+20qwSMiE23GFFeT+O4nRbms51DG/zzYu0k/4Z8kXFenba/lfMuWd5+If5jTSXuzm//F50/P5Z8Z371N5NY6UxxN6EVraMU7h2t/uvecQ2xhM4rCav/cLgm7wtmLtfAP0ptbXcLiZ8IOta/ba/q61ko+HqY3PZYad4XVl3FCO2Ckrs++SfznOzw70g6i/b+ybb2mrpg+mN5i1E1NYrRQTBv93Rb2gEN1vaazF7nfMOn37vMq9i/z/da09es=
+*/

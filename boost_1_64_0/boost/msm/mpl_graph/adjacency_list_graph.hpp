@@ -1,0 +1,39 @@
+// Copyright 2008-2010 Gordon Woodhull
+// Distributed under the Boost Software License, Version 1.0. 
+// (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_MSM_MPL_GRAPH_ADJACENCY_LIST_GRAPH_HPP_INCLUDED
+#define BOOST_MSM_MPL_GRAPH_ADJACENCY_LIST_GRAPH_HPP_INCLUDED
+
+// graph implementation based on an adjacency list
+// sequence< pair< source_vertex, sequence< pair<edge, target_vertex> > > >
+
+// adjacency_list_graph labels such a sequence as manipulable by the metafunctions
+// in the corresponding implementation header detail/adjacency_list_graph.ipp
+// to produce the metadata structures needed by mpl_graph.hpp 
+
+// the public interface
+#include <boost/msm/mpl_graph/mpl_graph.hpp>
+
+// the implementation
+#include <boost/msm/mpl_graph/detail/adjacency_list_graph.ipp>
+
+namespace boost {
+namespace msm {
+namespace mpl_graph {
+   
+template<typename AdjacencyList>
+struct adjacency_list_graph {
+    typedef detail::adjacency_list_tag representation;
+    typedef AdjacencyList data;
+};
+
+}
+}
+}
+
+#endif // BOOST_MSM_MPL_GRAPH_ADJACENCY_LIST_GRAPH_HPP_INCLUDED
+
+/* adjacency_list_graph.hpp
+4fmLwlKaNx9X8seCUGRNN/IcknOeFrivvEzXLWjlQQHtlFZ5WcbvzuyMKLJwIrYhvG8vbgtfg+RMf1f1rnDjZYbeRprgNYRJD55Fqb5kPNL9kr1opjrD8rJKpv8yQ6YPQ48095p3c11zH8zXNTFmaMhw+euDsX6W30VX4gr4Kr6UNR4m6IdfRnSisju2A1r5VTmn/60061Pdr0jauV0Kja8XRPu+SuNrBZ1hj+wmmqFgrZwR91gYHDmVeyrRdUVrKgOf/4SR5zNxRyMaKU1bZXjrTRrGKsNTbzbpVAY6T/xYwQzn8rtzD/rOWoe+f6T83sc6UdKoLof30nfepkoenyppUGc0ee5J34nnkWTHyWg7r2l772XRrTXtrRWGuhkJKPS/GXSx9BJ9cm+dLjKgM9cfOB2DmxnoTOn79/fJ71hRpf93WkOFhYHiw2wDNPVMATWHFFK38G7OPVq/Fn64oKy1eQyRH97nHCUyU+PUw/g8FeWSxRLjkOQ296a7mmZQIWUOuxim1uiCzpp3EYYyoXPfO1+i60QydQPoYDo4ZuMhuTSEtGIM3voSLYZHAjsBD+szWocYNB2dT+l5FJmfQSM14nlgOcRmYeXxdS2PMIhhP1G0WR4qg3y3u87xpMfQLIJ20WrjkXkwx4GduRI1s6M2+JnKy0zsoghvh4EzmpnZNS49q1qvVZ4CQ8YPmh7W7eVTz0wh3ZQBuYTdQVWvxkvVeqGI0AmBdsdsc7g5YCwCf5F8B3I8nbGxF+PpuuXJjAYjjEPtcY/icaq8GZokbAcwc+CZCbbKXqziOa7y4Bk16CRt+Mh0INI06zSqxruv8jw7hndD34WPXthCUI2oTIWefpYyET62THeEp+qC1GjK9Ks9/rzKcwyCVNQDz5s9sGhp9420gwINhENOXoY1WR9sTKgjR1V/zF+q2wqmcJjThr4Rk20pHPT+/2aBp7fWhClOxE1nZbjJxti8tzkxGorKd6vKmzupC0OQGM/2c9b3jFE216ham+5UeTx0IhTx4UT3br9vMV+AY+zhRcG2z21kN+rjcll+fxW+33Wl/D6Zs1d34V/h1Qx/Oj/74i45gJO3aiGXvwyMZS4j5NQz4ufGEer6fwcb2w30ZffCbNDDE2UXgbuUO8V8F6ObCuRybXzzbou+ylQktyaKrNXGYCteJPnyyp5auvCu2CDcd3fAzTiQcCcX6nDdC2LJJdyPd8LxFAk3v6kWtwp9jLm6T9xej0OmMs/o5loM3h9n2l3umzYOj8uSfvIenE4y5t4rWT7KWcSgr/aI950GjRv59Kkezj0NulCrU9uucS/CsD4g0xmxsZEseq7huK1Lf9AvcVuz3kW13/6gY0lJg4eyke18/t4qTklKlZHrGKbRg4d2ZYzs0+lMR0eiZF5flLgZ4Vh5lHIfvo+NobQU3G0SRzodspbyTJXcl+Go26QMkb5TlzBDN+FZQ8rf5vezcaNZ6VKB76IK9tB+G1vuS12xMSl3+us7YXkJCLd+fxsn/TlI3L9snFpIKuN7H2DjaK02/IqsP5CwPM+ebNc7ShrWNy7qpnLA75H83m0uB+5pL4K7yQLhuFX54r84TrxPyDzxRorvbKfq8q2qIWl7H8xoWmsR7SslDUNma1IaLE6UvJ76EEkDQcox2HeShfDHTHGmp/qcP2hjpOhFpvWHGpw439P+sPFQgZEPuNod5Gc23ZKPn3uYwNjyccJ8vw7DUyJM8XCBUZdFLvUmzI06DL/bEsY/ZGNMef1XajG2/Mp5RA3OkF9dq8GYMn3/kQzDTgm4g6z2MMLkyqD6Ifrmo0rcRAxh+a52mH0X5wZRRopF3m+osRtiHOARel5KXMzz6t4=
+*/

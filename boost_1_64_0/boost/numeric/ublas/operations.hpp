@@ -1,0 +1,30 @@
+/**
+ * -*- c++ -*-
+ *
+ * \file operations.hpp
+ *
+ * \brief This header includes several headers from the operation directory.
+ *
+ * Copyright (c) 2009, Gunter Winkler
+ *
+ * Distributed under the Boost Software License, Version 1.0. (See
+ * accompanying file LICENSE_1_0.txt or copy at
+ * http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * \author Gunter Winkler (guwi17 at gmx dot de)
+ */
+
+#ifndef BOOST_NUMERIC_UBLAS_OPERATIONS_HPP
+#define BOOST_NUMERIC_UBLAS_OPERATIONS_HPP
+
+#include <boost/numeric/ublas/operation/begin.hpp>
+#include <boost/numeric/ublas/operation/end.hpp>
+#include <boost/numeric/ublas/operation/num_columns.hpp>
+#include <boost/numeric/ublas/operation/num_rows.hpp>
+#include <boost/numeric/ublas/operation/size.hpp>
+
+#endif
+
+/* operations.hpp
+F5rLNPMRu5CWWx7pMbpxlF4EVkBGmjrJopBB8iIzyeX78VpcrBpz01Ee0WmosLR/tH+TxQx2gVL1/hCzleUfsS+TMaWJvEvKOiF7j8hfmpzZn7k/61DGQL2EgSgBkf1wWdqbNx8qv5MQmSO84pTT+q5JGOOaiS5sZ7pc3m/ETgjthiJeBDSUj4u+9P8PNOXJ44v47d1A+fbtP1/OkyLt92ntbyK602w7E1c/g/WW2iK2/98pWh6ukBF/chmMpK03bL0RyqgPxmv2l4RtZRjJIhsmbXzfubwO7hL5oY5andzqbtRFV8TZC0aTOnOPsF4rBagP+Zx8XqqK6kEORr8pqhr4kEtKI8Q+xyoYQJKtwuQmhoLDJSqjpsYbyh86IdiN8ByE55AVr5EYJYYlqQ8AIj7/5fHi+0acrtaFl7M/IDSfrOYuf1CKKsSt1op4boq0FEFqWodTjLOQWq+oI5Nd2mRQ5wrPnaKuUQ0rowslY+BgnBtTBkoEV9dMzRjw60IEPy2I+QA8BaXFcEwu9ujcNFW/pXCk2Cr+OAOfz73ViRlS8OeLjZSDmAvHTMkuzst2gbwydFKZlQvjGu8kObBDereVqH3fIfp8+D1CpLBYbKdp7JJ6v/k7in6zVy+3UOTuaD9tFVlnbxOBRz2O8e5ipOmlChcs65C0oduA1a2TWIoPU2JwicvM1mxoGipVZ4hSqXLfRRT0qQe5IRbJ7xJYy0ho79pILDaKQnMairc7WGOqPZm2zotwOLfmbgslaeYEqx/QIFt3PLWajRsXUJwAHIi3yYhXjnhYiRzV5k+NY/vUONVm6mfmC3KgUkJIyUEQmWRP5rst/yZHsYst2z5uNQMIHDudJEolYGpJsauUV5vxPD+nU4t7aPLnQZqUkQOicPqc9w1M/FhrKgWTmg4qNLuOFDxeakRiOQEaPDR3wxTKeZGQp03Usy3vEhq0HGa4w+QCrXCwDKF4pgTwrRRcTYZ3s2fmZc+y0vYfHgrEqkYQH5LUGBx9gtZNASMMsxrM7uVN8caMnmoJIw3GCNCRJzYhUDBc7pdkYONdB4U6MlhyAw/KXTwurTCK8oeOkS3nY2LuM/2DEUK+OJLag9Slai4awQtcDtrhUUsTtdlxWmQmesImMNqjDkIoPF3a4oGwu0TYf9jK8L/xaPy5x062Ur/yqnZLx8iqNkf07AVvExautBmrGob/ZRJP0Zyk4vQkR9+iJGW2z7oQxqy3nc+03vaPjxQzVxSzjIuR9GKY2qfRjX2pZQj6aWurqCbxtL6S8Hn5cYW80GygvWY5VtcAzDybslWr5bw8JV46hYFG5+/qhJp43H2iJpgLiQYNxWQWOO8Tzi7ijsO/rpopQ12Y2RgngnSLrxMR73wJDQW8WmqGnabk+U+mL7xQPhEXaf080fpb36TWxyVw68VWa2p99YwMf0NfkbiErGB51P1hZlGTTno0w4y5kNiQWjBYmThaJGxVW6sTQtYa6LoGITNeN8KXLCfrUJe7kkCzX5jfrjI5aUkYYwYq5J9oZVWEDnD/X0rsE3Qvlm0le//xp9X5b29QnYu5gEy9zgBjNmaq4jJLtGQn25w5D1k0WbFlNRSyf+1CRdH9P5n7X4ren7lKiCgFIVkywIr5dyg6PY2WWrwDaWujrkcbNfO9feXi+MhMeZOAwct/55kyONfVtDKBKCkyNKctYRKiKwnMA6wAaPP5jUIlfw7yH4e3CG8hXictXd5Mhdl2n7XwuordAtkwtAenmmvMBZWbfMezdwSnWpo3F8FwK7I5ttmCX3tlFyrjaUo4eGGSt7RUfdXKPQ3Tp6dQaQV84F6QfbwOmNDxqCrP6EnKsdDFbh7R8txIh2o=
+*/

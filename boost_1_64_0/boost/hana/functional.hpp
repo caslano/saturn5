@@ -1,0 +1,37 @@
+/*!
+@file
+Defines the @ref group-functional module.
+
+@copyright Louis Dionne 2013-2017
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
+ */
+
+#ifndef BOOST_HANA_FUNCTIONAL_HPP
+#define BOOST_HANA_FUNCTIONAL_HPP
+
+#include <boost/hana/functional/always.hpp>
+#include <boost/hana/functional/apply.hpp>
+#include <boost/hana/functional/arg.hpp>
+#include <boost/hana/functional/capture.hpp>
+#include <boost/hana/functional/compose.hpp>
+#include <boost/hana/functional/curry.hpp>
+#include <boost/hana/functional/demux.hpp>
+#include <boost/hana/functional/fix.hpp>
+#include <boost/hana/functional/flip.hpp>
+#include <boost/hana/functional/id.hpp>
+#include <boost/hana/functional/infix.hpp>
+#include <boost/hana/functional/iterate.hpp>
+#include <boost/hana/functional/lockstep.hpp>
+#include <boost/hana/functional/on.hpp>
+#include <boost/hana/functional/overload.hpp>
+#include <boost/hana/functional/overload_linearly.hpp>
+#include <boost/hana/functional/partial.hpp>
+#include <boost/hana/functional/placeholder.hpp>
+#include <boost/hana/functional/reverse_partial.hpp>
+
+#endif // !BOOST_HANA_FUNCTIONAL_HPP
+
+/* functional.hpp
+E76q+tlkmzRlavQZEbqaOllhnShxUpRoM2T66nLAMhvskKdIhQZdBowJX0PdLBFhk20S7HNAmWP6zC8ZD9aJEifLHiWOaNNj7pr6zRY7JMlToU6DFl1mr6UNrBIhQZljaoyYv7b+EyVGnCx7lKjSpE2P4bX/9QZijg12ydOgy5jIdfSX3HX09zr6ex31ccoZHeavq7/ESJGlQIkjqpzQI7ieMWCORZZZY4skGXY5pMWA2RV9Z5VNtkmQ5oBjTunQZ8TM9bWL2PXlgRQFmvQIbqANbLBDkjxFDqnQoMWAMbM3NBdYYpUIm2yT4IAyx9Q4pc+I0KqxIU6WPQoc0WbI3I3kgw222CFJnkNadBkwe2NtYJM0+xxQ5phTOvQZMXMT9bNOiixVTugxZHpNG1hmjQ222CFDngp1WgyYvak23FT/SZPjgDLHN5UHTukwInQzbSBGlj0KVDmhyfTNtYE1dkiSYZcidVp0Ca9rA0usEmGTBGlylKlxSocR87dwnhIlRpYCR1Q5YUhwSzlhmTU22CLDLkXqdBkQvpU5wiqbJNinTI0zOoyYjxgTosTJUuCIKk3akcmHZTlhjkXW2CJDkQr1W8sJXQaEb6MdLBFhmxz7lDmmQ58RV72tthAjToosexSockKb4W3/9YFjjjW22CHJLnnqNGgxJnw77WGJVbZvJzek2afM8e3khz4jrnp7bWKdGFn2KHBElROatOkxfQc5YpkNttghyS4V6jRo0WU2ql2sEiFBmhwHlKlxRp/QHZ1PXJWVO8oXe5SockKP4E5yxDJbJNmlSIUWXcYs3FkbWGWbMsecckaHPqFNdXNVVogRJ8UeR5zQY/oucnAX/Sd5F3WTp3gX/Wf2rupklW0S5ChT44wRM3dTH+vE2aNKkyHTW3LOMmtssEWGIhVadBkwe3d5ZpM0OQ445pQzOvQJ3cN5wgrrxEiRZY8CJar0mL6nnLPIBlvsckiFOgPGLMT0nQjbJNinzCl9RszcS/+Jkr2Xeu+l3nvJ9b3Uey/5pkmb4N7qZZc8RSq06DJ7H/WyRIRNcuxzwDFndAhtq5sVosRJsUeBEk2GBPfVdxZZu69+s0OGPBUaDBgzez9tYJMEZU7p0Cd0f31mhTgpspQ4osoJTYYEO+pnkS12yLDLIRXqNBiw8AD1s8rmA+SfBGnKD5AHThkReqA8MM9ViZIiyx4FqgyZfpA2sMEOu+QpckiFFl0GjAnH5YMFImyyTY59yhxTo8OIqz5YO4g9WP0PlpcHywtV2vRYfIixYIMkGfIcUqFOgy4Dwg/VDhZYJUKCNPscUKZGn5mEnLDCOjFSZDnihDbBw5wTrLHxMHkhT4X6w9TPmNmHq5slVtlkmwRp9jmgTI0zOoyYf4R2sE6UGHFS7FGiyglNhgRJ48Uiy+ywS5E6DQaEH6ltLBBhmzQHnNEh9Cj5YJ0oWfY4okqb4NHqY45FNtgiwy6HVGjQosuY2ZR8EGGbBGkOKFPjlNBjzAvWiT5G/0lR4IgmPeYeq7+ssUOGXfIc0qDLgPDj1M8SEbZJkOaAMjU69BkxnzYWRImTpcQRTdoMCR4vHyyy9ni5YIckuxSpP14u6DJgzMITtIdNEuTY54Ayp/QJPdGYcFXWiZNijwIlTmjTI8hoC2tssEOGXQ6p06LLmIUnGRcibD5Jbkg8SW7Y55gR80+WD9aJkSLLHiWqnNCkzfRTjBHLbLBFhl3y1GkxYDarDWyyTY4yx5zRoU/oqXLBPFdlndhT5YQ9jjh5qvoZEjxNO1hkgx12yXNInQFjFp5uPIiwSYI0B5Q55YwOI1Zy5gYx4qTIcsQJQ6afYRyeoV4yz1DvM9RL/Rnyz5jZZ6o=
+*/

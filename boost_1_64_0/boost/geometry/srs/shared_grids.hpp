@@ -1,0 +1,37 @@
+// Boost.Geometry
+
+// Copyright (c) 2018-2019, Oracle and/or its affiliates.
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
+
+// Use, modification and distribution is subject to the Boost Software License,
+// Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_GEOMETRY_SRS_SHARED_GRIDS_HPP
+#define BOOST_GEOMETRY_SRS_SHARED_GRIDS_HPP
+
+
+#include <boost/geometry/srs/shared_grids_boost.hpp>
+
+
+namespace boost { namespace geometry
+{
+    
+namespace srs
+{
+
+
+typedef shared_grids_boost shared_grids;
+
+
+} // namespace srs
+
+
+}} // namespace boost::geometry
+
+
+#endif // BOOST_GEOMETRY_SRS_SHARED_GRIDS_HPP
+
+/* shared_grids.hpp
+WCVi4w4H/4b5A+tErN7kr49jfwArQyx5We14LOu36uOtOLD/CdatndWuvvNXrD8wWmaH2ns1wHOcnY2D3X+xrMHKEqvTbALmIRMMLkWjbf9twSash/fqNhFXeXBV7GNgrYmFVd7UDvMAz3YFEdM2u/oS4wSj6QyKDzqL/R2Mjme+FapjWjLBaB7umSoMwfLUaFVpmXEqANcdZo06Lef3truPcYLR9cNXi9/Z7qFAouF41OoMxHHey86cq89pg+0MTE/nS/mL49zUDEbntOX9ag3GfqtV591YvYtcA4HlVNZZYLRvRtZdugPLRadVnW/bpZz1wjyA0bZ7f0OBLtiWwGoTS7nc6hKWGVhNOp41O4bzXYMeyoW0petVl/bBPDipy+XkD4m/4PHAsFzs7hGlOanbS5Htx1ZjWwLLaczKclKX54xm3wZj3eZR29HIxi5YZmDuxG5H/jEEyyyPOu9uSUF1sW7B6Njaa3f5spgWMLpm/mKpaQaWZ16t8CHWJvVgWzyes7p9VrzYaA/2MWd1eTZ9+bgvtkGwG3ppX+c5/g7bWSGtuE/CxSb7e2BZF1a3a1/fcwmYTrAntFx8f8GxwLWIVtSl4/We09GYTjtzfznkDbYJMBdivXs9345tAuwMHc8uv2uBVlRdf4Ovd++IeQCjay5zg7LfYT2AFaZpSXe5inkoplXNhY0/vNiFZQaW03wwDSynNpgJ1lpD5ks/3grCOEto4dvl0lrXGBWC/chNq1qLzji2wYxttyS0QQ1tE/vMGKe7Nsf5ZxrYGHrO2XFUrjtKaeH6PJnbPCqMZZYJppq3Vo/BeVZ6aXgjXpplr04cy8Fovy3UY9Q6jNPOfiiWD8NlgeV0zjHAQ6rL6bxnQq01GCeYP7H2Fdri3M1YNuc6MoPRtGSGlemF5QmW07o4GawKseigkzWxXMAK0/N0qdtLMJ12cUZd8nmNebezjYsCsB5EuZzz4AVGx4LG/ZoUxryD5aXzQZ/SeM3YBPY7raOvPnfFcimvzsNFw7WqmPfy6vPK6+nT12M7K6/uR1195mA/MlRQp7PZ+u6DMQ9g0+i8bu9XO7HMwGhZD2/eaSn2W0PO5WIEK0bMyzNlFo6ROYeDd9PVZRY/wrwMxx7FSP+beXPxHay/ilp4FkBagvP3v2MeKmlVa9jw0i4xmM7K0I9InD4tu9/CtFQhfczuOYhUMLpWq/B28D2shyrqso6551Uc2ydYaXK8C3kj+mEdVSPnALt7LyawrsT0nXz3Y5xgTiTONSlN8Vzl6qEVw+jcu8OWDZgHD/U42OJdU9t6BeZAWnGRWMjRCFynmuADennQ1PcRwsBWEXPavwjbi1dNrfAj6YwbXB7bWUYtrQgm4SZ2X+SCaamtFRHS4PpWbD3MO1h/EmflLt9h/SV9rBU3ybm4wNCZcr+S+lq4f4Smfg6CsUzGRIOczcCYkbEwxpIYS2UsnbFMxkRDJn+MGRkLYyyJsVTG0hnLZEw0YvLHmJGxMMaSGEtlLJ2xzJwNTk5M/hgzMhbGWBJjqYylM5YJVoeu/yZ38MM8+GhFH2ILD++Lx+OB0fPR/Zs+BfF4jGWClSL25/1EeR+2iVaMkgabI82Sz7+A1aL3j8YclHNTMHi8Xo6fnz3C/fLMzbSqaxd9IyNiMU6wZvQcUP0BXvvNAqtO54M9l+D1EK/mWnGdrjvi7uIayNRCKxKJTfiqUjzGCTaI2Kqw741Yt0aYm6ru8c2/gG2ipVZ8TmzAR0sTsC35akUanUfuWvol1h98xDiA2JjlxjV4vFY5n3OSwUbSe8Kj6nyBefdTz70HPQiaieccsMY0XFbPYExLa/X5yLuTxz/weGCrSP05JW8=
+*/

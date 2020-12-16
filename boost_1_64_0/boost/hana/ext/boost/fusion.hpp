@@ -1,0 +1,26 @@
+/*!
+@file
+Includes all the adaptors for the Boost.Fusion library.
+
+@copyright Louis Dionne 2013-2017
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
+ */
+
+#ifndef BOOST_HANA_EXT_BOOST_FUSION_HPP
+#define BOOST_HANA_EXT_BOOST_FUSION_HPP
+
+//! @ingroup group-ext
+//! @defgroup group-ext-fusion Boost.Fusion adapters
+//! Adapters for Boost.Fusion containers.
+
+#include <boost/hana/ext/boost/fusion/deque.hpp>
+#include <boost/hana/ext/boost/fusion/list.hpp>
+#include <boost/hana/ext/boost/fusion/tuple.hpp>
+#include <boost/hana/ext/boost/fusion/vector.hpp>
+
+#endif // !BOOST_HANA_EXT_BOOST_FUSION_HPP
+
+/* fusion.hpp
+DPe3tiGLAYZdfoRcrsoEMzaT70nC7sDgzBnghca5eEuwBrsa2YWcDr5z53qTZqo3sO8C7CkKXDlwHn4ffcsBW6LhC+3wr1duI4clcp/fscY4OAY5iei78Bnjyb+TM+qSxD5mg2882x4cSQvBv2F7tgb8KbypC/t5awf8I5h3dwhjDIZLUDaOGCgPv9Ibe3aBgf2bge/Poq8z0INcZAGmTsbmb4Rjzy/jbhe+5gFs59Z5xMX41p9Pw4HWgo0/EStFwyubMwcCqNeR7YVL8ans4UOM98OlzH0Wa76GeLkrZ9P4yfeIgezVwfhq9gLMKCBHHFLGmae4Pw+31fAJXdnfamR8lLpuuehGJbj2LlzvVfB+JHMVeZZm8MMl4M2r/FtFW/j8wo78PZ74r4Y4QOjicDDQjc450Rni7qlbuUPYjvveufiq8dj8EXxmDLiMHJ5irh+z/unE05ddi44s5FygnhwEvnn6nSJ3DJfKo09swPUr+30Y7p5G/pM1765DVsyj+H6w6hr28WXszcV84R/fzWRtreBTW8COzuSv7jD0ZQ5nrrMbWBt2Fu2Eg5Qj5xbcoe8Fz0Fvy98n74De7p5vtB+LLvX/FrltJ2c+FB/HPjy5HA4H989D5+PGgFfY9ZU55BGQ0appzIl8fJuu2C3rO7gYHs+9Mjv3iCycTWYcRxcY/1U4+JdHiZk4Qysj11aEvR6Ed8SegmORy53EHm25Dl8m7mUht5/c5Jg/lJzyU3jJxcZ/38T9w+xnDf/7mYe4EXuproQ7k8/fh43ayVWcrsKHw6WeHA/3fRk9moN8uoALn5rQb84rkKntEDK+0+jzrSiNQB2/Qswbew9ndO8a/Q/sw3qPGvazoTl6GE/7n7CvzGD9ux3WiHuF+8Dj2XAU7OmrjeAqZ8r34+sue5gcWhL3wJOInz3UbUJu+Ot8ZHXxDdxZboUKot/V5Bza9wM/J2v6vDbZ8envwr0b0B/0rAEf9RU5nNfaohfkDNLwAanc6xh1NZx0PTyaMW9mn6bmsQ+9wZvruafDHjtyydfR3nEFdoGPDLqDfBh6Z/7KiCl+CWGfLOSnnMhzEvM3wd2Ii0zEnHH3BnNfDYz8TsY+b+N/LeRuatnvGpOOfW2uBH+X4xdq0Y98KBDzS3XxfW4p3NtAb9eCMdssnI8MCILnogPo9D72/HZxv/YsGDEdO0V/+tfhHyrJqfyOzpGPaAaejcd3VIE1h06SMxuDfPYRhyP/4FDiPfCy15vsJRhRSD5mWARxxFB4MVhiKyE+2MN8DnBvjFzFEGTdsS1nDsQprYg1Z3XADsmnfQdPr2KMf3QBk+HLN60mzp4fpOe9uk8hd0QfJyfik/Hno5+H96EnnR/A/xGHrfyW8UeC6cfhFyVg9BHierhOPD6Zx7Xn8J/NwaJJ6OK5J8DEMtqXcm8DOXwD3qTGcEaJL0ibwNq3sI9WeGp/9r+afYMLzULnVl5G3jsFvMHml9N3QSg5gstpA/+NgD+diuWuPPt4iLgtgjXew96MOkz8VwF2VjIX9rxnF9Y/C7sH36aAP6+uJM66gdwC9hx7K3OIIlaAJx8BD2334m/JfXQ7xB3IVeK8GTu8Axtago7hGzOWoF/YdWIwfhq82ORiTRvAJpGv/Bo+kEEsMSQIH0CfB/DB6PsuZJPwBpyb9a9A7oXJ+LIhhu5FrcBWb8Jm2bMjr+EjQrkfdZg49Di2+Sq8rp59g9PPxDck/MhegrXBIkaGC3rAvtc2w0n2gqdgaDP0/GNy2ZuI1fYexg8mICvyoxexTxZw4PUQMKkTvDKcnMUaciScwwzGTia0x3/OxldfAN9OAevbIPsh6CJ6nRiBX5lLLgp/Vk8=
+*/

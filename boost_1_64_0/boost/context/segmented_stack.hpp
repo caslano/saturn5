@@ -1,0 +1,17 @@
+
+//          Copyright Oliver Kowalke 2014.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
+
+#include <boost/config.hpp>
+
+#if defined(BOOST_USE_SEGMENTED_STACKS)
+# if ! defined(BOOST_WINDOWS)
+#  include <boost/context/posix/segmented_stack.hpp>
+# endif
+#endif
+
+/* segmented_stack.hpp
+Bxwj0oY/Euw2xdd4NoHeabuCMmVkt1/KOLicww50MWbe/Rfg2cFqzPz50eMCfIklw3tUM9wXWP1pilfl/ts/6O138CqE9/V30Ypg3/new5w3A/L0o+LgM6Nwv9gjfrlZmN/ZPtju53LeYaH6egcGIa86VK63p4vvds3mcztOZv84Tl51c85OvuBe2efhdN4ZFkqDingJ5j8yD6yOzgn+Kf38L+nnbrnH/BjrEZPz+Fwr+znDxTEP/X5Kc9itADbfwegqE84PEg4G8bp5LYzj8RMQ5wfcOjkMBbjHM5wPTjHs3+xvZnnDmvEEtlRg/hEJhfOZh+KYwV0pMMXVNq6hPawksYv19zmY4X/QwYJ2slw3E4yX6+Rcew312+Pg913gkefgn39ZtbE72TG4OembwyiY/Qs+gy78eo62C3kWtIv325h/zgjOUXkJmOcEdXZtTnZv7OkYUCMcycA9v3/HfBtnJPwfjuGZlEY9I7jgmZhKlEZaRJ9/SGt2hFaAh7QOJ7xY//4A5evaeWQC3g+pDvwD/OYdlfB5eEx++M07Wnm2uIbnmgR+Z6NrMnUm3/GC+fODfK7DfsePJZierWS/xM1JRFfo+4fni5h+DaxJKCwRrFuwvWiFNQodH0vcmwsyPnT+ngB9W+rTHSqWYlFrusLdxspl2D41SD/xfTMTq60xEV5Lu1PmC02J4Pu53PhFLZTHZ9WNni80tCifaS0S/Oeb9YDjDT7lM/4JUPeueeF400+GPIePvupJoE+Fsm2b5T0F9IFgEX14agLwIS73S+A9uFPMWyynmboon9vSprIy+GdYWQn+mYJ/osF/usE/UfCXJyQ+9HyJ70N+rt5Xq/P1A/asOYbmCJ4xeCbaO/5WuBMfSUJiZQJAeK1svuOlTEzhZxHN2HnhNOi7tp+TgLZLXdF6yJOA/q5j2cTz0wH2s64MrS5jizQOnqW1GvSvVfP0fLqx03Hvd59rdM/uc2xIBGNB45zje6wWv0/05WWim6J7WpbnB0+BuKKDIluluTERpblJeFhi6DwZ6Jxv6GyJofMcoXOioXMC0Nlq6CRj6FxgdPwC0vEKcYHy6VI4P00HtnBE6jsxdI4v8EVGE/77BiP0AoCD9cs4SYXGySQt140M0flmeZwnNRp6jqFstr6Dg+NzZyqXD+4M9PIYHZrYlgniytTwO6POOSUirrysi20DnhIBT7GcYP2xca0PsU28ZpswsZ0SYfu8XdIEV7safzbzANri6p009WZMvVlJOzja8wuNnckHNhb4JJ9VxljG4O80+BnB3+XbCJaH6vkeo+d7Y/T8+VJuEsq9wJS7JKbcCwmGMclwjXpxnb4Rmvc2iS6/KKTLPSpWQnIBjUacouVTFxWpo/2LGhUxqBdi43c+AXT5m2v69jLTty+V9GWmby8zfXW56avLpK9eofZYaFvZvopli7YiPzRRwHNh6QLGWnlNSLZ9q7p4QVxVWNMV/LnKZfy3po1M9hmZvE7S+0AmNtYmvpfVK37RGxKalnLgyxMsUhZ9+TfLGNln5P6WQO7AE/nMIPd9MXJ/O9h83VvsVrtZoR8Cm0lGQp6bVbuaIDs65tYF5Bz5u6CvWknu53Z2txnRAyg8r2QZuTp4+oi2W+wjmXSMRfVuqxemJgCUv0M1jXK8Pm70431GP94v6fcF+hF/D3aaMuF4N6bOa02dH5L0tTE6eVutvtUb1cmPJnS/BfHK4Vd7H1f/TPDRP/uk8HAUnJ9R2gRj/HvqYt+TY9qfMW2aR2Wibw3rD/k6zPu8jI/3mfHxBTM+3ifj44uCf63B/7LBv1bwr4fx9L6Y8XQj5F8bk3+zGW9X03jbWdHujWTyhT550go=
+*/

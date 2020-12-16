@@ -1,0 +1,23 @@
+// Boost.Geometry Index
+//
+// Copyright (c) 2011-2015 Adam Wulkiewicz, Lodz, Poland.
+//
+// Use, modification and distribution is subject to the Boost Software License,
+// Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_GEOMETRY_INDEX_DETAIL_ASSERT_HPP
+#define BOOST_GEOMETRY_INDEX_DETAIL_ASSERT_HPP
+
+#include <boost/geometry/core/assert.hpp>
+
+#undef BOOST_GEOMETRY_INDEX_ASSERT
+
+#define BOOST_GEOMETRY_INDEX_ASSERT(CONDITION, TEXT_MSG) \
+    BOOST_GEOMETRY_ASSERT_MSG(CONDITION, TEXT_MSG)
+
+#endif // BOOST_GEOMETRY_INDEX_DETAIL_ASSERT_HPP
+
+/* assert.hpp
+fz9S9/cFdX2fUtf3C/bj+d7ep3gb5/f2nsXb+x1v71/q/p7Cfpzf2/uRur9X2uBXcz81DrHti3rvh0of9N/X/zyXfc9z2e+sa5+zComvRT/zP6V/eXL8ue1XVutT6v6k7kva9iPPXR/So//4L+47Sr+x/lf/q//V/+p/9b/6X/3vv+rnj0z7Jz7/F81Rj/+/+NmfOb36m7ltvjK/F+NjYB/YOZZ+9Gb9jfWE4RMmjBx3Bd9tZOcWmd/ABzm/7c9Hlbm0ZpjWen77cqV38o/x91FzWw82NcLM0XODf62On+cf7h+i4hit42ip/Bcry7Jl7j6PAI8Yx77Tc/kf3mLoocpvQJial6+/2XhKxROhbOV5U81NnYm1EXL8vseM4/GcyRc/Q9Sc8FuVWy+fhcz/bIOei70fETYPuktuHWn+nY+cDLeJT2SbeS75NnNQDfPcVfrp2vPxoJ6/HqTmoUq5yFx38h038l108gNd5YfH95M/yPf26+Xd3UqkeyzhH7evC8mZ+Sp/D7R0cBxF1wUVxuOb8S+VXsi8tkDbuvBXdTzHMdAhdUHH0bL6XGd1PApO3mocD1fxkW7V+sy695MKm8fMc6ygPAM5ejvpzpJvDvKRmdgwoxbfFETIHF/SSb5JOnFLcOWtx/d/WfKdvg92tIIMVag2tWGrl3yckTE3J2+6t3Yl4c5X+hXoryj9bfd81PPFd6tjb0kemmHjbNtTEzWvcbDKMzV3XulppGUqbvhBS1RuoymFAPFnuiUqNzNvc23rf23mTweE3/GEZz2Ot6nHfT3zWuZA133Oa13n/tqPXXobC6v7nFr7MdC6j3Xaj515G7s8d2O7Cc0M9xM9v+g1b1F42NtLBk8Y3/CTfnUf6/xnz/mu61ih/dilt7Fdb2OU3say6z62620s+ys1h0Pum3IfL+GPnvz9EFT7wcjc44GwAxwML4FD4RA4DE6FI2AWTIDz4Ci4Co6Bq+EV8BF4JXwMToSvwsnwA3g1PAmvgY18nHoUvBZ2hslwEEyB14qeDtPgr2AGLIWZ8HHRt8Hr4e9gDvwO5sJw8ukG2A8Ww0Q4G86BN8JF8Ca4FpbwbxNcAHfBW2ElXAI/hUthe2MuEOwEV8Dh8E44Aq6E0+AamAvvhbfCdfBOeD/cDDfA5+BGuB+Ww9PwUdiWcnkcdoAV0Ny3Ud3j5J5bUm3fxs5Sbt1gTxgPJ8Du8CrYB2bAnnA27AUXwovhUjn+FcRuuQ+oe5I6T5hDpVv9nsXpfLgTdoG74CC4B06Er8EZ8HVYBN+AK0RfDd+UenEAVsCD8HXRD8K34Z/hYfgZPAo/h+/ALX7GmHvN4/L1Y/L/W2Py/lfip35M/r9iTD7rG8oe2fKNo/73b3z/z+ei5+z9f1pTh35e2SbPfWG+Lv4lhva7Tj+vpBKuKDk9ozANKwqIDW9ua5LMSs0pzpC1LMxwbfXaFpPvN/QGtVj7IxRQJ5V/l54iegTPCuOcf7cbc0XPng5xG+Fy62G6DXS5dTfd+rjc4k23btqtRz/TrYPLra/p1sbl1sd0a+Zy6226NXG5XWy6BbncepluP6/Tbjod37rcdDpOuNx0Oj5xuel0fKTduut0HHG56XQccLnpdLzmctPpeNHlptPxrMtNp+MJl5tOx8MuN52OMpebTsc9Lrd4hzwLrtBu/ZR+u9b7Kn2+1vsofbbWeys9T+sXK3261nvJ2ovmt/+qznqseXMoUPb39xVKO6hc770dJOfk0Ri8tgXCeraFn8vq1hYWb/BsC8FKl/pSputzL11fyqzt45Mya/v4qMzaPo643OJ1fSmzto/XXG59dX0ps7aPZ8us7eOJMmv7eLjM2j7Kyqzt454=
+*/

@@ -1,0 +1,15 @@
+
+// Copyright Aleksey Gurtovoy 2001-2004
+//
+// Distributed under the Boost Software License, Version 1.0. 
+// (See accompanying file LICENSE_1_0.txt or copy at 
+// http://www.boost.org/LICENSE_1_0.txt)
+//
+
+// Preprocessed version of "boost/mpl/aux_/template_arity.hpp" header
+// -- DO NOT modify by hand!
+
+
+/* template_arity.hpp
+yLsAB3Z1rm/4Fk/H/Zx9DHJ8kl8qqj+8M/2cLe8xrOK4r3C+pF3yY4WlXbkGW+X9f8q8Lw1l9BWWddew7nDl2XY3565XmLQXMMh3pYt5bPPOlmO21BA78z280f7d7n7Mf1zd759Vx/uJqY73dN9ecfe8veO5pw761koPubjrz+/HXNRNu79uc6nj9Ue9fJbt+Ntavu18yrldQDm2C9XJ3zt8S90/08F2U+XzNPn8plU8TFL2H9aIp6Zst1s+75XPX9oev5Rf2RrHYY4ny2b/+bLduevsf6F8flI+n1HFE6KTMg0NEo8ndlK9k1DSk9Fe6gC6YFvMIX+NolQzErLqOPduv9w67nf72T6r31JH7+6j6cQz+t2cp9MEfV29rjUhlBBFyCSsJGyv635O757+WpMnYcof/ft/WlxiYkL0DT8DMLftP3DC9Ltdop3QrXeQjH8ny/UnHS0PsSzv62A5zYMty43Wy4N69LR+799Ku+Uy5pwsP2i3nF8fquXe39nHr14e6mC5+vhSHSxXH98aB8vVx3fEenm3oBDr4/M5Zbvc+vgG2C23Pr50u+XWx7fewXL18RU6WK4+Pt/v7Zerjy/se/vrqz6+uXbLrY8vz2659fGddBA/y03Pj5bU08l724insuNnJRmdLM9K1Afh9LsKb5P4fTXel5fjOH6X3ldo3ke6xj5ytfcBru1D671/eY734dJ7C6/3/r98rX2kXv/5kjr+pRrxFziO3+l3I5rjv6YRf6Hj+F1+P2JkVY1nnTbxS4Z3Oa/ma8Sv6+ww/nLl1dZeGs89He+jXHk1S2MfAY73Ua68elpjHwbH+3A5r4bpNfq8OY7f5by6RiP+CMfxu5xX9dU03ldpE7/88XM5ryZqxG90HH+58mqBxj4yHO+jXHk1uLrG3wfH+yhXXl2ksY9cx/twOa8Wa8Sf5zh+l/PqqBoafxccx+9CXpVxTb3lnT/ybPor85irbUzxm+NWVWu43q/QlefT6v5Ny1TjANdoW/KMJbeDdfrDasqOpc3lPPP7J9tbp9/2naU+FZh+5Rm6HxGcJSh1BZvaaz9DN6/rV5O4lOdHHUrXLdZYdwDrTmT+C6p1i8p4J59e3smXKdc8Q655QaDdOQupiDoJOWfqc2F3DtXp36GR/gD79Evy/9i6LlfTnyXvFNwn6d8j6Td2tE4/ZVGFpz/NifTHy5cnS9Kfac4/ba3THxdjff69/+D029bHFavSb1s/p5QpYe1Kvi+jW1mXKX1N/2eelCm/mcclbm19fOb6qxvp8+ls/ZW5Tyef6dOZand96qry37Tk2Diwrh+WY5op12y6TsrJdtbHlPwX+84Um97188fXbWnUDWnU5bleN6RRt6VR96RV56VVR6lVp6ZV16ld52gYr8wfvbP+uSHjL+36YEXb8a89PvbVkrqtAJ08G8Dq0s+kEkq+N/VDMq+X4+R6uU6ul+fkevlOrlfg5HqFTq5XVMZ6U1Tr6To7t56Pk+sFOLmewcn1Qp1cL8LJ9aLKWG+qaj2jk+tlOLlejpPr5Tq5Xp6T6+U7sV6UTu6v8WtZT/2erwtS93gR/fESBuJlnIi/YApexRX4H9wn7wH8SkH2k6eT+2C5P44n1OPfKwlM9LeUfmDoL/0qu0m/ylDpV5mBoZgj/SmX4ABcIf0m35B+kxcxDH/HO7E2+xoi/RyHYkMMx7Z4FybgMJyFI3Ae0m9Sxu6Ve1HMlPOjHru3s6S7i6TbgB2xG07F7jgHgyX9PVTxBpQRbwuJt6XE21ribSPxtpN4AyXe9pbrKfduuM/B9Rwj8Y6VeMdJvOOxF0biLIzGdzEOd+Ik3IOTVfspkN9BWQ72U0X2U1X2o5c=
+*/

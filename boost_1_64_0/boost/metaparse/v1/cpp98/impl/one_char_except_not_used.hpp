@@ -1,0 +1,28 @@
+#ifndef BOOST_METAPARSE_V1_CPP98_IMPL_ONE_CHAR_EXCEPT_NOT_USED_HPP
+#define BOOST_METAPARSE_V1_CPP98_IMPL_ONE_CHAR_EXCEPT_NOT_USED_HPP
+
+// Copyright Abel Sinkovics (abel@sinkovics.hu)  2013.
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
+
+namespace boost
+{
+  namespace metaparse
+  {
+    namespace v1
+    {
+      namespace impl
+      {
+        struct one_char_except_not_used {};
+      }
+    }
+  }
+}
+
+#endif
+
+
+/* one_char_except_not_used.hpp
+EzB0S3ZlnaX3Ga2lRfbR4NFa5ul7oNMk8bp5TVcXOvDqSiH6epy3CJyg1bxDeLjTt5GxFe3bdXg+nFuN2wEcXQ6XHK3pCKufWpOiYVfQV99zRI9ZJq2MWkLWGZs1C56b31CQ7ihHHO7C8OK8QKcIjsbNWePGCyuySakLpwC7+lv4zb7Ua2TbObTNRon2j6m2c2XbnlrbZbLvD7W+V0q8XTW8a2TbQq3tTtlWrbXdL9v6a21/km2LRVvvdJXjG1+sepbXJ709UvokvjtSzrG7rqdvjbTuZnOuocO/HBndXfa+W/BrG27dJ/veSN0fYnIRHt2uPxr09x4dlUscLhyBwwrFxyLrZ9jI3nrTZuvu4+TGWxbxSw4drWWTdY/rfdfF1t6xzXrfK9DBM3lM55O4kyGvbQR1JY3Hn0i9FIIhgYEvGQUPOvFFQsY0/IG0T2+ZwZNAc8QnopaFtafBEv8nmpwOkW1nizYtz95ofXxBUkJ+bLFuXOccZVs/zdBwFQ8dbcsWxliX3WWhDxJEAW7HAz02HIIbNW3WIOA6UUPYMEU/FYd4+/HObjyfca9J9e1tLFqsCrgx9bUD/pvnfRmP68O+eOY33lymXPGEq3Dz6mdXVznvutrLxTFynepRztlsk1Aa5139o6Q+EPSF77II11Gjwcx3PSoazwYHYSF6SLXrz6L8AJ6zaQQpfBWzqt/VuWu369Pq2WdjDdFgkb62uGMZ766Z78IdHTjESysIrsWYCz04ymqpsQ611htOqtvAw8DRF2TTVuVdznMkqiZZev+QqHhOR1mJsfzv6VYoa9cpd05u3OHjHSPpa2oAB94TTy7NLEm2G6/i1nnbOUqzK/JF8L3MfRMFzLT7/Olqbyz9FrUIM0kw470ji3tT1/3s501zwN0kQ8WweeBRZ+t9mj0GDGkP459R6ODW+FFyi8my7QraxF23z2Kq7S6J10/g9c72JLq8tudRL40+oZW3nzVVVrDMpobZFZVwR9vH/TrPgpf/w3fVV3z3YZ+4eBKB+wx8/TjOHfYaFIZBVP6tjxEaHWVTGEfTITpGMQz96iubGor3gyubKVPwTZKi0rB+X99iTcqMw5521i/e3A8P7f5Cw0Hyrov5ASE3brs+Z5kF1/dSF8YhIqELkzdiRsIOZNneC4PSWfeZb44ycixMp9rDu+EeRdIEifQ9rNVhHTwLaPPOotcXOr2iARUcIlhwBl1r8oMMpIEvZlAem80m5T4seE8r9YQAHO1/x3BsAi57H7tqMKaMeDHBWA9Aa73lNpzOuu2aMlrmbNBiqvhi+jyRmQVcZaRobfuMVvlQeRFZOy8F5unv2O5vl56LVfWmXsIvkY85dnCNV8cbR7uyp9N2llYzwK0js573RQnVSRR6clQs9bvhzYxNvTcobYOTasf+LM73IvbiVz67JOXs5WNvzjVf8qGqWPeYzrtPVM66EJiQSN2e1Wh0+E5Afwvujl2djsbu3T5y2HlnH1969/FvIy+hX69sPL+IgR3+k36ouVQ+sXi0kwNZl8yVjKY8uHn10rsIb0kJPFH5M74hNNp51tp5v3I+xGkAJfjCN9Ktaus9o705C5dhkgQiWl4yWo95XPjLnlyQSnIUpybXSSeWrNG0e524vPVJo+kx3vWHx2kK73ujS76PGiYp2p/g4BXUcxW9laM2n8xuO9Ans2eOlvkXXSh68JJCxcNzR4c1YGK0TDdPOsh31NuxLS+asp+f6BoV6KXhx3u7D76K0u3sY9BA71mWxo95hCszDuHj740Vc+z3klxRAi8IkjcAz8opriyBF0pCdO+fuNVBMmv74AS8kGF08GrX4N3Y0Xy/LjGf/R6T68DjSKN4viE=
+*/

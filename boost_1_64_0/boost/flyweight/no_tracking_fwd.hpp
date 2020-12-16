@@ -1,0 +1,30 @@
+/* Copyright 2006-2008 Joaquin M Lopez Munoz.
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See accompanying file LICENSE_1_0.txt or copy at
+ * http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * See http://www.boost.org/libs/flyweight for library home page.
+ */
+
+#ifndef BOOST_FLYWEIGHT_NO_TRACKING_FWD_HPP
+#define BOOST_FLYWEIGHT_NO_TRACKING_FWD_HPP
+
+#if defined(_MSC_VER)
+#pragma once
+#endif
+
+namespace boost{
+
+namespace flyweights{
+
+struct no_tracking;
+
+} /* namespace flyweights */
+
+} /* namespace boost */
+
+#endif
+
+/* no_tracking_fwd.hpp
+j+mNouWJLLd2+c8R5HI6cE82Xj2C9zYnmpEejRhEGEmNNU7rEFYSYzpgJDPfMMkB9awPIUt33Y/L09CAJ3iutu6niCkEwcncxCJAfaYdZVRmEkc5EYo3JmEJRENOxnO1fXerfCYi+UgwaFj3O7dzUwkKWoHFcrHQi3qhQjL6p/s/32KNkH8fN57Kobrv/4mnL1A/Q+M30DJxWA3/wEIKjwAyRjgqXOHLWfsha8TCAO+LqX5vXu3l9KWmX0TeSA9PIfqLuAtJV7gXFeZ2lllMSExVVP9An9wprUn6wWzC+IA/CkvmsiORCA7X/3VzC3W8r15G412MZtVyaDAOc+0ibJ88KOP3u9BpvbPKQVcOHYGbq5BLK1ljj5rG42Aaj32OmMejZox9UfSjOh5fg7fGVxzqeKRjayHlX3uEj5kVOFQuw3bc9IXFno5SfMS+9xq2oeciG5/LpfalTPB1FMUI7LQ6kRKhMsF5F2k9rJCyUUN4/3ANGyN9D0ci1IyxMIxErBPOs+eGh0ERtyzS/wfC2Y6MZzcVSIniTilRdIMmFZ2Ot9gF1TH9NXlfZtzdwlOzP6HsRMO1GTHvPVpX2P/DY7BMUlk+L2MWPx6GPU57qlwIHzFKAS1zddpJ6Q4QtETYcbiVln1jfSTuCzUq/7OUu7JYqNr/TrKzf7AWFxM8fcn1Kw023yJ21mxMbu5srRydPUtN+xEpQdKFWSSPEHW5ePdweW4hjtPwKJoSNdiI71tJU7z+OLweJIF11RgcXvk4vG6S0pPH5wnecc5MFJjEeXYyjQfFXDd4An13Mmp1k5SQxxc9mbL4CY5PMqchMSvkgBTqTGkgj9mpTBhvV6kD8sZO50fJGx9eQp+erEnrtHFP8q8eU74xbYnFRyKRYpoTmfKgqpWQixuKQ+iTVdAzfDJm6Ro8V76TkIOMiHNgGeqDn240fbqXR+Onq8RPN0t+ui/m1keYqI4cD19ARe9hRcuNRbdB0fAUKjeWyt3Ayl1nLLcMyw2V2/rFwJLTC2lBSJIg9kwPe9D+CoVEbCA6hDzYgoFk89eM/vtO6ekmoJ9wpQ5mYlAKnObpk2umEGW782qLiGOYGEh1MCalErYDmS1uZ1APyGhj+isacB04xDqAIpN5DFl1bjXLprDcxs8cPy5DxJtj8pHY8nM2qJfcoQvtxF1CCtWDt0zBQf29D0XfaLmMVrgvHueMIb0Og6Oo4p1jMOEUo4c6vbMcX7dOF+NLvRf6S0aOZfvW/iVG+zauaLJ9HX9vaN/E6+Np3513/Vfat+/2GO2bel+T7XOVGto35b542ldQ+l9p33eLY7Tv6PIm23fNo4b23XNdPO0rf/h4t4/sn6l9Wl2Vtf3zclvyOfL/+2c9VBA18Vptwg0GW3i6r+UllnP6OZLlfFCynHfNZve1fJLLztUmg7yObVD0eu04NRzXub9vaTiuaP//FvT/9XoL+kcR/U+eLel/XtL/9h+i6O83xUD/E2NV+hfMOBb05zL9x21Evzi7KoGBc7F+P3JoOdoZ03E30h0YBXi0phWqA6O377bhwChGf26oie7PUaUW/XmYuILJebI/H5b9ueDmqP7ss9LQnxML1f4cMv1Y9Cf5P1xEU+OpCrO8uON9fFY0334Of/F1Rr6M8cXTqc0lftnmOyUndPssfuxq/FAycBSdowo4ZnFcOAUWCMGqXU/YOjNs1xmxnQPYWEhfqTqnW2Rn07uJ+/OKyI/lhHLHWYiywojyEJyTwiOIpauicg+wcuXGcnVYrp2BizNwa9XXHj9ujfx5+IH/jnl+bBuK8rfgxbnjLOum/RWl2uRdJi+HH6dm0QpuN4621fnvVhoar45Xz38X2JE=
+*/

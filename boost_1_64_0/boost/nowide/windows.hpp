@@ -1,0 +1,36 @@
+//
+//  Copyright (c) 2012 Artyom Beilis (Tonkikh)
+//
+//  Distributed under the Boost Software License, Version 1.0. (See
+//  accompanying file LICENSE_1_0.txt or copy at
+//  http://www.boost.org/LICENSE_1_0.txt)
+//
+#ifndef BOOST_NOWIDE_WINDOWS_HPP_INCLUDED
+#define BOOST_NOWIDE_WINDOWS_HPP_INCLUDED
+
+#ifdef BOOST_USE_WINDOWS_H
+#include <windows.h>
+#else
+
+//
+// These are function prototypes... Allow to avoid including windows.h
+//
+extern "C" {
+
+__declspec(dllimport) wchar_t* __stdcall GetEnvironmentStringsW(void);
+__declspec(dllimport) int __stdcall FreeEnvironmentStringsW(wchar_t*);
+__declspec(dllimport) wchar_t* __stdcall GetCommandLineW(void);
+__declspec(dllimport) wchar_t** __stdcall CommandLineToArgvW(const wchar_t*, int*);
+__declspec(dllimport) unsigned long __stdcall GetLastError();
+__declspec(dllimport) void* __stdcall LocalFree(void*);
+__declspec(dllimport) int __stdcall SetEnvironmentVariableW(const wchar_t*, const wchar_t*);
+__declspec(dllimport) unsigned long __stdcall GetEnvironmentVariableW(const wchar_t*, wchar_t*, unsigned long);
+}
+
+#endif
+
+#endif
+
+/* windows.hpp
+XrPQSxnkMwB76LyDWf+3meTv/WTzNNtCy7tZ2lVGW/bK/d9mw/7Pq7BEhQl/cIsmyw/Tr7fxZIWYpeonzmK+GGzMIXNTHGsoyozep6hvn6I+bsb6FGVG77eKniZpG+NzFkO/HLSKHiyuU4V68rlBstcsLnDrUlfMzyPatS7N0r/cehhzgoy3s8Gr22Go78/gFmOwG9Wfy3NKhfnJRmu2iZZtxST2rAm1k9ndlF753sJjdE8ps45NznyN7dlx7RqLZnvffL8Euf/HKiqGSquWb5sHZZ62imFCWm1XhpdoJ9nPzIaX3HUI7TxjFR2YFbV/jf5MIuvJrL55Ugj65aw8/0ve+E+Nf1EPOZyjazrM5g05XA5xZBlh+nvyvWR5NdtgXMcUJs7THITp52CMwtznZZk+Q5k+hQVQJplxH34huLnIGmlju57+H7/yvR1jewl9Rqbvs2gyG7Ny9afNxjkCjzM8Nx9viDs7o3N2rGNkzUKkZT19LRf65SrdQ8DsSulKyzEON6yik5BWosCp3GjLTaswsfzisqbcgrENWMUiZilWHp+Ivr6t/f6g2dSvvuuOHO7QdaJQaX2SFsvvJj2ga9uszFOeV2vRzodWcUpIy70xVUGM3yOrWMHiWgxpUQxz/olV3GYWE/V9KPJ7Ste2Q6Sd6VAzE8p8ZhUDhLRbV8/L77w+pzEKk3a0Yw75vos3+ty/TJHvCHG9DT4n3NyM70sgK89sZLMqsCSy4cwuN7/UBXPinVWEs9wTZkd8Qn7vrSIfi/umjyUEc/4D7d+ZZcjSVt4jSJaDlfnq5f6eWDc/yd/V1gn978XxZInMwvI8nIbcP1tFYWaF+nWV75Il8zNbc64x5pLvi1UMNEm7dqDNAORusomGLO7z3FOdsH0JsYnazIY+KdQIY0T2PbMjW2eeQe5kEZqtNd4fqbAkhYnQ4GZWmFNh0WRRMMM9pWQ2mOGeUkWcRxHnU7TFrygzoChThAWPc4Ypcg8LXmYsWTaY4Z5EhfkUFlCYOdwmMsMM97QpLF5hXoUlkqXWbI3h3d8BshLM8tx8fgd9lkJvPzaW9yy4DXbodtQj1Geww4e+u4UxSmkTRZm5R5ZFO11kNZmtn1WsBuYLWRNmx189KIp2fmUThZh93+rgU/QZWbhmqw3vTHWTrTFJK3V580n0Z4QN+5VVtGxTuUldjHtqmzjGbNLSLUmwNDZxn1nNMuPld4/T2kRrZr6Xs15hDqaj/EKlPT9yYQjaabWJTizu2u+xKbA+2GziV2bjwu/kQFvILDDDsxFkETDD7wFkkTD9ebGwBzcnWbD6YsiC1RerKDNeYR5FfT5FXCLZXs3+oGXY3szyW7WRNuE0SYu9mtWNeRZlE/OY/ZOx6VHkl9EmjmtlrqRlyuX1dsAy2fC874rk9eFatxj0WWabqB4ubeKPFVOjLdn1cS0fvMVc8uawiX4h/1ryQdu8kIZFEZfbJiYwy1rkPOKS8tlENyHtlTfbOcyz/DZR0SRtmUm+X99cAH1NZngeliwSZrhHUGHxijI9ijifwhLJImCGea2oTxQMXqZTYTFkOTVbJgzfRyebyGxs104tUGYh2mYx61wth/wuKVmoSdqxtg0DyL2wTZxlNiHV5p3I4VubCAhpOdb2KYX6itrEKGZbb56Vz2iSLQqRVvDOSRviStpw/+5SWnbq27Uu+pNsALNDETVQn7sUtYVZy+qz1mLulraJDsx8AxoPQH1lbOJ2iLQ6fxf/gHldHuNHZvj9liwSZthmVQhuTrIImH6+RJMFqy9WUWa8wjwK85FV12wJLW/Uf18b619FG94Zt5iWpxNXLMUcrET7MWYDXnZ9jvxi5H5zES27R/Q=
+*/

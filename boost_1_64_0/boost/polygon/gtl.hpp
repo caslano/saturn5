@@ -1,0 +1,39 @@
+/*
+  Copyright 2008 Intel Corporation
+
+  Use, modification and distribution are subject to the Boost Software License,
+  Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+  http://www.boost.org/LICENSE_1_0.txt).
+*/
+#ifndef BOOST_POLYGON_GTL_HPP
+#define BOOST_POLYGON_GTL_HPP
+
+#ifdef __ICC
+#pragma warning (push)
+#pragma warning (disable:1125)
+#endif
+
+#ifdef WIN32
+#pragma warning (push)
+#pragma warning( disable: 4996 )
+#pragma warning( disable: 4800 )
+#endif
+
+#define BOOST_POLYGON_NO_DEPS
+#include "polygon.hpp"
+namespace gtl = boost::polygon;
+using namespace boost::polygon::operators;
+
+#ifdef WIN32
+#pragma warning (pop)
+#endif
+
+#ifdef __ICC
+#pragma warning (pop)
+#endif
+
+#endif
+
+/* gtl.hpp
+/pXp3pfptLF1z0sMsAvohZ9jdbyI9fASBuJXOBQvYyxewST8GifjN5iJV3Epfosb8BruwO/xbbyBB/EHTSyxrh9r27ltjLBzmthpYTJegoynjZ0WLssRKcthwGoYhQEYjW0xFodhHI7CeIzCBFmuRLTEBsuX/J6U/LSxweZJLK75WA4XYAV8BqviQvTHRdgUn8WOuBh7YRYG4xIMxaU4AZehEZfjNFyBUh6eS3RenslSngwpzxQpzxNSnqlSnmlSnulSnielPDOkPJlSnplSnllSntlSnjmoxqbMk/MInfZ4U9bHj9gOb2nWd6ZM50m6are++5awjpft4ni5Ml6ZAsbLk/EqFzBevovjeRx3rXwBx53Pr59mvCB1fvcfL8XF8bJczDfHxfHyXMw334X5mfZnJ2Q8nfbzqcSSPIOV8DO0xJ4LkOlSZDpt7LnPHpL9GVbFz7EGfoFN8CL2xks4Cr/ESPwKY/EyTsArmIBfW85rySdX8uX5H/I1nwMORNN1NIkF3xC9sCX6YSusj22xObbDdtgeO2EH7IGPYT/siAOwEw7FzjgSu+F47IHR2BPjsTdOxL44Wep3Gg7ANTgI1+NwfBWDcSc+jrtxBO7H8fgRhuIxDMOLGI5XMAJ/xki8iwZ0pzKi0BOjsQ7GYH2Mw044AbtjAoZgIo7DdIzEyZiAGZiJU3ABTsXFOB1X4Axch5m4HWfibpyFB3AOHsYFeBafwcu4EL/FRfgDPot3cDG6s+6ysBouxbq4DJvhCuyEK7EXPoeDcRWG4PMYjqsxBV/AKbgG5+FaXIrrcA1m49/wJdyML+MbuF62hwaUKeC0xOyV85468m83iWleDr/HyngDa+AP+CjmY1P8CVvhz9geb2MXvIP98Bcchr/iGLyL47CEvPuhJM7DUrgCH8KX8GF8HR+R9lMGD2BZ/DuWw/ewvLSjCtKOPPEUVsQLWAm/wMrSrrzxe6wi9VAVi7HMvlgGq2EFrIE+WFPG41qPPEfDMkh91Vb2M1Jf2VJfW9ELX8OWuA17Yo7UwxsYjNsxFt/ECbgLV+IeXIV78XXchztwP/4D38Y8zMUL+A5ex3fxLh5EZTkOYSU8gj74EdbBj7EN5mEXPI6j8BOchCdxEZ7C9XgaN+IZfBfP4Wm8gF/j53gbL2rOG/zOqvtLh/OGSDkvj0ZvjMWaGIf1cQI2x3gMxATsionYG5NwKCbjaEzBCJyIcZiGCWjEm5hPQXKkPOx7KI/5/EHZVs1h8+V3DFbF37EWurE89aAYNsGS2ALLYgd0x95YDodgeTRgBVmfHjgHK+IirIzPoze+jFVl/friLqyOx7AmnsJaeBFr49dYR+rXX961UB99sQH6YUNsiI2wOTbGQGyCnbEp9sFmGITNcSQGyPpvgbHYEpOwFU7H1jgb2+BS7IDHsRN+ip3xEnbFX7A7lqCOe6I79kJv7IudsT8G40CchoNxKQbhARyGeRiMd3AElmW9hWBbHI19cAwOxrEYhONwGI5HuS4hz9uQN8n+usQ2iYmagwH4BnbA7dgF38RuuAN74k5LrNWSludiOBbJde/lynYvNyPPynH5C/TCL7EafoW18Qo2xG+wBV7FtvgtdsFr2Bu/w6F4HUfj9xiONzABf8B0zMdp+E98Gm9iFv6Iz+EtzMaf8CX8GTfjL/gR/oqn8S6ew9/wS/wdv0U3fifmQzG8jcXxNyyByvXyh7AcPoyVsDT6YjmMx4o4DSvhXPTCp9EbF2F13II1cA/WxHewFh7GOngU6+In6I9nsAFewoZ4FRvhP7Ex/ohN8Fdsjw+zjjpgeXwMfbETDsfOOBq74FjsiuOxG8Zgd4zDnpiMvdCIfXA29sU=
+*/

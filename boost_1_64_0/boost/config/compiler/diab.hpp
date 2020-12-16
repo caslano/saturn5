@@ -1,0 +1,30 @@
+//  (C) Copyright Brian Kuhl 2016.
+//  Use, modification and distribution are subject to the
+//  Boost Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// Check this is a recent EDG based compiler, otherwise we don't support it here:
+
+
+#ifndef __EDG_VERSION__
+#     error "Unknown Diab compiler version - please run the configure tests and report the results"
+#endif
+
+#include "boost/config/compiler/common_edg.hpp"
+
+#define BOOST_NO_TWO_PHASE_NAME_LOOKUP
+#define BOOST_BUGGY_INTEGRAL_CONSTANT_EXPRESSIONS
+
+#define BOOST_MPL_CFG_NO_HAS_XXX_TEMPLATE
+#define BOOST_LOG_NO_MEMBER_TEMPLATE_FRIENDS
+#define BOOST_REGEX_NO_EXTERNAL_TEMPLATES
+
+#define BOOST_NO_CXX11_HDR_INITIALIZER_LIST
+#define BOOST_NO_CXX11_HDR_CODECVT
+#define BOOST_NO_CXX11_NUMERIC_LIMITS 
+
+#define BOOST_COMPILER "Wind River Diab " BOOST_STRINGIZE(__VERSION_NUMBER__)
+
+/* diab.hpp
+twA+aB99pQqvJcwG3qv74yjnKRjxt2/juGlrFG7nuGpsxN0JA4cGJ/i+HRxXDY94uZPjqvERf9lNOK4UANfYnbfSNXZYhGUep46gTY9tv0m5TgLGz6Ubhdf/rpdh6z/J2p63+zNUu/st0ur0LQfoD6rdsc1Jvz3RYE/78yq8ub3Rpm+Ucnhf/+12wFg7I3ZxAjDWxoj9bidi2L6Y3k0Qw7bFfrsLMNauiM3cHDFs0zvoNS2x/1P2aYhNEQyWxdSm6xzB1KYDYucJ1l+O1nIf+h9nVxJj11FF23PHBDCzgQBmDnN7aLsNAderqjfUGwt3Gxymdg+/3Q09fPp3BzObYZEFSFkgYQRCXiAIAgkkWLBgEQGLLECyxBQkFl6wiBASWbCIEAjqvv/efffW/21iYgWcf86t8Va9Gm7d22H4lhpjBn7Dm+PLUlfR3b9xfbGzF/yFu9M+PGGsvVjNuclc2Ynu9zfh78a+7yz3v/L+CXZL2N3b728wZiXZyeYHEB+x5/7MoQZrW4NgO5MthkmiTU2ftNXa1tLOekNp8VWCk+O57o0nwTd3tladvmy2b5wuE4wdL5L8LeF0e77u7dFtjqvm8ngD5wDWn6moojKsTPnM/fs3/Zm2e7Fv8L2YjRNTpOn4sNvrdcztsv53+ky7nMA7r1s0rWkrY5WHeSKgHejbg14bn27qJ7B3/cRgYWhDtQzBkmC9IN3ck1tXex3MBY3vtNeA78F58HPK312+j+gWtVl7+ECDQU80eKsOaAtzCDjehSzRo+NHAKc3qMTmZBIx2tOYv72nxetgNEtOW+oDIGrzeOJoy4GC4ftEzN8+C3B2M4XY5LM9bK2r168Z1tsZKjrmC++DEMeLMvq+8BjgZP5u83we/D7WZg3X+v/6Ov2eKZnEYREVwvV/Act9CNk+clc+eYPvd1IVRnmUhmLq5KnTZ6bPnps5v7C45I4tm/eG6N/yBp/bpIpkHtpnHpenGQvtvmmVpqcjUaoylWUQjR0MsFXKBs13Gv5DDodFeQnqhmk+ysoYw/liYcOk2jtN9+4J2r0eagWkOfx5Q2CaT7A0NRiIRGFQyv+nnG9o+6Aeu/PwmVsXp1dOLpw+2zvVWzy5dOb0KfeRWmt5xzmvN0X/IbwZyjvjPObtwUsY72SvCQfca3mtjlwBXhNLeGaK/+P/NyzH6ffn0tB2atsp6godXz/e12KDzQZF7NqBFnuohRA7cxgxFHw+7tsAc3NZf7t7f3sMfht9k/Hn+ncIEvnQAl3n3Hge/L68tdDfnncv5yAUDab/wxcAtrKxs9LHdB5/VfMbjEQyjj/z+uZ3lzP9fepN8HvfBTk+OcXeD9e/b2/tbi4/RH0h/IyO6XNlEKoojWFMq2jqzLX2GCcIqI+BX1GZ0yU44C5TKxxxuiVPt9xblHsqK5MkDDPgYrId93eMmwSVSTOj6rIsNeRpXPtQrjQiViYJAmtq9sArvi5mbaDC2Qsn3Tw1C/NUe7KCe7V/0PSmsyhKKx2Ew3Y4ddmNtcYGhPo8mxuemexu9Dv9eWwf/X1+aRF1C/Y7DFvps3jEFEMjSpyf33poDA7JE86No2M4kA2Lld1yXECS5riY+ZV6NuCj+nzjOfB7vRjmb5Kei79DTuhv6BHy3juCcNo7hbv1XLjae3+3XnqYr6naG25M4zrBYUuABLLmusbTgO80ULr4728BW+yrC2tQpfor/H7Q4xo71r71xleL/lvszqZ7Ym8ujosTf4U1zwWYj8WFkxcusFyFOC/Od2v3y1/31npBrCNp7d1+39APLhsPlShUWei40OO/G4sLa/x7kTdOOXDN/zxc81/SFqrfvAk5/hNuR96YeeK7kPs=
+*/

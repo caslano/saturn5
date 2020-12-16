@@ -1,0 +1,33 @@
+#ifndef POSIX_TIME_PERIOD_HPP___
+#define POSIX_TIME_PERIOD_HPP___
+
+/* Copyright (c) 2002,2003 CrystalClear Software, Inc.
+ * Use, modification and distribution is subject to the 
+ * Boost Software License, Version 1.0. (See accompanying
+ * file LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
+ * Author: Jeff Garland 
+ * $Date$
+ */
+
+#include "boost/date_time/period.hpp"
+#include "boost/date_time/posix_time/posix_time_duration.hpp"
+#include "boost/date_time/posix_time/ptime.hpp"
+
+namespace boost {
+namespace posix_time {
+
+  //! Time period type
+  /*! \ingroup time_basics
+   */
+  typedef date_time::period<ptime, time_duration> time_period;
+
+
+} }//namespace posix_time
+
+
+#endif
+
+
+/* time_period.hpp
+H2cI17T/VM+GxweUe9TwvaVc7pJ5wPNIftMI7mtEAmDgg1jVXHasYTVaAs9pS2DdALAEmsES2GosgXvU3h2vVSE4ucHQWoNwQjDkBTb66AjM3t0A5KB5DCOg8osgX3/r+DOqkPAvh2eo5+KNfwNsIHjwYzAA7NU5PJ8n4RYqzJyPXnakmy6nalP2gE780gWQ2ICJ24EQKrxVpYM/M0aHb6I+zrkaa0SoxjZT4z0qHQDHgIgDQMSxK7T3ElQ4WNJ4KYqsxr2qSHrFq9ZuuBwwmFX3AGCEcM/NI0wRWt6rk/7ubiQtpEhivS6SKB+j0KNiNxN6t97HPm5iBaoBjcG/ytldeQmLkgCrKipISTPDo2rvVAP+pdKY92AH8Ui1nYHtmgVcFvTpEyI3XIonRKp8/3uBJK7z9/l39Dp/vVDmRzkZ52/UJqBaNViz7xDSkL6p/kNJkzV9c3ulTw3wWZmJc6AvtdhGn4JUJoiz/9KiKR3fcI+GoR3Pg9S6/+d30dZOqki9NdTRGzqR2FAOgbPSeAiaB1F4A8aN6SD3Fi1jRvpAxqyCWX+dkTHzZmOQ+30m4mGDcj+wZ8DbXKJV2sbEC0oMJNepUtp54OOdkLPRMCq+6WUPZ+Vw1kjK+i1ldXeoSFcdz6eLNHarDiczoMrLOyCIbt178azfYhOr0qjTI9gsrPEvj6VGna4x1l5jULrG45oQqd42YwfdoTvoZQ900FXWDho3CztosxXbb9+DbWurBKf/B9PtAgnJLSMX92I7yipA+WWN8mYnlA/OBJSpMoHvI4hv7e2o1bzBkRVPZ3N+KW0Y/ngRMrW0m+vgrzkzcSbtCXY3F3CsYjwXz21o5mtJfJgPnScn5aQrrimlJ29zMW8rKuPuOZ8JfxVrOLroKbm7S6duPJQ3eR/ZPMrQ3A1CnIIEwDQ/eAgOrODX3GvaK7WA/9l/RqJXb+4QGTNEXr3T9Zg+rMqQV2+9GdNfqS3Z5Gm0HNYnFqnE4ot+vCfgMSnnHgH2qdX7fFefi/HYucm/edEUbPIV33S3W2imIlDHZW7EzU4CGUpMZSD3eSm+YzY0f00VqijrTgMQeAnCZXW0qYrSq0YZ0Z7N/oLUWVhn47FJa4MY0YukPeH3elJllLNk7SBLTnfycjULeDCKtz6i/ue3eIt2gM40201cy2vZUgqDDV+8J5GHAp6/exsGgqpNVfBhdz+Jn8Q8+HwrGAhYz1fYybU8ptZZllp7vFnUkTWWHH3GFB3fs6hh2QkwDtid3IiNXd7WOpX2ZPSyJ7k4xvmlx/nOoax/BPijoJrhdl+kLcLLXwWGo13lwDxUIepSpwO7LdXsNk+VwLNLkt2uOPd/yljuh59YihsuJAW/TgneoeU/mUCLsFv5EJXX4tmXqkXrBqZ5ajbttajtojJI+CUntEaUI9urVtjhNe0TtWx46RUYKph4v7kko/kj8T+0APFr9Zh9qInrR3gMHX+YYKPj4ATCkMH/8C4GXaZpXKRoRGdD4rZSlcNfVq/wpHdjKwD+KkJYwQiXccL+SBi5NEsz00HfES3fFTWb1CGcIYBq4hyVSIvnOabVql9U3mXv5RNMv6jVT6EtNXqvcX+k2mO2iTMf+bXZh2I7+DRNFK5T2FL6+N1loKzzy8RhFONlUoZTSsycBowXywDiSGqwKZsaytYiSUcqu5nKhkXZ71DZcFTrhWW00RvUlmY8YMJWf+rTFucO8nxwPMjF81B5WKRZK5IY8x5oyHbM1J25a5bu8lKD9ZdDUe25zSc64ImhvAyvgWQG//Z5WmNk1K2R0DOHyNKthiN16wIwPtYikFEd5wQT4w9fHqwjfLVQX7Uj8XZlB3OBLTWmzsY=
+*/

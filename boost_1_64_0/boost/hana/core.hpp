@@ -1,0 +1,26 @@
+/*!
+@file
+Defines the @ref group-core module.
+
+@copyright Louis Dionne 2013-2017
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
+ */
+
+#ifndef BOOST_HANA_CORE_HPP
+#define BOOST_HANA_CORE_HPP
+
+#include <boost/hana/core/common.hpp>
+#include <boost/hana/core/to.hpp>
+#include <boost/hana/core/default.hpp>
+#include <boost/hana/core/dispatch.hpp>
+#include <boost/hana/core/is_a.hpp>
+#include <boost/hana/core/make.hpp>
+#include <boost/hana/core/tag_of.hpp>
+#include <boost/hana/core/when.hpp>
+
+#endif // !BOOST_HANA_CORE_HPP
+
+/* core.hpp
+n0V2ffQBW2mEPij2/3OyPcwnS8u/TPljKL+K8pmHavm1lJ9IewXo+y2+S+dhLdKBSKvF9UCZz2T5FCutBGu13zgFcg550edg+BZkK2IOMBcHx0EkW3C+nJ9+VI7JeK8iN0lr7DBa3wcjXT0Eeou20DH5bO5qVYZZ1McW228i2Hehmfq5X9HekbgH6WKsoRbZz2S9n/BFELMPfU/FLDl/qoUz4FD1/g/Rzj2ZSmuR+iJVIp2DSuU/iv4b7TZvQFRE5z7VHbDayZyO9nUfFG/INyV4/TllGzNo/eltHhTkK1BYa6uWHg1yj8oiHPFQHeGj8JX0ZTi7zm0Xy2+SO+BrkG1NFr4xstwplE9QVv1IvjGaTwcQZOGnPTArgto3fBsi+X6grCWobLBvAwbhcRXZZb/nYxyXyTLF8npMiOG/UGT4uoSfM21NFhnr1Tgv8jpWGH4PQXOiNi1GnQjzwHdOuwY4G/SdvIby5+nfWcpfkBW6LpJTtMFfSuvSSetidei68PrUy5yeOr++MLq1LtbJNlRaF3qb/aKuCxl7VJapiLkudoati5O3ks9NF+vC29F+zHVRE1Q22rqYgnF8K8tcRPunClSJRvTfZ+mrskmWKe3W2qmIsXYqoqwdbxdrpybG2lkXtnZ+Dls7OVv1tdO9fVrTc8TxG8suWbrEvGHclpZMZeSYF8fzPq2x9mndLq6BQvdvel4w0zPDOFoocxD+90AF/+Gf+AJfA3kE5K2Q4j5xG+RIyov2Fil0fxXritpLRVpA7bVSe29BYtrKO5DpkPhKNR4r7mGQY8Xagjxb/F5AlkKaICvEfRzyEnFPgRTrvx/kXMj+kPeIviCfgkyDbIEcCLlarOUEbXy5Ct1r6R5sFn0hDafxDU5UGpPFfQ5S3JuHQG7X5k/3TtxTqd5BSAHF2NO5UfyevQ45CHJVgjav3TSv32lef9C82mleCtqfJeYPWSPGAukT84a8ScwvUZtXfxpHEVI5fV9qaRwHIBXQOE7AUMW4ToYU8zuFrlce5HHavk2Nudr1bawUv3Z03SwK/V7Sb7OZfp+nULuFKNdPxIWidVACKcqUUfsWan8GtV8OKX7bZ0NemaDZgNpmmJTUmSYlFwl2IdiAwu1Cmn9ZKT73Ct8yn9z7J9injOxF5FMWwWZE/mSR7UbkU1Y/U/MrWzCzw7dsycyIvmUR9xBunWmKuY/whyhD+wbpfmfG3kFtIuFz2kMI/aI9pCVV0i+tyz2GJ6BcNB+1onLMTbSD9C7SNiTzxeyzxtg/ESf+j53udQXA3vH/7vDysYM7eHkN8dGn6d5xL71Tn7OT/Ml1Mia3/jdopfY8KB8I/Q1+DEOl58s88Xsu694ny2TKMl7VV2UP+KjMBPGbLMvMCXquNJo2nm+fkGXMxvPtGzKfou/xb7RhPMcmBg2XmtPbOk+WPSSmPmAQ+fFjbnhWpLnRcTHuTHmc5kPHc41nS+qUdAalsk9FOTpby1dSPmOglneH5edS/rjsjmfMlISePxsG5LPbppV9dzTd7T3lujUf7Vw7LLt+//fd0J55aG3Sms0Ne+a5gJ41iiAPFS4Z9EzoghwF6YY8TZbXnnnqIMUXYy5kOT1TWiFvh7wacjHkQvE8Cim+G09AtnXpQ7Ln/iOum5J7zYekjfxIot2/v8c9WPcnSfVrPiV4vunsVzKL79UMBoPBYDAYjP8v4sH/pUnVXlUt2f9e2v+7w/9HDFYMe7SXYuodoBDIHp0hOVYLxdSTI9QC6uncX26XXmrzVauBoPeuqd4BXbzjnDEhgXhzisGbqR3izRnE74Zld8/Wcr60tdxd3No+8ajd6z5ueuFP80uvf8C2lu7YWnIUumY=
+*/

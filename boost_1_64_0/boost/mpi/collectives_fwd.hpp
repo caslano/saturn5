@@ -1,0 +1,27 @@
+// Copyright (C) 2005-2006 Douglas Gregor <doug.gregor -at- gmail.com>.
+
+// Use, modification and distribution is subject to the Boost Software
+// License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+// Message Passing Interface 1.1 -- Section 4. MPI Collectives
+
+/** @file collectives_fwd.hpp
+ *
+ *  This header provides forward declarations for all of the
+ *  collective operations contained in the header @c collectives.hpp.
+ */
+#ifndef BOOST_MPI_COLLECTIVES_FWD_HPP
+#define BOOST_MPI_COLLECTIVES_FWD_HPP
+
+/// INTERNAL ONLY
+#define BOOST_MPI_COLLECTIVES_FORWARD_ONLY
+#include <boost/mpi/collectives.hpp>
+#undef BOOST_MPI_COLLECTIVES_FORWARD_ONLY
+
+#endif // BOOST_MPI_COLLECTIVES_FWD_HPP
+
+
+/* collectives_fwd.hpp
+75UCl1GBx5wCz2GBIFGKVydKgYk1hVIARgRPlq03hotcgiQZFtx+NUMlD/SQ3MouO1TykADaZ1v8FDuNT6fGD3MaD0OKTWfIGrJk8WFsJ/5RFa6WW+Eadylce90K154chavlVrjGXQrXXrfCtUcpXIP/boVruC8/qew/94P1bOtar9pPFtneNT+QZWzvo8X7swqztOYJSbEtGmKmWKHtlH8f1gXMLHBho7rhv0j9h/Xgw0z40ktfjNiwOH0xP9A+mfHDm5/S8MNCNCpBxL2Hw10VTKHu7Ny9jeHTiZDXS/2xeeNSFUIxyOjnHeIWEMj86lubymj1HSp3mFvr4DvHwR/NHotB/n4q508W5GkEreTfScofUYAWnHk0A20DUQtpZF87gdwsV7PMpCPUmTBkNk0gUTzIbAyKtCE2CWCGVgYl/V6GHUrTpG8/f9KH98HV7w8u/xONkcyF8uwM8theMN6eizzre+OPen2HiiuUZdAI8Fzo3aqqePcD50LpPyc651l1+zjT3z5RP8TqZeUmoMZOcSN/djSPVYogXMVv5RBiK3vTON6Gq8H6A+6ZugHw84pSwc93Qwq5kJiNQ2BMRGeyP4y/gv9zY/W1fAkyq8zP7utkaX9HH5ITIQuhdFPWpJXaLuu0LGcfTD5cr7soMQkQ7L8ikqvif/bLjS/62mEqvmgfTqzuKXwpLH0Ym/oy3goGh7x4j42k5JYjTjNVzMlvv59RtxzpQSRpbv46hlZb/8Cpf/tj5sN6E4t8qPDFGZP1cd2b09SarPVYTQAliY154Z/oYTvHZ2PG7Bo+m5pT30Q5QRmdU+naf+SNxJT+D3CU6q0hvb0zS72126uU8w9bhChHlv1mW0MxbL7HJA3Fjw7wmDqi2BHJ5i1XADw5p9LfYcELfCWxKpTfrfR4fU8vYR0QqEzZp7IU2DXJQDBfSiLbQeyMeVC19aOc1FOgEAvyYiQi7vLEf9WDADN6WnRecJrwHor5odQZQ6ZFZxRNwyPcfLq3k/PN0wjAAPj7HUA7S3qzil+hPeyF9TV+JVFkJrrijq5JI5qKA5qiFXJTkFZIntDY8roHf+KTet4RqkXYX9X8KuM3nV+1cdgAA6DFGdA/kXAzcxeOWJX+H5BnzWvSs9rZ1up9c/T/pPLlK9jezvB4ZTdMn/kBOn91H9SYsXLexUH7L0xmtPgBF/jskLd/KXeCX1gFWzU0J5fy8azxPQhzZMjmjFXRRgp99jBMxLZaqjrg+K+CKm1BF6QO8JPxsROsA8skk9J14a2tF2W7qLfWQ+4fK5lk1o4nr6GvDVPN3QsjMLC1j1EEXvpx4aXByT+uT1rzgmFxzwAhhNEzswt3M0KObdOYPzdCxT/6FApK453ARhfvqWIXoYCD+WXo4ONetl/V0+9mHJjj2OKetTs4AOAOlfALSJC2MbGWa9u+TZBSAani2V8HRO7+bjopUjHkxm8PYnTW2eY0JQrBejVpvdY6m6CCwSAZn4LI8OfDDRXr4jCbgxHco3AUIM5zGEYhV31e8YA7ybLJVV9+GPHj9VP8/958nm1ND9JiFeMg+vbr96iPuE1Yafolqww4MX3vXqZfcmhNYhsNx2TkNdohpB4n1d6xzJjZht2jKc+POA/NUBTaCIpqgUD4LIMQy+fQPy/+Z6/ceJqv7a/iD/X9XkcMdeUOR3PK3iLT7SlhtthLlpQohsRDqXg7bw7G8a+cvxfxu3hWSCHBeimqMrtOhpQKlo2/txE6y3RujmL0xJ65NEL79GU0OtpFWQyMrTjdqDjBIOtlQ6LikgJZnMB7ykkJhrcnZNn1l82aAFe0wH0m1uGPiw8wtBWdE9DDxgBdiIbbbcdNcfk=
+*/
