@@ -1,0 +1,51 @@
+//////////////////////////////////////////////////////////////////////////////
+//
+// (C) Copyright Ion Gaztanaga 2005-2012. Distributed under the Boost
+// Software License, Version 1.0. (See accompanying file
+// LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+// See http://www.boost.org/libs/interprocess for documentation.
+//
+//////////////////////////////////////////////////////////////////////////////
+
+#ifndef BOOST_INTERPROCESS_DETAIL_WINDOWS_RECURSIVE_MUTEX_HPP
+#define BOOST_INTERPROCESS_DETAIL_WINDOWS_RECURSIVE_MUTEX_HPP
+
+#ifndef BOOST_CONFIG_HPP
+#  include <boost/config.hpp>
+#endif
+#
+#if defined(BOOST_HAS_PRAGMA_ONCE)
+#  pragma once
+#endif
+
+#include <boost/interprocess/detail/config_begin.hpp>
+#include <boost/interprocess/detail/workaround.hpp>
+#include <boost/interprocess/sync/windows/mutex.hpp>
+
+namespace boost {
+namespace interprocess {
+namespace ipcdetail {
+
+//Windows mutex is already recursive
+class windows_recursive_mutex
+   : public windows_mutex
+{
+   windows_recursive_mutex(const windows_recursive_mutex &);
+   windows_recursive_mutex &operator=(const windows_recursive_mutex &);
+   public:
+   windows_recursive_mutex() : windows_mutex() {}
+};
+
+}  //namespace ipcdetail {
+}  //namespace interprocess {
+}  //namespace boost {
+
+
+#include <boost/interprocess/detail/config_end.hpp>
+
+#endif   //BOOST_INTERPROCESS_DETAIL_WINDOWS_RECURSIVE_MUTEX_HPP
+
+/* recursive_mutex.hpp
+THcrGloqwXqAqQ9UZUABtdGXOx+kyDgpprt7zrfwj/vrsonMkHj9fdVO3mfww52CbjQV2Sx0+wtgUbbLizxEoD03P6ls3brGErNua1tF4aYG6wAPzfnSMjzXVtwvsnGx+QJ1exmShKg+p6EbbkzUnHfERiqlToSgypAv8T+gRXn87//5D/oKdVTdOBnsw2kQFMztfdl1Nd29kXuaw+f3Aw27tz8gDdzzZ0U3+CY9Izf95aJq
+*/

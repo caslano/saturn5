@@ -1,0 +1,23 @@
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
+// Use, modification and distribution is subject to the Boost Software License,
+// Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_GEOMETRY_MULTI_CORE_CLOSURE_HPP
+#define BOOST_GEOMETRY_MULTI_CORE_CLOSURE_HPP
+
+#include <boost/geometry/core/closure.hpp>
+
+#endif // BOOST_GEOMETRY_MULTI_CORE_CLOSURE_HPP
+
+/* closure.hpp
+8Njw2fTCL1be6ibRPn6S/GOtz8GrGp6HtzTeb5m4nvaxVf/i/Yz0n4LXtuLf+EAv+vqsyfgA4Xr8dQbeR7geP5uJ9xKu6+f1+HnCdf80H+9cRP3dKHx+5zz1Z/2eEPB91qd+/ovHz1G+D488/wS8lPLzP/Pz3/l4rPJ7cJf/NjD+YPXf8NpWfA1vZdR/Y/GLjee7AW9nrd/GEwyPY/L7J+cV/v36YW+CTytNnEb4zZ/49/cS
+*/

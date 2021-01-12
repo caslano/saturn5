@@ -1,0 +1,43 @@
+# /* Copyright (C) 2001
+#  * Housemarque Oy
+#  * http://www.housemarque.com
+#  *
+#  * Distributed under the Boost Software License, Version 1.0. (See
+#  * accompanying file LICENSE_1_0.txt or copy at
+#  * http://www.boost.org/LICENSE_1_0.txt)
+#  */
+#
+# /* Revised by Paul Mensonides (2002) */
+#
+# /* See http://www.boost.org for most recent version. */
+#
+# ifndef BOOST_PREPROCESSOR_ARITHMETIC_DIV_HPP
+# define BOOST_PREPROCESSOR_ARITHMETIC_DIV_HPP
+#
+# include <boost/preprocessor/arithmetic/detail/div_base.hpp>
+# include <boost/preprocessor/config/config.hpp>
+# include <boost/preprocessor/tuple/elem.hpp>
+#
+# /* BOOST_PP_DIV */
+#
+# if ~BOOST_PP_CONFIG_FLAGS() & BOOST_PP_CONFIG_EDG()
+#    define BOOST_PP_DIV(x, y) BOOST_PP_TUPLE_ELEM(3, 0, BOOST_PP_DIV_BASE(x, y))
+# else
+#    define BOOST_PP_DIV(x, y) BOOST_PP_DIV_I(x, y)
+#    define BOOST_PP_DIV_I(x, y) BOOST_PP_TUPLE_ELEM(3, 0, BOOST_PP_DIV_BASE(x, y))
+# endif
+#
+# /* BOOST_PP_DIV_D */
+#
+# if ~BOOST_PP_CONFIG_FLAGS() & BOOST_PP_CONFIG_EDG()
+#    define BOOST_PP_DIV_D(d, x, y) BOOST_PP_TUPLE_ELEM(3, 0, BOOST_PP_DIV_BASE_D(d, x, y))
+# else
+#    define BOOST_PP_DIV_D(d, x, y) BOOST_PP_DIV_D_I(d, x, y)
+#    define BOOST_PP_DIV_D_I(d, x, y) BOOST_PP_TUPLE_ELEM(3, 0, BOOST_PP_DIV_BASE_D(d, x, y))
+# endif
+#
+# endif
+
+/* div.hpp
+5k4Pg7/z2XYSp6xP9PNjMQ4zR3P5xSznRV5dYu2tpq01nw3DXD5QuSU2Cr4k1L87eT9Q87klAa/+4jMPWZLdYEYcGumiwyP39UWlmys32XVpPrQE6QBcMx3mKxrjLyQ997Ndktxr4rXmCsN8/s0aFpdtLKmx6yJ1aAnSAbTwYNwTUZYO0kg/9fXkL1lSVplRzXMSw3C99s0aVpZsrPKVFdr2HMeUhcgXwFCSw8zXteulpGdn
+*/

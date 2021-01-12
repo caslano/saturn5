@@ -1,0 +1,73 @@
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+
+// Copyright (c) 2007-2015 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2015 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2015 Mateusz Loskot, London, UK.
+// Copyright (c) 2014-2015 Samuel Debionne, Grenoble, France.
+
+// This file was modified by Oracle on 2015, 2016, 2017, 2018.
+// Modifications copyright (c) 2015-2018, Oracle and/or its affiliates.
+
+// Contributed and/or modified by Vissarion Fysikopoulos, on behalf of Oracle
+// Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
+
+// Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_GEOMETRY_ALGORITHMS_DETAIL_EXPAND_SEGMENT_HPP
+#define BOOST_GEOMETRY_ALGORITHMS_DETAIL_EXPAND_SEGMENT_HPP
+
+
+#include <boost/core/ignore_unused.hpp>
+
+#include <boost/geometry/algorithms/dispatch/expand.hpp>
+
+#include <boost/geometry/core/tags.hpp>
+
+// For backward compatibility
+#include <boost/geometry/strategies/cartesian/expand_segment.hpp>
+#include <boost/geometry/strategies/geographic/expand_segment.hpp>
+#include <boost/geometry/strategies/spherical/expand_segment.hpp>
+
+
+namespace boost { namespace geometry
+{
+
+#ifndef DOXYGEN_NO_DISPATCH
+namespace dispatch
+{
+
+template
+<
+    typename Box, typename Segment
+>
+struct expand
+    <
+        Box, Segment,
+        box_tag, segment_tag
+    >
+{
+    template <typename Strategy>
+    static inline void apply(Box& box,
+                             Segment const& segment,
+                             Strategy const& strategy)
+    {
+        boost::ignore_unused(strategy);
+        strategy.apply(box, segment);
+    }
+};
+
+
+} // namespace dispatch
+#endif // DOXYGEN_NO_DISPATCH
+
+}} // namespace boost::geometry
+
+
+#endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_EXPAND_SEGMENT_HPP
+
+/* segment.hpp
+x8bSwTcVmo/hONtaBSsW4vfGd0o82o9M8LeJREfS6OUrr+4nvW+z7792grXZWViDtujd4usneH4kIn96t/gAooO4vLEGsmff4UAm25LpMbjV7f73ZV7m331kcoC1ayIMGKr3e99DGPgcFmt1/fqG53H1Q0QHux9cWIHVNgaSIB4XCUOTgMWQnOX6wahutAbpUnU6u11FOoJZeX8UpiZG7YvV0aNxUnea0PU8+u+H+Y6H2m0b
+*/
