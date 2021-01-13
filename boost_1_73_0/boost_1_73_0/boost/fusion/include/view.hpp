@@ -1,0 +1,17 @@
+/*=============================================================================
+    Copyright (c) 2001-2007 Joel de Guzman
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+==============================================================================*/
+#if !defined(FUSION_INCLUDE_VIEW)
+#define FUSION_INCLUDE_VIEW
+
+#include <boost/fusion/support/config.hpp>
+#include <boost/fusion/view.hpp>
+
+#endif
+
+/* view.hpp
+whQ3uCdPkHbeyTja98Mj3dfdv69meECFSarUq/W1stWflpE49nPErhad
+*/

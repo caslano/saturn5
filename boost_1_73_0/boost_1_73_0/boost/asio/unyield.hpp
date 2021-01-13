@@ -1,0 +1,25 @@
+//
+// unyield.hpp
+// ~~~~~~~~~~~
+//
+// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+
+#ifdef reenter
+# undef reenter
+#endif
+
+#ifdef yield
+# undef yield
+#endif
+
+#ifdef fork
+# undef fork
+#endif
+
+/* unyield.hpp
+S9Z5bLa0uR2YYUk5NAAvBRtZItcmlpyFj7k3b8WgZpboUmwOztb+b9Bm
+*/

@@ -1,0 +1,17 @@
+/*=============================================================================
+    Copyright (c) 2001-2007 Joel de Guzman
+
+    Distributed under the Boost Software License, Version 1.0. (See accompanying
+    file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+==============================================================================*/
+#if !defined(FUSION_INCLUDE_INSERT)
+#define FUSION_INCLUDE_INSERT
+
+#include <boost/fusion/support/config.hpp>
+#include <boost/fusion/algorithm/transformation/insert.hpp>
+
+#endif
+
+/* insert.hpp
+cKneFfNnmrJPLVWkLn1bIqbnFkkyLm5za1jR4H22bUeQTkS+r+n2q+7l
+*/
