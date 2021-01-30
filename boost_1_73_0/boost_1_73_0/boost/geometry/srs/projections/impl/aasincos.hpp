@@ -120,5 +120,5 @@ inline T aatan2(T const& n, T const& d)
 #endif // BOOST_GEOMETRY_PROJECTIONS_IMPL_AASINCOS_HPP
 
 /* aasincos.hpp
-WYVr71qQifemtSJHIyvO0PU9fZYzres0rRNLotECbeubpzW9b20trY29
+ERwfMMs4poAjcksboeHDtH51b6vhdeve/YY303DAHm0hrVlnwc6CN/TyPfqCXXpVo+59AVZQtzxDZRrE
 */

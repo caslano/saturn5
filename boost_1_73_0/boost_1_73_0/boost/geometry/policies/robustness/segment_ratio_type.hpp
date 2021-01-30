@@ -49,5 +49,5 @@ struct segment_ratio_type
 #endif // BOOST_GEOMETRY_POLICIES_ROBUSTNESS_SEGMENT_RATIO_TYPE_HPP
 
 /* segment_ratio_type.hpp
-hI7eFKEjwhCE8QjTEeYgLEFYjrAGoRohux3yitAbYUw7lTGhHEm6/MmW
+mzaDKM6pbvVaqK5/YSosvBttYEG6kXAR5YiW2YjfaMJPZ/L7uL8Q9qRoSzwTMZtLw/1l7cKp/hTNubs0
 */

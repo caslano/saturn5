@@ -681,5 +681,5 @@ inline Point return_centroid(Geometry const& geometry, Strategy const& strategy)
 #endif // BOOST_GEOMETRY_ALGORITHMS_CENTROID_HPP
 
 /* centroid.hpp
-oJ+qwDFzRhCj1TAxnE2NFMP9uwAsYb3RAFXYKT9Gl/C03o2/H8FNzfX4
+Nn0qytj70srw2jO+3zt7nsEdOV3yKHFTFbRVdcmXrm8HdQm8np8mnuNmyTDO3WS0oFLMmiHutJ3o5uPr
 */

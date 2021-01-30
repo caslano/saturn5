@@ -404,5 +404,5 @@ OutputIterator find_odd_cycle(const Graph& graph, OutputIterator result)
 #endif /// BOOST_GRAPH_BIPARTITE_HPP
 
 /* bipartite.hpp
-vdMTZH9B10Wqzyf0+eA7Mo8anPv+8irNfSb/aC+b+19MsP+RVoXQ++9z
+WNdrFXiwr4AHBYpRoMHdA8nyBP5bxn9X8N8N+GuFcyZ23rqz/urbUjGABZAc7CM+OHKV5SZ53qa5yIz0
 */

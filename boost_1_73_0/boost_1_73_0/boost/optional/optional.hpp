@@ -1605,5 +1605,5 @@ operator<<(std::basic_ostream<CharType, CharTrait>& os, optional_detail::optiona
 #endif // header guard
 
 /* optional.hpp
-khVCPom8o7vv5z+eDuxfVvYv9yiZYY4OJKwRpWMZ47vyrLpa7qrMDQ/y
+St5l2mGlztnTYk64M2PFCJWjCsLDO2z8Ekvi2S7mbCNOd4PfqUXLfdfaS1sl2WJ1dl1HlxW101vG80j3
 */

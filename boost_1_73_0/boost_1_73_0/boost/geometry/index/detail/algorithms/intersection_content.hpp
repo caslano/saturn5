@@ -75,5 +75,5 @@ inline typename default_content_result<Box>::type intersection_content(Box const
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_ALGORITHMS_INTERSECTION_CONTENT_HPP
 
 /* intersection_content.hpp
-+fsZ957NSbbD9Vvom7QFT7pTtG9yf8k893nIbf+q0PBH+qZ3XHH1Iurq
+IGi7Z2IhHb0oBI0ZK3l6cmD3HUNJiBHYtFOHNw36uljeBNI7lJOtRrwnDcvl+fza3J8l7ILsNumHT89a
 */

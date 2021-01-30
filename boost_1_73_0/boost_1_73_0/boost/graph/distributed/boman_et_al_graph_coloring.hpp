@@ -371,5 +371,5 @@ using distributed::boman_et_al_graph_coloring;
 #endif // BOOST_GRAPH_DISTRIBUTED_BOMAN_ET_AL_GRAPH_COLORING_HPP
 
 /* boman_et_al_graph_coloring.hpp
-l2N5q820lVjfC2ZZnkTaF2ZaHerPMo9vVIJ35ARpz6EOnjHTXkRdvW0u
+b7v7zUKimeXZJRJNhyQL2kwHXecOus4bdJ0/cM2IH2fGRxvl08Q1d8L96lYqlh4vJIlV0YRRPpkSZyBx
 */

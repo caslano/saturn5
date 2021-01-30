@@ -229,5 +229,5 @@ inline void buffer<Ch, Alloc>::swap(buffer& rhs)
 #endif // #ifndef BOOST_IOSTREAMS_DETAIL_BUFFERS_HPP_INCLUDED
 
 /* buffer.hpp
-TYZ5/TYb5vW72DCv3yXE2kS/Sw3z+l1mmNfvcsO8flsM8/rlDPP6dRnm
+Kt6EwtuFvJr6bQ5FpCTs1QjN8aTTHeGp6cLrQB5+Z7Yzmxy616AU4qQMfqcwThN3YhkehCHvUP9vT5qK
 */

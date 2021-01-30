@@ -76,5 +76,5 @@ struct win_static_mutex
 #endif // BOOST_ASIO_DETAIL_WIN_STATIC_MUTEX_HPP
 
 /* win_static_mutex.hpp
-6XA8Ku+HhsrRTUn6HFmH7Uh6NMjT6VcG9Z0/snU+j5QmS/m5n9PvcnVe
+vvfJkLm7Ya7BUAccl5uWExOQSiL8rJ6yutjPcIlSbpBl2q2F2ZlVJC5RJnohrI3k0d7vZnBXH15t329f
 */

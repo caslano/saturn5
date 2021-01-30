@@ -141,5 +141,5 @@ inline std::size_t num_geometries(Geometry const& geometry)
 #endif // BOOST_GEOMETRY_ALGORITHMS_NUM_GEOMETRIES_HPP
 
 /* num_geometries.hpp
-Ngjlsvz5QN0MeXbWmLGu0dIwO+fUhuzL5nQT/eHH307ECiVnYNSynf6B
+O57gsbdDWg5gFAiqjbQjRvAi89N47N3LsKAbO9FPW/ElCZ4UcGrKRdOe9gI4IWdIKNGx5rVP6ZBgOK/1
 */

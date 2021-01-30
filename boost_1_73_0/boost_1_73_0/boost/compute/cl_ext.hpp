@@ -22,5 +22,5 @@
 #endif // BOOST_COMPUTE_CL_EXT_HPP
 
 /* cl_ext.hpp
-EhWWQv8m5dKln7KASOskk0TifJOtiJdylZthLh/JMb6kROO1zAhuPCaT
+76TYOKJ3JrAr1aGR8aer80tD2U2V3h0Zy/6y+ijsLCBi2KY4NDRyqbctQqLGUSZyzAR0Ogv/PDKJjEch
 */

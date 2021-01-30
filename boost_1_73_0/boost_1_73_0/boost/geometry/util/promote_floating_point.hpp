@@ -50,5 +50,5 @@ struct promote_floating_point
 #endif // BOOST_GEOMETRY_UTIL_PROMOTE_FLOATING_POINT_HPP
 
 /* promote_floating_point.hpp
-vjnxsV2bX1KCfJnyWfbLd4Uz9giV9Rlw98FfvPrVprplKOqSWahL1qPr
+Qs+vp7rTzKx22XpfPpV4+k+KDIgYt/aaBP+cbkS+VUcSbSeGllr01F/+xCpJrFLk5Ku8TI6in80R9XMY
 */

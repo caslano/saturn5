@@ -295,5 +295,5 @@ bool is_kuratowski_subgraph(
 #endif //__IS_KURATOWSKI_SUBGRAPH_HPP__
 
 /* is_kuratowski_subgraph.hpp
-PtHS99wWoB18gu9NBHwBIBxenkMB8vAlaod2CeGinX7/L6/PC939f9fz
+hGTHiG/6Scy3ORBrwmwLQDUGcifafZs9XPxkmagqWnfYpoUYe4SThsPoNnHwZj6cgm3Ot9ybfEdkx3Fr
 */

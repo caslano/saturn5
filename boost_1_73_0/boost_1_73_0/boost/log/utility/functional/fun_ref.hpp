@@ -79,5 +79,5 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #endif // BOOST_LOG_UTILITY_FUNCTIONAL_FUN_REF_HPP_INCLUDED_
 
 /* fun_ref.hpp
-tTTzddql0ykqQ6jpDkqK1/uLRUw2+SaOR/gygk/um5+pVXyif1TS3iPA
+jCtu4OEb8aBjwKvEKpTMw4SqL25lHJekanpMtXko5E3kgRraOpjFS0Hfx0+xeHP9De8X4vX1+4KeTGTK
 */

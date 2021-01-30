@@ -74,5 +74,5 @@ struct is_write_supported<Pixel, raw_tag>
 #endif
 
 /* supported_types.hpp
-6maFQ02VrQtd3g7MyF9IgqN/AfK3LJ4VTrbGoxPq6+NumcKMMsWKY22x
+gSPgT8B1HjzKFbqeQ40b9ypUT2WinqRaDLBiDXIV0LJdtnjpwJEW8ZHuFlnvyJH+Io80b0/cqkjFOBrp
 */

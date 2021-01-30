@@ -160,5 +160,5 @@ void bmp_write_view( const String& filename
 #endif
 
 /* old.hpp
-XYr3TOUzfAfxfowjenWO8qGcIfh4viP9G76EkNdFDHkMoksY1jL8qiO+
+iYq3xiu+VB5A/SqupjptC3qpWq0LdS7oRYUPcQxhuZ+42hC9iM5MsdHYXXX/0/LWlpJ0N/FBC+2pby9b
 */

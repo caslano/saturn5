@@ -33,5 +33,5 @@ struct norm_result_type {
 #endif
 
 /* norm_result_type.hpp
-zuqbHlsqK3HVElz1p4LCTmfZ7X+arGuGiWPW7S6rbo4bGZttYE694jej
+sl4ROvRXZxMJDmrVQJ20M7N+gNSIEdIqDMRjvERC2kamNhlmgTATuM+/ZyKzqWYCpU+fu290+9BjeT4X
 */

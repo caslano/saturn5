@@ -34,5 +34,5 @@ enum class channel_op_status {
 #endif // BOOST_FIBERS_CHANNEL_OP_STATUS_H
 
 /* channel_op_status.hpp
-2/X/sYvt8v/ExXbwcU32UxfVlb+/z8fK6cM3oeG8o3+Ingf87Dzk28HP
+DkHIgRqd89mkHB+CadM6OkeByw24/EHd+3YYvr0c/4XTEvpr2RiU7awwm9adhGp/n9hHSLZcEV+ZPKIU
 */

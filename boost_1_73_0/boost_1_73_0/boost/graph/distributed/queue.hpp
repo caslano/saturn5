@@ -278,5 +278,5 @@ make_distributed_queue(const ProcessGroup& process_group,
 #endif // BOOST_GRAPH_DISTRIBUTED_QUEUE_HPP
 
 /* queue.hpp
-/SYM+02hQyR0lWkaEjmyF+Rr6EQ0TBsmKAbpheHS92YDxgO9yOejssKx
+syrF36FANRJEdXqaeozd9eOC4vf/Ms2IWUnrt+Of3AlBkvXO+IQVAEWfSHtfjvgT5LOm97jfnyB6aUFd
 */

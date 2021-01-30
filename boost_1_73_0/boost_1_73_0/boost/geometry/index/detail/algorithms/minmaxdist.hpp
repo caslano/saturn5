@@ -119,5 +119,5 @@ minmaxdist(Point const& pt, Indexable const& i)
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_ALGORITHMS_MINMAXDIST_HPP
 
 /* minmaxdist.hpp
-IzZ/U21nFc1fU6mVtlrm6f0Vl+L2Tz5TXcsY/oPtw+n6HOkyW8n+ozoe
+uD4z5PWZMXfVjAx5fba9iSJf05ZtgnGwgfQumM8q8Cvawif1wyh4ebTJk5dogq6/a7B2JF+i/LQhKTt/
 */

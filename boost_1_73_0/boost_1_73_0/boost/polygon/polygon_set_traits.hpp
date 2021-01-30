@@ -133,5 +133,5 @@ namespace boost { namespace polygon{
 #endif
 
 /* polygon_set_traits.hpp
-AniFdH3tVcITeXacFIbTn0CWOLKVHZRuyQzvywCvY/DoFrs9g6bBLjSi
+bOByXZsXjIdaR5vub9exRCrVPj1lNgRVKQhUpwHosR1oWF4BCa75DiG+mH3BMrKcZt8x1DxHiGVe0JQN
 */

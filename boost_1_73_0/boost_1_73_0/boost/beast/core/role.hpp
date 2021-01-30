@@ -50,5 +50,5 @@ enum class role_type
 #endif
 
 /* role.hpp
-XwO/Axo8Pkz5nR0GtuXxATyLx4cp8+lPwEHAo8AhQA/yHQ6MB04GJgB/
+vqH0joYrvPMmFRoBde8qzNlEPe/XQi7h4rAFdH1G149nkJvaK4CjAz5ctzkZnNQzbQrqaDqQjHmg+BKL
 */

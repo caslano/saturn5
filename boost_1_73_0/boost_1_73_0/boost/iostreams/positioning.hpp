@@ -117,5 +117,5 @@ inline stream_offset position_to_offset(std::streampos pos)
 #endif // #ifndef BOOST_IOSTREAMS_POSITIONING_HPP_INCLUDED
 
 /* positioning.hpp
-PSmwwoCwJxNDvado7FSLfcKeGuq5kSVltxNLBKbsaWBuYkv0e3pg6udn
+SMiuvFAmpFdeWC/EV17YwtXcH0GxNMHo8N6DMPb1oi0LQ2y4f7zXu1JHzOZdpr8kebPhpc4y+2bxisoH
 */

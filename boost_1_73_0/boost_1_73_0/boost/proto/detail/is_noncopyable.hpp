@@ -63,7 +63,3 @@ namespace boost { namespace proto { namespace detail
 }}}
 
 #endif
-
-/* is_noncopyable.hpp
-fwYAAAA=
-*/

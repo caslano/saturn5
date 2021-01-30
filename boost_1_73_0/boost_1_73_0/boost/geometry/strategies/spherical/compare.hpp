@@ -332,5 +332,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_COMPARE_HPP
 
 /* compare.hpp
-YRMuKjTeUZFw0YjyQZGywsi2xUUe7r/w/ujyqhjfceNvjPvHhaNV3N97
+Zgq1mdhKb6Y+YzntTf2uJfqMFfqCXm1EUWCOOoQX6zzTvzxyi0PZaIJM0UbAjhpkWkD8CgENtWwIYIif
 */

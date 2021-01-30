@@ -21,5 +21,5 @@
 #endif // BOOST_GEOMETRY_MULTI_STRATEGIES_CARTESIAN_CENTROID_AVERAGE_HPP
 
 /* centroid_average.hpp
-7KjsAmX8+gTUlvGwgMr2UUaBsn20X3A34w2oLeNHAirr92JAbRa/HlCb
+9v+nfbBA7oN5ffsALbwLukh+6SmC93nIliLRw/i/MNLLgcuHCrdUn28lvmbB86YZG4uuxZoSl+PYOque
 */

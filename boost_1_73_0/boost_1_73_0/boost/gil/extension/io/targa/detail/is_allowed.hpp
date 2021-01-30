@@ -57,5 +57,5 @@ bool is_allowed( const image_read_info< targa_tag >& /* info */
 #endif
 
 /* is_allowed.hpp
-vKY+3uSbbfRgcaiprrWB17Omjh8xP5E2x6S1xCPRpElF2l7Vn7kmTQY0
+cHy4k7pvIW3IoO5bUtgIe/tSnTkFnfkNUX084Uew2CjPMWzGmIpgpWUxpPvmx4dHGyKt35fHXpf0ERS9
 */

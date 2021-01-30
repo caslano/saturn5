@@ -192,5 +192,5 @@ inline void normalize_spheroidal_box_coordinates(CoordinateType& longitude1,
 #endif // BOOST_GEOMETRY_UTIL_NORMALIZE_SPHEROIDAL_BOX_COORDINATES_HPP
 
 /* normalize_spheroidal_box_coordinates.hpp
-V/+akR144YzM4syb5n8x9tqls+5Y+vIJdcsO1CX7UJfMQl2yAKvMGUuX
+jHcg3Ftp9MjZ8+xWU/QMg/saWZ5pqe10Kq66Eyw0ELiu/JWidLzOQUJK5hA5pGhfZndJ9U+dlx407umB
 */

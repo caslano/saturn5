@@ -81,5 +81,5 @@ private:
 #endif // BOOST_COMPUTE_CONTAINER_STACK_HPP
 
 /* stack.hpp
-L+L/0dljPqUWPsnkRHI8HY2aCV6vVhcwvh55uAYqgt4XjBf0T72B7fHd
+Dvh8ATNLIU3eSISB63SvbU4CYdRslz+fDF1Co6DWJjkgaRVgWjq+Faqwp6Y5h84KrniyMGVMZZZK+mXS
 */

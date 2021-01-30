@@ -166,5 +166,5 @@ BOOST_MPL_AUX_NA_SPEC_TEMPLATE_ARITY(5, 5, inherit)
 
 
 /* inherit.hpp
-M/1j/4lmnEjv3fveveeec+65v3vOuXOsZMlhKqfgY1ywBH+DdAgR0feQ
++h278+XtPdYDpD7faNyVALV4UCYRiB9EWMNHPPBjB2DF8kQVKsjdLofu31zKbazOduC5j6uNFzLkKh5w
 */

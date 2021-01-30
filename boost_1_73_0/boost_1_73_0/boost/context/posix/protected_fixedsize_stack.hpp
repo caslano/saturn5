@@ -107,5 +107,5 @@ typedef basic_protected_fixedsize_stack< stack_traits > protected_fixedsize_stac
 #endif // BOOST_CONTEXT_PROTECTED_FIXEDSIZE_H
 
 /* protected_fixedsize_stack.hpp
-/O3t0+Jh+nUkuL6OBF8yDX7yE+abjLp+Lt//u/7v+v/5miciLtpSnBPi
+Ox+l7pOWPfaQ24zhmXnRnGf5vHkgD9+9gX+hdEKn61L52ivJf8ovdyL4p2Cy7f1KWHN11TLIng2bsfR+
 */

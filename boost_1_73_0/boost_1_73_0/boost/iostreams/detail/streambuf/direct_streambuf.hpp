@@ -311,5 +311,5 @@ inline bool direct_streambuf<T, Tr>::two_head() const
 #endif // #ifndef BOOST_IOSTREAMS_DETAIL_DIRECT_STREAMBUF_HPP_INCLUDED
 
 /* direct_streambuf.hpp
-XB0jhnH1OtZZxq3rmcm4tZ+ZjFsHmMm4Nc5Mxq2DzGTc8u87Kn3HjKGO
+06ST1wMmfYSIV8PogGmB/SjE0j1TVLnLZtTYyorvTQIjz1UtpfJcYDIGeDUHuBt1gVHw/bRgoBk59kYo
 */

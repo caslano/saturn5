@@ -285,5 +285,5 @@ inline result_direct<CT> spherical_direct(CT const& lon1,
 #endif // BOOST_GEOMETRY_FORMULAS_SPHERICAL_HPP
 
 /* spherical.hpp
-Z1j/M+2ZNfUJfbJ2pY1XvitP45X5kuf7Ul+YlOcDqhMr5RwvLupyeLRR
+I64U22QPHtkmezBF9qA3spR6IKYk+CMuFHe4tT7KK5bKy/mLl7FIfvx9uTqmMUDgrtFukQFiplLPrUOV
 */

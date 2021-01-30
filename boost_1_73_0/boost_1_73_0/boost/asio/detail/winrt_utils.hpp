@@ -108,5 +108,5 @@ inline Windows::Storage::Streams::IBuffer^ buffer_dup(
 #endif // BOOST_ASIO_DETAIL_WINRT_UTILS_HPP
 
 /* winrt_utils.hpp
-VE/7N+xYQGvYu7SyP8e2A9i9oADzPB0Pqz2Vi2d7Og6ew/7j7C/yVB4i
+AzrS34PeWASykod7Ee+tRAAxebYXYN/jLVDJvL0Xs6p7CrtXONTd+iGbRmxmU06BK44XgEce0CGl4cEy
 */

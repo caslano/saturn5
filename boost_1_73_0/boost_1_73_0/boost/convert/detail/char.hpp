@@ -39,5 +39,5 @@ namespace boost { namespace cnv
 
 
 /* char.hpp
-5DIb0r3QsVV9O0QlzbkMmNeORFtfZ0c8R+sOmC6cfuDCmkQGG6DbmPHW
+ZzzNxmzGyz8Rk5jxzJfAkpg/5NnIwpiWbNs2ChEspfIBLVJLQXKZE2vA4i+ZRsmUJbTjON3wCuL8M+rE
 */

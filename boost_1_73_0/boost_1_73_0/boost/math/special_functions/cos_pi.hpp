@@ -85,5 +85,5 @@ inline typename tools::promote_args<T>::type cos_pi(T x)
 
 
 /* cos_pi.hpp
-EWvuKHs8kesvqvUpxBd9+FwyXxwskC9+nvGOOeRQEG2LQKW92dCjNcG2
+aXJgUAbGFepj+6II7iOAh80/rUyvt7kTivOLsljbK6MYq2B6ulx1ovP6TsctwtpvEdba5dBtP1pcdWnz
 */

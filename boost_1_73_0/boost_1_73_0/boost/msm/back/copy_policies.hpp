@@ -30,5 +30,5 @@ namespace boost { namespace msm { namespace back
 #endif //BOOST_MSM_BACK_COPY_POLICIES_H
 
 /* copy_policies.hpp
-jfEmU1/6xgKty2XcqojfvGGdeSHzGNMzl6KeWUB8w0W+mX7zEyqlgevc
+YNvh4qK+6263fK8PbA9ywf2OW7tKTab3t0zcPxa6fDufbSdukaWYDb5tw+iKvmSQ1jqoLrDrsALryHto
 */

@@ -131,5 +131,5 @@ template<class T1, class T2> inline void test_trait_same_impl( char const * type
 #endif // #ifndef BOOST_CORE_LIGHTWEIGHT_TEST_TRAIT_HPP
 
 /* lightweight_test_trait.hpp
-LraPjpT1ejB+w2SRWFMcAffwCkJ1iTLvZTFcn56QadtiuDatceDzaKlY
+FKc4qT6SgHXFGPVi9yBbVjcND7jeC7Kww9AL/4mcxMAVLxGgGPYFgLBMz7N1CECOtzlgeSNnu5457Vi1
 */

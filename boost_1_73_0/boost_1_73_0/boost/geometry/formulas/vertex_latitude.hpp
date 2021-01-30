@@ -150,5 +150,5 @@ struct vertex_latitude<CT, geographic_tag>
 #endif // BOOST_GEOMETRY_FORMULAS_MAXIMUM_LATITUDE_HPP
 
 /* vertex_latitude.hpp
-WWmqhVIDn4AcA/MkvAHOgbTN1UhhH+Zp6S+cC+enqWbKa2mqmSLzAv4D
+dNmZRBEt+1xdjTcha5Eru9N47XDuLD13JtrLxqmL4r37ereZcVFylUwx7EtM3U67PnWX8PpMmr1/tA82
 */

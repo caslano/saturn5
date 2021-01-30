@@ -91,5 +91,5 @@ std::array<Real, 2*p> daubechies_wavelet_filter() {
 #endif
 
 /* daubechies.hpp
-/RyEVYPXH7qMGfsgZPtwC76iR19JLpNLEkmwS/NcAMIfWFjbky7gKk9n
+oACgAmAjwFaAVwH2AxwB+ALgIsA1AH9ou7cBjAGIAZgOoAPIASgG2MlCfIANAGUASwBmAdwPMAEgFP0h
 */

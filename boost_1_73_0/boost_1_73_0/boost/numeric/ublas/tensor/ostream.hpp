@@ -122,5 +122,5 @@ std::ostream& operator << (std::ostream& out, boost::numeric::ublas::tensor<V,F,
 #endif
 
 /* ostream.hpp
-ZmgzjKJsbIaNk5aYFMDk+pMz0dUuz5eFsfSMKxp9cDhdq8vExPmEdZ20
+klXTuRqtxxEwk8+zdUpKI/bd92ieIRSkKs9QNBKG2JcT42wN1IGO63gSAxO69R0QSrszZWFFpDufQXri
 */

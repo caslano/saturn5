@@ -506,5 +506,5 @@ inline RealType entropy(const students_t_distribution<RealType, Policy>& dist)
 #endif // BOOST_STATS_STUDENTS_T_HPP
 
 /* students_t.hpp
-OWZk68wlU8kChpL7JW/E43ukCVcvDBjG/Ztwj+FQYlDV1c8o7i9yOIks
+ZXuQThu6zl0A13l0bQc/kMINycw+eRLGyTMmM6eok9mYzHSgM28zMqjttK245vnHrFZSRPPUT/AU97/2
 */

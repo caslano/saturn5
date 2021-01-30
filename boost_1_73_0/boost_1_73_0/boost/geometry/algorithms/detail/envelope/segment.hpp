@@ -95,5 +95,5 @@ struct envelope<Segment, segment_tag>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_ENVELOPE_SEGMENT_HPP
 
 /* segment.hpp
-7rvpYt5XLgIoQQa5gaab98A+RDQef6C6rcwtGov/n10QbVO2etoetz1x
+a1f5N6X18KuvMJtS0wfti0JNHptpJSfSyqjkbU5Tsvy9VkBhjWnar+6kO5tu1P5qJf9p4sE1sFU+uLKq
 */

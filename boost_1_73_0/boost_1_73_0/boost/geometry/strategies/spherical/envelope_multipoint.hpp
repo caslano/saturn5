@@ -379,5 +379,5 @@ struct default_strategy<multi_point_tag, geographic_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_ENVELOPE_MULTIPOINT_HPP
 
 /* envelope_multipoint.hpp
-XzR96YS9n5lZff9j//fOIVx+r5axlj3Jy+9FFRg+cVNRe/+7AVfJ1s8v
+WxJO0HTv/mg9chPFdly0fAwCUB1Dvd9TETLNkX+lc1bUfo0XwteJDghCKATr8v0iJFPLjSonMf9fDgZZ
 */

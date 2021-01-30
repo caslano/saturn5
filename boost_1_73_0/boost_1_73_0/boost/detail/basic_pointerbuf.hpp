@@ -139,5 +139,5 @@ basic_pointerbuf<charT, BufferT>::seekpos(pos_type sp, ::std::ios_base::openmode
 
 
 /* basic_pointerbuf.hpp
-C3fuMpzDbWnLt67jyesNlv5QXFlW54m4tMvTOS6H7W1Z2Lx5q4ji23Jr
+QS2+c/NMpGvCRIb42nZcEWatQ8la7tE0ehOgOjYYTNS3aZL4V/7LWHsFBIR6SYBFo/xF7lxS7JOVFUGF
 */

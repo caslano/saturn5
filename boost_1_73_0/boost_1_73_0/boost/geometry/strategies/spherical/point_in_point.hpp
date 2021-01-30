@@ -177,5 +177,5 @@ struct default_strategy<PointLike1, PointLike2, Tag1, Tag2, pointlike_tag, point
 #endif // BOOST_GEOMETRY_STRATEGY_SPHERICAL_POINT_IN_POINT_HPP
 
 /* point_in_point.hpp
-PxRfgvbbDxO15dcXSDUPtOPESOBRQDbI4cC4qE2AZ4FjgP8EHi9qH/oE
+/4pY8zTaU0NLILj99VFmb+BiDqRNccj/Pjv0Wmt5mnNoLlbGgm5VZKVdib1J4MU0DrmS2e8TcCyVKv+R
 */

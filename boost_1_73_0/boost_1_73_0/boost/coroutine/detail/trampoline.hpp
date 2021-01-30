@@ -69,5 +69,5 @@ void trampoline_void( context::detail::transfer_t t)
 #endif // BOOST_COROUTINES_DETAIL_TRAMPOLINE_H
 
 /* trampoline.hpp
-DYfx7OuCI6gD4+bJ8ml9gMb1tRP5AcKXw1wXmjdzvittYXc805mQ2/U6
+a+aVP7Gvq1aE/8NW/akAqC+PZu0owmfE9Pd+4AquBnUVj199KaeQMFtYqF8miplVlDF1W2fZyHLjKtDZ
 */

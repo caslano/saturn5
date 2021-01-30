@@ -303,5 +303,5 @@ struct access<model::point<CoordinateType, DimensionCount, CoordinateSystem>, Di
 #endif // BOOST_GEOMETRY_GEOMETRIES_POINT_HPP
 
 /* point.hpp
-n4THyHZg/6DGOR8Li+DxsHWWasEMz1ItGIl3Fg2YK2EpvDFLNWCmw5Ph
+jNFMRcEOhLY8Or94edZZa2hEqrH8dmlZOtGetUI5qW3HHOGz4wwL8yYa8ALbcgNfhC3fdMa3UsbJ7oiN
 */

@@ -71,5 +71,5 @@ struct default_strategy<segment_tag, cartesian_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_EXPAND_SEGMENT_HPP
 
 /* expand_segment.hpp
-qIFjRg8dPCJ1nz7I7Lvv/fHBBQd8NHvarnvf1umF3V956o/t06lPbNNU
+jwEwkd/SttGYCxTsBgB3hfifs6xSgcW1UmrF5oijXKAMc3i6FJaOpVpG2CbGnIdpBW7GHQ1/h6B9+9Up
 */

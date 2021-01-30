@@ -154,5 +154,5 @@ struct set_kernel_arg<pipe>
 #endif // BOOST_COMPUTE_PIPE_HPP
 
 /* pipe.hpp
-oB+kwSg4CSbBOTANZsE8uAVWwUNgrUFdgR00gTbgAVHQB4ZBCZTBBDgL
+JfGbVf6Ffp2ETXXI0xdPsGtqKK+bhOeakhNupnXeCLeXHm1aHdu1TOtmK8sczqaeMVSz6YbntVXhjTce
 */

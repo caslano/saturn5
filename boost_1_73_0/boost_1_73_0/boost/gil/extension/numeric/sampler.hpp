@@ -188,5 +188,5 @@ bool sample(bilinear_sampler, SrcView const& src, point<F> const& p, DstP& resul
 #endif
 
 /* sampler.hpp
-clbgv/OvGLER+CvM/hBy3dUpd+ngt+GXm/K4+2a8eU6ln+W34qPp53Oh
+MXonrXsqHM8tqmFOB2j6Rwh/d5jb8U3K+6Iv4+9KkOHp4CmRX/Z+D+LfHeeM0ymjzNNX/R6w/E68zeNB
 */

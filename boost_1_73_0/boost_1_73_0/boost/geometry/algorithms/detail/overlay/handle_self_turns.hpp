@@ -299,5 +299,5 @@ struct discard_open_turns<overlay_difference, operation_intersection>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_HANDLE_SELF_TURNS_HPP
 
 /* handle_self_turns.hpp
-TIlOaLwSXQHkaQd+1ESQmXkFyAgnK5FJIVtqneOVSnSfkLu17iwXvEtp
+vmgzYZG9M4I+wusQFEaGR9azqEowJ7B8JiRzIFf0qAxztF5Nl2jA9jwOl6sgQhR/LRJGXYg7B3FOiuMS
 */

@@ -29,5 +29,5 @@ inline bool has_one_element(Iterator first, Iterator beyond)
 #endif // BOOST_GEOMETRY_ITERATORS_HAS_ONE_ELEMENT_HPP
 
 /* has_one_element.hpp
-MfNPXvEcYI+A8n7JIybvlzxiylyQR4zqN379/grsF1BeHP37rRblGb8n
+/fn5eDiMZqM0U0bSEe9xqmNZA8osbaYyF1YYZc6K0FaUaZFl4m+JZ5gXegovft+/GOKZTAttUPMCQfF1
 */

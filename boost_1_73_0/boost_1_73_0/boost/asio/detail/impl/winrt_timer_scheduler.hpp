@@ -94,5 +94,5 @@ void winrt_timer_scheduler::move_timer(timer_queue<Time_Traits>& queue,
 #endif // BOOST_ASIO_DETAIL_IMPL_WINRT_TIMER_SCHEDULER_HPP
 
 /* winrt_timer_scheduler.hpp
-9YLi0jaeTr8Crnd/W5k7BG6YxA2waR+3aYsETun2hMTl8lrVO2bb23R6
+qGpjKsqJUONpywcPxscfdIVJ2uboNqHVVPyh2yTKU7r+xicY4oki4/mvIoTvU9nC4VXSVFHb6OsTOBq0
 */

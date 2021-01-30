@@ -70,5 +70,5 @@ struct iterator_selector<MultiPoint, multi_point_tag>
 #endif // BOOST_GEOMETRY_ALGORITHS_DETAIL_DISTANCE_ITERATOR_SELECTOR_HPP
 
 /* iterator_selector.hpp
-PDlDsT9k5qwUkVF5hmdFisioS8A1sDWwm2DrYBMmYRImYRImYRImYRIm
+x+r92tZuXr42X+Mw+vpLtxQqOXGw4TQQUsK3y6cOhG9dXwHfHhcrbKE7XXjn6Nb+9+N4HB+O1nLGG3Dm
 */

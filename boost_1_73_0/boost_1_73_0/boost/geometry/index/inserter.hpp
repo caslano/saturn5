@@ -83,5 +83,5 @@ insert_iterator<Container> inserter(Container & c)
 #endif // BOOST_GEOMETRY_INDEX_INSERTER_HPP
 
 /* inserter.hpp
-tj3li8uXUn4VKQOhg/39vaje3g+ivul/lKT+4ir7Xj/b77CcrNFfXGnb
+y+8q6hVI5tNM5/HXOJj/1Ea5+WO0bCUBD32RFYcNg6J3CshRpgQtFtOOAJcHBtG9lRmcYHBUrHhPzJpL
 */

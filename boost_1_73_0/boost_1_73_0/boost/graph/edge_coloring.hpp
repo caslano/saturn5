@@ -201,5 +201,5 @@ typename boost::property_traits< ColorMap >::value_type edge_coloring(
 #endif
 
 /* edge_coloring.hpp
-0faIaO8I5RwIMFYhOXP5bAOoTfqLyhPkv2qmIPnQbw/Q5L1OOC+DrAGc
+J5sFgPWvaqlP24hUujZy3lQd0WmIFa1S2aXN/oD5apk0mG4ufLUoC81ULzCm2T071VH+eXqF3eQ0maeZ
 */

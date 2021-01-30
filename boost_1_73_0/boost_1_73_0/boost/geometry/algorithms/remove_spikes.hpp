@@ -337,5 +337,5 @@ inline void remove_spikes(Geometry& geometry, Strategy const& strategy)
 #endif // BOOST_GEOMETRY_ALGORITHMS_REMOVE_SPIKES_HPP
 
 /* remove_spikes.hpp
-FMVAruRh6cDjLzKslGdoWbRmTNtIO+U4GyS6XTZiSYvu2/CXDENHoF1e
+s68YLUYWtVPnft0udivoXEJrFjWz7ekkTWU5kKJJUhJVoCsqOxkBKDPMaTEV7Szq9XY57uvw7g4ODaSX
 */

@@ -39,5 +39,5 @@ typedef basic_stream_descriptor<> stream_descriptor;
 #endif // BOOST_ASIO_POSIX_STREAM_DESCRIPTOR_HPP
 
 /* stream_descriptor.hpp
-22/nZYXqisf8nym64kgb1g6czQbqMzBA8xQ7/j6K8D3L+4Ps1zKOypFB
+d5Wmp6NWqicM4+0QpjB45T8moNn0vrGLPKKqgr6F31SuFPnZJ23Xx6b+fPP1cBC0TyMZdDMQfVhIEmGB
 */

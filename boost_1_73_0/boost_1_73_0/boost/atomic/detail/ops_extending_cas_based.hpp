@@ -69,5 +69,5 @@ struct extending_cas_based_operations :
 #endif // BOOST_ATOMIC_DETAIL_OPS_EXTENDING_CAS_BASED_HPP_INCLUDED_
 
 /* ops_extending_cas_based.hpp
-k4eL1WdLV1sZvnc/HJxpdE/A//6Tp2sk/veNIX1+jv/9UEi/tXcs5N7r
+5aZ9jfxCfwDaIRDnEjFAMmj9lNmuvH+BoH8oVS3oBrrO+SfAZBAQAwAAADNEQCMAAA9V3CI9S+mqpqnb
 */

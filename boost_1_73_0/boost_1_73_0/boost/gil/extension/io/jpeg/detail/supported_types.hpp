@@ -117,5 +117,5 @@ struct is_write_supported<Pixel, jpeg_tag>
 #endif
 
 /* supported_types.hpp
-u/rHA5S2mSnUve04R779nsvwXd4c7TffJY7VPVxDKJGU29+xTxvbPxu3
+/bjMr+qp9UFqyQQF+Op1qfBQcvgELjzYRIGRiqw83aq8xebthgRUhr1sdhZ5e9b9xZhbnVouIt5Op628
 */

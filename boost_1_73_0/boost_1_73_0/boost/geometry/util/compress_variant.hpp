@@ -106,5 +106,5 @@ struct compress_variant:
 #endif // BOOST_GEOMETRY_UTIL_COMPRESS_VARIANT_HPP
 
 /* compress_variant.hpp
-PeRLqr9zbHcTROzTje8+8tnpN5p89l3EmE1MVMsf37v/N/CM529lP56+
+EFiyJL6IvoIjK7vXivd6U4DtudRs3lxWVMVhtJpOEbPiaVOvrj9lzMrVvT1a2iVabyydHQL2WqZMoW+n
 */

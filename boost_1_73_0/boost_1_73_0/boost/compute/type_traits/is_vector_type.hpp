@@ -38,5 +38,5 @@ struct is_vector_type : boost::mpl::bool_<vector_size<T>::value != 1>
 #endif // BOOST_COMPUTE_TYPE_TRAITS_IS_VECTOR_TYPE_HPP
 
 /* is_vector_type.hpp
-syBk9c2dFeXFJcFNqSpSTWelkk7jjM70uPSKH19ndKDSJmwwqHtaYMjJ
+KhmpALpSqNR5ZdJ+eQwveU9cqf3vhJAOe26lQr9sBPLTW6cOWMR7Ry0RqZLyqPZDXWgXvpWqjZ7mAe5D
 */

@@ -102,5 +102,5 @@ inline T pj_authlat(T const& beta, detail::apa<T> const& apa)
 #endif // BOOST_GEOMETRY_PROJECTIONS_IMPL_PJ_AUTH_HPP
 
 /* pj_auth.hpp
-JiSf/WILZb7vbqbMJBbS/lcY0jJfV5hS5rGo3S942+Ef7Xtun6iIRaaK
+Clv0Y6TGobjqHpFRQcLmDjsMWBzGPbs4NDahe3+0/gRNTMAvTlSDrDr00DnTmLWQ5fe1wUp/qPgYVrMI
 */

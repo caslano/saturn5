@@ -99,5 +99,5 @@ Real barycentric_rational<Real>::prime(Real x) const
 #endif
 
 /* barycentric_rational.hpp
-Nuu+Q7/NjD38vnNwlzPj3K3AuZoV+CuZ4UMFnMO7ipHfFKRTVT/2c6Ou
+/1fKQX4BWgAOALwMsBlgDUAhwCKAWQDTAaYADAGQAfSUgRwAfAFwAqAR4G2AnQBPAqwDKAVYBJACEAcw
 */

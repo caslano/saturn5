@@ -165,5 +165,5 @@ struct write_filter_impl<any_tag> {
 #endif // #ifndef BOOST_IOSTREAMS_WRITE_HPP_INCLUDED
 
 /* write.hpp
-sX7C5rN+whawfiX/Dm+hYf4d3iLD/Du8xYb5d3iNbJvIazLMy2s2zMvL
+mgju7Ry/yuAw3KXaIBCaQrDsAgnoGETDt5Bg/2B7XDkMsk0j+tqlY6a+jw2k6UDbqXys+MSwtJN4g7Ii
 */

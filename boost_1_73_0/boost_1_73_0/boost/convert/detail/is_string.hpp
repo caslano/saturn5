@@ -34,5 +34,5 @@ namespace boost { namespace cnv
 #endif // BOOST_CONVERT_DETAIL_IS_STRING_HPP
 
 /* is_string.hpp
-Mj4N+oS5ae0qA33uGNXnLoQ+lymMDeX7C+Pto6WugVJqYrhQKvZ3FAaL
+jBpHkL+q3WqWf2wK/yDL4KafyYRj5tJWNYR017t4HKXJIsrT3gxvapwBzIN9km7WInMzcqrhrFgent6v
 */

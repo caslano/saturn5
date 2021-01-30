@@ -148,5 +148,5 @@ private:
 #endif // BOOST_GEOMETRY_FORMULAS_GNOMONIC_INTERSECTION_HPP
 
 /* gnomonic_intersection.hpp
-1PD8tWtEfpDkeKZt3nV+Xq0rEZrw2/jHtJlfN3z8Znjtn2m0K/fwOZR1
+gn0ojFLWaHU74vFIRsyRCJhKAfx05H1bHVKjbermxb6oZapnJOQ4D5ximcb/uVU+oXQDK6G7KVIiZePF
 */

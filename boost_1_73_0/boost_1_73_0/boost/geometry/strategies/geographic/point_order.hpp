@@ -120,5 +120,5 @@ struct default_strategy<geographic_tag>
 #endif // BOOST_GEOMETRY_STRATEGIES_GEOGRAPHIC_POINT_ORDER_HPP
 
 /* point_order.hpp
-5C893e6ejT7RRmVyDZpz3aPzDuzTKe+paz9/b0zfb9b835Oz4JozIW47
+7YTWlzNmz7ak7nxyzlGosrlz4Plxs3T3DQ+ur5+RmsJAK28Ib7XleU/ziV2+89Ihj8cogTw/7DaPQqY/
 */

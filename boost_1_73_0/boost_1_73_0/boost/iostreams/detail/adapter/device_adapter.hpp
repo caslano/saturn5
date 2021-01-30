@@ -67,5 +67,5 @@ public:
 #endif // #ifndef BOOST_IOSTREAMS_DETAIL_DEVICE_ADAPTER_HPP_INCLUDED
 
 /* device_adapter.hpp
-CvxUTww+mkEMfmgghrFnJjGMO7OIYcyZTQzjzRxiGGvmEsM4M48Yxpj5
+Ty1PanlvLX+ulrfU8t/U8v1N/PdmkL/TeiGjSdyeRiepK9ZLjkfDSPwJkFc9CxNAWO2hF8ik/qXb7+Oq
 */

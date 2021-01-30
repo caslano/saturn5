@@ -2186,5 +2186,5 @@ T lambert_wm1_imp(const T z, const Policy&  pol)
 
 
 /* lambert_w.hpp
-49EBQ4+tig5DZThw+0kNnp2KVtEY70rEd/vxJJWLX0N4j05ec3B/OK4o
+sPnj+kOzk78O/HSi/x1zHHRs/kgnc44Dfw74zfGAb/O34ed4OKc2ZFbf/H8L6q3j9qR/uF8lcw4cmfJn
 */

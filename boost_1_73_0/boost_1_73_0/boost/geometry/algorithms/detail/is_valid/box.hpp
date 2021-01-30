@@ -115,5 +115,5 @@ struct is_valid<Box, box_tag>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_IS_VALID_BOX_HPP
 
 /* box.hpp
-KNe6mWttczzX8s2NMJwntilN5omh2TVjAzJmQMOyU2x+X+eTeWILfbKO
+ZpasdAdusEqVWS5dYVVO4bTJJr1EajCdaMMUw34g9aNzgxl/B/BjomGNFiDDdEoGrsd2TS5ywX9VJCt1
 */

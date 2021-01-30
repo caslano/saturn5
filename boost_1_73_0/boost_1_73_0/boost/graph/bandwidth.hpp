@@ -93,5 +93,5 @@ typename graph_traits< Graph >::vertices_size_type edgesum(
 #endif // BOOST_GRAPH_BANDWIDTH_HPP
 
 /* bandwidth.hpp
-YxmeIB8sQ+vTdTL9d8UGYfbdaCwH2xTHR5UwlzOd/W4ZzwsZ80UJ8sfi
+8dMxueIHkE44pDtbqzFpbmbjWrz77bw3WFHZ25lw5lfjKFDTqzq+8rjU57WZmydLJzZW9G0e3bceTIxu
 */

@@ -12,5 +12,5 @@
 #include <boost/compute/image/image_format.hpp>
 
 /* image_format.hpp
-ScEBh3XZFFLIgAMZcCBlHfCAs5uCs6SQYV1wIYUUHHDBhRTSxYUEUkhg
+1fktcWOhK0NztAHRItmejHWTE7+6NHMkzSbQqWc1qakldxVxqCj0WiaJ2F5oT51yAlelZZXAUtnRfWTP
 */

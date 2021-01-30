@@ -196,5 +196,5 @@ struct type_name_trait<std::complex<T> >
 #endif // BOOST_COMPUTE_TYPES_COMPLEX_HPP
 
 /* complex.hpp
-E2Xp+6eTA1KS7aKi5MQ3f9dRTnLg11pQw1QYWSH+fGOHlBXz4nf+zm9c
+FLru0v1kFH2fudLbli5OgPxbOwVs0Zh6ki974dd+DvtPDkdPfiKpekGpew/QUQ5ViFJjpOv8b7Lcfy0v
 */

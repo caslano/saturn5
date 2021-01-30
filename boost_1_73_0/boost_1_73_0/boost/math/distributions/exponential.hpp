@@ -282,5 +282,5 @@ inline RealType entropy(const exponential_distribution<RealType, Policy>& dist)
 #endif // BOOST_STATS_EXPONENTIAL_HPP
 
 /* exponential.hpp
-+tjqLL33JL04R/+XnIvkiXKcM+hcJHQmA+wKo22V45xjYNySqwPWHNDW
+6X+30TPYi1/bzWEx9lEDxN6EsdsOuLfHDvPOr+kEwvav3WTgCYzWjNFesUXD/mBn5TXXwhch3hXEqz5w
 */

@@ -119,5 +119,5 @@ template<> constexpr wchar_t  space_sign<wchar_t> () {return L' '; }
 #endif
 
 /* config.hpp
-0MfzS5lsn1vS54FX0u/HkzvwP6V4yULTe8buxgD7zGUfAxwaBxwQUFIm
+z+nuBpFtF4fs+ucKzdFvVYTXP8Wl6p3sED/Y8EDff84sfc8Jzy+nQsqY/TNv9uKmub/usPUImRNtyfiq
 */

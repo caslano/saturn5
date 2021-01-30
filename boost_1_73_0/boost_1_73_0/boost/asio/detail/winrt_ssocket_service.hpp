@@ -252,5 +252,5 @@ public:
 #endif // BOOST_ASIO_DETAIL_WINRT_SSOCKET_SERVICE_HPP
 
 /* winrt_ssocket_service.hpp
-Ef1w1Bf65mi30D9vsGHIfeipr7Fh5N9Kbv2m60Tkz8N58h6D52z+z9v8
+ROChnBFma9Yns0zJDIEXzIl5XcCGStg5dNA+V7I3nKvfMbCou+e+cmiYN5VKw8ZJrbGES7woz9C4ju9w
 */

@@ -182,5 +182,5 @@ struct select_most_precise<T1, void, void>
 #endif // BOOST_GEOMETRY_UTIL_SELECT_MOST_PRECISE_HPP
 
 /* select_most_precise.hpp
-8+z1h9g9do7o3qSR6B57ZF177MoZFTQXSGN9W5MRaCS9ck+w+5iZTXR/
+NrijFsLibvU4+m2Tv12wxxsWjayH488e95oc4+Y5hg1NIUzqrEwEKqs/k2rFsffnG22FVY5wRrS8U/e6
 */

@@ -51,5 +51,5 @@
 #endif // BOOST_PROTO_DONT_USE_PREPROCESSED_FILES
 
 /* class_member_traits.hpp
-L2xpYi9wa2djb25maWcvUEsBAhQAFAAAAAgALagsUstBL/SuAAAAIgEA
+4126V/7PbAjfA/6twp7/Sg/shB2fPUtOCPxd23mtXrpDsshX74WTe/NnpoitBq85fgt7gh6Ed5kuBN/w
 */

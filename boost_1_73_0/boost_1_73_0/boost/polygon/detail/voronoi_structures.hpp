@@ -450,5 +450,5 @@ class beach_line_node_data {
 #endif  // BOOST_POLYGON_DETAIL_VORONOI_STRUCTURES
 
 /* voronoi_structures.hpp
-5bUq7JqNjk+Pf//oCxtZDq3kDMrDU9+zKdkuX5Wr7njHJjSVCvAshYGP
+VNhd+Wk2/82mFMaLyHdob6p+X0hkI/revBocAO+LV6j7wF9AExeaqfhfNeltSaB8M5fypcQvAMAQEAAA
 */

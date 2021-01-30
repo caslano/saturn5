@@ -314,5 +314,5 @@ class windows_intermodule_singleton
 #endif   //#ifndef BOOST_INTERPROCESS_WINDOWS_INTERMODULE_SINGLETON_HPP
 
 /* windows_intermodule_singleton.hpp
-xt9ZxcVpM/h8D2G088OmqgOTULH/FsD7+sffqvGAY30kNBbWXR81aUx9
+oRkX+2X7WpkWFmorkIUs/YAHVVahhgpCVGqO/glHVRJMRJxyvA9mXaPLr6Bdh6Vs2nvkqQPU/qG2OU7b
 */

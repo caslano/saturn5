@@ -81,5 +81,5 @@ inline typename tools::promote_args<T>::type sin_pi(T x)
 
 
 /* sin_pi.hpp
-tkXgmfMAHu+04WGur+grFtTGAa7muhrbDtCx2oInX/4/9q47vqoi+39n
+XuBnEv5E4U+0GJaTg4V4GPMUgUj3LET/h0naDo+HxbwQn3FIZxzSGYd0EGEWV1iI07Ck0Hcn9XlGQnGD
 */

@@ -40,5 +40,5 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #endif // BOOST_LOG_KEYWORDS_REGISTRATION_HPP_INCLUDED_
 
 /* registration.hpp
-XurBxplcr4PGdMei9Z6zzbWrvWW5/hxzrcDnsv4p9nLmsb7EVX6tqwvX
+U4DTAGcAWgE+Azh7vVFz7gHoUYjJpt3C+jaqvMdbpPCryK09wXNXoB/nJtR2cmNqrdxduXcqc5XN8ifw
 */

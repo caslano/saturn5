@@ -353,5 +353,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_DISTANCE_PYTHAGORAS_POINT_BOX_HPP
 
 /* distance_pythagoras_point_box.hpp
-SIw/PEMdRRJE6r3zmXwg/zUSyDZM+XGye0YDyRagPnoD4LFixKaNXjoL
+a/Y888igZs/d+f+92XNJm9LP7JnaNAlt+ma/NnW/nWhTzsA2XcltSnYYmT14s6r+F8361dFPNcuPZh2+
 */

@@ -66,5 +66,5 @@ struct multi_index_node_type
 #endif
 
 /* node_type.hpp
-mHQHXREAKCaAmANvpOAwUa5ACILneygFJpYjLvrD8chbjnX3vhMVb3kK
+Ne7IpSKWtqYbHuaKPXeWRypvScCgvRwVigDMuhs9U3tTOyvWHJS3UTuBK3G9OcmYY53pfKziQle1Ehht
 */

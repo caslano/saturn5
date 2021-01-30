@@ -39,5 +39,5 @@ struct result_direct
 #endif // BOOST_GEOMETRY_FORMULAS_RESULT_DIRECT_HPP
 
 /* result_direct.hpp
-TWI1JG625Q9uO3Zb3Oz5HRqOmz2/685xs7GYXq9ts7xxbVpAn/lLtW0T
+c6+l8Yx8wuM5Qb/4aTxzaDxzce+/Q2N8PuAQXJ9M74S2jJeDmaLG7t2rXi/GhA8Fj4RW5pjUPN0eRFWO
 */

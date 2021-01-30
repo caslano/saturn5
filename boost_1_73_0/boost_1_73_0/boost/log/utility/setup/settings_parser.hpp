@@ -47,5 +47,5 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #endif // BOOST_LOG_UTILITY_SETUP_SETTINGS_PARSER_HPP_INCLUDED_
 
 /* settings_parser.hpp
-fPfT8w4VjkdNGeeoODkZkXfKCLdBULe4ekfz8rjmS6q3l1iP9jNmaCeT
+Bq1zDsL2kIpBESMhaJl7rBgMqsKgFJKmwrzPuXhtgDL4BWxNuEyG9Y/4uxA/7HPamm7cc8M1j18/jxkZ
 */

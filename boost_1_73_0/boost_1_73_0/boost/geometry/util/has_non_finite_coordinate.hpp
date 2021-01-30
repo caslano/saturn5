@@ -55,5 +55,5 @@ bool has_non_finite_coordinate(Point const& point)
 #endif // BOOST_GEOMETRY_UTIL_HAS_NON_FINITE_COORDINATE_HPP
 
 /* has_non_finite_coordinate.hpp
-WL++/Y8qGDjiuKGjjh5RcFwXMWcGZ+Um7QZGazkzuD9HZM4c7uP7FqSk
+OQTfxA17MYyjTRsM/Yg/Tjq1nm2nisXjV9sS0c/qT6Ape+kUm/ksh39OVUcHcDCa1flm1gm4rfwIRrzX
 */

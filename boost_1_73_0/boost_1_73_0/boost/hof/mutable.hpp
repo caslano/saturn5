@@ -68,5 +68,5 @@ BOOST_HOF_DECLARE_STATIC_VAR(mutable_, detail::make<mutable_adaptor>);
 #endif
 
 /* mutable.hpp
-8luHWVgp5+V7el/n7Eg76CZZ++Q3OjhbtBaR+wCe5uvh+mc4c61F/8fe
+YS4SDZ0fc6A9KoeP+0N9rtQRLtVHq18ZYd3cU/VSfYz6fsi3Z6EpWj0QTPTHeg9Tg47U1ZfRYWratzAY
 */

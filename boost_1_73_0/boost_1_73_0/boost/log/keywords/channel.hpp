@@ -40,5 +40,5 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #endif // BOOST_LOG_KEYWORDS_CHANNEL_HPP_INCLUDED_
 
 /* channel.hpp
-DAy3tbTIWrQO559icvH+nqLH/tz1xNuofmcq07+gdOUNTS5Ou7t7KgND
+r73Y9dnQw3hfC1MV8BkfFAreAQvbDFfjuSAYUfHp7cb5UuMAi7/hqoLzwQnZO+wX5/9LNGjE/0oNGi5q
 */

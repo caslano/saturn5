@@ -161,5 +161,5 @@ public:
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_RTREE_NODE_VARIANT_STATIC_HPP
 
 /* variant_static.hpp
-UD9elPVleV8DRB0ZmV+uTa+1+eSz4+2a70ubzzwx/psM0RYu+wdt2vL+
+D0S30ObVVBLbrJ7qsU9YQqO5Ec0Y/awcSwiagKcTLOM5OuQIf54O+BeyhggoEuiGSdrQYXfvIdDC3MxS
 */

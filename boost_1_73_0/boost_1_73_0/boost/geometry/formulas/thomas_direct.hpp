@@ -264,5 +264,5 @@ private:
 #endif // BOOST_GEOMETRY_FORMULAS_THOMAS_DIRECT_HPP
 
 /* thomas_direct.hpp
-rZJSoxolw4xqlNTAq+EMo1oljxnVKpkDJ8N/wOvTdA4A0S7hsdPclKaa
+3zRaF/4OoINpisgJHwIC6GgdC06CKc6teD0Nd0ODsMnR2k4t0Ot1tP4OY12n1ASGFUJR5i5tVK4OfN1U
 */

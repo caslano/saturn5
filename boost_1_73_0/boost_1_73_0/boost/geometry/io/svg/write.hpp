@@ -418,5 +418,5 @@ inline svg_manipulator<Geometry> svg(Geometry const& geometry,
 #endif // BOOST_GEOMETRY_IO_SVG_WRITE_HPP
 
 /* write.hpp
-uzn1up+9dnnuJ3n+7y3rAVamgP2X3YHn4szvops9faBg222IePPq5fv1
+vuzNxsIeSI5ZJu6GdHwjX9s4PUfWpKe+6fnb6gxaT5EbnTbD3x3ZaUY+GbpmoZn3YPfu6Yp8YY/NA4Pq
 */

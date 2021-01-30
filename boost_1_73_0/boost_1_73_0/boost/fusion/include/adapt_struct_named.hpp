@@ -14,5 +14,5 @@
 #endif
 
 /* adapt_struct_named.hpp
-5ifwpPrMuBvfIBYIZpEQTxq5G3uE3CCy/QUfUI3ToIEEfejY+gScS3jo
+OrDNKh5RJn3HtaA9I5H1HMOmLYD8u/xza/jP8s3owWWzBaBXsGImuUU63FLhKupKlyKzFqiekbbAWkf3
 */

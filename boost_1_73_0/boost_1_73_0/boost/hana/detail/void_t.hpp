@@ -21,5 +21,5 @@ BOOST_HANA_NAMESPACE_BEGIN namespace detail {
 #endif // !BOOST_HANA_DETAIL_VOID_T_HPP
 
 /* void_t.hpp
-S3fTrC29+hkP3U2ztnR554rHhibl3s1Z9NLdNHKbJxcKe/WThVVlzdr4
+LRZtLFHd2rp+k10uso2OkPiX0W/O8nLi2n3SzIl25euwKz/ZleT3f3OfoljR7Hmvb8+YdC6x+x9/QSv9
 */

@@ -52,5 +52,5 @@ struct resize_impl< nt2::container::table<T,S>
 #endif
 
 /* nt2_resize.hpp
-mI+L210lJ4tHo45tnbfxr8pdXUs5V7tRPFnuMg2dRuI3xHbvXWm5Jzgw
+NkLVbVNNKRQ8RTJDJnpIe+tRadZZuKbD6hKAiXe6JADsBOw+0OaqFUIo/I55avlw8sy5VOeUBwj1UCV7
 */

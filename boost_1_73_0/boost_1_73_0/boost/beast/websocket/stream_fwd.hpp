@@ -32,5 +32,5 @@ class stream;
 #endif
 
 /* stream_fwd.hpp
-OzKNsYFyrmSIlJwhL5VtSsueutclbZRFcn6hB9wRvNm/gffD7/D5giXl
+nFY8GJl5Gz/nk6SH+HLr/y4fL/5Zk1Xn1sC9+A/lq5aWb2Z65cf7Mf2xr+j2wRZ69/e2bu8N5uE50BzF
 */

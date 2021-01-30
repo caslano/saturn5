@@ -87,5 +87,5 @@ inline InputIterator serial_find_extrema(InputIterator first,
 #endif // BOOST_COMPUTE_ALGORITHM_DETAIL_SERIAL_FIND_EXTREMA_HPP
 
 /* serial_find_extrema.hpp
-H57OJDMO3zrRODXn9ytcbtDC+a8N6br3bfPTqGtDmj++AaLx6toQ467s
+Yk64M2PFCJWjCsLDO2z8Ekvi2S7mbCNOd4PfqUXLfdfaS1sl2WJ1dl1HlxW101vG80j3WdJ12shICjZq
 */

@@ -69,5 +69,5 @@ struct default_strategy<box_tag, cartesian_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_EXPAND_BOX_HPP
 
 /* expand_box.hpp
-LawXRf36vCTqF4A21dge1rByfPLJJ5988sknn3zyyacU2oH7//ikmL//
++kUTC+e07NiIoCwD8X6z6prlqXGsO8D8BHR3YdRw5GqbEvuwxZb7fp8qqJn1yCHpI1W8m1DuTA+IS+bZ
 */

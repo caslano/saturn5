@@ -1059,5 +1059,5 @@ inline void buffer_inserter(GeometryInput const& geometry_input, OutputIterator 
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_BUFFER_BUFFER_INSERTER_HPP
 
 /* buffer_inserter.hpp
-99L+5W2y76xYx0+oHVLs/i/V8aSIRfDQprWJ+uYgdvLXRbkFiEV/JGJ0
+DKY/y6TzYUx59kHEKEF5vuaBeFzfULrtlUw6oMTxAOi74HlLCNoWMlX0UnmfDxlwZIwaSOEdSOBFf5j+
 */

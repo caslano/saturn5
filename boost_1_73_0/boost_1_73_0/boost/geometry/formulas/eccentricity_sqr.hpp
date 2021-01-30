@@ -72,5 +72,5 @@ ResultType eccentricity_sqr(Geometry const& geometry)
 #endif // BOOST_GEOMETRY_FORMULAS_ECCENCRICITY_SQR_HPP
 
 /* eccentricity_sqr.hpp
-uAaW8L1pG/397euOKslaqb92jYyujI8dWV5dXc3E2orK+BggbbbjVUO/
+45AyxOrlNqI16iLY/nfMqEpbQ81YxNBD0VF8jnS0ss1wqyyKdedaWeMMF0WuoL+4lbK4HCrue9DYhJq1
 */

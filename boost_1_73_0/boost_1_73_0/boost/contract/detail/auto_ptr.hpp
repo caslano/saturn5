@@ -53,5 +53,5 @@ private:
 
 
 /* auto_ptr.hpp
-mKYxQFNUfN0JtleX/w1Vvm67Lhv/9DhOddSLJ2W4bmGTIP8rwvwvTIu0
+gNWz42tKh+Q0WyF3pp+E7cXueeGi1CyK5f3dhWzmeAA8yv7FjLEp0kgt886Sf9g4KcvZYB9McVwZERgq
 */

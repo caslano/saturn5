@@ -77,5 +77,5 @@ private:
 #endif // BOOST_COMPUTE_ALGORITHM_DETAIL_COMPACT_HPP
 
 /* compact.hpp
-K+07iuaK+p4ibU+pugcJIduSNCgZe5QQV9WzPTnsvOrQidgw313J4/RA
+B5ShXoUab6dZFDixvggILshR4KfS3I+nVPiFixB4qGSMUqyI4EkZ4o/4VAKlYBdGpUe+4j2laHrZXZWo
 */

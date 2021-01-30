@@ -142,5 +142,5 @@ public:
 #endif
 
 /* static_ostream.hpp
-6uzNfGVTJnrfFDTrG4nnjlov7ptC9b4s3DcS/gB+O2V0U5O+SfNaewFM
+0z7klRtCQqdKw1avOVq9w1utFKAPShYscpqLoOxjvxRzd2gH3y/EIB5afzWmribJYRCfeAqFw9E0TfWM
 */

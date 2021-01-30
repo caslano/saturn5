@@ -167,5 +167,5 @@ struct disjoint<Segment1, Segment2, 2, segment_tag, segment_tag, false>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_DISJOINT_LINEAR_LINEAR_HPP
 
 /* linear_linear.hpp
-1/NAfI5VFezQFM7BKaqrv73D0Mc333bLfxX2vvbM+/G+tfvSlbs3Ljzl
+U08qqcKA6TmpHLUAaBk3ewg1dgq4Fqyr5nqmIqNspNFrhUovlo2EWWlD4zylw0u+r9GMZqMd1Qp3J9GO
 */

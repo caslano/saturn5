@@ -96,5 +96,5 @@ struct intersection_box_box<DimensionCount, DimensionCount>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_INTERSECTION_BOX_BOX_HPP
 
 /* intersection_box_box.hpp
-WkdZBg4EZ4PnguUgx6bw8h3ufY780jr4CrAQnA/OBBeA3Hv8GnAheC24
+ViyLvC8GP83f9nJf1G5aFInugMjpffgb2mZZFLnvBfJ1hx+kvxARizz0MH+vp7+sWTW8g8fgMR6iJ/jv
 */

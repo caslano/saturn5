@@ -12,5 +12,5 @@
 #include <boost/static_string/static_string.hpp>
 #endif
 /* static_string.hpp
-bGR1/zbDeTz8eyRU979l9yRe23xVnfvgutu/1PyfF38/d3tveE+Cj+tw
+0NVeEVelNw48AeGS+MaUJzsWKUaUtzqgD0EhEY27QwH6Sihqfl140ygWojKKF3NfedddofFw6fEpLIRv
 */

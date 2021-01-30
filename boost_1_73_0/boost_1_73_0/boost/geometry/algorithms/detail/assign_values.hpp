@@ -343,5 +343,5 @@ struct assign_inverse<segment_tag, Segment>
 #endif // BOOST_GEOMETRY_ALGORITHMS_ASSIGN_VALUES_HPP
 
 /* assign_values.hpp
-QoZrEq678jUh3L1EyfDaMO7erCN8cRhnFyG5/JIQzi9q8j5bKuPsEiOw
+x80mHvH5p90ftB4+29CvD68mWSGeU551jQGtPgYGcrw/0zladMj7MZ1oOWqxVF634FlWXlcxDbqQ39w0
 */

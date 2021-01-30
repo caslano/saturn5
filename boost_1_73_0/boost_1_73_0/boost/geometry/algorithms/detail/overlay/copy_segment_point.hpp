@@ -400,5 +400,5 @@ inline bool copy_segment_points(Geometry1 const& geometry1, Geometry2 const& geo
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_COPY_SEGMENT_POINT_HPP
 
 /* copy_segment_point.hpp
-8/0HgUzbYJDjXmfZUq+HgHeA54D4VqphIMq0Gg6i7KkR4D7wXJD7tWSC
+hiZ644v5r3JTNLHn2PjSdIPppW+I3xH9NtspwiuuzeS4u87M6tefqp4MU7WtFWB3KWrXer+QJmyLwDQO
 */

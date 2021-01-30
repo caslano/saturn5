@@ -79,5 +79,5 @@ void trampoline_push_void( context::detail::transfer_t t)
 #endif // BOOST_COROUTINES_DETAIL_TRAMPOLINE_PUSH_H
 
 /* trampoline_push.hpp
-4YhmASrUWvV5bdX0KKtGJX8tB3puMVgGC5cfytOcqdHVceXSRH8Zxj56
+AdkHQ+cLVT0WRngo1ExtIUBORZPQ6/DvRFZeWaaK0p5nS5LPKj5Wc21KAdKp+1t+zb5ivhYfd/EZo0be
 */

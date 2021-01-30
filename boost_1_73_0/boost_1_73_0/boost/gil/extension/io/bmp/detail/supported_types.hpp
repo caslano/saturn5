@@ -145,5 +145,5 @@ struct is_write_supported<Pixel, bmp_tag>
 #endif
 
 /* supported_types.hpp
-f89RDGdyXMaxjeN2jgdnd7XRGsuD/dQ54v/5GHeuev4fDsxeu622OT37
+IRMmjzAZgbuzgruZvrgfe5Z3O1RWOD5dAcfs5bT6vURZqkNkFF+YhvBOQ4zdCJ8GiuowHgJKj6UbD3Hk
 */

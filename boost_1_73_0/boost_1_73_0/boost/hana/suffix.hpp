@@ -52,5 +52,5 @@ BOOST_HANA_NAMESPACE_END
 #endif // !BOOST_HANA_SUFFIX_HPP
 
 /* suffix.hpp
-rnxex/xFjof3t9Rbbvg6n+d+Rh6fIb0nuDZ6j1NO6Hqe6yMfA8QPV5Ne
+kOQhnmcKpE3Gu14Ywvj64rn1U/htQjxwzDL6PBuv+MNFVb2198XHVMbtfE5jffHJL1kmTyl3Jw3hyzxB
 */

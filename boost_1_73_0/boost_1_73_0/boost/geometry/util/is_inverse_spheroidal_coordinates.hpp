@@ -48,5 +48,5 @@ bool is_inverse_spheroidal_coordinates(Box const& box)
 #endif // BOOST_GEOMETRY_UTIL_IS_INVERSE_SPHEROIDAL_COORDINATES_HPP
 
 /* is_inverse_spheroidal_coordinates.hpp
-N14YLpvopnpL5wbqy76tNMjdE7i0Ab9dcLS+N7qyPIZiFT1XOM6mY71N
+G9WZYuwfcBPqeq40U68/TuW0rNOzcqVyxk9ZXOOq/yHshEse2VtGi+Wm8D8qzSwhTysbzc1qQJqVXwJf
 */

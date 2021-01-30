@@ -54,5 +54,5 @@ struct envelope<Box, box_tag>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_ENVELOPE_BOX_HPP
 
 /* box.hpp
-P5WwzzEMj7+GQ7yD6iR5MM5VZRm1LakjZq4388UUZakkP7XO/md1xB+o
+ic+i5cdCHzq93eoNoTvtpugP7U1XCaf3rODlirZxP6F8dGDSoEgW0mkmyUPqYB7SeslDGupwRrJiduH7
 */

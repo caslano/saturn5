@@ -48,5 +48,5 @@ inline bool equals_point_point(Point1 const& point1, Point2 const& point2,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_EQUALS_POINT_POINT_HPP
 
 /* point_point.hpp
-wZg8mqKixlP3/t/lEetdHyR+TQeleDL6SZdE653bbrv+suBnNewzcBvj
+4BQ/BWUHd4Gv0Sx2AJZUx1JPk3t4W57RwyW/NhPu012xkOHkxSzn4pQkSTrjLpkZPjqAHjlwLPT1U2Ps
 */

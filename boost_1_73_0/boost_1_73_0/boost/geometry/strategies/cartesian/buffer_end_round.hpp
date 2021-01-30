@@ -182,5 +182,5 @@ public :
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_BUFFER_END_ROUND_HPP
 
 /* buffer_end_round.hpp
-1Tb+J5PxD4hMqCoujsR2SLxumY+0Zx/f18RbVlJZEo6WzIyMHlYSNy6k
+V6b75ug+v7x85Zsyefyx3xPi/w5dtmdYeaaniW/yCirir59kfw3ZMFNRR0EpsgL/+NVWaTSD27Bk47xw
 */

@@ -353,5 +353,5 @@ segments_end(Geometry const& geometry)
 #endif // BOOST_GEOMETRY_ITERATORS_SEGMENT_ITERATOR_HPP
 
 /* segment_iterator.hpp
-qaEk9fnIy8wD/t1RntFKW0+UeegqKuPAdeHLtp5edVQ/h34wKaNCP5jk
+qL7nrNEWzKOUqSwz0YJXxsrHZcT/2hR6aNg/XVlPnzB97qWPRp8H6fMofX5Ln2b6HKTPMfr8kz4f02cs
 */

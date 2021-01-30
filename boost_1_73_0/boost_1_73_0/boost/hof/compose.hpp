@@ -169,5 +169,5 @@ BOOST_HOF_DECLARE_STATIC_VAR(compose, detail::make<compose_adaptor>);
 #endif
 
 /* compose.hpp
-b9747NdFfpj9U5Nsp/7mx5zZr9HQZUq8J1c7vJzBXswHFNZS8t9PiTSv
+mxSAZFgAVt+hXr+cwkTSSa87YaJnrHZwGHBi5OQmlKf7Eq8A70fzeE+orgYzja7dTZWUtsHEbL7d2WAO
 */

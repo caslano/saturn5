@@ -76,5 +76,5 @@ struct sum_for_indexable<Geometry, Indexable, IndexableTag, AlgoTag, 1>
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_ALGORITHMS_SUM_FOR_INDEXABLE_HPP
 
 /* sum_for_indexable.hpp
-+bVPJp/3luMwHmKL8UlhxuXmwNfxzPKn3HKcGYmVb31crqsNsRx5buDK
+qmzYuRRnjirWSL07Msvj2FjpitaacyL1eVJYrRN5zOpbgILbDAKAaz8QNK20Fy/WJU6C9DsNpN3vbrmB
 */

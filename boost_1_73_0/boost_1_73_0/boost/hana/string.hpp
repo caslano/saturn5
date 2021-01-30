@@ -349,5 +349,5 @@ BOOST_HANA_NAMESPACE_END
 #endif // !BOOST_HANA_STRING_HPP
 
 /* string.hpp
-+rQS7tEK56jlXoyXUbZl+m/jZWwbsMlz3Pu3pLmJ65yjLNhG2W6zLQxR
+1eamUgqk/AyIGjneLygtiYNEid0xQI8jDE1vzFFItX6rN5Cq89hkZYRVmT8hewIolocNv6PI56nLDZhX
 */

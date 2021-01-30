@@ -153,5 +153,5 @@ struct single_tag_of<multi_polygon_tag>
 #endif // BOOST_GEOMETRY_CORE_TAGS_HPP
 
 /* tags.hpp
-+JL9jxVxPm//NqZiV7Ec639DLEeOLzbEzmnRUGyHncfDH9th80SSYzu2
+djSVQ2pKfP6ayJRS7ZcWE/OO/QBag5s8Jbd5/DXaa1YZ+JQ0BmuNZDIXsStEcLBZ9AXfpKpKTctGC1Z5
 */

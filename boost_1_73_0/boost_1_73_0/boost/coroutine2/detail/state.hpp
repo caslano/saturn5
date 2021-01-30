@@ -87,5 +87,5 @@ operator^=( state_t & l, state_t r) {
 #endif // BOOST_COROUTINES2_DETAIL_ASYMMETRIC_COROUTINE_HPP
 
 /* state.hpp
-fmdxZIs3VCyDEzEkYgtnRS6CdFf6mbG8qLjYxTe4IQn03PMEllcn03m0
+H/dNJFkjMHvxoVuh0eoZ7Qguxkew0e3odxON5+SuwzDWT510GG716t4Iz7v9eLcfx1/+aldvfUH5ur7P
 */

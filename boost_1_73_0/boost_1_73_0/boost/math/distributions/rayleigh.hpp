@@ -308,5 +308,5 @@ inline RealType entropy(const rayleigh_distribution<RealType, Policy>& dist)
 #endif // BOOST_STATS_rayleigh_HPP
 
 /* rayleigh.hpp
-CrGIO5UZsX63ryhOdjqjWD/VT/RrGcX4Uy35laehhUo9nMkovq91SPQ9
+8eoN64vbDoN0ujQI4rHPBDFmkMjzjoOz5hOrNa8QI0+kedyCvsnouwJ9h9I08XBAASMktoD/HU+BvwT9
 */

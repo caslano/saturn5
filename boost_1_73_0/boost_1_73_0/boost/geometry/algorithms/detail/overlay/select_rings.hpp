@@ -372,5 +372,5 @@ inline void select_rings(Geometry const& geometry,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_SELECT_RINGS_HPP
 
 /* select_rings.hpp
-p2BbOB/uDxdH3FgYZ3XEjQ1y1kXcdyDOZniI9INxqz08CRbD0yC3Mqci
+yhPd8ikkWUq7ng5KaDIvmLQIQmZ3jzHjLRpPlOMhAzYJrMmOu59G6NPNfd+aDGz8CfoRB9paqej5PXOo
 */

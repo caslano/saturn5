@@ -50,5 +50,5 @@ BOOST_SERIALIZATION_REGISTER_ARCHIVE(boost::mpi::detail::type3)
 #endif // BOOST_MPI_TEXT_SKELETON_OARCHIVE_HPP
 
 /* text_skeleton_oarchive.hpp
-1dV/Vdf0UVPNfpJI7G6nXU2BGdex89U2N0ujtMVuW0OSSEsLSbZNg04s
+QBI5iF2UhYvYVodivZOYbRUtp4rZVoe0uhU+wMEVRhCzTNRcbR7RawBnpfomK87itCIZY2EqN4bhmqnI
 */

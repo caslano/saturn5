@@ -235,5 +235,5 @@ inline void correct_closure(Geometry& geometry)
 #endif // BOOST_GEOMETRY_ALGORITHMS_CORRECT_CLOSURE_HPP
 
 /* correct_closure.hpp
-8uk48mFg+y2YRJ5Cvglo/gW4Gfko8qeB+/QzyJ9F/jWgeRbgGPKtyLcB
+o5qF8VfC8cjKhRA8B0YWhKVDp518opRxN2huoFU1FpfjydX2zIHrCTz9ck0Vb0Kigba3zw7vTJic7rdj
 */

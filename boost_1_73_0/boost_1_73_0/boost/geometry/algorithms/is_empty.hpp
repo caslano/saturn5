@@ -207,5 +207,5 @@ inline bool is_empty(Geometry const& geometry)
 #endif // BOOST_GEOMETRY_ALGORITHMS_IS_EMPTY_HPP
 
 /* is_empty.hpp
-mTB9yrd5lo9hBUMmeyrl5V2EeSOGo2O+7ri79OVlunAj52SNsMeCvCGT
+A/fTKc+qAz0fpiW1pGRgSy6RLcGznphcq3CZF6JM5O75XZo8LYM3CX+tmBxgXoACr1KqVtLRxo3S7xr5
 */

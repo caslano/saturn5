@@ -33,5 +33,5 @@ inline typename default_content_result<Box>::type union_content(Box const& b, Ge
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_ALGORITHMS_UNION_CONTENT_HPP
 
 /* union_content.hpp
-o9XIn0lyvDLlXBKz/o+1XDcfU22bt3sAynhxzlsN/ALPVj/tpje5psiR
+kXY09v2yCb7SZf5FLSVV04KzVpddXWoOuvtLcoQfh2xs2atc2gefxuMoqdSqWkstlK7KIDk4wi1It0qm
 */

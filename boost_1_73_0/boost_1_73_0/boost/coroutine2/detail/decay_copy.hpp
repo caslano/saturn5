@@ -36,5 +36,5 @@ decay_copy( T && t) {
 #endif // BOOST_COROUTINES2_DETAIL_DECAY_COPY_H
 
 /* decay_copy.hpp
-ZKqzO+HJMUBuzyW1qYhu1WNTm6t9JGpju6Q1Jd/ja1NjRAejv/4I69D7
+HufWMwtHRZFuaJ7f8SngtGfOztCZmU8PAZ6k9UzTalIwF6r2l5yonr+HVFkMZ1HGpX7Rw57+jxGgXDv8
 */

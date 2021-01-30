@@ -302,5 +302,5 @@ struct disjoint<Segment, Areal, 2, segment_tag, areal_tag, false>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_DISJOINT_LINEAR_AREAL_HPP
 
 /* linear_areal.hpp
-NGdsrnl2ReS+BnNfn2buwyfK4Xs8C2Q5RXc6cl+GeU+uX+99I8x9mT7J
+JPPV1FBQoexBMfLpNdVUa3WUUfRRVu/njtZPIBpLU28yOe7WzFJqJrlfKMbT36/tZt4MTm+noxVkbab/
 */

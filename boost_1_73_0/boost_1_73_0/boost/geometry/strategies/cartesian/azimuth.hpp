@@ -51,5 +51,5 @@ struct default_strategy<cartesian_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_AZIMUTH_HPP
 
 /* azimuth.hpp
-jD+e8kJKRdRvvN1tvO7Zwq1uvKMjlVvIer2mwa3vdTYNz7lpGBUuiUdq
+BdNmKHPo8zx90qfPUL5Dn+fp8w59PqTPOfpcPmOG8mv6HKTPx/QZO3OGcgN9GumzkNDcBvr8jD58u01E
 */

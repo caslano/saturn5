@@ -196,5 +196,5 @@ struct feature_of<tag::sum_of_variates_kahan<VariateType, VariateTag> >
 
 
 /* sum_kahan.hpp
-38haeHnUDpk+j3lVSno/8VV5IX3vnAraEKStfZdn2kNDv3e+0Pwm9HuO
+eTRFKbLRADs0EuHupuXXu5IFZWs0zMGErFNuvHyPxmQXlCR9TYE7ef38+Am+1Q5UoCoeRvKAOkaAvt50
 */

@@ -19,5 +19,5 @@ __assume((reinterpret_cast<std::size_t>(ptr) & ((alignment) - 1)) == 0)
 #endif
 
 /* assume_aligned_msvc.hpp
-X690/ZYpie7pUxPdBZFE9yuV3HWmVQpvRqLbNTPRvX5mYnqazUq8vrqS
+qZOmN2OGnc8LYjDnvAX1MnyakwTvPmiaTZ83f+ew1pZf8NyWs6CCwvu5qY4M8C6vH5YKxXxibuKz1jPy
 */

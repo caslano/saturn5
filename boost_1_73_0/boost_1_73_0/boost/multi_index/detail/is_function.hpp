@@ -52,5 +52,5 @@ struct is_function:std::is_function<T>{};
 #endif
 
 /* is_function.hpp
-0LS0rqpnaBc0tmhoVzUKfOS+ofG+mpDZVUVx0EAlngGGpF/HqObzEaCB
+n9HCCbzcIpP0XonqXN5Rm1XK4X2D0giYI0Ihbac11gUOVpJgisnHkCXiomOvu4omBVAud3Rb8nI3lmt1
 */

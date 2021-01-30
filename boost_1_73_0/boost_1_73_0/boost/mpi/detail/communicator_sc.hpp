@@ -60,5 +60,5 @@ communicator::isend(int dest, int tag, const skeleton_proxy<T>& proxy) const
 
 
 /* communicator_sc.hpp
-jRcXNf5marnzOg6u6fy5ouPnRDweq18vFomk26Q9HY874v2p8/4FzV+l
+qjORzCeJ9JTPIF0kmsbURbXnZ/HkpK2NOirugfNuNMoxjEAnpXikfo5I45EI1YtHJYZRF5xL4xgUjabB
 */

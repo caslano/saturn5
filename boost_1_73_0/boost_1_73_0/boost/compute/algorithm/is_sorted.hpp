@@ -71,5 +71,5 @@ inline bool is_sorted(InputIterator first,
 #endif // BOOST_COMPUTE_ALGORITHM_IS_SORTED_HPP
 
 /* is_sorted.hpp
-fF3chnniXj3iPc3XxNl6OFvrnqzka91sDZutX58E58AsaMJ7vgf0gUkw
+/LvW/bu+4bxbmf1Kvenpu+55m9rlPJuvtlaVEZiqASgIEKuAKQ7E+5m7C3k5qGITggJCAArURm8j5JHk
 */

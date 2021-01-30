@@ -48,5 +48,5 @@ BOOST_HANA_NAMESPACE_END
 #endif // !BOOST_HANA_FWD_ADAPT_ADT_HPP
 
 /* adapt_adt.hpp
-7ukY35EMyTudFDhVWydxC7dRHDcxmhgQCgf1DxcV2gYw0KBQgBQ1ijpQ
+bamH6Z2JfjbIZ8RbamZIHUNNjLA5enG/1chPiWb3mozg2owpAfqjnp4kNfR1JjUWvxvdngtu8y30dlt0
 */

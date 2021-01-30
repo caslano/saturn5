@@ -33,5 +33,5 @@ struct front_inserter
 #endif // BOOST_MPL_FRONT_INSERTER_HPP_INCLUDED
 
 /* front_inserter.hpp
-26HZwtxz6PaiGFb2zy8PCtsyl7BzCW6Vp3lJzfSjwtrmwijxhp148M/f
+DrfjYMTYiFXhR8LahXntbwthQr7tGWuEtcTykbm3ebXJappu3GuYY/gNLUQD0RKEz/9RdrnGgGsAqlHY
 */

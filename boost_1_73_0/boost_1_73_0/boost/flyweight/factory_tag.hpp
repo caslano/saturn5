@@ -44,5 +44,5 @@ struct factory:parameter::template_keyword<factory<>,T>
 #endif
 
 /* factory_tag.hpp
-g+LaR8QMjGvZvn7KN1Cqpd4vKDYuBlxOtX3aYxGDwh/YGTftsYFRqbGU
+kE1RLVGvWK+LtNducQ/KKX+BYObannry+BbpKvs4vHiS6fk/lFYlyMV/O3/03veuJMS/Ezksypp9NCr/
 */

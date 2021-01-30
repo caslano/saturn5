@@ -96,5 +96,5 @@ struct default_strategy<geographic_tag>
 #endif // BOOST_GEOMETRY_EXTENSIONS_STRATEGIES_GEOGRAPHIC_IO_HPP
 
 /* io.hpp
-6z7dLc+hu/IdpgNnI8xHWIawonuSB1IXT2Jd9835Eptwr0MPtD+ESoQF
+SVNhhb+zbGnCQVJeZWEjEZs5ni7jDaM8Fw5j9PIeGggY3Q2J1rRDowXKhe1+dkyyQmrLc3yYSI9N9+ao
 */

@@ -101,5 +101,5 @@ namespace boost
 #endif // header
 
 /* manip_base.hpp
-g7kSPo96HkQ9D2WJPQ+CfW3AeFOG+ln4XU4dI3IS0e77cySci3JycT+X
++HUZsYDoiliCWIZYgViFWI1Yg1BH+Ch+TexCaCT+TOxBbsavzxCP6480eqiWIYLi+5lSTkixIIrPR6kW
 */

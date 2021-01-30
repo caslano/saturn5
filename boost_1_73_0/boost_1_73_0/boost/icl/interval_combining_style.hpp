@@ -28,5 +28,5 @@ namespace interval_combine
 
 
 /* interval_combining_style.hpp
-ymFeL5qUF+rC/GQ+uaeQXQdrQ+MEbb5XyBwdQ/ldYA6uf08WPtJclLnt
+KJKWpBdzkLpRT8/Yym4PJ3Xh9NZQoDRhApQ0EnmF7BnoqNaTa5aXzoAyneQ0NAy5YRmV8wOmIEHQoK7H
 */

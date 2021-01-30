@@ -189,5 +189,5 @@ struct extra_fp_operations< Base, Value, Size, true > :
 #endif // BOOST_ATOMIC_DETAIL_FP_OPS_GENERIC_HPP_INCLUDED_
 
 /* extra_fp_ops_generic.hpp
-yLElfm3KpCLzjnHXw9Ntn6TR1X4Of9+Z5+lubq9zHHrLjqbOTQn5DaC7
+Cusp34RRZ++EoFCeXZ+Lcv9ZQqYrSWKeWJcIK0ayPYuirkL/jnKCpc6qvzznHiLe8ZwUhLYMcWA0Kjgd
 */

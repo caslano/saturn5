@@ -152,5 +152,5 @@ typedef basic_pooled_fixedsize_stack< stack_traits >  pooled_fixedsize_stack;
 #endif // BOOST_CONTEXT_POOLED_pooled_fixedsize_H
 
 /* pooled_fixedsize_stack.hpp
-1aHzvmi+daLxwPOH++lbiSwm4F9E7qf+wXHu/0fvp/7Bce7/1wG+zsK5
+NF1NA1dJ+we7i4O+zEPxP8KaEOL9j4O5Pa+BetvvYQnjRoftyT1M96m4RNjDWXvj/595A0WZ2lT7jS5e
 */

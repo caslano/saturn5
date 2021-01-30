@@ -78,5 +78,5 @@ inline ReturnType determinant(U const& u, V const& v)
 #endif // BOOST_GEOMETRY_ARITHMETIC_DETERMINANT_HPP
 
 /* determinant.hpp
-4TVwBZzSWHPd326sOe7LG2uO+2r4IdwAV8Kv4Gq4FXLNOrkM6Gthf8i1
+q0TUlzaa/X5x1Q5KwBrEItBvUQv9eawNJadGaLCS0a09CX7Xvjhbu2z9Hms2VRRYOmi0GBGFjtZqVkOv
 */

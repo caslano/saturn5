@@ -58,5 +58,5 @@ BOOST_FORCEINLINE T* addressof(T& value) BOOST_NOEXCEPT
 #endif // BOOST_ATOMIC_DETAIL_ADDRESSOF_HPP_INCLUDED_
 
 /* addressof.hpp
-cNqy1jNbM8qwc0+6nXs2dEqStYX8EGCQrG2UeJ7/JfZES7xgWdO8qsqa
+tMmHkms61P4xOidgLbd7llLM8VhXkVmkaLF8S9+Jka5yRpl2jIa7Cr/mW7fwQOp8FoleHHjs3HZi3oNo
 */

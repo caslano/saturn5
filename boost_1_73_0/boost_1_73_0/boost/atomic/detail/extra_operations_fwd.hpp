@@ -35,5 +35,5 @@ struct extra_operations;
 #endif // BOOST_ATOMIC_DETAIL_EXTRA_OPERATIONS_FWD_HPP_INCLUDED_
 
 /* extra_operations_fwd.hpp
-Gm20HTzGraVvJlBjOkPeIKis/1zGQUmfGuuP1yRcQu2hcS3suGkZpdCc
+LTUVR3zXGL4RFgzmaIUj7lBgpipfD+xarE3NoWnvXPYDoolk83eHcGl9rbNbCfacBPUdVECVpnDbli1C
 */

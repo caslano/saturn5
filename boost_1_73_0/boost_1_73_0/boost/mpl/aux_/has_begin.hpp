@@ -23,5 +23,5 @@ BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(has_begin, begin, true)
 #endif // BOOST_MPL_AUX_HAS_BEGIN_HPP_INCLUDED
 
 /* has_begin.hpp
-Rt+5oGlxYsEqDIeTRHBSrWi+HDqAHweVcrakF8vQxxJY2QT0Mf5D1uQF
+iepmQLOSwzD+99SsN73L37aN/+ndgnmf3LtJPjPH+2SRq/pkC32R+1Gwzqu+Kn50Jr13SoP7zXWBk3EK
 */

@@ -101,5 +101,5 @@ BOOST_HOF_DECLARE_STATIC_VAR(rotate, detail::make<rotate_adaptor>);
 #endif
 
 /* rotate.hpp
-Mtp6DrjJ8t062usd6zdL/C26t+LHkrV92x0jdbkuMSpc7cH66l0f1NmX
+WJqE5cOC/S/EwFPRjS2S1ksNdSxe7yS8WTfbIoZ7v4nTKN2G6df33AD2iO6TflMZubiV9hA97qF7DmtK
 */

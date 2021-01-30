@@ -538,5 +538,5 @@ struct set_kernel_arg<char>
 #endif // BOOST_COMPUTE_KERNEL_HPP
 
 /* kernel.hpp
-nAUz4Cq4AW6CZXAXPABV6Og2UA/2ghYrG95oT3AEJEEevAvGwRkr6/Wo
+oMQTg6Hbh7Iz9D6obT0dFNHA32uK56kM2XO6DIfMrtQeVhYYavlkDzmowIpZC5dKksqKAi/Jkq3h9bXx
 */

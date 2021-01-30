@@ -79,5 +79,5 @@ template < typename Graph > inline void make_connected(Graph& g)
 #endif //__MAKE_CONNECTED_HPP__
 
 /* make_connected.hpp
-l6PNJR1rqJ2sbSj7q4yb2GabDasxt5mR/1B5MoT8IGCbXeuOqqu1lfH7
+5t2UOkD66hb65Ik7ceK0oPncpylb850WwOTD4vxtYDb7FKxgHES+zafIYLUvrU4ezT8s5lEqsfNOWxJJ
 */

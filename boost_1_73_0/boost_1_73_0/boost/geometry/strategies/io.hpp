@@ -42,5 +42,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_EXTENSIONS_STRATEGIES_IO_HPP
 
 /* io.hpp
-A2H4m5z2uomJ06w99hHlc+4nKpeyv+iaFmses6Y9UFT+E+8aud+DRdcg
+s+hqlPKCXzgprjvOndkv1t8iO0Pnqf4zljSXqvOIWykJ4u2jy0DXLqxvrM2N25K1hnP94mfTU6QVWSsD
 */

@@ -988,5 +988,5 @@ void PBGL_DISTRIB_ADJLIST_TYPE::save(std::string const& filename) const
 
 
 /* serialization.hpp
-+TDuyfKd5/Rr4pjO+frlED70AGFlGdfvJpAZsHMkydezjOizOX+/Rwln
+/IfecaiqdibtCbEt0MLpmQMq+OgFSrzMOw6N1MbRvmtktHZ6KtybyrIrZPzq9Ut444xP9I5DK7XuQUVj
 */

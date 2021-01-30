@@ -184,5 +184,5 @@ inline typename Functor::result_type kahan_sum_series(Functor& func, int bits, b
 
 
 /* series.hpp
-5obt28eH052+4HkzXccI8jTahp8Ds+kIYWUDlHuzSqy62j8b07fz7btU
+Y/epbfwgGWsHausH8eW4/cMQv7OdHeJXXg7x/25jR+X+MtefG28G2aadHdafjh8lY9v95gEj9vzc5I92
 */

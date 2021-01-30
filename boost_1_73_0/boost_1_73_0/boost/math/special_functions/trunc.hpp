@@ -162,5 +162,5 @@ inline typename boost::disable_if_c<boost::is_constructible<boost::long_long_typ
 #endif // BOOST_MATH_TRUNC_HPP
 
 /* trunc.hpp
-TK0nsW+HxNyTCqP6SCRlK5RwvtMXKty9VmIV6x57TeDn8Sz/uURHr8Bf
+6YIstrAoN3tBeVn2AnzmQsmyS8r0E7JLS5lHR0fGzBs/OjLa/jNpHoLd4Q6VjDiuVBVmlZfbjkbSM7Bj
 */

@@ -266,5 +266,5 @@ struct feature_of<tag::weighted_density>
 #endif
 
 /* density.hpp
-FvkJvX+D9qcZ4ld3ZOg1UxbWzcsi6w1ZZeU65i7m9LOkz5VS9JeMPmYd
+HPNWwQlkv7t50F4shRigVSB1vlKS/f29jraTv0NkcyxVqlP1kRLz4Av2Fy5UdlYHHaWx2nM+nSR4VG49
 */

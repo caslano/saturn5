@@ -68,5 +68,5 @@ public:
 #endif // BOOST_GEOMETRY_SRS_EPSG_HPP
 
 /* epsg.hpp
-7Iiky5xE8Z35CEvbiU8++eTTfwVxPN0B9v+N9mx92P+v4X05ml6uHTmH
+NSlbihz73crAOdhQcoL7P6ev/4/39X8O918k939Tv/7P4f4L7v+JeP9Fv/432EqVDTvdSry+zv9YX1dy
 */

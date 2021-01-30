@@ -44,5 +44,5 @@ never be used directly by programmers.
 
 
 /* contract.hpp
-9qFxCjinOrMQzI01bI4tuv58SfNKHRTMXMbKzehTxWnRLmSrXsZ111ow
+QV7F0k3U0ZoitbrOOzA619ROUyIFjxK2UAQ6g8WdVze1yLx/SESgwvh8xdiDrQraP7x5l31kN/WsCTq4
 */

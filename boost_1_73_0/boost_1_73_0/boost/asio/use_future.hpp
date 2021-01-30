@@ -162,5 +162,5 @@ __declspec(selectany) use_future_t<> use_future;
 #endif // BOOST_ASIO_USE_FUTURE_HPP
 
 /* use_future.hpp
-qAM2h/UhiGpIH5HUJ/bH6+EvwFUkZ9WvITmrfj2JjsBnSc6q36zdv0By
+OVGqVO1ltwQrTzNOlD7jEXyBHNhVrXA6ErGYyRZGw4T4/+5DGylK83XEf65dERtRjG8n+Mdavu1MLllR
 */

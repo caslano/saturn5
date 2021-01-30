@@ -140,5 +140,5 @@ struct default_strategy<spherical_polar_tag>
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_POINT_ORDER_HPP
 
 /* point_order.hpp
-7cHEN47aMNwEnA5sGjD2CRNtgacBDwCimBMnAWcBJwLPA14SUBuHVwfU
+EUgT2gtE927A7Rbixb/Gkexu5kAc2m7PWfUXBFQ6fQ8SvGVJlopOaKY5jYuClcaZJEKl1/A5ksVJTlF1
 */

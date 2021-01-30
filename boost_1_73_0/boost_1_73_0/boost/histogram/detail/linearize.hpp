@@ -111,5 +111,5 @@ std::size_t linearize_growth(Index& o, axis::index_type& sh, const std::size_t s
 #endif // BOOST_HISTOGRAM_DETAIL_LINEARIZE_HPP
 
 /* linearize.hpp
-oF+EejEHf+/ZU/Q+pfPQt9kzq+PZ7ju7U53xYE6HoLTvxLZwsb5zLv7/
+gjS1wBRJ1iWeOCADBLnXXQff1ZCom4BjBuyVel2vOXY6C7ZWbLY17zLePwn73fB+S5iBZWzQXhuh1jzy
 */

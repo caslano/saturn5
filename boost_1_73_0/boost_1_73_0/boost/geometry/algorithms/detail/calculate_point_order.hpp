@@ -370,5 +370,5 @@ inline geometry::order_selector calculate_point_order(Ring const& ring)
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_CALCULATE_POINT_ORDER_HPP
 
 /* calculate_point_order.hpp
-dc+GNT5WZDJredq9xsZ1rwtj7a2s3HoXo+aQzIYg3d7qlqsPMHINw2Ic
+iyyQXLY3ods+MKza6fi+nIb4OimHkF7U3nBTp6igEv/OHKooMSau9mu7E59v8nw33DRwvbQcKR6WTGkt
 */

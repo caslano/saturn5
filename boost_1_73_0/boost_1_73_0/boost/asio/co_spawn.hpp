@@ -102,5 +102,5 @@ co_spawn(ExecutionContext& ctx, F&& f,
 #endif // BOOST_ASIO_CO_SPAWN_HPP
 
 /* co_spawn.hpp
-rlP+zvopv3xnvcEv31lvBH1+0XUaAjeBKeA2sD24HewHvgReCu4Ah4PP
+IrIZvNgFosGHK8dZUWG4xXaJLtz7nOh0kFLFjqh6ioQXLD/sba9/k4c+mfHj0HerS8ZwChwN8hQNrSPz
 */

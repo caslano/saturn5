@@ -37,5 +37,5 @@ struct is_bit_aligned<packed_pixel<B, C, L> const> : std::true_type {};
 #endif
 
 /* is_bit_aligned.hpp
-8U1Bvj1Q1gTFcB5lDZUby+ViOSlcbj7rEc8n4Fw5T5DPoALWZyHr5ZLQ
+g9iETsZfsEAxHlsyaJykab8dNflg9DeV2zDdmOt4EbUFK/iQXQHOaK7j8rOEPj1zc28/gAUwrMVfQQ0X
 */

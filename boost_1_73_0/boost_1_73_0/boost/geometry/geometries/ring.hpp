@@ -181,5 +181,5 @@ struct closure<model::ring<Point, PointOrder, false, Container, Allocator> >
 #endif // BOOST_GEOMETRY_GEOMETRIES_RING_HPP
 
 /* ring.hpp
-ghp/fSMshjfBLrmqIdgT3gqPylUtwavh7fAueIe0I1e1BV/KVW3B9+Hd
+RFt2aT822hKlqU2Mik+3NA2aN93WWRZmbNRudpnYELEUpYcajCd3GDLBhhoMUaUogfypABZ2a8V6huB4
 */

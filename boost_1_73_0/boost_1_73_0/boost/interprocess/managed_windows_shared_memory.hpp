@@ -224,5 +224,5 @@ wmanaged_windows_shared_memory;
 #endif   //BOOST_INTERPROCESS_MANAGED_WINDOWS_SHARED_MEMORY_HPP
 
 /* managed_windows_shared_memory.hpp
-EgIRwaePxojnntSUlc4Sn59NTeTTk8R/b6qaK1iEf2eqVME++PmGlHUE
+nt9hZxa6tBXJU6UDbE39tjBlwHLO/sNmFUVd+0XlnPKOkFJzUrhGOZLyrnFGUZdQF2euTTQjBjbAAIrv
 */

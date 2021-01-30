@@ -118,5 +118,5 @@ private:
 #endif // BOOST_COMPUTE_ALLOCATOR_BUFFER_ALLOCATOR_HPP
 
 /* buffer_allocator.hpp
-+WOIq9k4vKKgLlxw2edtvHX/FHGXbVzLvb23pTxzdJMEODL8nRsEX/AW
+AZwBk147owmFt2qenPgkDYz65JhzESAGM9JCebc/d5mwYf6hpjczhRF+i8+w8jdbu91v15vs8lVzVfIA
 */

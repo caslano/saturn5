@@ -116,5 +116,5 @@ bool are_counts_ok(Rtree const& tree, bool check_min = true)
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_RTREE_UTILITIES_ARE_COUNTS_OK_HPP
 
 /* are_counts_ok.hpp
-5bxU3PWhrhtJXOMt1p+ce8y4jzHL2DS/TnQ+uR54pBg9CDO+LBTlHS4S
+MH3CMqf6EFCfZXYxhYZp0YQbLLddwu+fit370a3DxHJn2mfeE9hntxZQQsfGagsMeLX//3j7H/imqvt/
 */

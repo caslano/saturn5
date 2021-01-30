@@ -22,5 +22,5 @@
 #endif
 
 /* struct.hpp
-obcAGOEcUR8Myehp86lRLFiJjfKNbQTaHVY89WTj/0BRx5DrsOjZYxxS
+vpEGbOcoK8imKmAQZHXzbhAwczdNQThLHq9yrR7WBF6Uy0PH2Cklkz8LSOnlX+8xqlHQ8tCxwMe6ItXH
 */

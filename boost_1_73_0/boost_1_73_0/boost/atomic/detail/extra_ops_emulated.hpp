@@ -238,5 +238,5 @@ struct extra_operations< Base, Size, Signed, false > :
 #endif // BOOST_ATOMIC_DETAIL_EXTRA_OPS_EMULATED_HPP_INCLUDED_
 
 /* extra_ops_emulated.hpp
-vmY8emM75H6vaU1fmTbkrqFrnK1+4v6Gn1XPsz/33Drbi0yK/6XH//mT
+ilM8zxKtWtgZnQViByNGxSt2Y+01qf3BNMKI2Aj/xTyEBmE7Q7u+09nxo2F96+QteI3mNLaS3HodZgGO
 */

@@ -41,5 +41,5 @@ struct default_area_result
 #endif // BOOST_GEOMETRY_STRATEGIES_DEFAULT_AREA_RESULT_HPP
 
 /* default_area_result.hpp
-7MNcUdkH8uYp+0DZTso+3CIq+3C3qOzDGUHDU0qcH1QZiIuD6g/qqqDK
+HGkt9XiDiFot9XZ6cksNcSpSfqLCb3hVuGNhO8jXQgvbIf83emYFMTrf+cY5M+g3n82FMWDSqGVQukwV
 */

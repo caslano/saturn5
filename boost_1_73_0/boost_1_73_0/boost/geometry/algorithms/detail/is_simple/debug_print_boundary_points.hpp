@@ -113,5 +113,5 @@ inline void debug_print_boundary_points(Linear const&)
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_IS_SIMPLE_DEBUG_PRINT_BOUNDARY_POINTS_HPP
 
 /* debug_print_boundary_points.hpp
-MBQOFYRzg3nhvNzw/LLQz9J9uGWRfSivDi+/OK9gZu6svDkzY/vO20ya
+1qFliL3f3aeBNHc8/yN/0b4tEB870du29K//nlYtkwwv2kcBf2k6/77oU54FTmj2oJiO97OrAw/TltQ+
 */

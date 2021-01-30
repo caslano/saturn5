@@ -156,5 +156,5 @@ struct radius_access<srs::spheroid<RadiusType>, Dimension>
 #endif // BOOST_GEOMETRY_SRS_SPHEROID_HPP
 
 /* spheroid.hpp
-67W2HKaGoynvRgPKf+zdOfnumrR3V9fx7oKA4TvLaV2TaV2FZ/fLwbv2
+ld8ZGw/LQO4uC92lRnIx/DPlcAbDSggqXn5ZgV+MDVvR5C6O7GhjqGNA8L0NL+qK4tYchaeI5k255Lpl
 */

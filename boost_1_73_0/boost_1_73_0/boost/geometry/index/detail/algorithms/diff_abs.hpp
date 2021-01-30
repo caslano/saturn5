@@ -39,5 +39,5 @@ inline T diff_abs(T const& v1, T const& v2)
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_ALGORITHMS_DIFF_ABS_HPP
 
 /* diff_abs.hpp
-yz1pLRRNawuplVLkhfMf0jWDe90h7bq1vd5S3piXQkn2O6Z7kkcXYUMt
+SY1ytD6Eu5Qb5gj/BFGpcp2OcJPZ4Iq6lY3qPyWN6t/MH23yg8VMf6h4/+4IR6TUTOd2ph2sBFvHZJVx
 */

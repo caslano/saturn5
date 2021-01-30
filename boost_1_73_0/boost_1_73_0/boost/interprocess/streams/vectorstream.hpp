@@ -622,5 +622,5 @@ class basic_vectorstream
 #endif /* BOOST_INTERPROCESS_VECTORSTREAM_HPP */
 
 /* vectorstream.hpp
-j70BOfS9rz7P6ZlNgg2N0DxfP0I2veUs7LBKLPYjCsyT8yLsIufJ+SP9
+e77n9uR1pnwPGR7DDPd7VozSlO8hs/ehtK8g8qvhIvdC5NcQ+fVwkb+DyNMQefqyyEBbbUZq6yT2PCJU
 */

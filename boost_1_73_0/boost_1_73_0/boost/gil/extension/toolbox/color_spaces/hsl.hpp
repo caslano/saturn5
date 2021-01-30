@@ -261,5 +261,5 @@ struct default_color_converter_impl<hsl_t,rgb_t>
 #endif
 
 /* hsl.hpp
-3j+DdRBtc75Vcu/LL18/bG7Hg9c9u+esa8bnttf4nalnzcH29vop/8fe
+lTlQx5Mvr2Y3fk68j/2NzvGOr3FCNv022qTyFERhOUp0tjKW+nIxfa6kzxfp82X6zKXPMvqsoc/36fMU
 */

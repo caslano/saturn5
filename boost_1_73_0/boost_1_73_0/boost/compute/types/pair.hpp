@@ -117,5 +117,5 @@ struct type_definition_trait<std::pair<T1, T2> >
 #endif // BOOST_COMPUTE_TYPES_PAIR_HPP
 
 /* pair.hpp
-w+Hn7d71lRW3hddcVs3UyIrvsc5vlLKir/W/v/8L1yV2iN6ixA/ubazb
+5Dgzc4fDpl832WlhT8xbKPa8IguaWUnHn0qxwwLtMwPZA3LjnsVyueQcL92bYouONgvwojKS8NE/K6FN
 */

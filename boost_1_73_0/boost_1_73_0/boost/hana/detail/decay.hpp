@@ -48,5 +48,5 @@ BOOST_HANA_NAMESPACE_BEGIN namespace detail {
 #endif // !BOOST_HANA_DETAIL_DECAY_HPP
 
 /* decay.hpp
-nRw315VjXPf3M85X8Zy8gXF7kfG2hf2dntawyPEt43r0vjlX0S7ruM7t
+S/ObpexE29lDSee729naPbkWlzCMxkpLjsMNdFYzoOM1ykhS7VIzja0FviMkgrcW+A6XFvl6V49pOqg6
 */

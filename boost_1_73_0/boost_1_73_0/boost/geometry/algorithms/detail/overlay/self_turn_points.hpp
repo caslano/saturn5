@@ -378,5 +378,5 @@ inline void self_turns(Geometry const& geometry,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_SELF_TURN_POINTS_HPP
 
 /* self_turn_points.hpp
-3Y35ifmghuRJv1q+90TNaZ+feMLlga1Hz39kSNbu80HJu4KWTYw5oonG
+bPpYxR9V8mMdf5TLjwf5o1h+PMYfF8uPJ/jjHPmxmT+GyY8d/GGSHy/xx8dD+ONV/viX/HiTP16XH4f5
 */

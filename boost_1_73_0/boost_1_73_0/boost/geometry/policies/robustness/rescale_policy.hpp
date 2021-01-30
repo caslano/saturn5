@@ -83,5 +83,5 @@ struct robust_point_type<Point, detail::robust_policy<FpPoint, IntPoint, Calcula
 #endif // BOOST_GEOMETRY_POLICIES_ROBUSTNESS_RESCALE_POLICY_HPP
 
 /* rescale_policy.hpp
-OwNqt+OhgNrneCOgMkE9MlRmZ1GGyujcnqEyOs9mGPPmiTUZKqvzfobK
+leUDeEOm50ueg1nIozNfL1M0OnE1d6iuHFMXosKPIdUY3kA56vdq42HIGHL8g6PMrwXsPVxM5wy70wDI
 */

@@ -116,5 +116,5 @@ put(two_bit_color_map<
 #endif // BOOST_DISTRIBUTED_TWO_BIT_COLOR_MAP_HPP
 
 /* two_bit_color_map.hpp
-wQ52sIMd7GAHO9jBDnaww9coJD2hiDcEmdVo9ic9qYh+hvgO6xXRTX/s
+Bl423+gpYU6hBNOijohfYUvhXu/rOJbeSnuXHXWscLFa0K3P79Ln95kVEiKrS7xcapOwxZ00VM3XX4Ed
 */

@@ -28,5 +28,5 @@ struct extract_exponent_type<Backend, number_kind_floating_point>
 #endif
 
 /* extract_exponent_type.hpp
-RzU7vR7REgPO3b7VuwUPTBB3n8rmZ5oCzkPxQyNobUy5gcy5tC+DeXc7
+YwdX8ObyY53zUf+DfiJ6tsW3T893Edr5gTmPgSj6n0X52BT/30mUrzL3xNYtr59w9Y12ulOxCr71vRqZ
 */

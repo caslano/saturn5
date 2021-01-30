@@ -133,5 +133,5 @@ array_adapter<Mode, Ch>::output_sequence()
 #endif // #ifndef BOOST_IOSTREAMS_ARRAY_HPP_INCLUDED
 
 /* array.hpp
-shIsl9c1A2eD0TPgOYEVd+Y9a1MW5prbA1PdOwJT3dcHpv29MzDt7xsC
+e3Jwu2gH3S7KV1Yks1oE+TU6KWjHokfQ6h3P15evDqVRP+NbTyUOJvSMbyeVOJ43JI6nAhLH04bE8bKH
 */

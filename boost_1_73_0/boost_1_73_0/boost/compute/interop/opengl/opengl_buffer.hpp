@@ -106,5 +106,5 @@ struct set_kernel_arg<opengl_buffer> : set_kernel_arg<memory_object> { };
 #endif // BOOST_COMPUTE_INTEROP_OPENGL_OPENGL_BUFFER_HPP
 
 /* opengl_buffer.hpp
-pzxLZ7/0W9TKB8sXo9aWkcEftPB6q80a4++9LPFKcaP5YkHqjFRh7QNe
+1wG1Fh3HgVx9yldk8okXvSGxDtZr7/E7OqJCgsPxKBBTsSYVTeBQhbXTVAfU4+WEe86kwl+jUxb8tn1E
 */

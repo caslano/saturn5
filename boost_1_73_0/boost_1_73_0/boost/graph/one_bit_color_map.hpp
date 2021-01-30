@@ -104,5 +104,5 @@ inline one_bit_color_map< IndexMap > make_one_bit_color_map(
 #endif // BOOST_ONE_BIT_COLOR_MAP_HPP
 
 /* one_bit_color_map.hpp
-5nOXSTcot3YWB/kY77XWZN7AMht1+18Qk2vQ7ZSqcqlbn7g2P2O7aT4Q
+Pr51QjRup+ruIIJI7NyG1qIZG+BN0qpOoaKnRC4imVGukFvCxQ7iUqiUh8bRcO3g1EYrsQZlS6N1wqnZ
 */

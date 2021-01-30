@@ -92,5 +92,5 @@ using extract::min;
 #endif
 
 /* min.hpp
-3aV258V0UjG5KtLJY5LeTOh5jvGs3L9vss2p+PaqJY5e8y8T+qYiv5yf
+1S3L454WkfR6Pfot9++lR+aaG2k/H93vojeMi2ivcc9/mtH/bfdLuhyIvWX9nd7v9/+FVbvvTo0w7iX9
 */

@@ -229,5 +229,5 @@ BOOST_MPL_AUX_NA_SPEC_TEMPLATE_ARITY(n_, n_, inherit)
 #endif // BOOST_PP_IS_ITERATING
 
 /* inherit.hpp
-YcM5GzYLyyg36jxYeEjSUGGZ5fw6MsS6kBgTq7vU9hC+fvn0OWVTzn8L
+Ycl789yYL85iPJd5iLHugDuY45pc7EaV1sq+Tef/pvN/0/m/6fzfdP5vOv83nf+bzv//N87/JdYRlg/M
 */

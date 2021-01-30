@@ -86,5 +86,5 @@ struct is_valid<Segment, segment_tag>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_IS_VALID_SEGMENT_HPP
 
 /* segment.hpp
-ybrWCeAScKIl7cskS/J7CkiZ+EoTP8q30UeKnpKGdby/ScsMS+rrTLA7
+GMxqbiqtLXCED3FkbWldVC2tq9aeMBKoLseWCjRd0e5PZDrCcBkQBON18X768fnj2Yf5mmm0q1dqrzxh
 */

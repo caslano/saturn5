@@ -33,5 +33,5 @@ using protected_fixedsize_stack = boost::context::protected_fixedsize_stack;
 #endif // BOOST_COROUTINES2_PROTECTED_FIXEDSIZE_H
 
 /* protected_fixedsize_stack.hpp
-jevW5PKbh9TeF7Sh9WIc1xck/a+X7UGzRn4LPuNqZrQ1iaWWwJd68k2B
+ByjRAhczlw2zR+vaqp33otVujwHIpIjyyRcPZ3F3u/YpxytUNL7WwYg3Xffe80srjDne90CqYWMsFtxK
 */

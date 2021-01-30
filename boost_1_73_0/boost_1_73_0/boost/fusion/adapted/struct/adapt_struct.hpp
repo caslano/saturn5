@@ -121,5 +121,5 @@
 #endif
 
 /* adapt_struct.hpp
-X/ScBAfJDH5H6JQ0m7jzHTv9xoiPblr43DepWMd9MiADDEquc6AxSuG7
+iiD+SxOZ4vhzPayP33bKjAtHlwFWueApgyB+NTUewKN4qv28KDmVchPyvcG+CcqQYF+2kh5WXPZoBS40
 */

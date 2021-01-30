@@ -77,5 +77,5 @@ public :
 #endif // BOOST_GEOMETRY_STRATEGIES_CONCEPTS_CENTROID_CONCEPT_HPP
 
 /* centroid_concept.hpp
-4yX8v2gUeePeb4wsL2Em42LOGdrm0hdaqq1/2sUmL3sfhLfwn/GG/71T
+axx6Ta+5GZqCLV4HC0e9nUa50DdyAa9DXHAJj2aDbekMpTn2jqGdMNJDjpOKEp4ESjaTxu8awlkNJ6pm
 */

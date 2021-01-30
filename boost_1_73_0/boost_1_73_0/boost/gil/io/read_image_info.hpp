@@ -110,5 +110,5 @@ auto read_image_info(String const& file_name, FormatTag const&,
 #endif
 
 /* read_image_info.hpp
-q7zFKrMTmg+KXhZ+k6VPc/33sYmyrD7B3y9T2dFg182JBvNE/A0SXQa4
+obwQmyLyGHKzYu6QxLNlEtkxCvczT90kp0S7NCDW+3CM9EVX+OCdGTgEObqC7ptAG3ABYbBVec5A0PV9
 */

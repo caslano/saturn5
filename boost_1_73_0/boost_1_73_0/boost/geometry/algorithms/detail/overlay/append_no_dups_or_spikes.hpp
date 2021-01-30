@@ -216,5 +216,5 @@ inline void clean_closing_dups_and_spikes(Range& range,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_APPEND_NO_DUPS_OR_SPIKES_HPP
 
 /* append_no_dups_or_spikes.hpp
-Ce4AvwVft2S+8huW1Jed4FjwTfAa8C1L2oO3wd+Du8HHwHfAJ8F3QbQt
+dH/9WhE0eT8WGbgf1UsnNNjUXFFh83aKEtWuaE/GLdyFBpv388hKW/A9v9b2BwmHEoJJ23SmKbgFw9GZ
 */

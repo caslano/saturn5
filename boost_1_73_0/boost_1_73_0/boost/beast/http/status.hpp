@@ -183,5 +183,5 @@ operator<<(std::ostream&, status);
 #endif
 
 /* status.hpp
-T+j8BxjWOJHfCefPZWZbMUxDdbnhr3ToinT5R5PYaxtLcm6cZT0jgAuB
+yXduI0fMVV5qP/TIuyvDeK0eLdVx46sCGsVYofXs1sXb0TYALMg1AjZRrNTb7W3Vqq/G+IauS240HzsJ
 */

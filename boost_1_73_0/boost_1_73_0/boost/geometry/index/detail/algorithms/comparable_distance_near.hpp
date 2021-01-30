@@ -77,5 +77,5 @@ comparable_distance_near(Point const& pt, Indexable const& i)
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_ALGORITHMS_COMPARABLE_DISTANCE_NEAR_HPP
 
 /* comparable_distance_near.hpp
-5cQ/1TYoQzWxPFYarkzKsrJtUFbKTVtFkHJ8qeUbtBU6T9R2Jfe37+Nb
+yUzW73lbOjhWCL5fACXvvDCnKxgHPhITopNBXdzx+xyUJDo5F1oWl6tx1RFavty8bEjzJMf+Sjq4p9Zp
 */

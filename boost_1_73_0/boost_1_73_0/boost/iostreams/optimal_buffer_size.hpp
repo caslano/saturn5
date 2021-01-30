@@ -87,5 +87,5 @@ struct optimal_buffer_size_impl<filter_tag> {
 #endif // #ifndef BOOST_IOSTREAMS_OPTIMAL_BUFFER_SIZE_HPP_INCLUDED
 
 /* optimal_buffer_size.hpp
-bwKsHOpNapv7sXhK26JaHCoMqA8OW65+uNFy9cURy9UfN1muPrnZcvXL
+yqT1ptVz+6obVkKQO7LBxxTZG2R+B/fQA5FovKxm3inehEpeslhL27eeNjQ0+pveIoCA/CSSJMyViEWY
 */

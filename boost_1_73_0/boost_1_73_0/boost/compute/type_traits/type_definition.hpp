@@ -42,5 +42,5 @@ inline std::string type_definition()
 #endif // BOOST_COMPUTE_TYPE_TRAITS_TYPE_DEFINITION_HPP
 
 /* type_definition.hpp
-3jiJfk1JN6dmmFMzMy0pdtlGEpg42Ux/snScO4dH9g1/sxAvzW+HAO3i
+qVKeUU4xnV5XIGzCAjmwfwOPKiw5DBQqb1aC0vq2M33+2i9Pig97ctELNzC0WgvnMdDQ0Pic/ci7fFqT
 */

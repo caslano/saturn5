@@ -26,5 +26,5 @@ struct is_variable_precision<number<Backend, ExpressionTemplates> > : public is_
 #endif // BOOST_MP_IS_BACKEND_HPP
 
 /* is_variable_precision.hpp
-AWNDbQ/eG/4CeWehAUjnC6rrhYBrg1q7IVC7SXVu4ocRIi06K1OCdBjB
+C+/M9ytn3G7xgPUxq/ABZzjP4DrXmspnr8Nm53b13Y+f7YKZ8sr34i0pOuWdzveZ/E6W/iHK9Bxc+Sng
 */

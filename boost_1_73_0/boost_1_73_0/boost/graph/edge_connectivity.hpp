@@ -187,5 +187,5 @@ typename graph_traits< VertexListGraph >::degree_size_type edge_connectivity(
 #endif // BOOST_EDGE_CONNECTIVITY
 
 /* edge_connectivity.hpp
-EGHylH53SgT5dSrFJTBgmD8DP8KCuzcFGvj5J4L8d/1USP8/8t6xtwTJ
+oFg4E7cVz0MKVFTyeH2ZQmy7RJIt3k47u6rv3o50Vx3u/ALANmFb0CxkpJpApF83brfH5kTLO9mlN2Kt
 */

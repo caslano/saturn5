@@ -106,5 +106,5 @@ inline bool is_degenerate(const model::infinite_line<Type>& line)
 #endif // BOOST_GEOMETRY_ARITHMETIC_LINE_FUNCTIONS_HPP
 
 /* infinite_line_functions.hpp
-w29hfbbmwk/P1lz4OZIvBlvluHnDTlv4E+yToznyZ8DtcGyOO7A6E3Lc
+8TyYxpJGRS9tMGvvdyfGZID8nVNULmEmyVzGW/eAoQ7QgKP1l3giFuVWSNSarjy0yLsNM+dZRCkuCg7H
 */

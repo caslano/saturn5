@@ -374,5 +374,5 @@ inline typename tools::promote_args<T>::type
 #endif // BOOST_MATH_SPECIAL_LEGENDRE_HPP
 
 /* legendre.hpp
-GVP38WEjWfC1pRBE42vPCDSOcm8g3bsqMVhM4g0yvSVyfR0aVnTG2pKF
+NgLOgQVqZjDgtck1zLBgDXNlgIb51E/DSGHclQlPxG2GcD2kcRp4MP1h2ral3UnMPUvVTBYA7lmJWqJm
 */

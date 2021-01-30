@@ -48,5 +48,5 @@ inline GeometryOut return_normalized(GeometryIn const& geometry_in, Strategy con
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_NORMALIZE_HPP
 
 /* normalize.hpp
-0Xclp28V5ei7knseFjH6rmRBqpe+K3m6RcTuJ7njIvYQ6ZPK0nckQbL5
+wKJauc982sIoxdrTiQ1pyaOkXkDD49dXpTHKacljHHxrjgQNmf7R8jl2aR366qSeBq8RFQQTPGumQOxo
 */

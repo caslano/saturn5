@@ -282,5 +282,5 @@ struct get_ring<detail::buffer::buffered_ring_collection_tag>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_BUFFER_BUFFERED_RING
 
 /* buffered_ring.hpp
-gzBpXXia/Nwt1vt75BdpnvwK2XxcLPs1KivNic+R76X+fSFSvs/5Cyor
+ajtAB2VnwloU4NH/vvkF/0HzbUnNn3jivxpPHd6v/9oG7Tca9MudZ2zQfqNBy3YmjWdv/3heLBefO2Xx
 */

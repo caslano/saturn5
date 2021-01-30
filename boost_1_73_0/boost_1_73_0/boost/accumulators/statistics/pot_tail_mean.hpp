@@ -219,5 +219,5 @@ struct feature_of<tag::weighted_pot_tail_mean_prob<LeftRight> >
 #endif
 
 /* pot_tail_mean.hpp
-q6sqJlFD+ZhB76VqV64Pab52aXLqMxP2WRNbO3C/OV3Sr8Y6eVzow5bL
+P1XLLqGQRSAKpe/dJ3Pmqc5dffq8QA+2t6oyzjIRHtmR9xua1uWUoTuAj1b2tLcP06j2AuhpJm5e6k79
 */

@@ -78,5 +78,5 @@ BOOST_HANA_NAMESPACE_END
 #endif // !BOOST_HANA_FWD_TAKE_FRONT_HPP
 
 /* take_front.hpp
-wjo8LHhgRmFjnVckpCtNfwEeaIxzTOKakPeGLi+VM20r5aUcJ4vyPNkw
+5rmg+tuTSQOxpodYtnpRUmvwtCiIlt/61DvtXWJOxPxzmAifOfCGvvOTe5Bg31bmEpsOqtOi7Q6APNGY
 */

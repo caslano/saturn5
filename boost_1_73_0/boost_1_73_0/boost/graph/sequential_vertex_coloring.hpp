@@ -126,5 +126,5 @@ typename property_traits< ColorMap >::value_type sequential_vertex_coloring(
 #endif
 
 /* sequential_vertex_coloring.hpp
-do+0McC+kb4hwW6RtkaOIFsD50doQnmfNOSR9wujreEW5BPSI+g7HA5y
+g7y549uKqpzaFCMTGVhAKapyaZnt/oAtGc4LCKa0e5Ul2DUq/oB5L2odv178PpcdD8QHW0GonTKUAE0k
 */

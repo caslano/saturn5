@@ -166,5 +166,5 @@ struct is_simple<MultiPolygon, multi_polygon_tag>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_IS_SIMPLE_AREAL_HPP
 
 /* areal.hpp
-+B8Kjyn5LX+ncuCH64+p+xjk8dfcd8pb/oex0MNwXwEkTb2vTPtcoMt/
+xu5wtILZilrgaP3cxM0PUPB6s6P1iHxkmO09eZtr/XDV2ZVpUsRJ8al2i1lC02s8Syhp2yszv+U88Y7Y
 */

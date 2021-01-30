@@ -61,5 +61,5 @@ inline bool check_nvidia_compute_capability(const device &device, int major, int
 #endif // BOOST_COMPUTE_DETAIL_NVIDIA_COMPUTE_CAPABILITY_HPP
 
 /* nvidia_compute_capability.hpp
-F2Y8Wr0h+AJvNXxcv98wnZH0yXQumy86sXghmk/mitm8MxHPZ+IpbDT7
+JCGzuZKXMFgSwNu/OfxgGhwZx+NhWGzKBErVl/Cc3S5vdPJ9Wkar3bN/PslirGGpXvP4Jh4RWDy9ov12
 */

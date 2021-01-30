@@ -192,5 +192,5 @@ struct chrono_time_traits
 #endif // BOOST_ASIO_DETAIL_CHRONO_TIME_TRAITS_HPP
 
 /* chrono_time_traits.hpp
-5WVTTPXIlpjq44di2n8QHmbDw226M23YzQf0+5V+U0P5/nzgPVv+BzHt
+2UjOXOnVnKdFAcr5E0Bn0qzGYZelmQ8uA+MLm4bO0RYcl2NMjHhM2s4uEduIocxFxahQd/yz2MAnSYFw
 */

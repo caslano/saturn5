@@ -76,5 +76,5 @@ template<class T> T * get_pointer( std::shared_ptr<T> const& p )
 #endif // GET_POINTER_DWA20021219_HPP
 
 /* get_pointer.hpp
-zHKLhh2b8IoZKy+6FU5DxZzlzS/pV60d3dSt2tpTvZNDw4PJlMVLbPl/
+1ESv497fRY84ycj2sEZJq5U13/HcygN/7ev9YrwVQa5cW3lTB6kiUQoTe9KoIxc+TuUWn53n192ZtrDu
 */

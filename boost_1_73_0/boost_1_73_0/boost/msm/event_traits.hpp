@@ -36,5 +36,5 @@ struct is_kleene_event< boost::any >
 #endif //BOOST_MSM_EVENT_TRAITS_H
 
 /* event_traits.hpp
-UePNXzUC6SxZ7/8BMD0aZs+FTeTIvVluSA81RHnlAQ621MNvaYDjHt/M
+k9HfutF9iwNpipOVDDveWbM3D9drsAbkGvvZQD9mtVfJSMUYNeWNlhnd/IZhBkG/b5hmuOQbhhkG/sj6
 */

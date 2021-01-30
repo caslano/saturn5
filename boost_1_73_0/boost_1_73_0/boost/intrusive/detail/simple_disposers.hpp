@@ -50,5 +50,5 @@ class init_disposer
 #endif //BOOST_INTRUSIVE_DETAIL_SIMPLE_DISPOSERS_HPP
 
 /* simple_disposers.hpp
-+yYOHinJK7ohBtrvv0H9/pvS7/uNH9PZdLPvjx/rD6kiA7LW2R37Vjom
++aGnGgaYpdLAPFg5IAyrVNLL+6EDKGEU/UY0jYDGsS/DxWQguJi8B+ROiAi094jBxWQpXUwihm1sWEyg
 */

@@ -517,5 +517,5 @@ namespace projections
 
 
 /* stere.hpp
-YE1Q99//DOo4sDao5wTvBvXc5z2bjo+CWj4fB3V993VQ28U3QfUjWR3U
+1yjNjZY7Kvx6jcPMmgnyK6uUdjTR7jKWvOdtbVzRDkyA9jUjfePc4g3WzTysb2M302arazRKMDx3XHM5
 */

@@ -321,5 +321,5 @@ struct point_type<geometry::strategy::simplify::detail::douglas_peucker_point<P>
 #endif // BOOST_GEOMETRY_STRATEGY_AGNOSTIC_SIMPLIFY_DOUGLAS_PEUCKER_HPP
 
 /* simplify_douglas_peucker.hpp
-ulGt+/ZhQ0ccpc8HzHdOt0+/cjd2PtiFyPElRZH+k8KxMeXDq6KVJf1m
+Uzu+msjz1c/IM7mjJJGn5HPqm9QBIUndy+rlMu/Iz8k7Ibb+VJNdrSwKOlz1QrFWGVa9I1rTCkTzGcvg
 */

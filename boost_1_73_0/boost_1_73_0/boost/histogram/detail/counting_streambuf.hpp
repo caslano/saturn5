@@ -40,5 +40,5 @@ struct counting_streambuf : std::basic_streambuf<CharT, Traits> {
 #endif
 
 /* counting_streambuf.hpp
-2AdyHrPDFPw9bM7zO6imDrK3BxwN2R4/Kv0DWes5J9Zgz3SwPWzMHlPx
+cOlhEaK0YvfKIS7uxG+/c7FpVop79yIumwxkBeQKzwQM7fj3sg4Y/tqNdvWajTY1q+k9dcrLSBHPbHpP
 */

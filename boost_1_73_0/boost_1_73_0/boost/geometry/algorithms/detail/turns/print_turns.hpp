@@ -105,5 +105,5 @@ static inline void print_turns(Geometry1 const& g1,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_TURNS_PRINT_TURNS_HPP
 
 /* print_turns.hpp
-fr+7+iCr2aLx6n+W+t6uL6+qrl7/YH1p9+apL+3KdHsv0XuLFPF1XeTF
+deRrlOLh4D604nHHvo9ZYfNBw8lhuodODaoOlO6mOxwsY9HNnjbKq3158hQoeY3grl4DETiWRfCALV8W
 */

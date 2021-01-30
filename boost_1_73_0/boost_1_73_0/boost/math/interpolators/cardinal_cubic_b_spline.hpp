@@ -87,5 +87,5 @@ Real cardinal_cubic_b_spline<Real>::double_prime(Real x) const
 #endif
 
 /* cardinal_cubic_b_spline.hpp
-AzXqwlcY8ITaT8LIl6rL0enC2FkYYide1zDyo4LOGF7HDD9KtVOup9/A
+DiAMwBeg5zfAb4AvAY4C7AfYBfA0wAaAUoB5AGqASQDhAAMBekGmzgK0ANQB5EAZZgGoASIBhgP0B/DG
 */

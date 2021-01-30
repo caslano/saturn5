@@ -881,5 +881,5 @@ struct get_turn_info_linear_areal
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_GET_TURN_INFO_LA_HPP
 
 /* get_turn_info_la.hpp
-fpEx7y/SZJ5/yDxPg4mjdG5Y+9lp/ktRkfs4n2Yf7pseKg+54X9owr/a
+zSF4wXr2aan99ZS+ySqp7+D7ra+r46oI5C4GyE3HTQlW4FOeUhsTLeluLwSNwGxwq98SgrXKqLxSZH+1
 */

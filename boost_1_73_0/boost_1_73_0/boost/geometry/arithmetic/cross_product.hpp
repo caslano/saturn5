@@ -132,5 +132,5 @@ inline P cross_product(P const& p1, P const& p2)
 #endif // BOOST_GEOMETRY_ARITHMETIC_CROSS_PRODUCT_HPP
 
 /* cross_product.hpp
-xsa8AhtDriWnqLHmsO8HuaacDo01l70cLoVnNtac9nPgu/BC+E8oyW/L
+vaDxXEPSQ6rVQWW0GU7tAECFdnSKHxZ6PwgOiy72lBAy9GcHDL77+fU/sAAtq0kpd2MLlYvw4G/F9GIx
 */

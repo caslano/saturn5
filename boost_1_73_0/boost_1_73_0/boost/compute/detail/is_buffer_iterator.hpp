@@ -30,5 +30,5 @@ struct is_buffer_iterator : public boost::false_type {};
 #endif // BOOST_COMPUTE_DETAIL_IS_BUFFER_ITERATOR_HPP
 
 /* is_buffer_iterator.hpp
-YvQ4C9ze1M/rmDhmkwVXr/zo+KfPwrXEbB9ttnAtMdt0v4UbD45Ttm21
+T2Mems+UAXEWE/q2uxThcvXrLlPwilx0tODX1sDi+4r+tNaNT3k946elvNShdUgicxmyxI4lr5+W+b1M
 */

@@ -98,5 +98,5 @@ struct is_simple<MultiPoint, multi_point_tag>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_IS_SIMPLE_MULTIPOINT_HPP
 
 /* multipoint.hpp
-1HMtGL3GNDboa5TwI6K/jotpnD4mck03kbxnGNzrx3jjytVioXut0Xst
+oBHi/bKst9M2R00P0RFnjto9ALRMVIEuR7HN1K+mfoanlBr82OeEBD1f1pnCLxnSzEwtdnmqQ+0W7MEc
 */

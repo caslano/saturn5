@@ -727,5 +727,5 @@ struct get_turn_info_linear_linear
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_GET_TURN_INFO_LL_HPP
 
 /* get_turn_info_ll.hpp
-bB6YbsZV6VZs4nTHvBleqCSo/dS7903Pm+fet8t140Qvc1+1G5aZ91Vp
+FR/qNxULPuRSYYj0MRdVI8Fhy06wHc2I5JR0gg6RyycaP95AiRyVh/oV32kVqv+TxIhI84C3DlRCdx5N
 */

@@ -398,5 +398,5 @@ inline void difference(Geometry1 const& geometry1,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DIFFERENCE_HPP
 
 /* difference.hpp
-Nbi3wj03sE9LAD1jovWVnu8sQcZuwDMCAIYO7mEALgA6GwFgCOEeBuBi
+86wHwD3w/ngw5f1NyvLOs4XuKIAEen1E9Xgcrb8Dl3YCY6YWzOXLIltizuLGHBACdOR5rqjJgfV9qa7o
 */

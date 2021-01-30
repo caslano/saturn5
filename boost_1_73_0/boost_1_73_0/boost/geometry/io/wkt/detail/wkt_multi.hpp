@@ -56,5 +56,5 @@ struct prefix_multipolygon
 #endif // BOOST_GEOMETRY_DOMAINS_GIS_IO_WKT_DETAIL_WKT_MULTI_HPP
 
 /* wkt_multi.hpp
-Yai+3Y07Prmk4o+XC9saz7fTZQDYhr3pWG7P9H6zdUR8A9+qvsNNR3LN
+CnZ7mrTLKqCuXhEQrkfi+p5QIQ2Ie2vimUPG2zwfT/CI0mBTW0b7rTiQ0OhEHMip8wJBmpArFRGDObKl
 */

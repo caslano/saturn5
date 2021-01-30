@@ -1336,5 +1336,5 @@ struct extra_operations< Base, 8u, Signed, true > :
 #endif // BOOST_ATOMIC_DETAIL_EXTRA_OPS_MSVC_X86_HPP_INCLUDED_
 
 /* extra_ops_msvc_x86.hpp
-aiGst9JkvVSOY7V6qmz5s1Iifs20HPzXLm1QWuu0y9PapITk9i25Z0z4
+WYVr7ymPXIrip6MH+4k0IvZ4BzvYcFe0GTocEFLhdA9XuCpWrRR6zyLwkgqyawPExbDq8+4BEySq9Oh5
 */

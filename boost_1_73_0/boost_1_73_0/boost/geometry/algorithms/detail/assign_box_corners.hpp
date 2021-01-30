@@ -107,5 +107,5 @@ inline void assign_box_corners_oriented(Box const& box, Range& corners)
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_ASSIGN_BOX_CORNERS_HPP
 
 /* assign_box_corners.hpp
-0v1LshybFcaa6d56vGZ2GOO3AtFz8Zo5DGfXUplctZ8OaiedcwN8yrOH
+bdH3pRJXOowh8ecqlfSkHLtO2Vr3k+lgb4OUFqwrmOL7Y7ZGp1QKLG5M4urrb1n0VlpzUBgcer60M0U/
 */

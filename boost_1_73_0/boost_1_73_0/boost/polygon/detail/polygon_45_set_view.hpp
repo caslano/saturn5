@@ -380,5 +380,5 @@ namespace boost { namespace polygon{
 #endif
 
 /* polygon_45_set_view.hpp
-6YtOebt9YiH2vgs2H6Q0sdL3PZIgvuoMnRyeSVZOaW7ytHhHfURBKPiW
+PZ0G8MFiptnIxTQN1B0p5Ds9vdvZ+MTYTEFQjWmRYqW4S46N4VZPnJnrHvEEX4UJqkOXVUYgPUy1rjzN
 */

@@ -32,5 +32,5 @@ inline boost::filesystem::path shell_path(std::error_code &ec)
 #endif
 
 /* shell_path.hpp
-3iGUrqbUseCki1AcHFwlTa96kLYxsVAteXeTRqyCkCH33Xd3vzbQ4LhJ
+BGPDj2uSasWwC+AiAlfakWpi+qxwDGxwXwhFA4VAux6QQXh5HIHlsXPtT+URObtUHmiJP8jDbiVhG6gW
 */

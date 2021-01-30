@@ -261,5 +261,5 @@ namespace locale {
 // vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
 
 /* collator.hpp
-x19rmL/H7zNMfufUMPmdU8Pkd04Nk985NczP3R0wzM/djTOT/Q4PGubt
+XV8krgaJbNK2CejRdomFKevGc9HbkzFOjM2WGm3QL196z7wE4gPdr/2FD8czap56HCeaeTYZGbCydJOp
 */

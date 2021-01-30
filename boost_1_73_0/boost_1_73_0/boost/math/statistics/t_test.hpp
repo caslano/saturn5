@@ -50,5 +50,5 @@ auto one_sample_t_test(Container const & v, typename Container::value_type assum
 #endif
 
 /* t_test.hpp
-eaOPOVsR7f2JlsQPxunjzD+6MVa9wvkoZ85dY3t7oe9F0i92HKgPJFXS
+b8e3+SM+85gDfyD4DRTxIx9z4Nv8Eb/KCX8Q+A2y0XfCt/kjfuQGh3//Kgrov8TJf1gVBfTfbnT4j6ii
 */

@@ -51,5 +51,5 @@ inline void free(device_ptr<T> &ptr)
 #endif // BOOST_COMPUTE_EXPERIMENTAL_MALLOC_HPP
 
 /* malloc.hpp
-8VLxSGYy54zns5M5xbOGPKOJSF6YMy6PQlu5zt8eQLysFH8PIj3yF+bs
+nC9pkf5h9Jz2zMw/g6tBNVq3w8+h7d0GtQBQ7uRl/m1kQM6L19KsomlwzSJ0ys1fJ1t/H5XARwaV1GBG
 */

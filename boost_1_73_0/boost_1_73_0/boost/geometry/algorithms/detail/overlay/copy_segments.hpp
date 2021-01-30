@@ -387,5 +387,5 @@ inline void copy_segments(Geometry const& geometry,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_COPY_SEGMENTS_HPP
 
 /* copy_segments.hpp
-NzgB/Cc4CaTe6Ap/dJ1+jpGPvzNjjewv1Jr4+tvyvk+z5X2fact3a6At
+LuUuOho+JD5O6FdobvLkmtShjo1+qvpKWywtCgFEEI60i3v1w2SlTXzAL5n7wkcj16hZkRVAoEQn1S7e
 */

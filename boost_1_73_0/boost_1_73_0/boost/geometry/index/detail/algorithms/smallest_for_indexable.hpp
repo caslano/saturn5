@@ -80,5 +80,5 @@ struct smallest_for_indexable<Geometry, Indexable, IndexableTag, AlgoTag, 1>
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_ALGORITHMS_SMALLEST_FOR_INDEXABLE_HPP
 
 /* smallest_for_indexable.hpp
-nOncZzb8nurvJX0MYb4ffELzvT5Hr1fZ65ft9Yf2epW9vvfJ1OdfeDL1
+jBflRS0TZn5DvijXiJtKW7bZKG3UmuV9Y86y77eUKLSvgzdHK3O6pueaHBtHLGr5LMsSHB+aVWwRt7lb
 */

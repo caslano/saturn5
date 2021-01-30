@@ -87,5 +87,5 @@ typename default_content_result<Indexable>::type content(Indexable const& b)
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_ALGORITHMS_CONTENT_HPP
 
 /* content.hpp
-ecvctFUZYcB0mVQPbbXumTa0u1pluH6opRzT/QrUtFOb1kq01zYWP8C7
+mz/jEQ1fAsXe0xcSqjd9ARjhnnpCPhrYwkfVc4FLd00DNbx+gbaac9DnXEf4YxOzLWWE7qDDZ5LeqCfM
 */

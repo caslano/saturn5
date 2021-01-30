@@ -113,5 +113,5 @@ struct x86_rounding
 #endif /* BOOST_NUMERIC_INTERVAL_DETAIL_MSVC_ROUNDING_CONTROL_HPP */
 
 /* msvc_rounding_control.hpp
-zPVL9zrvVu4WmwxtPYs3aftm61Rg+sKCuj0AQc8YVClr083sN+5M6tLy
+2KRVPGA75UyomtywQuW5srxpVZOjxJhkq9cPzLloKjnLB4PTGFhHIc3i1M8rQ6+uTF7qj2fvD+o9s26L
 */

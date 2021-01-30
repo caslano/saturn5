@@ -96,5 +96,5 @@ execution_context::service* service_registry::create(void* owner)
 #endif // BOOST_ASIO_DETAIL_IMPL_SERVICE_REGISTRY_HPP
 
 /* service_registry.hpp
-BtAJ8rZa+kx2Mr6AZ1c5Mo8qYR5v5XrWxHGWsYlGeGxZGPGy+kcb+P+A
+50aaFK8p+GbtVbsRnAyLDA3fCN+m2tmRswghZ7PgxTXUjCLK804CGuvJ86i9U0tyFWKR2JdkmeMBliH2
 */

@@ -540,5 +540,5 @@ register_serialized(const T& value, PyTypeObject* type)
 #endif // BOOST_MPI_PYTHON_SERIALIZE_HPP
 
 /* serialize.hpp
-sBueJ0dsDnbDbIfChi1R1RKeZzdFh9sxak18vd3pdDhgZrgi3OJYAycm
+lmFFMH1SGydINv6G7swWvZ25vcLGiSobt+PaVJ62HISO30Zj9dYaqyt3ZcGh3ZcFFrHUNqbwaI2NObjC
 */

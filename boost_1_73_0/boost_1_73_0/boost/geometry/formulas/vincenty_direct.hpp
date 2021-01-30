@@ -176,5 +176,5 @@ public:
 #endif // BOOST_GEOMETRY_FORMULAS_VINCENTY_DIRECT_HPP
 
 /* vincenty_direct.hpp
-KnOCqqHyInwTvhlULRWZv0+0VD4IqpbKp0HVUvkuqFoq2SHVUhkYUi0V
+42OmIhs8Gw8xK+i0Gz+BCsgTZ3VPdln4SNSH3qTw6IvM7jIef2YEcYZ7xVuO8D/BKEBrihsxSx+Criwq
 */

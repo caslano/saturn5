@@ -131,5 +131,5 @@ struct is_adaptable_input_device<FormatTag, LibRaw, void> : std::true_type
 #endif
 
 /* device.hpp
-1Fg+SZf3M+OxOnP2MIwuC4wgmIDWL6kKLw43zQobN2Wev6iEJgdOUDlL
++0bCa0Fm8nKwxBhFXrdsd2+/dhO34vZwjnV/TNrYn9M894Dm1X1m89A0aqFs3sy+5mX1b17df2xe3YDm
 */

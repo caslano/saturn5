@@ -94,5 +94,5 @@ single_geometry(Geometry const& geometry, Id const& id)
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_SINGLE_GEOMETRY_HPP
 
 /* single_geometry.hpp
-iJ1aK8p9i+T+SJT7K/KB1Jd/g1g0LmJ/j9j0H4jYPyIG0ph5DbFGaT79
+hzRE5GPrJcyEqb2xW7LV0Tbxu1PBAcl/YlyxCvg0tK0P0SKYaZ/fIDufJMaSbI/KP1i7bNQum9EuV6Jd
 */

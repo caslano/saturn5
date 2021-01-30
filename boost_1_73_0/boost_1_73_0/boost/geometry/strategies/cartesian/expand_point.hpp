@@ -125,5 +125,5 @@ struct default_strategy<point_tag, cartesian_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_EXPAND_POINT_HPP
 
 /* expand_point.hpp
-r3X/z5JJ2//TPzRpD0mi2f+fVrP/x1vU9Q7l9tF7w48eNdA4PuC9o/Te
+lD4vxdccZ2F4ZO0qmzaRsLQT5kxpYdfC2MhIT6q0rsyI9AzTYGKZcJ85by3bpPeZRPvVpQnLarhxcYjX
 */

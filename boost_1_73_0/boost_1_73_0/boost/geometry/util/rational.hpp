@@ -179,5 +179,5 @@ struct converter<double, rational<T>, Traits, OverflowHandler, Float2IntRounder,
 #endif // BOOST_GEOMETRY_UTIL_RATIONAL_HPP
 
 /* rational.hpp
-H7xnX+Pt2dcEe+ZVCOR71JVYZN/rg7BGUvUrmloZDfqNQHEYG5rsG7Sh
+Kv268Q8xOcZEwA2nZJxjLa3jj3+EX8RBsg6JwfcYhwtsVjOQ6jePcvDu6oaRP6Pd/9QnNFNnYGbb1eLt
 */

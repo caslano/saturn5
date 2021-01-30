@@ -121,5 +121,5 @@ struct geometry_concept<segment_data<CType> > {
 #endif  // BOOST_POLYGON_SEGMENT_DATA_HPP
 
 /* segment_data.hpp
-JO2rEJ2oyzhiNhL3NG7EZQcaWTeoE7WAjWeYbb+UOpWyolk42aG2HA0T
+a9IYwgd8NXgkQpBt0+W9Puwvnby7lntlTYZmG5gdpXAq4eSAycpBBnJ7TETWkUEQbSeqVwoHUi7boIcN
 */

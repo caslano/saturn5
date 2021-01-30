@@ -54,5 +54,5 @@ struct group_ref : handler_base_ext, ::boost::process::detail::uses_handles
 #endif /* BOOST_PROCESS_DETAIL_WINDOWS_GROUP_HPP_ */
 
 /* group_ref.hpp
-yAc4QnyniG9mAcBkYh8kWudADom9SX1vLsBdxN+/mPCS84dIeQ05t5Lo
+Am/7AUEB4dpUA7Rkk1vI4B1AmJsQRgr0h8bqoqXqB0qARVpg3ZlwftQ4P1qcH/2AKhhebA21LQIDhpFI
 */

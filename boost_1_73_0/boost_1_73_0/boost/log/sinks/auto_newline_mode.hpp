@@ -47,5 +47,5 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #endif // BOOST_LOG_SINKS_AUTO_NEWLINE_MODE_HPP_INCLUDED_HPP_
 
 /* auto_newline_mode.hpp
-NbyX7sfnVG8KYEfLGJ7ulHiu5UlpnhToivzPg+f1Dv8xCfzHMn87ToiP
+Vu1+QquD+4R8HBk1Xwdqvg6i+dI78HZT0HzXbJrvR6L5foSidhLN14ma75qo+QArnmi+a6j5OlHz/Zg7
 */

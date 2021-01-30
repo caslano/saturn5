@@ -405,5 +405,5 @@ async_close(close_reason const& cr, CloseHandler&& handler)
 #endif
 
 /* close.hpp
-7QW2TLChwJYLsgH/SNmgF8+9+4uMcGR/kROWAavgboVbDbe+vy2zjCVD
+yPDIuLG2mvQCH91ZLMSIZBJ5bhwZU1byFi7RoRYSMKtkhCFmu3Pz5ZPHGDmli9g47m+WnTWWlJvDsOGt
 */

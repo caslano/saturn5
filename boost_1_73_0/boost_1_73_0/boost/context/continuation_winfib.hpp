@@ -461,5 +461,5 @@ void swap( continuation & l, continuation & r) noexcept {
 #endif // BOOST_CONTEXT_CONTINUATION_H
 
 /* continuation_winfib.hpp
-8f2jv7kj3H/R/XvqjsrxhffPsTsrn/8G/Ms7K5//BvzLO+mbc3hx/T9V
+CGAG/1Xteeu0Y80y5fy9Lwan6rPXGoZdBmupCM9VF/5Vy0bi76+Fyf7of9WXmRgqp+MCNcFxavfPDQg+
 */

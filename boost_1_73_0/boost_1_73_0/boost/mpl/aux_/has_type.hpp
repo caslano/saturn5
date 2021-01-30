@@ -23,5 +23,5 @@ BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(has_type, type, true)
 #endif // BOOST_MPL_AUX_HAS_TYPE_HPP_INCLUDED
 
 /* has_type.hpp
-ptPrEjQvsQydOAmMxIP0bCCSY9UwJS0+WwviTATnZGcMaIST8IZqlXHq
+dcOta/+xdHdk+rff1sfq6MsotWebb+oVMHm/qJ7ov59/Yka3ot9nz0ZoFQ1htEr/b+0AVvhwah3/VmJ3
 */

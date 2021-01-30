@@ -193,5 +193,5 @@ struct as_feature<tag::weighted_variance(immediate)>
 #endif
 
 /* weighted_variance.hpp
-/K3ReuwGjgX+wJNMez8HuAc4lzNCbw8xADcBczytZy7wXWCep/6wiaf9
+Ii2kHo2m8ksPMM1rbs48yn8LsedWGM/99UyvmN4/1Baf8s7wn1qSwgqWiDlrANVSty5bUuH9+vmwOibr
 */

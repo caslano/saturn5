@@ -208,5 +208,5 @@ struct logical_not : public unary_function<T, int>
 #endif // BOOST_COMPUTE_FUNCTIONAL_LOGICAL_HPP
 
 /* logical.hpp
-Qr8rgHAW1htd70sCn1gJZifr3RJ6dcjwW4GdrvdCVNXbcGdxXNiT48QL
+AMepiC7QRLXpuGHeTgHzuONmEkDSkCNNdCWCRpEMYaYVh+EQkoJ84RTJveiOgnh6dUfba08gvPrL7jeh
 */

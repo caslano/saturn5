@@ -108,5 +108,5 @@ private:
 #endif // BOOST_ASIO_DETAIL_WINRT_SOCKET_SEND_OP_HPP
 
 /* winrt_socket_send_op.hpp
-k8nXY+d+ZtfgugcB/EjfZPFvMeha3N6N6ms/YFQO4nxw4HvYaLuF3jmj
+2F7mhWfT9D7e3NqTEiVez1vl+ojb6q4aNYvmNxLTWJoRRRyJX6ViRkiV141B497r+6psqpWjZD9xbSyY
 */

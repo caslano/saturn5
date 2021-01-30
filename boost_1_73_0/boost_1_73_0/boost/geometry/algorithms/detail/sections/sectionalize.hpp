@@ -1098,5 +1098,5 @@ inline void sectionalize(Geometry const& geometry,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_SECTIONS_SECTIONALIZE_HPP
 
 /* sectionalize.hpp
-rYzHIMg6FTUTLrDr2DiLCV6cgo0Z8PtVFni+BX+8hPhBWpvE2IjkOAjr
+xFeC7xW1x9LHtIcOAqce69cuf0eu93NRQpSq0a7/8lT8UXwRbj5dUcSeVfNvjsyfGplfGZk/QxszEbNC
 */

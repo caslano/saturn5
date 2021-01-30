@@ -219,5 +219,5 @@ inline bool windows_named_sync::remove(const char *name)
 #endif   //BOOST_INTERPROCESS_WINDOWS_NAMED_SYNC_HPP
 
 /* named_sync.hpp
-HiqzZEbmben5d9+1OImqDyd/a8Mm7e/Wi3y02c2BpM/3Ltcc3jtx8IDL
+rITXM5FT1aslX2T51O1s1Xnt3sxHN08k1w3NPyGYfww6t3pnp9G2V8tGA+pr1+TFRtv2OMm8oVERiweb
 */

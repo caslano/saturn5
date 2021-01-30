@@ -134,5 +134,5 @@ inline std::size_t segment_count_on_ring(Geometry const& geometry,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_GET_RING_HPP
 
 /* get_ring.hpp
-+x9wfUllQNaYbAC3we6C5VqTPSD1lNwjIbHuJGESJmESJmESJmESpmXD
+rfRVVy9OFrXTwQOmBpujFXSNGr/kd2701mt9H+IhA5vykJrRRcPcaXZsyVS0E3wAsX6a5usuIAC12xz7
 */

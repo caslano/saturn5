@@ -301,5 +301,5 @@ struct channel_type<pixel<ChannelValue, Layout>>
 #endif
 
 /* pixel.hpp
-nUbmB7CGciznOHW6fGdaxnAdx63T/d+c7B3b3u9Lu6d3/ca0b3r2O7sw
+i/CqXF9DL4PWy1K8/OtRCdY9ACxM8sVW62XugJdsthCxXpb2a2lNjwhb9W2Q9bmC8S5UWCXgVD0ZHPok
 */

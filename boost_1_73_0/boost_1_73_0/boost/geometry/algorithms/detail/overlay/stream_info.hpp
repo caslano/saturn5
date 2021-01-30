@@ -79,5 +79,5 @@ namespace detail { namespace overlay
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_STREAM_INFO_HPP
 
 /* stream_info.hpp
-pgD4U/Z/LN83qO2VZ6q2Hpvlx/QSrP1fXz5qnGtbig/Aviu0/fTKL+b9
+aNbLmQS7cY4wM1gdaMvjDGUydy5/FMmPYv64CEW5CbUKzqewMg4bKRNU8kc6EpSvpSquUfMmbR4OkvCk
 */

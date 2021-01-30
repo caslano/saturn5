@@ -50,5 +50,5 @@ inline bool is_apple_platform_device(const device &device)
 #endif // BOOST_COMPUTE_DETAIL_VENDOR_HPP
 
 /* vendor.hpp
-+5aF82plhZPz6OkuHOtg3E0LxzztMQ9654FyFhVvAfoSxrw3NBbCuk9l
+i0s/dmOeIFb4g8TakwKsyY/4qhLYHvmPqWn5ughPjvyT7tJzvIH0aRh4KvLkj4meSemEfaiVg/0h52rF
 */

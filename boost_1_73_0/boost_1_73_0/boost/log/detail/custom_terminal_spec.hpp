@@ -70,5 +70,5 @@ struct custom_terminal< T, typename T::_is_boost_log_terminal >
 #endif // BOOST_LOG_DETAIL_CUSTOM_TERMINAL_SPEC_HPP_INCLUDED_
 
 /* custom_terminal_spec.hpp
-JXPX1zIzmp28TKY/11fszVV7h7uGSuWCWyFfke+e6uJjg7mhatEfq4+P
+eHCF91UmyjhZ7Bop1xwPddUfC8r7sv1iQlk/8LC8tSEUCFgTpeTj61i/fAO5usHytJtaZAfFLgxm+8cM
 */

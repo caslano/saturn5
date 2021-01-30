@@ -172,5 +172,5 @@ private :
 #endif // BOOST_GEOMETRY_STRATEGIES_TRANSFORM_MAP_TRANSFORMER_HPP
 
 /* map_transformer.hpp
-A+DJXPoAsDbp7J6JprbIc6f9s5+aYO9lbdKpX70CNxFblfd3/ak9g6+n
+lgY6NCpZ0mBMyWVfskdwR1dpHoW5PD0vVsez4TzcpcVGraQaNNiqqLi9fXd5UqAZS7Ig6p+Je6Jxgasb
 */

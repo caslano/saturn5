@@ -20,5 +20,5 @@ namespace boost
 
 
 /* next_line.hpp
-OoH8gCMnnySQFzmdT9NUbY+eWvlx9rRcD/uOg1+2NIQH03BqQ4Tl/Nip
+LDiOm3TsnsWJJ6rRIe8+0/Lfhd9SpsE3rNk3Bvf0zxezLvTFY2eN1ycdO/tUHj6mhFzwc2v5WQF36edm
 */

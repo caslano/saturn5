@@ -65,5 +65,5 @@ inline std::string current_directory()
 #endif // #ifndef BOOST_IOSTREAMS_DETAIL_CURRENT_DIRECTORY_HPP_INCLUDED
 
 /* current_directory.hpp
-aZiXN0WsTeQdNszLu9EwL++IYV7eTcTaRd7Nhnl5DzbMy3uIYV7eLcQ6
+K71JledXbonVubwndS5Pcey9uz6K21PN7kUej20gTAmsYDxwBE9BKnckcHxBdi/jax6GFWX4+B0wEYC9
 */

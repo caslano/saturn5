@@ -69,5 +69,5 @@ struct pixel_bit_size<const packed_pixel<B,C,L> >
 #endif
 
 /* pixel_bit_size.hpp
-p6Fw3ZsCk/g5C/C/Ap6ikA+fRwBDmYFvAf4F4DcU8t2zXyEfL6c5///h
+Gj851EN43fWH3VHnl6Izvd1/2UOLQC8n8qQrDU5sXc990Ti48rV/TF95+ohr24FN+ZvKbKlEZJV3ae/C
 */

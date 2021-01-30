@@ -57,5 +57,5 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #endif // BOOST_LOG_DETAIL_IS_OSTREAM_HPP_INCLUDED_
 
 /* is_ostream.hpp
-a6ldjqG/oa85FvpUiJu0rutT0seWlLU/wf5ZS8rUn4L/Zi9Re7XuHMe0
+wv5E8BmGQ/eL4AYmsAOxPiI6NRcl3FhUjwNiFgr2PcMFknmWe/F2ojAXX6lFgAhe3Hfw680dcw6LqrPv
 */

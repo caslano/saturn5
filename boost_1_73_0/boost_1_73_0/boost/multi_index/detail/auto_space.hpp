@@ -105,5 +105,5 @@ void swap(auto_space<T,Allocator>& x,auto_space<T,Allocator>& y)
 #endif
 
 /* auto_space.hpp
-ip+0gSOlNuLW92AUSTT6GO91L5p+BvEi5zUtHQrzR+6Z2HVAooyoS76l
+d+mLulIbswHm8iZi98i0LZ8Qy3+IvqONiK7grhEzl4keY5dgibPk6LuJNKJn3mlXDoMVOcOnzFb/51cG
 */

@@ -82,5 +82,5 @@ struct result_of
 #endif
 
 /* result_of.hpp
-MKyaYfMYtoBhixgWYFgNw2oZVsewBoY1MayFYW0MCzMsyrAuht3CsBjD
+sxClgKBGJv0PDJUsWNYMdoKrjqN6Xu36sho4cVxcZkyM6LRel6cApiGrmAPdtRh70Oai5l5CQiIgxGeE
 */

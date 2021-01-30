@@ -59,5 +59,5 @@ namespace boost { namespace geometry { namespace traits {  \
 #endif // BOOST_GEOMETRY_GEOMETRIES_REGISTER_MULTI_POLYGON_HPP
 
 /* multi_polygon.hpp
-sC6kfgo+CFkfoiGPD8KvNb+FNo/Y7tX4IJwr2q6uEm1XV4u2K7QZ0x/m
+It0uE4tHWU2xG6laXpI2k5gFduMi7y71crGL8X+fs3ebLZjdu80dHC2ut4Z3Bo8gH+y3jgrNKrHEhtFf
 */

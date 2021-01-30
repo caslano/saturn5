@@ -194,5 +194,5 @@ protected:
 #endif // BOOST_ASIO_IP_BASIC_RESOLVER_ITERATOR_HPP
 
 /* basic_resolver_iterator.hpp
-aO22+Tq5p+sgXWOBnkG5B9sq+P9idL6AcJ4NIy1sqvDxBTZUa2y42YZd
+LKb+xUFpu00rM5YqhS5fRZ1DoF6Kp6BKDGDtA+xppK+DnOjTp6wEua3aQa9JqSw1je6IQQnARa/6QwSh
 */

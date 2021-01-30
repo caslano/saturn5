@@ -54,5 +54,5 @@ make_duration_from_nanoseconds(boost::chrono::duration<Rep, Period>, size_t nano
 #endif // BOOST_COMPUTE_DETAIL_DURATION_HPP
 
 /* duration.hpp
-elrBzLUhCVdPK2g4vsvHcJt/bYeEq+cTNPz5nQZu08d2IVxPEQ3HNXej
+97qwtp/IzMFGRUI4pUUS/txYd8TA3eNgyEz5uGRHs5guy2baFphGbbjgkthWaiFpunVEF0YckHsABW8E
 */

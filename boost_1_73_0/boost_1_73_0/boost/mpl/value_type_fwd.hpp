@@ -25,5 +25,5 @@ template< typename AssociativeSequence, typename T > struct value_type;
 #endif // BOOST_MPL_VALUE_TYPE_FWD_HPP_INCLUDED
 
 /* value_type_fwd.hpp
-fhrdTXlSkQlLCBgqScBUxDu9O6WVdOFv5MvP9OZ4LzZ08mxvLqsTxOLH
+48PgqMtRQ3zz8zG/g963c78cYlocQ3R9vOgAiBDVN9Md8y4rBnhIj4OGpIw+F17wHAs3Ib1uzjAO8cp2
 */

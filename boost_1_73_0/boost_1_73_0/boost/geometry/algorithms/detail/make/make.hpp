@@ -60,5 +60,5 @@ model::infinite_line<Type> make_infinite_line(Segment const& segment)
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_MAKE_MAKE_HPP
 
 /* make.hpp
-0wX2A2eBg8FScDg4D7wcrABng/OZb+ACsAa8BqSscy34N/A6S9bRIm+d
+nHh5RTu9HZE1nsdoJag34N0VyUVfxIaTrtKmncALWJH2SGqO7lbOgTlTXT7xWlKGLv3JDLIUerI4G8D6
 */

@@ -28,5 +28,5 @@ using namespace boost::winapi;
 #endif // BOOST_DETAIL_WINAPI_DETAIL_DEPRECATED_NAMESPACE_HPP_INCLUDED_
 
 /* deprecated_namespace.hpp
-8psp2CoM3WzItvcHlbCQ4Tnhg0IuzK+cDfbMXG5+jTp9p2W25qfjbnj+
+QDcVFZoZ1FlKnOUtO44UwQDptU86jtEGlCt44wsm/SWLAyvi85gHaAV+w1SqdRH+BQI6Z/BrmFM4Oem/
 */

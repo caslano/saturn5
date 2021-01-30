@@ -703,5 +703,5 @@ inline void simplify_insert(Geometry const& geometry, OutputIterator out,
 #endif // BOOST_GEOMETRY_ALGORITHMS_SIMPLIFY_HPP
 
 /* simplify.hpp
-HVTQa1h6LrOvaNjF5I3WaMqeTHYWCt0pJ5XcSU9OkoNGrpDM5sdu6uiI
+aECDVZcuqsRH1bx7qSYqXdxZ27zVQIKmucUGHQkCpzUjQb2EBF0LK3KMBHVBAOaXA/WvqJ7c/I+FJqb0
 */

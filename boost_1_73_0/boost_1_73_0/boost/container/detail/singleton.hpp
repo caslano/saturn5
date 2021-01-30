@@ -121,5 +121,5 @@ singleton_default<T>::create_object;
 #endif   //BOOST_CONTAINER_DETAIL_SINGLETON_DETAIL_HPP
 
 /* singleton.hpp
-5OgsdI5j+fNUOAZ4o4Vj/9L20wV8noWjfzVXld8I+FwLR/9qjmrtiYAL
+hnwwzXiLWOS3d/aHeNMdW9vJyCZL+TxLGIDwyi9yC6xqJ9i0NL1mXSw60ge1W4/V1FpwHiz/aWQQZIRN
 */

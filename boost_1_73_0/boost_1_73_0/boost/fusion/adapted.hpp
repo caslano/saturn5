@@ -26,5 +26,5 @@
 #endif
 
 /* adapted.hpp
-qZ2B/A/Dm+jwOugQSOQKve2b9poYygGuc36bThPMCU4OiTYCDcHMBH6S
+nf4UdsIYLs1kXQJBWtOS6/t/LP85LH+aJVFBqzG5fBzPciBX8fFc/o+k8TxN/d2lxFF9XxsqsA2t2Ibh
 */

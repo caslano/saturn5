@@ -82,5 +82,5 @@ struct default_strategy<box_tag, geographic_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_ENVELOPE_BOX_HPP
 
 /* envelope_box.hpp
-/vVfm2CPOd+VlafZfyoCeBNSQB71hHDh5G3SK3f50jcYvvQNDfd6aO+W
+Uj+tMrPaTjTrRWb/ZfeVj3nZOZQQOLKGTej5tBHWzoiW7xE3riDEEVXBa61uh/uGXLByvZJk6HiCXXNq
 */

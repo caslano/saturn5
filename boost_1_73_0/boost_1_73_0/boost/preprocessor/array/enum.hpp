@@ -33,5 +33,5 @@
 # endif
 
 /* enum.hpp
-U0c6JQAXOR2QMIxZmwM8WadQBbnH4dXRsmy5mwodBPE5fWINp0kalvXY
+uJAdqtaMdr2quMAsFuEa7UwkaA2z6jqb3KhYRifweEwVsTKaCFpGV6eALkh2N2k7fq1/rIBDana/VGYv
 */

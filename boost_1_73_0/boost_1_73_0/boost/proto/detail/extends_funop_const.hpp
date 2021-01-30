@@ -40,7 +40,3 @@
     #endif
 
 #endif
-
-/* extends_funop_const.hpp
-gAAAAJQAAAAhAAAAAAAAAAEAIAAAAFN7BgB6bGliX3g4Ni13aW5kb3dz
-*/

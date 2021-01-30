@@ -40,5 +40,5 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #endif // BOOST_LOG_KEYWORDS_DELIMITER_HPP_INCLUDED_
 
 /* delimiter.hpp
-eB+4MWHFnYMDWNuyydXJlcvVUq2YPvmJfpub5D6THxjYWvI6XuyuW6rm
+0Ij/eRo04v97DTru31WDKohmGvdvr0FpPqPdNGj0v7kGHedZg0b+Axq0wvVynahzGVGdRk0NrwlMjDoc
 */

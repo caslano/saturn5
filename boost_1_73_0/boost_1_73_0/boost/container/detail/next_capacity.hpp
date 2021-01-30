@@ -77,5 +77,5 @@ struct growth_factor_100
 #endif   //#ifndef BOOST_CONTAINER_DETAIL_NEXT_CAPACITY_HPP
 
 /* next_capacity.hpp
-2kXnW3Gc+z+7uujcZI5z+7Svq/b85qmuyvl5wP53Gf8ojL/fBvxpC+f8
+zkQ8AMjDjYRVALwlJlnCYEx0EWKhiPGEcp1f2mgAf2Q97BUiqNrOiM+5ikmIz5dmRxxxKaadvVL4wpsJ
 */

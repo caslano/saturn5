@@ -68,5 +68,5 @@ private:
 #endif // BOOST_ASIO_DETAIL_BUFFER_RESIZE_GUARD_HPP
 
 /* buffer_resize_guard.hpp
-fqfDR99Aqy0Zn1aB/9Hmrkjg/SA/C1wDDvKJ+yE+Secwbeb8ch8n7+X+
+MbM/dK5fwydGYl+zu5ltwDGJO0A1GH/Rti46Er6/6f9AxL7BQL4esHWfGnD/x8f+6sH9ocgX3lgBCZnN
 */

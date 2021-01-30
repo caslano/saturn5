@@ -188,5 +188,5 @@ struct is_device_iterator<detail::swizzle_iterator<InputIterator, Size> > : boos
 #endif // BOOST_COMPUTE_ITERATOR_SWIZZLE_ITERATOR_HPP
 
 /* swizzle_iterator.hpp
-HO0OIg37Dh9eV35BK6U1ZsxvJXaYl7sI9jqK4QodjqSQi9afp1rhKruG
+sfofKlks0M8zVEpXPekfiZYLOf4Icry85pkZJjiYh+Du2ERLV36jwy0UgW5fHacTEMUmtB8zAnosUGZ8
 */

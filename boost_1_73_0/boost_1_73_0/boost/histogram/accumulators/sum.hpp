@@ -178,5 +178,5 @@ struct common_type<boost::histogram::accumulators::sum<T>,
 #endif
 
 /* sum.hpp
-nD5OH6eP00fujlP42FLs1PAlGw1HU64rRjtiI/DvuZV4PHAOvY8ZsMvw
+GNAq2HJ0R292KWuuUox+9ab73GuOT9Cuvq/ENv2yWsf0ovrs6TNrJ0+/YfWk6WCKtrRExbR4Bv+9rKTE
 */

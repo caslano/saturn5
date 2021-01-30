@@ -153,5 +153,5 @@ struct smart_function3 : public smart_functoid3,
 #endif
 
 /* lazy_smart.hpp
-vQYxS4I1NMWw9lY/c3+t3rA4CZmDQNpKMvZskwWrdQCV0wbPVOvX13s7
+4biJML0jxhPoJBSknZLkRnFmUmAXNKSzoMhGXAjmRr/hkEfCdjJv4re6HcvE4iJ16PM5TOsM2qReMge0
 */

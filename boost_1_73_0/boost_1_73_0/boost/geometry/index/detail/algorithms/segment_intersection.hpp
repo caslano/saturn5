@@ -146,5 +146,5 @@ bool segment_intersection(Indexable const& b,
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_ALGORITHMS_SEGMENT_INTERSECTION_HPP
 
 /* segment_intersection.hpp
-Nh3EyA3JJ3gm5wk374WY6jXveZKkbcl7bX2rrvHPO2Y0kqTcvatP5I7l
+KXQxZoipx1Sa96nHYDCboIqIWX23+Y5cUz3dyDUe0fTREg3SBvORnooRTccWaDcnAurtoc/KxCxItTl+
 */

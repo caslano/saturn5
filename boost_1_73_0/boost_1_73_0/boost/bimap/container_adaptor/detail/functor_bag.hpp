@@ -100,5 +100,5 @@ struct data_with_functor_bag :
 
 
 /* functor_bag.hpp
-ffJzBg1zvaXklraZUp42zybclaTet2PqrQokrpmi+xBmN0CO75PWePJi
+xp09ExAwEYAlB4ZfhMQO4YOtuuQZKqRhBUlTKhAQmqE7tS5IJ71qmujuCyM+Pel4Wh/lCAdsGWKaHnPh
 */

@@ -167,5 +167,5 @@ struct breadth_first_search_all : // visit "first" first, then visit any still w
 #endif // BOOST_MSM_MPL_GRAPH_BREADTH_FIRST_SEARCH_HPP_INCLUDED
 
 /* breadth_first_search.hpp
-1MYFTAk3wiOK4UY4zsnjOlva+6lpVGvUpmPjKn/ElunSkYkkl/ZGNNbP
+dFGSOh/0MHV4ekMd2CdrUNx1eBAfH7pfqDDuQZ7VTzfS1g+eZZJzmtkKCgZ8HYxO3cDTW0+lHCvbiYKr
 */

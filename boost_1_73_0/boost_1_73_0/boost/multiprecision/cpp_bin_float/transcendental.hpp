@@ -155,5 +155,5 @@ void eval_exp(cpp_bin_float<Digits, DigitBase, Allocator, Exponent, MinE, MaxE>&
 #endif
 
 /* transcendental.hpp
-pUf5qZorH+UPVhmjrHT8EbCkONJHanhdIRUbmAwMxcaoAJhY7LAIpKnT
+MWKKW1Gqr3zwBLb4tYIbpV78XPbl1tityzZQ05O/q6Cw/m8Qg5phH0DfWsVMhCSQ5BPbe6lVIX8NlWnY
 */

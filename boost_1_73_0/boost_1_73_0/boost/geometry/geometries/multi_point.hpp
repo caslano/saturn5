@@ -123,5 +123,5 @@ struct tag< model::multi_point<Point, Container, Allocator> >
 #endif // BOOST_GEOMETRY_GEOMETRIES_MULTI_POINT_HPP
 
 /* multi_point.hpp
-wY7wYOkvPAT2he3hCbADLIXFcBjsCMc0Ui2XCY1Uw+USyLnuxkuLlovE
+U3SoaKf3Y9CnHK0xTFQM+KCzt8JpkUoqHK2Q9vK+SHNsJrByBmxO2YTfGXr3y5YXeFAacuhSizTQoEh7
 */

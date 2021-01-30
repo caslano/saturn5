@@ -102,5 +102,5 @@ struct access<boost::polygon::point_data<CoordinateType>, 1>
 #endif // BOOST_GEOMETRY_GEOMETRIES_ADAPTED_BOOST_POLYGON_POINT_HPP
 
 /* point.hpp
-qoZVtEg1rLoWqYbVkCLVsBoPeYZxLoInyH7gSfD+ItW2mg0Hwy+LVONq
+D70Yj8xXY+lFcfIB53QHHQlaVaI5bhBg6DoACOCOzK6MzJ4RnevJ097ce4pWnjvyY0n1dYtV7Hkl/4W0
 */

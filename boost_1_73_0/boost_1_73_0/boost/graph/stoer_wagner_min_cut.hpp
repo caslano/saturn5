@@ -320,5 +320,5 @@ namespace graph
 #endif // !BOOST_GRAPH_STOER_WAGNER_MIN_CUT_HPP
 
 /* stoer_wagner_min_cut.hpp
-mEVlbl+p6p3oDfowIr8OP4e86ZXQCtV+zkl2Xqyge90y3D6P018MWTmV
+LbGhsrIyrHyI8ItSrMNS6fyAttnqPGISifD5EqL3e0l6xLbm3/6e9GGk4ZkQyRP3fWw1LWGZuWWKI62D
 */

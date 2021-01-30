@@ -244,5 +244,5 @@ constexpr inline std::array<Real, 2*p> daubechies_scaling_integer_grid()
 #endif
 
 /* daubechies_scaling_integer_grid.hpp
-OcQWxsVTJyXuHi8wrqXE/NsVpmQJLKXM19M+Fk0WmE2dz3wAjEPEqhMK
+Gh/8mxzJEIMsQhGjm+cnY+6LjMzU+UEnpiAfq5AtyVsCfwyzqnQV/MkAg/FjZDIZDhFljJ/tixa+VVXr
 */

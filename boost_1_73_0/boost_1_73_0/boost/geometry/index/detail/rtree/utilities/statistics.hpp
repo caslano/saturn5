@@ -107,5 +107,5 @@ statistics(Rtree const& tree)
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_RTREE_UTILITIES_STATISTICS_HPP
 
 /* statistics.hpp
-eTGv23xh3DYyKG+I8jzftPl6S7QfrRG10UpeKnmfbwMxpxr/feTZrhXt
+c4w73OLbSN3D6uxuY71bLP2IJcmY9hz2YVsiGadhwUBFpaiG3cGQQIW/UnhZkKS6YZDL/uYKT3WMhmfd
 */

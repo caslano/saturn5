@@ -374,5 +374,5 @@ struct is_mpi_datatype< T > : mpl::true_ {};  \
 #endif // BOOST_MPI_MPI_DATATYPE_HPP
 
 /* datatype.hpp
-rhby+hmjQfK7oI3xNLOR8/B9Pn3YQp9N0x/t9KGD/ungmI/0EPN3inQq
+AkIXAM5Y8705ivgK0U/VEd5DRtCLr3x8tgOFl1Hgq1XFSLL/TAU+pTq2PxdfMTaqeSbALLCmfSSK+Qkv
 */

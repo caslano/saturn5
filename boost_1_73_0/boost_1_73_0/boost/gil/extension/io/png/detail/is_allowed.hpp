@@ -45,5 +45,5 @@ bool is_allowed( const image_read_info< png_tag >& /* info */
 #endif
 
 /* is_allowed.hpp
-Z76Ahk33uzrptV21tv6Zsmj305A+e8kUfE+4vedfGwdIwjISmeDb8/vM
+o9xOc0obJ7VJp5MKPhmzo+XuiiDVhKiUEDToC9yytxYamio74fEtQXmgIxR2Q1G1PBOFOdSjMxmELI97
 */

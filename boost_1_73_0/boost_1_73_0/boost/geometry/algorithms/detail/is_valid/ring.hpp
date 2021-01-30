@@ -246,5 +246,5 @@ struct is_valid
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_IS_VALID_RING_HPP
 
 /* ring.hpp
-T+dzgWdY0fdeZvSJXZp575mWtCvnW5LfF1nyvi8Gx4Go685VYDY4FRxv
+DfWs9HJHK2xqlY5ztP4UvxMdravx66VDBr8XO1p/hBHIRtfrAYnPVbTMc/jGxYMsNppjy4zSWp+2y6RX
 */

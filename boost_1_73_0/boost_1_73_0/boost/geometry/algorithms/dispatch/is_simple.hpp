@@ -38,5 +38,5 @@ struct is_simple
 #endif // BOOST_GEOMETRY_ALGORITHMS_DISPATCH_IS_SIMPLE_HPP
 
 /* is_simple.hpp
-0JzxczM0Z1wmT5Cc8avgNHhdhuaMT8vQnHGZh1Byxl+C98NX4QNwGXwQ
+MucCNQ5cAPo7b/OKf5uCZ1FeCnMqWuyAfFuYdnCANgLQ/xUoF2U0vrC3w6KOlZZdKLfCtmgqnbATYzUF
 */

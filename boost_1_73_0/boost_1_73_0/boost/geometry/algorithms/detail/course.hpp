@@ -40,5 +40,5 @@ inline ReturnType course(Point1 const& p1, Point2 const& p2)
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_COURSE_HPP
 
 /* course.hpp
-3bxdobx9efRLji9KlLc7lLef/mwzFcTGHsor5f3Vieq/WsTYukdxSn/L
+vXkSNoDJ8fQxRyuMV4oaZ8f7w3v3McHchWsdtFooc4Yocsu7YOBgFc1Kjfa3q2i3ZaN2xsWYz0+/96uT
 */

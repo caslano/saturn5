@@ -75,5 +75,5 @@ struct class_of : detail::class_of_impl<T> {};
 #endif // #ifndef BOOST_CLBL_TRTS_class_of_HPP
 
 /* class_of.hpp
-MdfeP+UYFyrQDuSQ2Oeq0E+PfT4J/aREiojXES8lTr9bkTnElxPn57zf
+3BTMI19GVXVY6QfJisvBZSOGBE+YNZ0ouFFxhtX763QVuSfqdltIq6FPZ68MqNfjMU3WCxSaEvSaPj85
 */

@@ -147,5 +147,5 @@ struct common_type<boost::histogram::accumulators::mean<T>,
 #endif
 
 /* mean.hpp
-AS1bzgPn56w0Qxh1Hjkvj8MYLuMqOrw817Ly8P16ebvZakyDpM9tWmVg
+VZ8IynoWLejWNlPK/dSuiE3s3ZLaV6ZSAvF4lEMbCkQPE38tlK4pB6nhLjh+tqnplRGbuUfsLuSw2+XT
 */

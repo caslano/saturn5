@@ -41,5 +41,5 @@ struct operations : detail::custom_tag { };
 #endif // #ifndef BOOST_IOSTREAMS_OPERATIONS_FWD_HPP_INCLUDED //--------------//
 
 /* operations_fwd.hpp
-CEyv8cDA9BrDgelz24MC02e2kcD0eW1c279Qw/h3kBjyukMaF6HeDcRQ
+qx4Hz7rRaa3Vx2TxMLpyFF+sLTjNVX8XaTJlSRWHTXLxXm7H5/BVt39a0uyVW0Zy+/ZzeyrTYTZLHRzk
 */

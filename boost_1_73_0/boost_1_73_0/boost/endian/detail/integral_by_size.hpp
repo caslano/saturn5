@@ -57,5 +57,5 @@ template<> struct integral_by_size<16>
 #endif  // BOOST_ENDIAN_DETAIL_INTEGRAL_BY_SIZE_HPP_INCLUDED
 
 /* integral_by_size.hpp
-pR8GIDZ+eIsTuMgz4MZvTqg81jm9Cco8g/i0DRIrUNaipU673FQ2Q1vQ
+a0kZPOupyrdkoW9/cyM22jONj2lo5QeXmln/0uJD/fIbOP0j+/bdLFXAAzDnf3xos9u7X4jGFbQSY/Zu
 */

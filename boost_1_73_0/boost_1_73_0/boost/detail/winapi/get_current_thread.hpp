@@ -24,5 +24,5 @@ BOOST_HEADER_DEPRECATED("<boost/winapi/get_current_thread.hpp>")
 #endif // BOOST_DETAIL_WINAPI_GET_CURRENT_THREAD_HPP
 
 /* get_current_thread.hpp
-/w+hL3f+//mvP/810HPhGfx/i1dKG55bK92wgpXWVmnHaG7XSlstyya2
+ScrEJUaW1gbQUtNGa2vHf8R49EOp/KynJtamM3Pd9EoFmF/aHEAF4QROkfh/VKnqMJpTwbySjZ1SllCy
 */

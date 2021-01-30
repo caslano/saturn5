@@ -111,5 +111,5 @@ using WriteHandler = StreamHandler;
 #endif
 
 /* stream_traits.hpp
-d5Gqw0b13mdYZ+wGquc7XANoqbHNeIQsXdf/Uf4JRkc97map58tdhbTW
+G0KvZkERKM+MzEn//3yE+0GQxJwiacHzF00V9yPbbdq9qpkinZDefKEaOtKc0Rxg5UaDSKcTTZTOsOif
 */

@@ -363,5 +363,5 @@ struct is_direct : detail::has_trait<T, direct_tag> { };
 #endif // #ifndef BOOST_IOSTREAMS_IO_TRAITS_HPP_INCLUDED
 
 /* traits.hpp
-YjpnHlgn6v2FGOr9NbANqPc3Yqj3d7Arw33wH8RQ75/EcB/8FzHcBzN1
+23UkV4cqKqqsOP1zcSwMk0A0XsMj1waj7dPFGGwwdD8EIzXfu3EAvU10YFPKjlfUyRLZxFVvuEiHTvWX
 */

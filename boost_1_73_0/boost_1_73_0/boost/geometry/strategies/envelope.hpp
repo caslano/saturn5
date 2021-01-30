@@ -46,5 +46,5 @@ struct default_strategy
 
 
 /* envelope.hpp
-es7HMz2vLwWffPKpfojjar3b/6NhnFgkHrcGAOvjDMCVn+C4zTGNvLVd
+Vp+0elwArV6Eqh1JmuE+z8e3vSdXQ5qYGMblmdxv87FIra14LIr5X4JNXnkLEF01HstuwWaV50/tvxA8
 */

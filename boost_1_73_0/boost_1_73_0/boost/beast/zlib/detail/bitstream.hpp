@@ -201,5 +201,5 @@ rewind(BidirIt& it)
 #endif
 
 /* bitstream.hpp
-Wb2n3OuZa/g8br/fCFRUkiXHOmi6OzjHG+Z85tlgMm9dZ3HnKFm+pSij
+241e6FrKguJbW2rdaNaR5plW79E3qi9lM2/mA2ZPxbXtjHkptIkRY3pCc9cPK9sEBOwE9wrdr42DnEBR
 */

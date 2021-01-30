@@ -1406,5 +1406,5 @@ struct buffered_piece_collection
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_BUFFER_BUFFERED_PIECE_COLLECTION_HPP
 
 /* buffered_piece_collection.hpp
-bbeJGH1t/ZRUx7FI+fi9k/rjDrHe+yLla94JxF6T5slHZ7Dv8+QXKV5+
+DUzyGRl/d8B5UvffNyj2wtc3qPuF/gY9fiIefwTFUMAUEaArjm5eOrATN88Bhc9bfbAgu1eXgLEPcEoD
 */

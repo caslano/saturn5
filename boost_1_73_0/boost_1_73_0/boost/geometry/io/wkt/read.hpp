@@ -918,5 +918,5 @@ inline void read_wkt(std::string const& wkt, Geometry& geometry)
 #endif // BOOST_GEOMETRY_IO_WKT_READ_HPP
 
 /* read.hpp
-Fjfv4anhkug2jzOrFqeOKyvSrp9YnDrO1CXj49oUqU7j17IvD0B9Dcg2
+NRNBvPHr9vXsNMcp1QlyjTvW1Zu7Z+aNJh7qMb7vahYXqOfNDVMVdZmlR7qjv7rpmoS66Rqom65xU5F/
 */

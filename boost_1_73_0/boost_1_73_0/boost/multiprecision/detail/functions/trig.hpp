@@ -845,5 +845,5 @@ inline typename enable_if<is_arithmetic<A>, void>::type eval_atan2(T& result, co
 #endif
 
 /* trig.hpp
-zVlZ4HjiGKGw+0fDRAja5u29t/ozJCKCu9s5ea9eVd2qW/fWx61bVbfg
+fiKUG03P/d/ne/6J/h7jkx0syg5mibNL8idXC/9HkYcUZUVl3R7+nZZPzf3LCwkpGxH2tralrmUrLDL4
 */

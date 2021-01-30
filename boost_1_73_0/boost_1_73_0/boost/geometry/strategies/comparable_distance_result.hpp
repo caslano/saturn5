@@ -196,5 +196,5 @@ struct comparable_distance_result<Geometry1, Geometry2, void>
 #endif // BOOST_GEOMETRY_STRATEGIES_COMPARABLE_DISTANCE_RESULT_HPP
 
 /* comparable_distance_result.hpp
-mj/KvHEOud9JvrfKvrdzLe89acvlWVE78c/Z+FaJOx7rOE1iua2w7zVy
+p7PlJWRc8BKEeGGJmP4WxPqZ2ugB98tDinAOzIj9YUGkc0UImlsNq9DfZ8tAri0XL/+d27dCjKJ+GiWs
 */

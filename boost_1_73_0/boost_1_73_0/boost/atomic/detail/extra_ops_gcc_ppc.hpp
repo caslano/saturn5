@@ -840,5 +840,5 @@ struct extra_operations< Base, 8u, Signed, true > :
 #endif // BOOST_ATOMIC_DETAIL_EXTRA_OPS_GCC_ARM_PPC_INCLUDED_
 
 /* extra_ops_gcc_ppc.hpp
-aeslrZf0mF7LVJkqjcn9ITm3GeWPisn9fjk2BmO0mfZjvq9j5b6oKx+v
+s4uZriBtZhzDcNl9OgoDwjQ3PCbEIrbsv7cUTuVdxydcwe2jsT/XdgugUII/BKCUb6fyHFhJW5vCeICf
 */

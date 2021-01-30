@@ -133,5 +133,5 @@ private :
 #endif // BOOST_GEOMETRY_STRATEGIES_GEOGRAPHIC_BUFFER_POINT_CIRCLE_HPP
 
 /* buffer_point_circle.hpp
-K4H2+5lfV9aEihl1ncFdZc62nq2ecmPO5etHDH+o0ZOff/q3e0TeMfc3
+syN6aBEiiG4SBRtZ5nYLVXc5zHqJZyuBoD/uhl+2YU5fG6QSzgYpqoP/qmyxfj1+LFI53C/rfsPNzsAe
 */

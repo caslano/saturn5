@@ -82,5 +82,5 @@ inline bool winapi_wrapper_timed_wait_for_single_object(void *handle, const boos
 #endif   //BOOST_INTERPROCESS_DETAIL_WINAPI_WRAPPER_COMMON_HPP
 
 /* winapi_wrapper_common.hpp
-s/9u9n3iG9PJjGL8C80hxr/dzPWC7tMdg16I8e/Itb/bHGKc6yPGXygx
+yCuceQ/1wshbYwI30NC5MlPTKtzwTDIsgK8nwR/dlPXIDFacBr0t38o4yXfPokC9mSFf44tUygR5CPQB
 */

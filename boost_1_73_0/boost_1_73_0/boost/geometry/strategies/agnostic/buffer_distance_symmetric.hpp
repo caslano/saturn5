@@ -107,5 +107,5 @@ private :
 #endif // BOOST_GEOMETRY_STRATEGIES_AGNOSTIC_BUFFER_DISTANCE_SYMMETRIC_HPP
 
 /* buffer_distance_symmetric.hpp
-k6oEHpdh+meiADgVeHhIfcIPDqlP+GEh9QlPHhsGBqO3cxrwrJD6hD87
+tzw7nPIVM6/+gHeGElnvIIrmKtC92gtGKs2A0UtjVPmE6V/R4aBkypDiqseT4X1hZWRqqlHSRVDV7HBq
 */

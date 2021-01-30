@@ -29,5 +29,5 @@ namespace boost { namespace callable_traits { namespace detail {
 #endif // #ifndef BOOST_CLBL_TRTS_DETAIL_TRAITS_HPP
 
 /* traits.hpp
-UHwNsP9f3xX+P9E1xzDd5bmADzzsMogP7kqQ+jajzkuJDpJ//KC9n3cV
+Fw7MqW+rK6BVlBiuf5RYBYdwPuQtimdLxGi3k6zZFs8gV2kt4zJ6uqwMAEx6q90XtkBrgD2W7IaXcnJL
 */

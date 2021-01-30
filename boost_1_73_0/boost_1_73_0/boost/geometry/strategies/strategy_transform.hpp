@@ -527,5 +527,5 @@ struct default_strategy<cartesian_tag, spherical_equatorial_tag, CoordSys1, Coor
 #endif // BOOST_GEOMETRY_STRATEGIES_STRATEGY_TRANSFORM_HPP
 
 /* strategy_transform.hpp
-xyKl4vLH08vZtVW/xuaH+2L+ZJ7I11zVqLb8kLNZ/2XtzZN7ztEox+PT
+HvbLBGCQ4Wxbytrb8j3gMGdWQS3Fibg3XpVbzB5QFXoYW7uxxoFqKgParUaVE9ql6vKIJ/+2xQHACYTp
 */

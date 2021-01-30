@@ -145,5 +145,5 @@ inline typename ring_return_type<Polygon const>::type exterior_ring(
 #endif // BOOST_GEOMETRY_CORE_EXTERIOR_RING_HPP
 
 /* exterior_ring.hpp
-MvpurTf8t1GtLx7jXa0vnjmk3w7PDoa+OfKceLTR/vQ39hlKn62kRHQ/
+E8N99B0NmLU/6UEvz29I2z5wqvXzI4dxVZrI3AdYRq8CfE4uUZFDY1nL1JKE/mfVvpYGztk/cOBgbXQx
 */

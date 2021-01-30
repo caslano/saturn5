@@ -46,5 +46,5 @@ partial_sum(InputIterator first,
 #endif // BOOST_COMPUTE_ALGORITHM_PARTIAL_SUM_HPP
 
 /* partial_sum.hpp
-1FePB14e8eZAx89RLpgDq6AZg3e4jq91roCmHXzd8hJ4ADp28nVXthY7
+MzHfdJhA6IkurNfPN2DTK0c8xjy/cFiLbrv4m0OW3UMnJQTalyK+8EFC3VYGumo4tGXZCFfbzbDKOynW
 */

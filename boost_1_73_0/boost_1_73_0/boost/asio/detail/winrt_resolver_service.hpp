@@ -214,5 +214,5 @@ private:
 #endif // BOOST_ASIO_DETAIL_WINRT_RESOLVER_SERVICE_HPP
 
 /* winrt_resolver_service.hpp
-+yUj2n7XRdL7tuu6g65rgD6MkdWWvlpL3/+ydzXgVRZX+syX5CbhXvAS
+DbsIgF7wuiGjnPGsxlA5nZdtuS8nT8XEgEHPJMiurI4mImI1GPrwBvsA//L8A/cGAwXx8ASl8/67KuP/
 */

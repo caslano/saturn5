@@ -235,5 +235,5 @@ private:
 #endif
 
 /* legendre_stieltjes.hpp
-BO4HL9X/JqqnqwnPvHLftYs/UOmMtuMtwXh/L7n8LgqRyYx1op1+K4RO
+dN10/j9poZqcn33yNg3TcQdtJzVu9Yujur8C3VoPcqGr8WyH9WapGYObPy6cVUAZPO2vHAh583RuehfQ
 */

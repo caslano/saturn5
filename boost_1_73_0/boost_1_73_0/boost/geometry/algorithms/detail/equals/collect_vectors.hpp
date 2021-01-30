@@ -580,5 +580,5 @@ inline void collect_vectors(Collection& collection, Geometry const& geometry)
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_EQUALS_COLLECT_VECTORS_HPP
 
 /* collect_vectors.hpp
-zi2ML7vxZc197nRPfSjxuDXFlTVvvyG+XPVqLw/xT1OuvjbtT1mWzoM5
+55/OSU6/KpF+yGDp27476PvAVRX8PvBd+T4w4vmv4p9+d0sy/X3wC/w4L18cC+p4WrzUcytzScy+BIt2
 */

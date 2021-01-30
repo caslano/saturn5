@@ -48,5 +48,5 @@ inline typename tools::promote_args<T>::type sqrt1pm1(const T& val)
 
 
 /* sqrt1pm1.hpp
-ARFRwIKrIoJLcZGmlI+C4K4o2FFBxQULWID9zr33Vcqi6x+/P+ADn3DP
+Rc1wX6mZ8/A+8XM1WTfZdw/dN4ZzVTki2PaN9fUHkuAkIw75YRyyxYyZMIbO1eN4JsT1LPslt3ey53aM
 */

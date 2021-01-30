@@ -794,5 +794,5 @@ struct default_strategy<Geometry1, Geometry2, AnyTag1, AnyTag2, polygonal_tag, p
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_INTERSECTION_HPP
 
 /* intersection.hpp
-RW0I9xPdn2OvbPbnA0T9kw8U1QPGXtnYmxsmul8fbvd91f6+zyeffPLJ
+3Q9OwUA4Vx6DaKHPz6p4YVBoR19laMbVrCgZh/bWVXFoAHX8TYDKl6AG8cUbEHpMquT0h32XhP0FwM5L
 */

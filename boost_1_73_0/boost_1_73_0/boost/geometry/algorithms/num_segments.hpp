@@ -204,5 +204,5 @@ inline std::size_t num_segments(Geometry const& geometry)
 #endif // BOOST_GEOMETRY_ALGORITHMS_NUM_SEGMENTS_HPP
 
 /* num_segments.hpp
-5eO6pNGz4XTWKvJxPenaecEceiZNyE2IfB+R3wFCzpmdbqXldm6f0c6b
+6PWmzz4rNy37vNxU8UW56b0vy00/jpebNpN7m9x3TZNNvyV3qXmySSEXJOe2TDb9MG2yaSW5h8htIref
 */

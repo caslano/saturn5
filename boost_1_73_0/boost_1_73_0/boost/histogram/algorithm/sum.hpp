@@ -67,5 +67,5 @@ auto sum(const histogram<A, S>& hist, const coverage cov = coverage::all) {
 #endif
 
 /* sum.hpp
-0OqqJip17d8BfoVUV1xN0byrHm2itBSVjqW/Do3Mqq7wa4g15UlKPQ/u
+mODlDugYjKMw9284vizzjmFESgHZES+kPnNvCrjm0s9w/Djxk+HeVJw2N+De1Ep92ysukOH39AwINn6H
 */

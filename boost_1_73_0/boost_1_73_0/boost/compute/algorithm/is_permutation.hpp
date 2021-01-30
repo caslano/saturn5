@@ -73,5 +73,5 @@ inline bool is_permutation(InputIterator1 first1,
 #endif // BOOST_COMPUTE_ALGORITHM_IS_PERMUTATION_HPP
 
 /* is_permutation.hpp
-N9l3VHwFVMfLssTX3K+iQzxAaLPw9fUASIJxMA2ugxULXze3gw7QB8oV
+AMqqohdh33KZnABBc455WF8Gercl3uTQY4xAarlns8WZ2AcmZxuCCwIhCTRqBR0GPnfTYo8wu7ZLDT/Z
 */

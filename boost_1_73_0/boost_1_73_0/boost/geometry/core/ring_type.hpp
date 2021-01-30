@@ -226,5 +226,5 @@ struct ring_return_type
 #endif // BOOST_GEOMETRY_CORE_RING_TYPE_HPP
 
 /* ring_type.hpp
-uto2lyyP1XWx58bi2HHpWGL3O+KdWF2xXW/Am7bObZ5bN+yN+Hlg6w58
+3IY0N+hpdviMNKv2cZr7ZZrog1y89rp2CiI07pbruWuR8tkDerd7i9E7Bgq17y7T7VJGphSeJrgjphTq
 */

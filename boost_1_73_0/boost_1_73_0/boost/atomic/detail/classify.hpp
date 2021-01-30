@@ -78,5 +78,5 @@ struct classify< T U::*, false, false > { typedef void type; };
 #endif // BOOST_ATOMIC_DETAIL_CLASSIFY_HPP_INCLUDED_
 
 /* classify.hpp
-fMfV4nMjsf6oBekLB9rJxPydnVxUFH9ev2Eqn8/yU7FmaEZbvP3eeBkr
+M7WvFHR5+T5/t6vhsflo6XY/nTtm+lnuZLZpUu+OZgiIKjJ2Jp3vWDsX7DR39ftYdTbcx+90Q+TvG7Wn
 */

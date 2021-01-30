@@ -79,5 +79,5 @@ public :
 #endif // BOOST_GEOMETRY_STRATEGIES_CONCEPTS_AREA_CONCEPT_HPP
 
 /* area_concept.hpp
-kLsCKVyZTTsCg0cX1Jh3GxUpLI9RzFna4pmVeKbFTvaZ/uVI+vRK9wl+
+4b1gXZax+b8N99AsGXI0h/MazqFpqZdI76COQlP3Hta1Nr3muFi8H1ydSDsuPfOXdxJpqTsgTz1cYRzQ
 */

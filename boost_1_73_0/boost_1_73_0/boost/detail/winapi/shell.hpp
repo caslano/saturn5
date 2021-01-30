@@ -24,5 +24,5 @@ BOOST_HEADER_DEPRECATED("<boost/winapi/shell.hpp>")
 #endif // BOOST_DETAIL_WINAPI_SHELL_HPP_
 
 /* shell.hpp
-qf2GlMNLpLggcDap9ToSoRCwxD5mgipkT/R1fGD7fj3SnwvJRLrSomFJ
+aVb8+gHHsn/FzDqaGdtBV/ru8Vf1jzMjOl78nk/8UyQlBL3RsmmV8OvC21SOa2nEMqzFsBfCJN46OHkf
 */

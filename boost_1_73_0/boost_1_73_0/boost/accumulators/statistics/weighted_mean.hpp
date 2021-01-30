@@ -196,5 +196,5 @@ struct as_feature<tag::weighted_mean_of_variates<VariateType, VariateTag>(immedi
 #endif
 
 /* weighted_mean.hpp
-wfR749pp6edZ+gXAdsCFwC7AO4GzgYt8PUu/FAhV0QPAj+zzHfZ+IJg/
+FOUeEG8zFx1BRrmJpLXS//l3lAbsARJmfuQORjuU4gKEVLuD/knn9Ci4cGJ4LP5Zn2bGophAF8sL3dzP
 */

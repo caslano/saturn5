@@ -395,5 +395,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_BOX_IN_BOX_HPP
 
 /* box_in_box.hpp
-Iq/XON36Hm9feMON0zSukZHYxPJYabisMNK/vKpsB+TZ7V9r7QvPu/HX
+QZU7EFw9nVDjbq+pRIsfLjxlPrdwI9EB15lZM/k6kkjjux2UYpRnUx6bbv9xZLc9cn7ObUc21JiK6oJe
 */

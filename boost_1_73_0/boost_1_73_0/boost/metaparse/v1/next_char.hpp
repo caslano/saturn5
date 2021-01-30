@@ -30,5 +30,5 @@ namespace boost
 
 
 /* next_char.hpp
-z9PMG2aZOPkwffgeA9fXM27Qxj+awbwogHkJc6dqXzMWBDJG9qDuK8bW
+FrgOSCkR5XkSbV0HwNWA9r2Bt12ow7uAZuBu1OkWoB3YD/QDI4AP+dgl63rDhmjWBLQCTwIHgVeAAWAI
 */

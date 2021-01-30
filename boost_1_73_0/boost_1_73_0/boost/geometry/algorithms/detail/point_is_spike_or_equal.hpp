@@ -183,5 +183,5 @@ inline bool is_spike_or_equal(Point1 const& a,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_POINT_IS_EQUAL_OR_SPIKE_HPP
 
 /* point_is_spike_or_equal.hpp
-7RCxxYid2iKWpW+/Hn9bxC4mTLJlBWKn3xDlViM2/e8itgGxrWdFrAmx
+Es+tw7G5EcXiNDQntjNF0v6cwT3x1enHzyt8LM4zype7g9C8JCDeOByk1bm6RqtEVZNPCd5+r8aZ5Gps
 */

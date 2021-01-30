@@ -150,5 +150,5 @@ struct default_strategy<geographic_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_GEOGRAPHIC_AZIMUTH_HPP
 
 /* azimuth.hpp
-I2hX+G9VWaXxi5iD+8tyPf+Laz7WefLRTDJyxyD+PkGjcyEbz9T21cjj
+01Z63lbd7Lqj9U5pV/J64TFUY9MuLlqXl6NeQH/d2mjEAghdYmN/kvlyESBXijYOHFGwz7Ieb8yZeTCN
 */

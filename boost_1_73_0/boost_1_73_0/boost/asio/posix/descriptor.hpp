@@ -39,5 +39,5 @@ typedef basic_descriptor<> descriptor;
 #endif // BOOST_ASIO_POSIX_DESCRIPTOR_HPP
 
 /* descriptor.hpp
-C/mxttW/7w7jWWGpyrW+PJ4Vca/zYde31VrYUbaff0tgNzPt8uhL/H8F
+lyzjb3shU3BEUOvVrDIuZq3SOfxPxy5M/4mIgofA12OVP78kE84x1JusD+VxrvIpI00d6Q1+K9to//kv
 */

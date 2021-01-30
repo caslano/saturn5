@@ -43,5 +43,5 @@ using boost::is_floating_point;
 #endif // BOOST_ATOMIC_DETAIL_TYPE_TRAITS_IS_FLOATING_POINT_HPP_INCLUDED_
 
 /* is_floating_point.hpp
-HBhSuTgP3A0ODqkvrvO5nuBQ8C1wWEjHn/N514a5Pkvwy2ql9fmlrQ+v
+bOSdB+BfT7q2EMUcmmJSVQMZDVk/wB2pUYY5lmigw1S+5SYBP9x8GPciiRFQVdEoxdTk9rujopGZD4NP
 */

@@ -38,5 +38,5 @@ inline bool is_invalid_point(Point const& point)
 #endif // BOOST_GEOMETRY_PROJECTIONS_INVALID_POINT_HPP
 
 /* invalid_point.hpp
-z1L6It6NhEsLjIqot7yWNtTIHsrQueo24GB8o2KztHammNh2zVfbkl4z
+WabfjZW8dDHvPHgLf+Z13v97uWPArj57CQRbEDRllEDVVcswvyRufNRG7w+Kd3w8jA4q0vED3Dzdw6I1
 */

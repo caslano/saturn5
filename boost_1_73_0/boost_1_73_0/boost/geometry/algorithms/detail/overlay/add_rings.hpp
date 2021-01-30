@@ -195,5 +195,5 @@ inline OutputIterator add_rings(SelectionMap const& map,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_ADD_RINGS_HPP
 
 /* add_rings.hpp
-4OPg4+AGphfEO9f519bn6jJFx0nD+rFffqqnLXl/z1jy/p4Fhyo99spt
+6bymIOwzAmle/ggw2DrAYM1NxZUmR7iKek43zLf/NzF64XZ9UCCGo14Q7pV7j67I7jK+rvuvyaY0k04s
 */

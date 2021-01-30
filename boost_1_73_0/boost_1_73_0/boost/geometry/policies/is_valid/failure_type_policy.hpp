@@ -83,5 +83,5 @@ private:
 #endif // BOOST_GEOMETRY_POLICIES_IS_VALID_FAILURE_TYPE_POLICY_HPP
 
 /* failure_type_policy.hpp
-eQVpNv3meFHb2qh/7ZcBdz+i+xPROCiDZgh5NDIJWFObcsG7CfZ1zIVm
+HRA9s51p8STvMfv301v76RV5jvpX1xBpYK4eGgoqGRtE1u/Omc0Wv0wkEFEOj4lXyxR9+An8zWrH3/HH
 */

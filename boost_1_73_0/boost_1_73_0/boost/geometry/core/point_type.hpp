@@ -162,5 +162,5 @@ struct point_type
 #endif // BOOST_GEOMETRY_CORE_POINT_TYPE_HPP
 
 /* point_type.hpp
-HT+N1XWz3/3pk3hdF6/urY9jdV1LvLpmvrqOXt2sVbG6WOxA2spYXZdi
+Zsyhmk/9vhiJXNqfjUTBkYQ+2rX4+1BqoLcDWVhNSC0E65nnD6x+V8JX7K/2XRi/DlwzL9Jp4f1U9EH0
 */

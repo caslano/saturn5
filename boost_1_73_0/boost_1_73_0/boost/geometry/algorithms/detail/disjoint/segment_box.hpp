@@ -276,5 +276,5 @@ struct disjoint<Segment, Box, DimensionCount, segment_tag, box_tag, false>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_DISJOINT_SEGMENT_BOX_HPP
 
 /* segment_box.hpp
-lq0XY1OWdNO6xsi0n/jkLDtyRCCi349Zlcm0lnkSGC/Xpqr2Osw0I1+6
+0njpF+BpqgTTzAZdwTfoo5n8+RC+BKbiSNC2TGAuF7CTh9+kirfk0OqhHOB7boMUm4iXnK3apSJDb+ed
 */

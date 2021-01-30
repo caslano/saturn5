@@ -461,5 +461,5 @@ inline RealType kurtosis(const inverse_gamma_distribution<RealType, Policy>& dis
 #endif // BOOST_STATS_INVERSE_GAMMA_HPP
 
 /* inverse_gamma.hpp
-r/G1WcWdw9p8GnP5iudXrbWcwfSzrMp8jXlt3Ny/FGafccnfPBODsljM
+H9EPP5hbV9LtB9v/7ibATyCuIg313z5n/b/ymqs4FCFeCuJV7/MwHtiXbqPbTqdGpyH+KsSfczN+mzl0
 */

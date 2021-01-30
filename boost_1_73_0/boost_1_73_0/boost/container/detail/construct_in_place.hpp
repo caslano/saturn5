@@ -96,5 +96,5 @@ BOOST_CONTAINER_FORCEINLINE void assign_in_place(DstIt dest, emplace_iterator<U,
 #endif   //#ifndef BOOST_CONTAINER_DETAIL_CONSTRUCT_IN_PLACE_HPP
 
 /* construct_in_place.hpp
-+rT9+QLg+yyc8/cewP/BwqPzDH33Av4lC187z9D3wAm0v4Tj9+BmMkXf
+rsVK6qC1EBHJO3CK8wQIImFsE3vK7ZZ7KsnA+M8cptIGTxIc2m1RCeRcfta55gqG4LQMDll1pTARhe6r
 */

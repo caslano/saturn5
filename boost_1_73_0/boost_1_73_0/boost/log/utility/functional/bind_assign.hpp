@@ -55,5 +55,5 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #endif // BOOST_LOG_UTILITY_FUNCTIONAL_BIND_ASSIGN_HPP_INCLUDED_
 
 /* bind_assign.hpp
-aLXcWL3TYn2M3GYC7TFxchN0OC7ShkZuMk9WHB/TJkhjclPRNtkQocd+
+l3rF0xCZwtcwypqPl0/0Q66deYecSeggm+LRo/EdYrfOx/tOzOm4NZpcrJMhhDSJt9lowcZ6Hu1Rzrcz
 */

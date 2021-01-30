@@ -30,5 +30,5 @@ struct robust_point_type
 #endif // BOOST_GEOMETRY_POLICIES_ROBUSTNESS_ROBUST_POINT_TYPE_HPP
 
 /* robust_point_type.hpp
-3SgT0TH7rjecgVfvk9fp11dvKd219X+fjAb7T764eyBdH82R1PmQ/Y7X
+/UYo4RaIeEeOERFHhBtKdv3H9uxJbk/xIO3Zw+3ZFW/Pns9rT0CcYU9UqguKwK98I27AOZodUmxOUj9N
 */

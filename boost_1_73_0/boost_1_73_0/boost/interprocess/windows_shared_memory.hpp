@@ -252,5 +252,5 @@ inline void windows_shared_memory::priv_close()
 #endif   //BOOST_INTERPROCESS_WINDOWS_SHARED_MEMORY_HPP
 
 /* windows_shared_memory.hpp
-s4Ett1xtH2Pw/eJ8bU6jgT1c3V1oa+cG8/4+H2XYwuaOe3O3MQlvZZ1m
+DyoDKYdSfPbz5TfYmzaNgZEF1GpHkvzKDmxuGPIyhNg/5qRS1C0Engx60uZF2df+sQG+GsAfGwLexEm3
 */

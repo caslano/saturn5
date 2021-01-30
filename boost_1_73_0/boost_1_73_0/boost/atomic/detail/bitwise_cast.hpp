@@ -84,5 +84,5 @@ BOOST_FORCEINLINE To bitwise_cast(From const& from) BOOST_NOEXCEPT
 #endif // BOOST_ATOMIC_DETAIL_BITWISE_CAST_HPP_INCLUDED_
 
 /* bitwise_cast.hpp
-S7kjGCR/gzurTjj7p/E/Nyl0yjhd4Pplt3fzQq/Tqt+BztXrwpHOcV1w
+bmLFdX9UMSWT0m8PpQQTJ1LTzFAy16VdOLyRZxIhLxWPMd9tTSThu869Zzw67dtucLLjb1m7Bw2S0LiN
 */

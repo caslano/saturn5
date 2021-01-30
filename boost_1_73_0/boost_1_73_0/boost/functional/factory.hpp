@@ -365,5 +365,5 @@ class factory<Pointer&, Allocator, Policy> { };
 #endif
 
 /* factory.hpp
-cIwW5LC16Cc3/C3xGGumxtoLFi7CjkXAwlpwkE2s/13qtKZw2Vxwphs5
+CoYMzWaCeV3YwWGhAxhUqsCC1aKJNhE47y8GoUAUyLyFGKSC0O8jwqFpzuEwwEAT6FDqh09KJv4NR3qM
 */

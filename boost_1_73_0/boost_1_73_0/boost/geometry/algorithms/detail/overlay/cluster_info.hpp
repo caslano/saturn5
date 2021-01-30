@@ -46,5 +46,5 @@ struct cluster_info
 
 
 /* cluster_info.hpp
-GmaLq8Pt4ZfvRm9+x8AT/dJ+9vVLfT7DL+vVz/TLvPaB4O3gYL/0E4aa
+5cXSXue51DV3fmy165KBBqCRG0agq8zhndGpZw1ZOU4K0Z8N9oT8Y6tdGZzDmZCkh4o2x8ZZGdGpE2xg
 */

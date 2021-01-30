@@ -182,5 +182,5 @@ norm_2(ublas::vector<T, A> const &v, compute::command_queue& queue)
 #endif 
 
 /* misc.hpp
-AEpgC5gJ7oHRoBCEg09AGmwADuAm0AdHQBB4CzTBLuAJHoMJ4AxYAjqA
+Nz4ZujtOId5PB5ShXoUab6dZFDixvggILshR4KfS3I+nVPiFixB4qGSMUqyI4EkZ4o/4VAKlYBdGpUe+
 */

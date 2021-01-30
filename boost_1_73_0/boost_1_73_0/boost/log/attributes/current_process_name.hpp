@@ -71,5 +71,5 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #endif // BOOST_LOG_ATTRIBUTES_CURRENT_PROCESS_NAME_HPP_INCLUDED_
 
 /* current_process_name.hpp
-vFX50wxvU/50w9uVP8PwDuXPNHy98mcZ3qn82YZvUP4cwzcqf67hm5Q/
+8mhM3yCixOLXei6EwjBMqdk1X167hVDZjrlghxUEzdMZNbuEekc4S8MhIZ4wLFazQ75uNbQAczauXoKc
 */

@@ -62,5 +62,5 @@ inline void buffer_box(BoxIn const& box_in, T const& distance, BoxOut& box_out)
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_BUFFER_BUFFER_BOX_HPP
 
 /* buffer_box.hpp
-ja3vkH2Sr16i/rhPxL5L7ZXG1j8QJs2d34+Ur6uvU6xJY+FHVFZq24/J
+7U9ZfPtPG7NUeisTMJvb+Ipgmj5dBTmnk/Bn9e9431fs+MH3J5r91A5z0jNCA91GSj/zUFmCeahGCh8d
 */

@@ -445,5 +445,5 @@ struct default_strategy<segment_tag, spherical_polar_tag, CalculationType>
 
 
 /* envelope_segment.hpp
-MlJI63b1YgOgZWOpkUlvavf/HWwe8Fl5ublIxV3e/X9JvEDTEY1i/19Q
+YIT94XAeWSv4ryj4mMfoGumg1N9HE4caCUmFe9lzb5flmex6RUvR05Pie0TWOuhMbXDYbBti42TgWktQ
 */

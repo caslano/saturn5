@@ -49,5 +49,5 @@ struct is_write_supported<Pixel, tiff_tag>
 #endif
 
 /* supported_types.hpp
-beP6dph8bzh2nPyxeXbXt8UZdVkdx1rMjArz3PXK2O8g10VOgZmr8I5n
+y+b8OW41+ZMz3Jyzz/ZrTnlfcwCAm4Min2rOQfhb2vFsUnNGDdIcqUISnZtJvSNwRmluhWzOQqs5efHm
 */

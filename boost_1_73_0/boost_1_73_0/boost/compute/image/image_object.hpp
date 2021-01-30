@@ -170,5 +170,5 @@ struct set_kernel_arg<image_object> : public set_kernel_arg<memory_object> { };
 #endif // BOOST_COMPUTE_IMAGE_IMAGE_OBJECT_HPP
 
 /* image_object.hpp
-Z0H1+v3PNwLzHOoIjpwPDw/5/K/sJDh/6EhQfIj+uBUgos0YGWrxlcaT
+/UDGsyn8mYxiUOaBnNiAPrTI/ANgWgE/YOE+nnqG4VbEI1kv5tUt+YDzVPy/llkt7Uu5iAwQOE6JNojq
 */

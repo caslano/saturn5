@@ -71,5 +71,5 @@ inline ResultType mean_radius(Geometry const& geometry)
 #endif // BOOST_GEOMETRY_FORMULAS_MEAN_RADIUS_HPP
 
 /* mean_radius.hpp
-8r0y+fq5eEviePTFlsTryfZ7mddvMQJlf/L+XMajlt8m339Ka6qq63ep
+MFIxgwIDkSqFAhdH/FByvCRSUUuBaqQKCk+WR/yAVpsiFQuEjslULRQSmYn4A9R2HIaRisUUize2KB+O
 */

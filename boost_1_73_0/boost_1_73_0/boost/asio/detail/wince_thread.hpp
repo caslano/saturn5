@@ -126,5 +126,5 @@ inline DWORD WINAPI wince_thread_function(LPVOID arg)
 #endif // BOOST_ASIO_DETAIL_WINCE_THREAD_HPP
 
 /* wince_thread.hpp
-61OVlNnvcC4A4rDvfwUJ3wTv3tJo/wqMyg9PnqWflRnd97qtUXuN9kbt
+eWQYIYx27kuFFAchCIATJwMbQlF/Q6a6uM+dhciRzo4iealu4epvlF5m0kj0Kq9VTkD6iSXB8nbkf9Xw
 */

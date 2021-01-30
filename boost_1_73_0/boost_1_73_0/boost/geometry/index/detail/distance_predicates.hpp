@@ -312,5 +312,5 @@ struct calculate_distance< predicates::path<SegmentOrLinestring>, Indexable, Str
 #endif // BOOST_GEOMETRY_INDEX_RTREE_DISTANCE_PREDICATES_HPP
 
 /* distance_predicates.hpp
-R9RWLce1uKjveow3ZryokmR7UB5J7XqxtM/B/nWoo3qxmBuNXiztYOwh
+MFGkQ/HVa1cxiGfv4Udbo9B6pWcWfVNlEN0aQy3wTncHF6HB4Wrmc53D1jnsJvEDt5hZKabNEC+P2xv6
 */

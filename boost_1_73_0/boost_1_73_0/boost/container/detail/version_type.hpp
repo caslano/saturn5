@@ -101,5 +101,5 @@ typedef dtl::integral_constant<unsigned, 2> version_2;
 #endif   //#define BOOST_CONTAINER_DETAIL_VERSION_TYPE_HPP
 
 /* version_type.hpp
-KZ67mM5z5jhfP/0R4L+1cD4/Ou8SId5l4Vy/33yJoU/jfP7w7CX0/QaO
+s59Ap2a79JALW5tQDVCOQctKofMPjddRwPfs/J+GOkt+tBVs9CbWlgx8tG3S9+4BekHioDLefa/1l848
 */

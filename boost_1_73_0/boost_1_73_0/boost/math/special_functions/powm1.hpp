@@ -84,5 +84,5 @@ inline typename tools::promote_args<T1, T2>::type
 
 
 /* powm1.hpp
-3hGBvX5iQ+wugLcuAVg7JwInnW9B+ikb2k63YeTwCPzueQtysQikPrTh
+ORiK5/QjGGY4PmHwFCbQywiG4TMB71jJL84RJ1/EpWBGNyqJ2dbHWnAryNX+bb9uv8X/D+u7v3a/hU2u
 */

@@ -173,5 +173,5 @@ public:
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_RTREE_NODE_WEAK_STATIC_HPP
 
 /* weak_static.hpp
-jp6JVjh6JnqWo7ZjkSZjO9Y9I/2Lo2eklG1+Evgq8Cng28DlQK5tn7Ht
+LCjBs6OruOknuelQmODkCHUaOPmri3Zq7z99CizjTjptFKYyJfhlAn37E8oU113ByoiiNHVa3x9PxXHX
 */

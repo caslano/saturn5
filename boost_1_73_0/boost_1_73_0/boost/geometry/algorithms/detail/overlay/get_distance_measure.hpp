@@ -165,5 +165,5 @@ get_distance_measure(SegmentPoint const& p1, SegmentPoint const& p2, Point const
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_GET_DISTANCE_MEASURE_HPP
 
 /* get_distance_measure.hpp
-hR+M/vT3Le9T8FP3F2AbNoB6e9ipHZTeg4fjAxtgd8JSp98pFX5SZQwg
+N95OPnUI+mxD3rUlZ6tDwUSnMX9dCncds9bJiNiqsyPz3gODC/jLCPpiNsF+3rKH2Lzze+BsgxHmyLzD
 */

@@ -533,5 +533,5 @@ inline Policy get_rescale_policy(Geometry1 const& geometry1, Geometry2 const& ge
 #endif // BOOST_GEOMETRY_POLICIES_ROBUSTNESS_GET_RESCALE_POLICY_HPP
 
 /* get_rescale_policy.hpp
-dVRGiLKkD4mOEw+L+tR4RNTH56NA9AkjK4S2LcuBvzjqQ6JZQGWEaBfl
+4u9H8no4vS6vm78fz+vi76fy4I7lke/X5UFMaWj2qNcOKhY/9oRZxEObewUGmaoALKOil0gHqh0FxPh7
 */

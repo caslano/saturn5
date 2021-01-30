@@ -48,5 +48,5 @@ BOOST_HANA_NAMESPACE_END
 #endif // !BOOST_HANA_FWD_DEFINE_STRUCT_HPP
 
 /* define_struct.hpp
-oTG894ZeH4ai0CUu1OXNacV3HFt9rP8lYzxL6ttwBgD1bA8a/KwL7x0E
+hNrCvanXvYm2n4DIZItnoZzkbZdetAeIO3u23/pO+CFwcT+P0+4obaw59Pqda9Aah7dd7S6iKqtAgPXQ
 */

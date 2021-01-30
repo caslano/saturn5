@@ -223,5 +223,5 @@ struct close_reason
 #endif
 
 /* rfc6455.hpp
-jtHj1T24VIW818DtgEtAuEK4aXCr4TbD1cEl5BJlw02Emwu3Hu7VXDkH
+oYpel/zOXbPY/eo/Pgkya+JPG7aAOC+ESy5yi//7Td+K0bsVcv/If5c/2sK/J39uvGCQhx9TOt8KlZbS
 */

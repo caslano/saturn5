@@ -760,5 +760,5 @@ void minimum_degree_ordering(Graph& G, DegreeMap degree,
 #endif // BOOST_GRAPH_MINIMUM_DEGREE_ORDERING_HPP
 
 /* minimum_degree_ordering.hpp
-Hxih+t1ZqH9zdhLqegkgDjri+LXCDnaww9cs4LquXc7/V/lUr9PjDuX5
+SgzUwdilZUVM8Zc+VJ5WhCJ+OU8+VwUbjYm3d1sa52x2J4biKno4HQv9+FscQIyj2APy0jgeXb1AMUpu
 */

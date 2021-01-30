@@ -50,5 +50,5 @@ struct segment_mutable_traits {
 #endif  // BOOST_POLYGON_SEGMENT_TRAITS_HPP
 
 /* segment_traits.hpp
-eiKocIhyK+jBTEHK6kPKs5c0rFhOowrz9ZE4XWnfytV2ZaDl/jxAazj3
+2Jv/9R2sEmZMQMTfhBsIHfDVZEPrysD0O96hPAYree0NHI0UOBS4sB7Hfgj0UmoTInBo3iT38J/cTecF
 */

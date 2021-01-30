@@ -91,7 +91,3 @@
     #undef N
 
 #endif
-
-/* generate_by_value.hpp
-BAAALgAAAAAAAAABACAAAAASfAYAemxpYl94ODYtd2luZG93cy9zaGFy
-*/

@@ -116,5 +116,5 @@ struct result_from_distance<karney<Spheroid, CalculationType>, P1, P2 >
 #endif // BOOST_GEOMETRY_STRATEGIES_GEOGRAPHIC_KARNEY_HPP
 
 /* distance_karney.hpp
-v1PUL/yDwDwgmpzxC/+qqB/4j0T9wCOPsj+Q4+kBTtKXgY5pOtbxmuXc
+km6cbJU0SeIXW3hkxZkL5XoLhm0iAtVniDi6aOgfX4z7RZj0Hl8j/clxZBqxFFOyB46aVEekKafjYMAG
 */

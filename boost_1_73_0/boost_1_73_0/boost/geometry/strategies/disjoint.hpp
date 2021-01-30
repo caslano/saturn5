@@ -86,5 +86,5 @@ struct default_strategy<Box, MultiPoint, box_tag, multi_point_tag, 2, 0>
 #endif // BOOST_GEOMETRY_STRATEGIES_DISJOINT_HPP
 
 /* disjoint.hpp
-5eKoDCvahJFhHeeoDGvMURlWxG385pDHRJlV6lIscZTHfLuT7H8Vdox3
+CAh3tsEuJofWDPFBFcQilbxhmvxmOb0xFItJIvATxCUP8GYoNrrEDHoZtuuTzKynQMcDKEZg3V24raTW
 */

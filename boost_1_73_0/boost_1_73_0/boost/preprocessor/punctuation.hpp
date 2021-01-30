@@ -22,5 +22,5 @@
 # endif
 
 /* punctuation.hpp
-WwHu7kJkQFLRosmHA8V5zJtW4oqy0Jsc/1DsEBiVlVDNc7v5wBRtn6jW
+qTIbkGQdn9fIQQcJ55qLhPMU2UEQYEnz+9FYsIwBbaVeOrGS+XY+OpoQZiH4ZhY+2ImKM4yL0ogwpAFh
 */

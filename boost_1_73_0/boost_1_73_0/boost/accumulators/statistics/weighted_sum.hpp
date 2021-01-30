@@ -123,5 +123,5 @@ struct feature_of<tag::weighted_sum_of_variates<VariateType, VariateTag> >
 #endif
 
 /* weighted_sum.hpp
-5Brg48BrPe1H1wFfBl7v6TseTAfXQbOB3wLnAntCyAWe2u1CT+10EbAW
+kuenMFVY49HudaKzl4DUwJT+ejBw97zN4GN7uatMhcEqh4Lpi6ktAcr4Q3Bx5xAKRd+I2Eco2AokllQy
 */

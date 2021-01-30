@@ -176,5 +176,5 @@ T *to_raw_pointer(boost::interprocess::scoped_ptr<T, D> const & p)
 #endif // #ifndef BOOST_INTERPROCESS_SCOPED_PTR_HPP_INCLUDED
 
 /* scoped_ptr.hpp
-1/Gz7b/U/LO0xjzi2/aMsu1fm3qtEmPfMFXbX4g2/B/t/k1h97/x7U7v
+IK16KjrOPYduGXhrTf0amPwlgrXXxAqRzXyPKXOXGc+fqaXnTk3sAOkYpAXq4wZYirRWO/NuGYqCo+ZL
 */

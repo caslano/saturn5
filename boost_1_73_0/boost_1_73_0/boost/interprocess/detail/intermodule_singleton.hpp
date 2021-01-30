@@ -53,5 +53,5 @@ class intermodule_singleton
 #endif
 
 /* intermodule_singleton.hpp
-YCOyaUw+WymZag81xqhmNkRNfVUIXgrBZgjuhOCNIXhrCN4Wgrsa/LSo
+KF3F4tFwI0hESx5GSyNPHzM88U9+JvfhXOrS+QqnHql9oLVR486VaFFbHV/WszLk3H5c2doh5/bReLSj
 */

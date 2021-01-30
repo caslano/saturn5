@@ -53,5 +53,5 @@ inline boost::filesystem::path shell_path(std::error_code &ec) noexcept
 #endif
 
 /* shell_path.hpp
-8IaOVrMjVtaDHy0P3omgzS3VbVzLymTwvJCYp+FZEyFXICZssNpKWQhC
+hDvMIIdOZcDDdYH7MMMiXD0RnMt6ObTHejxcLrjfXf9zuBd0cuhXdHg4tnVy6M3r8HnkXSXR+BKAO0kH
 */

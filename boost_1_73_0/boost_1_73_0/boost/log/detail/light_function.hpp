@@ -521,5 +521,5 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #endif // BOOST_LOG_DETAIL_LIGHT_FUNCTION_HPP_INCLUDED_
 
 /* light_function.hpp
-P4W6c1M9pT+hjwWdkr7kz5/vWOhHqucCPT/pR8IW8rWSQQE6LAo2pL2J
+5LxqtrfJW+Ryeh+5XBzmlMvg2/+v5TLVlkvoPUje6NhmdSA3XDg0VtzxSBcX3nratneylnQ5gSs+59OD
 */

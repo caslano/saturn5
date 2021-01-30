@@ -199,5 +199,5 @@ inline future<svm_ptr<T> > copy_on_device_async(svm_ptr<T> first,
 #endif // BOOST_COMPUTE_ALGORITHM_DETAIL_COPY_ON_DEVICE_HPP
 
 /* copy_on_device.hpp
-lijF1H81UNuDE2QFUJrD0ItGaPt2YKueb6eYb57buZvFSQ/pdowUefyt
+vLF/zDNZPN6kDSuCuacJLA950WtBZ4NuFR1ciXj4g533heI6WDurqEO02uRVnlkzuxrF5T7nPijU8vai
 */

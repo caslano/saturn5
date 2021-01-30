@@ -418,5 +418,5 @@ namespace boost { namespace polygon{
 #endif
 
 /* polygon_90_touch.hpp
-JDWkhsPkZ90PEXpQMbZr0SyWbL5ZTmQuTb8uvIyZRH7GshLGEMQY4LEK
+8yhVcyq+ydS43ucXEgb2UM33PYAsnymbPZKanO0tlmyPkC0FdTeGn7YVAoS973940AvbJEFq+h29puyT
 */

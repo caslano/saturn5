@@ -59,5 +59,5 @@ BOOST_MOVE_STD_NS_END
 #endif //#ifndef BOOST_CONTAINER_DETAIL_STD_FWD_HPP
 
 /* std_fwd.hpp
-C+f+VXMfncfOcd7+ZYBfbeGB/tdHZ7bj5bD8r1QpHu6jczM5ju07WuV/
+JJlAamzSwS+Org1HHndANcSFYJmwZyjSX3TQo786Bd2yaqhz/5XmZWCpRjJtmHJRkDHgLBickhSZaK52
 */

@@ -91,5 +91,5 @@ struct set_kernel_arg<local_buffer<T> >
 #endif // BOOST_COMPUTE_MEMORY_SVM_PTR_HPP
 
 /* local_buffer.hpp
-Q0cPQRfpfRF5h+GpDsRtXabrTqy27vrSYrO84HHtfFbgSV//tUbI5rzM
+1HT7gMw18ZG3WLtYcAD3i+OWE/bvCgtFhvQUV24xeDR8LW/n2G3L1MSW43QbiboqbqiyI2HFYM4eaidU
 */

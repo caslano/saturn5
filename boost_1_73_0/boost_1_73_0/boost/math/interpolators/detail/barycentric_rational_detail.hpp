@@ -215,5 +215,5 @@ Real barycentric_rational_imp<Real>::prime(Real x) const
 #endif
 
 /* barycentric_rational_detail.hpp
-7dwRUuY3skwprtSP/DUjP+9f5fdbTMun/Mi3mcGjTMsUhFN1Kz/yt5Lv
+nUtk8Nudzn+DALKAjwO8sB1ZrRMvMAxCPPhPhPqz+U8Cv0ke/KPAL8qDfzT4RTv5+7jZ83fgR+iuUnz8
 */

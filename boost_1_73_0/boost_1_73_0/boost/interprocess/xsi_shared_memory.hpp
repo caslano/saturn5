@@ -215,5 +215,5 @@ inline bool xsi_shared_memory::remove(int shmid)
 #endif   //BOOST_INTERPROCESS_XSI_SHARED_MEMORY_HPP
 
 /* xsi_shared_memory.hpp
-0bebyZyHY94Ie766NsaYlgMRzuLJxwLsPF9VZxZTrHnsWNvr6Lg8nYnw
+WJaJ59BkV+1Y8sTkQa6knsoQuE/wMu4TCGNwQ64T99LsM7uBTdhypZshM0qC22ibS/VttEt36SrHUOMj
 */

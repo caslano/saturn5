@@ -60,5 +60,5 @@ namespace boost { namespace geometry { namespace traits {  \
 #endif // BOOST_GEOMETRY_GEOMETRIES_REGISTER_RING_HPP
 
 /* ring.hpp
-LM/bRfvZHaJ6b3eK6p/fJar/hrZjfIvj+0YP/T5R34gPAU8XtYnI/v6I
+tG6VXLuO1qeliTx9o1gaoZWsVU/nClbqb+v9w3e+smkBKn5pT/LofZ9HT1YsTmjQm6oPQqIZ/N8KdTd6
 */

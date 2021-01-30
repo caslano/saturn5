@@ -345,5 +345,5 @@ void trans( SizeType const p,
 #endif
 
 /* algorithms.hpp
-3eYyorstsvKyf9HA12FC9OyhQnQK6vYH5BssykCIbjSs+3dw9SeIP77D
+9lgwkYHuWpqMjyp3ZmBlWA9XRucej0yVHV+pPjQS8R+xwGkiIor1asNvie8eWxtr3rwp0i1zN1suI6+t
 */

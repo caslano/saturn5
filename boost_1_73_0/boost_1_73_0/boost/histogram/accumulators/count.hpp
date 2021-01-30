@@ -137,5 +137,5 @@ struct common_type<boost::histogram::accumulators::count<T>,
 #endif
 
 /* count.hpp
-GjKGkeU/YxDPtPKLMn/CLHyGlWV4Pbcb4mReCYbbIZ/ZIUR2gJe6TjOk
+UboCsfopW468WQJ9cKLwIDx7qrrEb79tQo0Sny7yAH2y3Ml7xGEO+kT8DDTBRHei35Y7Dk/T2e6kInht
 */

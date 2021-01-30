@@ -78,5 +78,5 @@ inline Iterator stable_partition(Iterator first,
 #endif // BOOST_COMPUTE_ALGORITHM_STABLE_PARTITION_HPP
 
 /* stable_partition.hpp
-apfb2vxB4Uc0vhVKZ6HyL1K9MjRuRuj+Q5o3Pqf+yK5Nkl16jy3vqKfT
+KUoXoe15ENdv7wRXursuvIC6/1izJIHjh7PkuMzx2hiC46rJEcQsUC9JcorWF1SX4InkcYynQCJnW6tj
 */

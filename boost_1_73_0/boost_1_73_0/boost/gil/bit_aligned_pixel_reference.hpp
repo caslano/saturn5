@@ -390,5 +390,5 @@ void swap(const boost::gil::bit_aligned_pixel_reference<B,C,L,true> x, const boo
 #endif
 
 /* bit_aligned_pixel_reference.hpp
-p/X8Xa6bVj2rnZOlkVHXi8NiU7Hjv6a1oP+oMQVDRwwdw2e2di5bH2ll
+f1Dkn8aGFI/9S86lGPsbqVxJaGH1Cp7UYjnjw8OmP5Rxkk7cgh9K/fho+TAR+905U2z7iENzxCsdIitt
 */

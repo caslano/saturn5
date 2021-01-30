@@ -141,5 +141,5 @@
 #endif
 
 /* digitalmars.hpp
-B9mfd896UNGFsqc4VkOO3IOsagohV3DpGzf2pmPIam+Gt7Yqc2w7pdQP
+hF3rGtCzbrAVoJPe6YcNemVjArSRaJYBCCNyTX3GHxAB0MJOcZrZCBBMN0NX2YmYknavdB68IPtj4GWI
 */

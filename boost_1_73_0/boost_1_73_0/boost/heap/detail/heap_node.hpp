@@ -390,5 +390,5 @@ Node * find_max_child(List const & list, Cmp const & cmp)
 #endif /* BOOST_HEAP_DETAIL_HEAP_NODE_HPP */
 
 /* heap_node.hpp
-Wzsvt38SqZeG1zvqOV9PuXxfxCCkPwexdYDZGqN8D5gKDY+FESxVH9xY
+FD/a7Z+7CJJ0n04UCMnPh3uG1BAEgpaYTXRzcvLEDluPH/jPffjpNd9eJON1vvr7E4zAjCkB+4JgiA85
 */

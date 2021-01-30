@@ -39,5 +39,5 @@ using asymmetric_coroutine = coroutine< T >;
 #endif // BOOST_COROUTINES2_COROUTINE_H
 
 /* coroutine.hpp
-ZXK5ZPtQfny8q1go5Uv9Wy+3CZgmUat+bneaa8bG1yr6rlT8O1Xyacxq
+mO0nqLzSrfvDSr38X9NC9grkFlSq+xbEDSlW+xeaGfvBMfacLWNh8VyKefro+LDPxX8YJuzmf+DnI/f7
 */

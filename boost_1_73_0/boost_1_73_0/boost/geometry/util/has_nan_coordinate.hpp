@@ -99,5 +99,5 @@ bool has_nan_coordinate(Point const& point)
 #endif // BOOST_GEOMETRY_UTIL_HAS_NAN_COORDINATE_HPP
 
 /* has_nan_coordinate.hpp
-ieGqaGVBtLwwHMU2vKikvKDcSNWn6AM4eX/uTKCtZOdWIvVjRhb07zts
+gTjrWN55kFIeUx9I0EF9DaLWdKwxOUwdu4Nx6t4GjmH+AqRu3kaoIZhau1iO6NDl7ZRdPEToq+Fs7Qyl
 */

@@ -59,5 +59,5 @@ struct default_strategy<multi_point_tag, cartesian_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_ENVELOPE_MULTIPOINT_HPP
 
 /* envelope_multipoint.hpp
-9eeJ2go7X9S+/GxRPxcXivqTorw/9UcuBiKNRt6fPe5SUbv7lwGRFrlG
+nwQLdvvnBfpNfuUSVqzJlYCyBwLKNbyZEDYDkHGBBUoCIsw4L4BLs1K/hBVW4tBylIB4/C1csHKYLXWs
 */

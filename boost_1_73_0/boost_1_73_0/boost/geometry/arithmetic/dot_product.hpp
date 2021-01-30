@@ -88,5 +88,5 @@ inline typename select_coordinate_type<Point1, Point2>::type dot_product(
 #endif // BOOST_GEOMETRY_ARITHMETIC_DOT_PRODUCT_HPP
 
 /* dot_product.hpp
-6wyFn8PKLFffyDkfroePZ2ku/NNZmuu+PEtz3dfAzXBgtjFc684guAVW
++BDhsxoRxY7WCWA6Zf0qNVQ0/dShutz4a8zTP4Zia9pypNlOj3bgk1OSk97RCtk3mAtFluoaPfkRsJSu
 */

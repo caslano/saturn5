@@ -175,5 +175,5 @@ inline bool named_mutex::remove(const char *name)
 #endif   //BOOST_INTERPROCESS_NAMED_MUTEX_HPP
 
 /* named_mutex.hpp
-40N/vu4u9Dxur3idIkBRD91l01iAwdiqI4KsT78psma92e7CAr6q05yN
+z+ultKAXicewuV1Fc/sPxILRAXxIMIYF+LKHApxHgvGj+OzDXVbnBXvehUDzDM84PNEzhHG4HEDs+Qli
 */

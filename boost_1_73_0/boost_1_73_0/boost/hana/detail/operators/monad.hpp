@@ -35,5 +35,5 @@ BOOST_HANA_NAMESPACE_BEGIN namespace detail {
 #endif // !BOOST_HANA_DETAIL_OPERATORS_MONAD_HPP
 
 /* monad.hpp
-efR58g5XxscrE/mHJt37LDY/+EdK9kOTE800gQ80yVKZ4DaX+Wc2x1kt
+M4kKj8UaMUMhovJM+OkvGrII570pP1Kxbnc/gHgZJfvMo1T+/evYgVaDgdv6+Nne3Wqe1XEjipikpux2
 */

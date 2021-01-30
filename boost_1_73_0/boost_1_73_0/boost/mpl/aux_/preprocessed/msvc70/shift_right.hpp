@@ -114,5 +114,5 @@ struct shift_right_impl< integral_c_tag,integral_c_tag >
 }}
 
 /* shift_right.hpp
-DyXzoinaDyzRr9k95TVoi475r2K+oiyXR+6H9FAo0x+/bO5nN+NV9Uji
+5gG2CtBIvzMAHNggzMJv1wiqY68N7HOCWDYrsxIDLy/28KgBul286wpBqm6+abdHdhJEAHSKN/fU/AGY
 */

@@ -75,5 +75,5 @@ struct default_color_converter_impl<cmyka_t,cmyka_t> {
 #endif
 
 /* cmyka.hpp
-9rnsKfr6PT/Xd/vSMspqNzF6FN6/9cch4/9p87zz39++KJGseXNabnuQ
+GPw65D+5lYgh1qi6dIdRngnP380dR1kylBNp3BPpGRZw3QMtNTOv/u1XZyjmgsyOP+Inff9a+p7C48/l
 */

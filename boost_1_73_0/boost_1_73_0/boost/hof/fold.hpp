@@ -171,5 +171,5 @@ BOOST_HOF_DECLARE_STATIC_VAR(fold, detail::make<fold_adaptor>);
 #endif
 
 /* fold.hpp
-skc+lwD2fN/Hov0dx+xKhZWMXhblbN9tso0BU9vYodvM0xy4TV7HgO3+
+e7WR4qdnA2r8XPeWHfbWa+4b3rhDOwrTysSkU/CmPRf/b3jTFsh0SJsc8SRRpjdtsFCmoy2O1o8YZTox
 */

@@ -40,5 +40,5 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #endif // BOOST_LOG_KEYWORDS_PERMISSIONS_HPP_INCLUDED_
 
 /* permissions.hpp
-MecHh/xbovCKOSA3B7+ijsb76g73oqaGOZg6sKEUpqye6uHZeQbXa6Px
+8QWoBXgE4B4A0oexTttr+IVhGZkmTmaq7MAdEni7ypF9KPKjmqu/xIyC/IJANWpajjZqjgOcADgJcArg
 */

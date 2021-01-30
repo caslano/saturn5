@@ -169,5 +169,5 @@ inline Real chebyshev_clenshaw_recurrence(const Real* const c, size_t length, co
 #endif
 
 /* chebyshev.hpp
-XELsCosvpJssJ0a6HOefwTHpfKFvyZKBRH5gaWowm5BXP51UjZDlbcs5
++PnK5XKcywwDt8KpHTm3W/y74iG+7e8o8GMP2OWq09D/QT+877SK6Lu0vDJ9Vg70cV2JMFp20Haek2mD
 */

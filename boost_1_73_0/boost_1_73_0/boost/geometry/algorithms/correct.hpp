@@ -360,5 +360,5 @@ inline void correct(Geometry& geometry, Strategy const& strategy)
 #endif // BOOST_GEOMETRY_ALGORITHMS_CORRECT_HPP
 
 /* correct.hpp
-9+uLuA1xjNZXsY0vYv4XgP9ZxOeQx4DmZYAcch7ZApqTAQ4h28hF4PtQ
+HoWOzOjHCiqhg4S2fL1YYfN2B10hUJZBEZbHVc9+tqAbD2bp39t5r8sPsEmACNGUK+xhZpTH0AIbC5yj
 */

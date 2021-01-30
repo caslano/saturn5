@@ -288,5 +288,5 @@ void read_image(String const& file_name, any_image<Images>& images, FormatTag co
 #endif
 
 /* read_image.hpp
-+T30Vv7NatwL8suvEiOmiSrRU6wX0eL7YoqI4d8Yvy7jvwVUl9B9UPgq
+nv9OyRD6WhNK6ukqhFJt8/wN/m8Jsxf9GcrAms8g2iijJdJuWdYvita0f/yEofUac/PERzI+1zjoF7cz
 */

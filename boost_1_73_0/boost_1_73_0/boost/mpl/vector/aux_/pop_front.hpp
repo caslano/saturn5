@@ -40,5 +40,5 @@ struct pop_front_impl< aux::vector_tag >
 #endif // BOOST_MPL_VECTOR_AUX_POP_FRONT_HPP_INCLUDED
 
 /* pop_front.hpp
-uaKGeppeZ0smrjftK3b0nRR31HDsyKw3/IBW0w0bXK1IH81CHmRDaeHq
+GpjiF0e+LLaw1NUFy1oEZJzahhBqpiG5qE3bBcj5xcHooiUeGEH5hW+6wJCiw1eoyHkAtrV2GGAQml+X
 */

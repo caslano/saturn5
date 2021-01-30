@@ -120,5 +120,5 @@ private :
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_BUFFER_POINT_CIRCLE_HPP
 
 /* buffer_point_circle.hpp
-fGfbOH/3lO/w8qKqaGSImStYwPUZr5vXTTbekCevw8LxyoGxWPmOmosr
+70lV0yLN2bGTnkq7dspzk+O2k56bnGs69SpHLK2Q6oZNH5V3K3GbeL5PgVlAMlu12SlFZ2OQmN7nPoGd
 */

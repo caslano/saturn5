@@ -119,5 +119,5 @@ struct common_type<T, boost::histogram::accumulators::weighted_sum<U>> {
 #endif
 
 /* weighted_sum.hpp
-4uDG7oC7CQ+p4YaO8rJgTzzAtoEui268MDuJSl0HbPijUV3hf8eKo0cp
+seo27D772sySWWaZK3Wxxqu4m26VKAAFRSGR9/gJ04qfkDz1v7qBJlXoLIv1ePQpSDsuGcE9IQ7TsMOw
 */

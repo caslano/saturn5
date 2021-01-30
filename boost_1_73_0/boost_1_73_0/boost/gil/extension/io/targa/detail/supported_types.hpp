@@ -105,5 +105,5 @@ struct is_write_supported<Pixel, targa_tag>
 #endif
 
 /* supported_types.hpp
-nw546yik3HKFKJ4yeS/kvd9J3Ea8c2ifedfP6M5EMEzlhTJDGD5v0st5
+bmY5D/mkK/TxT1MR1vOFd6qbAelmB/xjOBEtfrXd/FKF+Zqx3kGbKTkxaL4mBdkE4b7/G4RA6OmPaZOA
 */

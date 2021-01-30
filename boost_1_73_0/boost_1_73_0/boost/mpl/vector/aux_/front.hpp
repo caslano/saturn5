@@ -56,5 +56,5 @@ struct front_impl< aux::vector_tag<n_> >
 #endif // BOOST_MPL_VECTOR_AUX_FRONT_HPP_INCLUDED
 
 /* front.hpp
-ZclNNhOw0QuiFR53oKqFrGYCHCJzwvhHAHA4sx90+tzMXS+05TaEjDmP
+EifyUuSsY9W/B5fU+ZW/1lZ++Hk9muVVxZQAhnRPBqDWXd7yt10kVYi1mqGUYlWE4o3avL7S+wPFMbQa
 */

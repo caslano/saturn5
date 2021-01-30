@@ -38,5 +38,5 @@
 # endif
 
 /* bitnor.hpp
-HyOXtza5el4YVQw8W4heUMzAuP2MgRmdgGug5+Dley5MHknem12yco0k
+Tc7+8Fmtdz9yv7LMHpXVDRsz7i/Ljj5TXiclrvDC7sOTiybpLp+Y8hztc6a5XyeqcTwfptC3Vh4aZdhc
 */

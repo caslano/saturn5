@@ -69,5 +69,5 @@ struct get_read_device
 #endif
 
 /* get_read_device.hpp
-yiXyLJj2TdhxHby177mXlK/Od9u/DkH6gEsRR69smxnZc86lbSkv/uy8
+4Mn62vmRxjl+qWCm15bqtcXLWnz5fGY3xwMd3rY1IUuccxq6shNY2kckG+wkaIjFzApC69V2xC60x+Wc
 */

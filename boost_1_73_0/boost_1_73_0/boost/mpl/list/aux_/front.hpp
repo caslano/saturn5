@@ -33,5 +33,5 @@ struct front_impl< aux::list_tag >
 #endif // BOOST_MPL_LIST_AUX_FRONT_HPP_INCLUDED
 
 /* front.hpp
-2SD3j0tz5yydeED1g0N8Oi681zwqlkDvVVZ9u8M9u+Wtj2rB3WzesT7F
+AurnIi9RNgM7J11fjnemHe2ScFDOdgf6hGzpl4TCyL/E2+tVIdPKmrjQMzAH/GwbDVRQpy/1EpQ4hZ08
 */

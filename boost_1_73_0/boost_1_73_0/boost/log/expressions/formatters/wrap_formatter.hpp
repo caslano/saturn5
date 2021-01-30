@@ -342,5 +342,5 @@ struct is_nullary< custom_terminal< boost::log::expressions::wrapped_formatter_t
 #endif // BOOST_LOG_EXPRESSIONS_FORMATTERS_WRAP_FORMATTER_HPP_INCLUDED_
 
 /* wrap_formatter.hpp
-J2xA9nDKNFbDVC7GoUbqt3JOfSP1WWEzGn1/xbUbGqkvSZ2ZjaEfod6s
+d2xlt7wGpxjxJHW38ORAemsLbi/tdk4UddJf8cqqRC9l0xr1NLJvdppJPcWfpjtEeC0a0j2v/Lu8Bi9I
 */

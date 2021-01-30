@@ -255,5 +255,5 @@ struct as_feature<tag::weighted_median(with_p_square_cumulative_distribution)>
 #endif
 
 /* weighted_median.hpp
-Ahxi9H6UvT/V3lcCHwaeY5+fB/wj8CLgWuBlwOeA84Eb+B4V2gScB3wb
+m0RWESNAi7e1EEHmm8FSzyZMYnlPlr3MMOeRQ7sXRHRMOLqXGvBgIwHU+TshQKQ6/NfN7dhKAHKIHG2+
 */

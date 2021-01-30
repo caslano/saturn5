@@ -485,5 +485,5 @@ inline CoordinateType longitude_interval_distance_signed(CoordinateType const& l
 #endif // BOOST_GEOMETRY_UTIL_NORMALIZE_SPHEROIDAL_COORDINATES_HPP
 
 /* normalize_spheroidal_coordinates.hpp
-SaWVB30fj8zqdMVlLUd1jtYtI9A0j/cHXHt4k7EZjx731OevHfDv68e9
+vyH80p/FX/+OVdTOAIq+Ar3t7JX1jSsfQ1F1bLjd6jiRDis9aUjUJsXulK736gVKV0rfUZBHypQAjcI/
 */

@@ -230,5 +230,5 @@ inline bool operator!=(const basic_pipe<Char, Traits> & lhs, const basic_pipe<Ch
 #endif
 
 /* basic_pipe.hpp
-NB62jnpbg50RuoK4wf1tnV3+EFgG97f0tLfT+7UsXhP27wjQsbMsXuPv
+Y1IHiavjDKYwulaeJPaebHVQqPpD7XFKmPtKc4ESWAv0s8HYdzRB1NGROCiIIjZyHApaDzdYeyh1B6AX
 */

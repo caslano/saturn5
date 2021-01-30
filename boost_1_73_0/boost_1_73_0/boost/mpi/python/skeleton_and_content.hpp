@@ -209,5 +209,5 @@ void register_skeleton_and_content(const T& value, PyTypeObject* type)
 #endif // BOOST_MPI_PYTHON_SKELETON_AND_CONTENT_HPP
 
 /* skeleton_and_content.hpp
-6IeyW9hIF+zW6TT/JE7tT1Pgc9vh04oDlqDYbTTHRKVrqKjOVMhNGqTG
+kja2U2n3S4uIEcQVhSO8rOkoLKG40Ij1ZYtEcX4hqDGSX9g5btHYMwBOoGzsaMlbBEJpEedsAigZE0PF
 */

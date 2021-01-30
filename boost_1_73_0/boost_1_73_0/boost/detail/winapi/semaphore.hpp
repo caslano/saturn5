@@ -24,5 +24,5 @@ BOOST_HEADER_DEPRECATED("<boost/winapi/semaphore.hpp>")
 #endif // BOOST_DETAIL_WINAPI_SEMAPHORE_HPP_
 
 /* semaphore.hpp
-V6dTGoheaxGdNy3FvB+9t6Ub2/3YSAHdtfbISmaP/AhPUQSDksrFEeiy
+rpSpaZQz+fezSfEX0PCEDwwQGd8rWWJqrygkAfA8wmfO8SPEDe6MxKGaMD7cF5ilFP8G7aEeXDig8aou
 */

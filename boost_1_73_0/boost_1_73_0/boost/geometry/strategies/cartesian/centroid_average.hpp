@@ -128,5 +128,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_CENTROID_AVERAGE_HPP
 
 /* centroid_average.hpp
-Q1q5NvL+4WjU5tknn3zy6b+VtrT/31+apYyRjWRXOWlS7eNjfXzDJ598
+ylKfRKt/sZkZAqeipV0OgyLpAPo7m6FIDM+A7FIEpGTD5vcGvQQWoV5572s5mstoSCUuIeZosbwnoqjl
 */

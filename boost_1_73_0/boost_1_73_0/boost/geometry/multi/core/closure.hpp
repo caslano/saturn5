@@ -19,5 +19,5 @@
 #endif // BOOST_GEOMETRY_MULTI_CORE_CLOSURE_HPP
 
 /* closure.hpp
-fFspmSHlnRMX4tlFc9x4kmuxjp6Pe+brFN75CVdp/tzrjvaa/mh3n2t+
+QPgYs/sw1IAKkt9SG5PqoQEPGNWlqIfj41QYN2LZ/d2q5/Whsp4wOrd2JvWl2q3CSq+of41ZxtypBIPB
 */

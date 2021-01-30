@@ -173,5 +173,5 @@ inline bool named_semaphore::remove(const char *name)
 #endif   //BOOST_INTERPROCESS_NAMED_SEMAPHORE_HPP
 
 /* named_semaphore.hpp
-2sNxAXP9D3HvAR7HcaR/L0AwJwBLUhSDREpUTkgEgxIXuwtgxUXg7oKk
+n6M4fPGjFOSlcz9BQR4+N4SCDF+Lu3Br2fmVPe+rQKMOz3nMPzeE8xhm/p/7CQqifT+EggyPzsffIzpe
 */

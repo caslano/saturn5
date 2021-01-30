@@ -29,5 +29,5 @@ namespace graph
 #endif // BOOST_GRAPH_POINT_TRAITS_HPP
 
 /* point_traits.hpp
-mHCVfHmcbwbnmyn0u7KSOF9vzof5x3I+GJcBLkfaiEZbMBYw2Hny7Mgg
+3oGmg8h3oeyAPGlgcpbxhli5K3mSSjdNdNPuO2CzQDCDYoLGvs1iEm2NULYcQZhUBpCnCVFEO6tHHRdx
 */

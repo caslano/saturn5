@@ -93,5 +93,5 @@ struct num_distinct_consecutive_points<Range, MaximumNumber, false, NotEqualTo>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_NUM_DISTINCT_CONSECUTIVE_POINTS_HPP
 
 /* num_distinct_consecutive_points.hpp
-aMu3KQ6kPv9rquNzIvbyDH30Cuk7Jup7lbAaEfsXhDRJ37+RD6Sy/0G+
+O2uq/Y1uH/U03ggA6B8vY21FfmAX9bXNz/wCBzm/b6f0vAwPd3KV//c9p166MIOTbVkVTj6Ig2OZeb+N
 */

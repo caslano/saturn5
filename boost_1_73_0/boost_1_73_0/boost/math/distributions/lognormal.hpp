@@ -350,5 +350,5 @@ inline RealType entropy(const lognormal_distribution<RealType, Policy>& dist)
 
 
 /* lognormal.hpp
-OzZSI+M202FfCVuFGWD5FGkREHx/H/xYCT/AB6+V8Pk++GIJP1jCWzJy
+NomC6Wz43E0uKxEpJAPHf2/f3H9hebj3IEvPkqId2SHOtq27QiYuO8T9f0gjGWlonWnQ+b85qB/RNQxd
 */

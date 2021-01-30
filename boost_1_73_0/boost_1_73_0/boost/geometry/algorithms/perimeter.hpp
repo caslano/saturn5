@@ -234,5 +234,5 @@ inline typename default_length_result<Geometry>::type perimeter(
 
 
 /* perimeter.hpp
-cKq2bfBl72E4M8HH7mNY0TDGAuw4wxwjmw1GE8es4WF3dvLwE75OXRgR
+D51y1YuTyxRapjXGa7tfB+5fEWs26kwLbtqSeKj06++UQMtcc+Z3m826Gk5gDPRtSXzTpprfbTI+X2q0
 */

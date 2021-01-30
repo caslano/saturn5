@@ -192,5 +192,5 @@ struct is_device_iterator<
 #endif // BOOST_COMPUTE_ITERATOR_PERMUTATION_ITERATOR_HPP
 
 /* permutation_iterator.hpp
-9dd1XA0q0z6NNT2+/9KJnj0Gpr8SRN8evuj+wTdX2uhbwgqWF99cuQ0t
+1LLz9uStN4ZIUMlmRW3WUrKcRJDITH76yPJSf6Sh1R9LHHeyzDQfv9hxGSHbDjHkdser0N1DZZ1lXFCX
 */

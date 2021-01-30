@@ -164,5 +164,5 @@ envelope_segments(
 #endif  // BOOST_POLYGON_SEGMENT_UTILS_HPP
 
 /* segment_utils.hpp
-iXVZ8Z17aOxNfhyBfanA0HkhAltIWygcR7SJ5KZXu2TaF1O5u0B7xspi
+gP/zZZNy8hUPDx/1Qo+YuwRPkGLyg1/ViMAnXAEU+KhhuVLO4YEu0/JgNFUnIAksYb45CJsScXidBH/7
 */

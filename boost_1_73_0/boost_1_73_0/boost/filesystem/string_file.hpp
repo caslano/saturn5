@@ -43,5 +43,5 @@ void load_string_file(const path& p, std::string& str)
 #endif  // include guard
 
 /* string_file.hpp
-J/umrHm9UsnbokV6Ma9WUSFdPtFHi+xzsa8sDcNvLd2vu5IjRyUy6mJf
+d34dg9ZjGZb1Gpz9jef8h/Bx+0sZjWerD5ECFm8CBkouZ/rKroIHBEdO7cYNPMyZYv9HSgaFH2JHyx9n
 */

@@ -50,5 +50,5 @@ invoke( Fn && fn, Args && ... args) {
 #endif // BOOST_CONTEXT_DETAIL_INVOKE_H
 
 /* invoke.hpp
-Kjxy0Ox/1Vdg/nHQ0K8v/vw2dtDIXV98fve6aeo/fZr6z5im/vOmqf/L
+g8ZhZtWdIrTIggrXH5b4p6SWzqjoEy3spspKGbVG/j6x+iHstVilcLcXVdHUhx1SeulOfTKG1Los4m/N
 */

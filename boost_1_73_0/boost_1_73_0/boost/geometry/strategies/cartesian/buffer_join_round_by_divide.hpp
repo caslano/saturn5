@@ -154,5 +154,5 @@ private :
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_BUFFER_JOIN_ROUND_BY_DIVIDE_HPP
 
 /* buffer_join_round_by_divide.hpp
-iqFlE8uPr+943bFrgY23+T3JeG1nYonvkDhdJaL90uLsW1Rk5OfqM063
+264xZuRG5tptkbl50jsI1JiCus+h1zrlxRv0QbSMjXPhDwLxmpbGUiN7zGVxbUwc7pRqLHAjnOJdbkUd
 */

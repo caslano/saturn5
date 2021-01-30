@@ -70,5 +70,5 @@ struct x86_fast_rounding_control<long double>: detail::x86_rounding
 #endif // BOOST_NUMERIC_INTERVAL_EXT_X86_FAST_ROUNDING_CONTROL_HPP
 
 /* x86_fast_rounding_control.hpp
-7mXN7jb0270oqvYe9QKjbiWBLhNJ3gdfjDnVHUO4dB+POfZb97tnj8X7
+z69o/vBXdF6orhTkqmuHQw8OFivL7wY9mvvOMQJhuiR2av0aKcgkg+Ew8k3rZhwsdDAnYar+qfbB0YVW
 */

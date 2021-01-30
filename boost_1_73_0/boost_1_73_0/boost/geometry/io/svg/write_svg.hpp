@@ -28,5 +28,5 @@
 #endif // BOOST_GEOMETRY_IO_SVG_WRITE_SVG_HPP
 
 /* write_svg.hpp
-sbz9DaLyse8iPI9nl7vxFETLaxsP6yrT2vh+eVsYq1lPVcFUXm96Pbj8
+jnxgpzJZhpa9sfiLc6dfO0kbIjO4idjiB0csXz7kxi6WD6WxMfSw8UY4LVYIMfIzSBq+2cqp3+uKLqFB
 */

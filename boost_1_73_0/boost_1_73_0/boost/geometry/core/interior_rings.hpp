@@ -150,5 +150,5 @@ inline typename interior_return_type<Polygon const>::type interior_rings(
 #endif // BOOST_GEOMETRY_CORE_INTERIOR_RINGS_HPP
 
 /* interior_rings.hpp
-9PjCszcsvPHKVls6//K7irfd9SdN3xANle0xJvp607lnXftyp9//DkP2
+IpBxcHydp9paFnpy7sRmZMtfRUfr5IzaGDWpYW440F+/h5m0Bedi4zGZVf0WFSjJr0OE3wn8KTZGxjix
 */

@@ -86,5 +86,5 @@ bool is_allowed( const image_read_info< bmp_tag >& /* info */
 #endif
 
 /* is_allowed.hpp
-cnL1TNa0stbN1LM2leeDJHq2kcRH8RGScfQHJHx+TOW62VNvSuu9KEu9
+NOp4FLsju52zi8p7Kdu6F2Wvkyupb6wtoxpqZxjerkLTMLZwBS5ZgWpV0CUr6ElUkGUYHHLc2+OLtDhn
 */

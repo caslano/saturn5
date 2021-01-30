@@ -95,5 +95,5 @@ inline T proj_qsfn(T const& phi, AUTHALIC<T> const& a)
 #endif
 
 /* pj_qsfn.hpp
-BfYDngLsD6wEDgBeChyUoTplgzNUJ+RI5ht4FPMNHAZ8ATgc+CrwGOYb
+UjUjxehioo73d71pnCSappG4vzhplUxYrXpIElapxX2E1ezo3f1I22CctP17guLKkxTX+H4UlyvoZxRi
 */

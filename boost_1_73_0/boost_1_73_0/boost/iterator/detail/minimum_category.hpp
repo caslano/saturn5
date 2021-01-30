@@ -19,5 +19,5 @@ using iterators::minimum_category;
 #endif // MINIMUM_CATEGORY_DWA20031119_HPP
 
 /* minimum_category.hpp
-NYExsY4YxsR6YhgTZxDDmNhADGPiTGIYE2cRw5g4mxjGxA8qC3vdfCgw
+T1ViMUFVA4JCTx8vzah4j6u+qO8OY6bf42u6ZyXjYewy37kXVWjtvvIwNIyfrS5HJMiilw1jAw6P9d8U
 */

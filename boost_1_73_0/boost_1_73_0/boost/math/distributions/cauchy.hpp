@@ -369,5 +369,5 @@ inline RealType entropy(const cauchy_distribution<RealType, Policy> & dist)
 #endif // BOOST_STATS_CAUCHY_HPP
 
 /* cauchy.hpp
-72p5GOvqu0HLiNbLVwLa5URbyrMuK0hn9ARVH1zF/7H3pOFxFUfWezO2
+pxEqHeZAR94nCtTr+Rk3XI2i4Zg9JgWyN8k9e6Q8D5L8dYj5O/LaVaohSf7Wkh6uQ8zfb2xvJH/ZtjeS
 */

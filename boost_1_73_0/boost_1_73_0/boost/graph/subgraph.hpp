@@ -1198,5 +1198,5 @@ template < typename G > struct graph_mutability_traits< subgraph< G > >
 #endif // BOOST_SUBGRAPH_HPP
 
 /* subgraph.hpp
-nJWfDnR/55m27bhJnaVd1vzQqU9euil1+vJAycwlDyW1bTcNTkb6K5//
+wWZaFJytKM35pzE702XUHWnot8MXzNnQ/7mdRmEESfjaYWkgAzt7SwNrbD9VLemUasnfXgi1pIvVkrQY
 */

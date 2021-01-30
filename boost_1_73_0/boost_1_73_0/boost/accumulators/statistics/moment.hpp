@@ -132,5 +132,5 @@ struct feature_of<tag::weighted_moment<N> >
 #endif
 
 /* moment.hpp
-kfSbTDOaSVvoQeG7E3xXCd03wnc/4Zvugx+U9Gcolx4j54fWyLPtJnO+
+txPeS6Vc72JUN633ek7otvc4OI6dZU738BSfIf6k3d8X2uOi/qJLALgipDmNuL6Td/Z+dcOta/+xdHdk
 */

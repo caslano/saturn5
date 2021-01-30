@@ -369,5 +369,5 @@ struct is_write_supported<Pixel, png_tag>
 #endif
 
 /* supported_types.hpp
-W2Pq6XpfyhfZFu9Mx865MhfDFmAEuef4d5PYzjD5xsbgPhLbnjaGLA76
+NgSha/i3zkWXxtIexS+/rLn+mJpRaWZNJhiLqUdrqEfLqizPWCelfYRf3Eh99uxWE9ezuDGK7OARcdVd
 */

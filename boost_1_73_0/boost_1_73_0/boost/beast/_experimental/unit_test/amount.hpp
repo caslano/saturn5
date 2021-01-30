@@ -59,5 +59,5 @@ operator<<(std::ostream& s, amount const& t)
 #endif
 
 /* amount.hpp
-+3eY/fnh3vZMvrfAExxghMIYKL7iMti333ihH6iM+sFb45I+CERb0gyj
+LDI9QjCvkA0HILtOk+bGDnD7Y3koEriedegnDI+vJrbHN8qSiReE9SuNlbbQz2qYDZC84r0V5a8niPme
 */

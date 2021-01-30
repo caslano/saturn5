@@ -80,5 +80,5 @@ bool is_permutation ( ForwardIterator1 first1, ForwardIterator1 last1,
 #endif  // BOOST_ALGORITHM_IS_PERMUTATION14_HPP
 
 /* is_permutation.hpp
-X0USe2T69tL+9T5b7BjU+mIaQf+Nzwea3aadlXWV0Jzm5UD/LaGXvnQ7
+BfkIU94DjoehJqrvbNfy4eb9DPuLB28G7V+b2j0Y67dMshMVWLWik3Ss54uvcNpaiNXWrPLqdHAwTVX+
 */

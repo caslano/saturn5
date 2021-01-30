@@ -976,5 +976,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_GEOGRAPHIC_DISTANCE_CROSS_TRACK_HPP
 
 /* distance_cross_track.hpp
-hEX2Oxw/8m2bcv0I/BPPsV2/DWwq6qeesjk/Wpmcn0R1Z34W1ZnZaPvs
+NZ7KCHtwO7zeTB68/84Ob+au/sJIlgA7QR6wXd10k82gOlb9yzQDobryGcrz7bupJ9fPsskAPGkdHYfY
 */

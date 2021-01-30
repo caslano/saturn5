@@ -175,5 +175,5 @@ struct default_strategy<box_tag, geographic_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_EXPAND_BOX_HPP
 
 /* expand_box.hpp
-Fac4/Fb15d29P/W6PzF7//iMwN8OrDxhwg0N3x31QfvlXZJ7YY0vuf/1
+OBzWZqhCKt05/jfZc5OyB4LxAvlUIDdR4EJW+ip1WHpfSUpkeVKP7f+5fP7/sfyE/2P5Sf/H8pP/j+Wn
 */

@@ -158,5 +158,5 @@ struct seek_if_impl<any_tag> {
 #endif // #ifndef BOOST_IOSTREAMS_DETAIL_CHECKED_OPERATIONS_HPP_INCLUDED
 
 /* checked_operations.hpp
-GOz5XMtbwedZ3gY+3/J28AWWd4AvtHw9+KLA0/t+WfhiyzeAN1q+EbzJ
+K43usKKUBuFK+LHwW5vSIC4kv/mTftzfXqOJ1P3uHbiRh+g9g3/U27Utq5Xj5HZqC11qYpUI9TalUSKc
 */

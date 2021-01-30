@@ -89,5 +89,5 @@ template<> struct value_type_wknd<int>
 #endif // BOOST_MPL_AUX_VALUE_WKND_HPP_INCLUDED
 
 /* value_wknd.hpp
-0Lhz+4YtulevXDPlXrjEAf/y+/+rO+j+x434Hya4qxn4K01el8Qr3qcI
+DM6tWQgZYoyRmFB+AF54+Z2waKv3lUtIr3KG3ZEylsBX5UGXi7DOl6C6WHQ6eDHMdi1WxeARsfyOXaz4
 */

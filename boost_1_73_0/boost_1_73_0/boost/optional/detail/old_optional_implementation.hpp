@@ -1058,5 +1058,5 @@ class optional : public optional_detail::optional_base<T>
 #endif // header guard
 
 /* old_optional_implementation.hpp
-3X8zld6ICS6+/B3wVeeEXf5EfL2OwqbSAOlpOEibhTiagbidjsiyx5mT
+rRR+yLZLgSSHB5HnV7JGxeZ1oefQgb2JRGGOW5rn4NnuMZ4DvNozVWin8VrgfIVedwtUS/MhJ7YT3B6c
 */

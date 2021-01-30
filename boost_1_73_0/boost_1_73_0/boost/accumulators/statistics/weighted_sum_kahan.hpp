@@ -146,5 +146,5 @@ struct feature_of<tag::weighted_sum_of_variates_kahan<VariateType, VariateTag> >
 #endif
 
 /* weighted_sum_kahan.hpp
-uIrzsR0D/wF8CPg98A/AUtTrCWALT+872HveC/0PT/WwiVzcXfcbWA88
+LYGpMHmklGMVSZgDUOtPAN8dTcqtyS9E4frUx6Fw2UV2f5+oxBaDOtwA8CaGnrC5P3khaJ2MApS45ZD1
 */

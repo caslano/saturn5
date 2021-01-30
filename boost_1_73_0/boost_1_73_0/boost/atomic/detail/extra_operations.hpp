@@ -28,5 +28,5 @@
 #endif // BOOST_ATOMIC_DETAIL_EXTRA_OPERATIONS_HPP_INCLUDED_
 
 /* extra_operations.hpp
-7RH6obo7KONvqKvmv9hz+7K9Ep4hX9p289jbcqyVlRdXp8VYx9U1TUx7
+V/T6Daj+n9RmQxhWSSzPjXVhAAbngNd2kG8nY26lzr0VrHZpVOu8ZpRV8Was4/YFn2nkA2bl5iNkcTkd
 */

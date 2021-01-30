@@ -217,5 +217,5 @@ BOOST_HOF_DECLARE_STATIC_VAR(decorate, detail::make<decorate_adaptor>);
 #endif
 
 /* decorate.hpp
-zHwryDn6noa2K6yz7mdbODv0PZkfsJceS7VyNoBZj8LKdr26n7MN35fv
+wcMqi9RnzqHv7l+IEVmkZkRXhRXNF61LkOxr1CVAnnjLV3jLdzddK5UlYU5Po6T9ncvLY3soRqqk0jKm
 */

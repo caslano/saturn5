@@ -655,5 +655,5 @@ struct is_nullary< custom_terminal< boost::log::expressions::format_named_scope_
 #endif // BOOST_LOG_EXPRESSIONS_FORMATTERS_NAMED_SCOPE_HPP_INCLUDED_
 
 /* named_scope.hpp
-wPPr1QdGxwX18INg8cVCJ7fWmzwXFEz9RU7/afjihFeT59Otsk9sZobY
+FfT9UeT6cDJzSydtZcZhiGUZ7nYXC/H0IRRgoDnIZSr2tHmLfR62ift9bKXCCNUfgOYUQ6ZiFbGVYfZ3
 */

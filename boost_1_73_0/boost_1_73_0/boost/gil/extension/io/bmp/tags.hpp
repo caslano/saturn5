@@ -159,5 +159,5 @@ struct image_write_info< bmp_tag >
 #endif
 
 /* tags.hpp
-QelkvTa+hvBBha/hfBKfUu73Rv48pqT4HdZXBi9PqykcZPL4a3xF+V2K
+v+Ftx4VO+WHjphUgoGfa6HRvgzDbzOqVynksu69gWJvisOoY1hKCVb7H8B6XsBhQq3HTcgnlMEIkD4RF
 */

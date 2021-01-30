@@ -73,5 +73,5 @@ T& win_global()
 #endif // BOOST_ASIO_DETAIL_WIN_GLOBAL_HPP
 
 /* win_global.hpp
-cfZ5DkI8oe3qZr/A03nGAPZ3s1/E/mvsD7J0Hcz+PvaHWnoCH+aB73N5
+woLsuRhrV0QHNOZKWKfRzJKp/FXUt4W4hc0V5l0Xa4HZ3Aayzu+sHGoHEC/crzSv3fQCEuh/Lou3VrEF
 */

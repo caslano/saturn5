@@ -48,5 +48,5 @@ make_sec_ws_accept(
 #endif
 
 /* hybi13.hpp
-yl93pLHRRF5lc7gtklIPNTY2JuBZ5EW2bkKN0XJZSWcP+2eGZhWtzFgU
+e/6J/h7jkx0syg5mibNL8idXC/9HkYcUZUVl3R7+nZZPzf3LCwkpGxH2tralrmUrLDL4jf8R48c+OdrU
 */

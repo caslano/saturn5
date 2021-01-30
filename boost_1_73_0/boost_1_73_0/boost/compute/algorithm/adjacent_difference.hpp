@@ -126,5 +126,5 @@ adjacent_difference(InputIterator first,
 #endif // BOOST_COMPUTE_ALGORITHM_ADJACENT_DIFFERENCE_HPP
 
 /* adjacent_difference.hpp
-jZXiA2lT2092cv2JgZHBQSHPRU2eSCvxglIoiGnadF2uKPSL1aAojxXE
+cVcyoEUxjWqwMzVxmSpKCqmiX2m4mozzfCILMvvPSZtcDGEiLEsH6Iv3KlsBCDn+oDLZIU3nDFr8VK60
 */

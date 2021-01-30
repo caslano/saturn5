@@ -24,5 +24,5 @@ BOOST_TYPEOF_REGISTER_TEMPLATE(boost::ratio, (boost::intmax_t)(boost::intmax_t))
 #endif
 
 /* ratio.hpp
-7xDKOYb6r8wRe9majucH6LUJ7ZDqlvx+1C8RdrMG7dqGcnc6/YD7uM4j
+oK8GOndiIFowVE0ebUS7TdvtGB2wG48sxpceyiG+TGyA2ITgTrTp/pwe+eaLPth3xBFJCUJiLG9y5B4x
 */

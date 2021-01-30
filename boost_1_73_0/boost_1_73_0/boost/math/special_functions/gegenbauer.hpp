@@ -74,5 +74,5 @@ Real gegenbauer_prime(unsigned n, Real lambda, Real x) {
 #endif
 
 /* gegenbauer.hpp
-og6Gm7K5jYmcyJefcPc7PePgczQcIOQHO3H/EVen/ayhr3LRpm4cA9xL
+uuJCslWTUYkKgozZp5esonO0tJtVpcJIOD+b2eWX1OeYecctwrbeImzzLcJqbhGWmpaQNgOXjwKSmc8n
 */

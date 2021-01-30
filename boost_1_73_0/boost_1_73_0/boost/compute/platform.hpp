@@ -258,5 +258,5 @@ inline boost::compute::platform device::platform() const
 #endif // BOOST_COMPUTE_PLATFORM_HPP
 
 /* platform.hpp
-LoAZcBXcADfBMrgLHoAqPMxsoB7sBS1ABiFwBCRBHrwLxsEZMAUugTlw
+rNdXQ+YkPYmj1NTmvepG22FjT4c/3E6W7VJbV9N4yQ3IraldESHnGfmkUTfrlbw2Cs/1+pR6pQr3J7Uo
 */

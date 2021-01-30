@@ -200,5 +200,5 @@ BOOST_HOF_DECLARE_STATIC_VAR(infix, detail::make<infix_adaptor>);
 #endif
 
 /* infix.hpp
-24LdqTD1+Ruwuy3YfRbsIQv2Ewv2hAV7xoI9b8HMni8C+40F+50Fe9OC
+Xk3kfkLCVJQZixNMX2eACkbuMPeDEp4bGS0vcmBrYlNHgU3ehWFbuJhZ8BH/H3H/AxdVlT6O4zPMBS4w
 */

@@ -331,5 +331,5 @@ struct feature_of<tag::weighted_extended_p_square_quantile_quadratic>
 #endif
 
 /* extended_p_square_quantile.hpp
-zlYp92GzL7U2000b62/Rm4RnHrm+5MqIxvq6aVX1Z9fUXRDZ4Dzh1cs4
+KwR3FqRKyQUhlhaRz6hPZDR5AMXm+ruD5/4YUfnABalTCARVTwolr4q6mQnj9UDn6wMOxgeA9ddona8q
 */

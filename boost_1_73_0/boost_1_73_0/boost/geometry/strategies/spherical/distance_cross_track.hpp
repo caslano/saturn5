@@ -851,5 +851,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_DISTANCE_CROSS_TRACK_HPP
 
 /* distance_cross_track.hpp
-tM9/0UbPC75uo3YRv2mjdheq2yR5l3Ps+7n2fbavDvb9A/KUd3lgnr53
+gNczFRpFa9svtp3tv6wP/dta1uzGOXI9BywqT5rYxmILz3yrBQrVuUVlqpZmVq+NOSriEeF+4+IF+pa5
 */

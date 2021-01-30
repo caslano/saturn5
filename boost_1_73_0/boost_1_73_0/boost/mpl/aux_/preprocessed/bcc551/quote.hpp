@@ -11,5 +11,5 @@
 
 
 /* quote.hpp
-X572K93CN+GbjLTRHNvaYY3WZkEfDbOay/rXIg4doq3D4AtvjCA/OX7u
+72jt5d4bI2VfEwTddB8V92e9IS6UsgWBfXIU2yiwj6EybD1tj/2vyZ//fil8iSkGBmXN+xsFhSFKBRfo
 */

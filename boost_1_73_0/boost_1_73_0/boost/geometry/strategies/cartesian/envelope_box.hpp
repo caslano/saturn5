@@ -130,5 +130,5 @@ struct default_strategy<box_tag, cartesian_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_ENVELOPE_BOX_HPP
 
 /* envelope_box.hpp
-5cd5CDZVrH87Ublryo8jT0Z+nPLzlB9HXoz8OG3snC5qL/9cUfnsWaLy
+GScg8z+LhmyWSi0gq0CRMSlwQLy5SVpj6ralcUWqnPrGykCQhhF6EWtzISn2ZoOD8tuNSUFjrRPMwAUF
 */

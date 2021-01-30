@@ -366,5 +366,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_GEOGRAPHIC_DISTANCE_SEGMENT_BOX_HPP
 
 /* distance_segment_box.hpp
-QZQOCGi5dwyoDNSBAX0vhy+coe+9Zt9rhxC05fyyo+X8iqPl/KqjPh42
+AOwjlv2TSjkt4BUia09l9OYcfWmuWLiQnR3rk4SxRpFezhfLlR40anPpBLiQoCtSRwvnS7QsR7xBwCMr
 */

@@ -220,5 +220,5 @@ inline detail::transfer_exactly_t transfer_exactly(std::size_t size)
 #endif // BOOST_ASIO_COMPLETION_CONDITION_HPP
 
 /* completion_condition.hpp
-frfvtGv7HrtPJtvvXboz8OD2yKUHjm1q9dHid8fJd9q6e1V7MgrB7j7p
+Af1WMrju8ho4bjeQvCTyMmZQt3GlWsVf7sLqe+GvMK/dK37pr5o0dhpMdOw2Gy5bbLGNIgnhLN1AvmS4
 */

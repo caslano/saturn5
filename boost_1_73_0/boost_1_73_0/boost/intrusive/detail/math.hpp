@@ -295,5 +295,5 @@ inline std::size_t sqrt2_pow_2xplus1 (std::size_t x)
 #endif //BOOST_INTRUSIVE_DETAIL_MATH_HPP
 
 /* math.hpp
-3Ldzna2fkhg5bVo51jbM2R1Ojx2acPOCU2NhjvjTaZ9O5+NSGz+Tju9T
+z+BMcikzMRGemHaLM6R62931IGbNxHSFofo89mZqj2GrpM8/PRWds3f3xlkofNmB+eh+MnRa45maTWh2
 */

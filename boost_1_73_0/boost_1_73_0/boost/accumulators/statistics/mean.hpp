@@ -308,5 +308,5 @@ struct feature_of<tag::immediate_weighted_mean_of_variates<VariateType, VariateT
 #endif
 
 /* mean.hpp
-kv8fpoNJUE9zTFjOB0LnyZyGdbVZ6DaYC0w8NjFdCnM+5SzJMwDpfshn
+e8uN8delPuX3sjeOuPuY7tQRotCXT+L29DQFH9BfLHuFPJndoU9+Y6G/iqtg/awKv/cTXXMrTHUm/2W8
 */

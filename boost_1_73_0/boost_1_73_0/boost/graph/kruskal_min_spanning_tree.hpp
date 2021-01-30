@@ -152,5 +152,5 @@ inline void kruskal_minimum_spanning_tree(const Graph& g,
 #endif // BOOST_GRAPH_MST_KRUSKAL_HPP
 
 /* kruskal_min_spanning_tree.hpp
-DvIhvvHBtu4q86bLPV0sa6p89olMyF8IoPcdp1Sc5lPd2HZNlrbrxnkE
+J+t3OPT62UTm9folen1Yr5+n1y/WGa1Pr1+wVN/CTJ8uI9HUl+qMA6gztqYuQ2fVL9frVX0Lg2wwMq9e
 */

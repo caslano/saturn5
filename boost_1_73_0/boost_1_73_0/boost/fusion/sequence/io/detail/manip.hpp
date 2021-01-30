@@ -268,5 +268,5 @@ namespace boost { namespace fusion
 #endif
 
 /* manip.hpp
-8UlgtgcoYkqU1xBfEx0aA8wE/7sQXxbMXgB1sJ8FisLHAhaDXQDxUXrO
+qACO1OzxJzDw4ReR4DEkwONI20JU/QJ8fciOx5G2p+B7GtNpLsZ0nuTp7MF0Ds2jVi1XF08a6iFPuXrV
 */

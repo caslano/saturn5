@@ -420,5 +420,5 @@ struct get_node_checker<SgTreeAlgorithms, ValueTraits, NodePtrCompare, ExtraChec
 #endif //BOOST_INTRUSIVE_SGTREE_ALGORITHMS_HPP
 
 /* sgtree_algorithms.hpp
-4aHxPW6fipGp0T3p6uK07fZkfRybI/f4XG88e5xef4/P5Saytn+6cWN2
+bMvSza30Qf4bb/EsnBd0HPjGaWjFSxwHXvk34PeHOA4EYRy9BvZkFPdw1XOQ59LEHn2DHo0TJukmCL7A
 */

@@ -369,5 +369,5 @@ area(Geometry const& geometry, Strategy const& strategy)
 #endif // BOOST_GEOMETRY_ALGORITHMS_AREA_HPP
 
 /* area.hpp
-GdUPYxfbJEvnnStwHh/CNnv0Yt2HO+90zTjnuu2Qp95ymOlYIaxZeDw4
+WeEnQQD1TCcNl5wgCKAqAQGciYYyhOAAR/g4NLYxXxUQE8eWLJ9WV69THRyt6XjBo/81WqWfpaJYyvND
 */

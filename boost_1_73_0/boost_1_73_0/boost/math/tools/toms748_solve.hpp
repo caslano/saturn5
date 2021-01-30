@@ -621,5 +621,5 @@ inline std::pair<T, T> bracket_and_solve_root(F f, const T& guess, const T& fact
 
 
 /* toms748_solve.hpp
-SXWgz0IFAckb0L0uPxbmNwYDDhKku0yZndYHCMN0mW+XNzOpsLNzuk6B
+KTJ7EAkMk/03tzTva0r+fTKg75tt7IiOryVj6b7xWgt6RfC729lR/fvHnel4+eyoAP55Xj4gc8Tr8dEx
 */

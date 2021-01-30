@@ -970,5 +970,5 @@ public:
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_BUFFER_TURN_IN_PIECE_VISITOR
 
 /* turn_in_piece_visitor.hpp
-ce3VCLqtiXW7AG4N58W6ZcGtLK5PM5rP+0is2zjeG/etuJz39ox1m8I8
+i6fp/MfqVABloR99AhpnZrg9Mt2qXiSmQ5WZLdRuFSafon021UhMkD8tDk4VfCN0p5VmWzgis6yBJZup
 */

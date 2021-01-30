@@ -32,5 +32,5 @@ struct newline<wchar_t> {
 #endif // #ifndef BOOST_IOSTREAMS_DETAIL_NEWLINE_HPP_INCLUDED
 
 /* newline.hpp
-JIOvsHnCSuNTVxUrA2F880zftS0IbDtsW0gMti2ic1FvMTHUayQGHzQR
+/J7EhPCrhZ+y8OFOeeEjnfAk8CTw7IJnFzy74dkNzx549sDTB08fPP3w9HsYPPY1WbotPqMwRcNKd8HP
 */

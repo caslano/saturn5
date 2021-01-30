@@ -535,5 +535,5 @@ async_compose(BOOST_ASIO_MOVE_ARG(Implementation) implementation,
 #endif // BOOST_ASIO_IMPL_COMPOSE_HPP
 
 /* compose.hpp
-/Eh2LH9osG+6+UFgDn/EPRvgOlIbQ33T2xjwpbcx9O+Z8/z+jfB6G3Z7
+NdlEHitkJ0r14b828bdKxpzSTZ6d6w9azp4QYPFhwedHzGDjO8tNRxt5LAmDvUZ16W1SuKiFkkyT0mZM
 */

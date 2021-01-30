@@ -145,5 +145,5 @@ inline void gauss_inv(gauss<T> const& en, T& lam, T& phi)
 #endif // BOOST_GEOMETRY_PROJECTIONS_IMPL_PJ_GAUSS_HPP
 
 /* pj_gauss.hpp
-6dlg0/OG6Pro76Ln1iPLTHpoZLyANr//6JqI5cD+4PqLwb9TbL/Ulja3
+6OVdNCCE3HrVNPEypYn3KEsifxHy4wZB1A6SX6HmiWeRnyMmnhTRQ2hf04c5xoHIP23izEfytjZy1jSE
 */

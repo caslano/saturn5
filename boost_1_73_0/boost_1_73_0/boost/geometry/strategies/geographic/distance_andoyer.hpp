@@ -128,5 +128,5 @@ struct result_from_distance<andoyer<Spheroid, CalculationType>, P1, P2>
 #endif // BOOST_GEOMETRY_STRATEGIES_GEOGRAPHIC_DISTANCE_DETAIL_HPP
 
 /* distance_andoyer.hpp
-bt1noJTR6SPuGKVjVz4CZXDcI7dLrGzOXFE/2ldaWZtFQI5xN4na5qdf
+i//JYuleewqw2AlaaiNekp73ELOUWjcVrfMmty7TmJvZzyDPj9aNz+pvkPf4/kTz9u8aYJA3daDVYWay
 */

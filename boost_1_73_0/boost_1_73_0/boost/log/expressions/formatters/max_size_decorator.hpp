@@ -561,5 +561,5 @@ struct is_nullary< custom_terminal< boost::log::expressions::aux::max_size_decor
 #endif // BOOST_LOG_EXPRESSIONS_FORMATTERS_MAX_SIZE_DECORATOR_HPP_INCLUDED_
 
 /* max_size_decorator.hpp
-iNhaL7ZSvZn1Yi+xWfVic8LQjrPrxW5ic+q97R5JDNSL/VRvXn3wQbvk
+X72UHNlJezsPS8kfOC8lW8PsxfIb1tdScuhAcSn5kU577+NkZeFNtKkZmZU4j/kjHlPS4Qa+yfPovd1W
 */

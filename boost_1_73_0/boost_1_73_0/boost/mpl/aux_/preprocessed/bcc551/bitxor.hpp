@@ -147,5 +147,5 @@ struct bitxor_impl< integral_c_tag,integral_c_tag >
 }}
 
 /* bitxor.hpp
-/1w0TFr8fQm5y9I0VnWfN7r+T9ZpCzGH+DxkBf5OPvbtOPgYjfZCqNFB
+vWQ77lFd4UIBmTeWOLoBYEf1+ad/qQkToR4pJwjq20iQEbhhu9YMhiOJOEBuU7cdCeSlw5QC47L7CKfw
 */

@@ -149,5 +149,5 @@ namespace boost { namespace polygon{
 #endif
 
 /* polygon_45_set_traits.hpp
-rdhtYcJey+fFHkRL+hXOxe0R0X+RDB+3mp0pCNWuYL9PTwG47nlULGY7
+X8ynREa5XnvVr4VunytJ17fMxPwDs8L048mdL3ZgfinXyz0/uVH1vpG03ZOJJTzNn+k00nzfYiQHG0n2
 */

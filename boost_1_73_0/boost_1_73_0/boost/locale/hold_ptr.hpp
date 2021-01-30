@@ -93,5 +93,5 @@ namespace locale {
 // vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
 
 /* hold_ptr.hpp
-OSoz5KiGSY5qmOSohkmOapjkqIZJjmqY5KiGSY5qmOSohkmOygw5qmGS
+nd2SeZlPrPaak8JdHmae023KJ0tWUrpTmK8PMCSvCejsTBiJDrnyqT8rrC5IzvnEO1H3CqaKab0ZxYk6
 */

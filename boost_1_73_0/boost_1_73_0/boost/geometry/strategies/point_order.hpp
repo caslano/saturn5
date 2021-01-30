@@ -45,5 +45,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_POINT_ORDER_HPP
 
 /* point_order.hpp
-D9y0ft6RGxYeee6EqH7zCRTAaoQNe+m8T94f5/3VHr7e0l107vfnfJ98
+q9mShP4AfYfDtFh3aAS+/tXMhn8PK8mGfyHcmkXrV5kwYvKLvR7G99H6ENBjC39tYTJVfQ1T2FvYGPnr
 */

@@ -826,5 +826,5 @@ struct linear_linear
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_RELATE_LINEAR_LINEAR_HPP
 
 /* linear_linear.hpp
-OKQ2fE5IbfjWcBNsF1IbvltIbfheIbXhjwupDV8aUht+REht+MqQ2vBn
+RGUJKf2J2Ip2RhQ8YkYq7asqnZFKV6QyZ1VlbqTSHan0RCrzIpUFkcrCSGVxpLKku6wU4HeksixSOTVS
 */

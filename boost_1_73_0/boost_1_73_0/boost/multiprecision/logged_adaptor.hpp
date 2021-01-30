@@ -637,5 +637,5 @@ struct precision<boost::multiprecision::number<boost::multiprecision::logged_ada
 #endif
 
 /* logged_adaptor.hpp
-rhE9NMbgY14ydeL+GXjHCp3FL3/DFck1huDzVkHVQgHBDD4t7LsJcpOa
+mQWSdYwhiief771bj+RydLkeEX/E41HA6dQX3nytspTY5oxv7ULuhxfMCLnsRC+4G2NnsINwa862EWFO
 */

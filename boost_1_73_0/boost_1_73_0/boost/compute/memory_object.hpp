@@ -264,5 +264,5 @@ struct set_kernel_arg<memory_object>
 #endif // BOOST_COMPUTE_MEMORY_OBJECT_HPP
 
 /* memory_object.hpp
-UA/2ghYggxA4ApIgD94FZ8AUuATmwHWwCJbAnW180FaDXaARNIMOEAC9
+pZRUs9k725TiNLZL9tZRxJo5PBAtFybeKfLfIFzIbu1bl+2rubQqCL/cTnZCX0UoHF/39nm9V2Vj7OMV
 */

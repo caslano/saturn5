@@ -55,5 +55,5 @@ bool has_infinite_coordinate(Point const& point)
 #endif // BOOST_GEOMETRY_UTIL_HAS_INFINITE_COORDINATE_HPP
 
 /* has_infinite_coordinate.hpp
-4l1F9f5zLFZj79W6v/jkk08++eSTTz755JNPPvnk03+MuP+fuiP2/0WR
+I8K9Qcm4oSHFcKxrZs15lY++MvqK3RAUMTigLM9s6nBXuF4sz6zwi79CN/cYlnQzka9apthDWYJGl2g8
 */

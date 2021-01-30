@@ -330,5 +330,5 @@ async_pong(ping_data const& payload, WriteHandler&& handler)
 #endif
 
 /* ping.hpp
-5oWQvJ/EDv0B8J38zqveVfqD15ZWBfW7z/W7apWTxZnaNqgvU3nFq7Bg
+YlR/PHZd0yiSkLG5BiBsc9sHI3Axu1l43ETzbWbWcrYVUn2WaAJns8d1cVvQyfUt8ipY7SKOY5O81hnJ
 */

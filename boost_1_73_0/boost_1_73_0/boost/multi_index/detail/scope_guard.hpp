@@ -453,5 +453,5 @@ make_obj_guard_if(Obj& obj,MemFun mem_fun,P1 p1,P2 p2,P3 p3)
 #endif
 
 /* scope_guard.hpp
-J2Gvu6SGNcKPy2uTK4fqp46MLK8l9o+gDcKEXlx1Ha9ibVzA5zrVMWla
+vFbAoYzHICN84yN//KLk6hkDlGbazSS12gVnhgsICDiIeQ98n7yLonHjPWydXTr2A2Ifenm+v7dUCw8R
 */

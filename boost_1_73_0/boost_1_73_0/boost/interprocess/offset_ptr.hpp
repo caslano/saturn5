@@ -765,5 +765,5 @@ struct pointer_to_other
 #endif //#ifndef BOOST_INTERPROCESS_OFFSET_PTR_HPP
 
 /* offset_ptr.hpp
-i+OtFEjKzUR9JlJoP2W3SWx36PMUfhZ0OfwMqsmxDqTQvkR3kH/GRmrL
++n7A9vSxW+Yo1cmofuEscOXTm4Wol7AwOVEiZmjFRK72HdTNWFGdpFRX05vkK5Jh1iTHKd3Kx+q/jhLu
 */

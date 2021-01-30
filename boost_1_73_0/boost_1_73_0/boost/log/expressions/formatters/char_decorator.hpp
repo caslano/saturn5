@@ -645,5 +645,5 @@ struct is_nullary< custom_terminal< boost::log::expressions::aux::char_decorator
 #endif // BOOST_LOG_EXPRESSIONS_FORMATTERS_CHAR_DECORATOR_HPP_INCLUDED_
 
 /* char_decorator.hpp
-A8BdY1cTrlFNk7eSxGp9Uq4Ue5LsPp4/dvX6kyjsN3ORDQl36Tzmt2Ym
+JBhpbJjjU9Fv4+18wIa0/qOT8M5W29tdSWO7LQO7Wp8q8JqLs2RCxHl6rk/TPrbyynGyzw5GP1dgcE9X
 */

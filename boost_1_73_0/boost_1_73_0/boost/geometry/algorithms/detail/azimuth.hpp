@@ -152,5 +152,5 @@ inline ReturnType azimuth(Point1 const& p1, Point2 const& p2, Model const& model
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_AZIMUTH_HPP
 
 /* azimuth.hpp
-/zoYYRd5GF2bc+UuDmG6zbFLwthhjl3KMffCD8eiLsauVwGPq8s4RtfV
++Hvq/VvbqUht3DeZl7X1kDrcv3XDRgoZIUP8W01Utpb2TcZicwAorKaDLTIs73eVgJ2c4nblUQ/5V9NC
 */

@@ -24,5 +24,5 @@ template< typename Sequence > struct front;
 #endif // BOOST_MPL_FRONT_FWD_HPP_INCLUDED
 
 /* front_fwd.hpp
-PuUN5plF2A+iwdJNFpxlrPtAk4Wp3aHZIPr81bi70oS5ZhPyDpjqZpZ7
+ezAlh4aEihRwpuVlXUPpCjhT82pvaKACzvS8oWsoTQGn863bVBIa3VyCQ2RzB5nVnxp4K+rvfDNyeORH
 */

@@ -364,5 +364,5 @@ protected:
 #endif // BOOST_ASIO_DETAIL_WINRT_SSOCKET_SERVICE_BASE_HPP
 
 /* winrt_ssocket_service_base.hpp
-YTcxjP2X2WeZR7uN6tXvseV5xZbnDaPny++17eN1o/LvDZtvZUi+kPen
+fk06Owd+qNqpsY2xfCN3dmoVYcC0HPm/kY+dVrhD0Y0ICy7dj+4QpxJOdo+DHQJNnLxfN5SIqR1OhBzC
 */

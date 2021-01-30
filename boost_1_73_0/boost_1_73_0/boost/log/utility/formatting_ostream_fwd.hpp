@@ -51,5 +51,5 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #endif // BOOST_LOG_UTILITY_FORMATTING_OSTREAM_FWD_HPP_INCLUDED_
 
 /* formatting_ostream_fwd.hpp
-y8Cn7IIxgbgvyHbfc7tDh74H378ow77nXF6PHdD1pLF6h+Rxv1247zTu
+mqu4KviJvOayF9mZqmzmTsdWhhkrWzkZ35+fITVqwyAXYLyckdc+jVlKD+ZkBd7zzByuMrfIf1vkjdc1
 */

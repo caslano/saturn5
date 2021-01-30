@@ -486,5 +486,5 @@ struct photometric_interpretation<cmyk_t>
 #endif
 
 /* device.hpp
-RSqLY29DzuPS5YszypcqrjLDFWNWacqiDSNM2ZEsB6kfHpm2r31k6qih
+45sFxkQwfqwalGmpBr0eXeao5AfEexnNXopKcVuVYQzTXXqqZcSBssrnlt3ymWXDbnHVF4nd5jj97oH7
 */

@@ -24,5 +24,5 @@ BOOST_HEADER_DEPRECATED("<boost/winapi/local_memory.hpp>")
 #endif // BOOST_DETAIL_WINAPI_LOCAL_MEMORY_HPP
 
 /* local_memory.hpp
-1N2giD2Bp+iyhf+UZ9qlxZv6tkm8BOodVSwPzCJWBvicnoSAz6n9Cfp4
+nEMbOYDfDoeIv0nv7rZ9FCyDAHoQ/EGMrpbiAUcuvhZ3JqRu1RZ7znMTEsX12/zEK3s4jiIPHHxGfkHJ
 */

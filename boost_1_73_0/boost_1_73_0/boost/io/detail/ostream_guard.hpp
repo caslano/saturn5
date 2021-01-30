@@ -45,5 +45,5 @@ private:
 #endif
 
 /* ostream_guard.hpp
-60zZdwzbkLLvGrYxZd8zbFPKvm91Vrt/YLna/UPLtZ1/ZLm2848t13b+
+VWqwWj62H9p45u56q2W/vWUTm5EhMgGTCkI0tDdSFX9ofv1IAPrDRat0O4sWBr3f0AAzV/0pzp2lt+Pa
 */

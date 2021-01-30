@@ -143,5 +143,5 @@ inline OutputIterator tangent_t2n(const int start_index,
 #endif // _BOOST_BERNOULLI_B2N_2013_05_30_HPP_
 
 /* bernoulli.hpp
-7ddU64eubqWuTq009ToJVku9rnH1Wlb+/peoTrRr/ZtyJqj5GcIwzoQ8
+jP57VGQ+z11ud7wF42AP+EWQT4kH/5i3Qf49+G8FfHflHApQutfz+Fi6y7M+efVdz/pkxnue5/u8n/U8
 */

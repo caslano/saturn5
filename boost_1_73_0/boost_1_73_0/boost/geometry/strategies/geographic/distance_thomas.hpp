@@ -121,5 +121,5 @@ struct result_from_distance<thomas<Spheroid, CalculationType>, P1, P2 >
 #endif // BOOST_GEOMETRY_STRATEGIES_GEOGRAPHIC_THOMAS_HPP
 
 /* distance_thomas.hpp
-OCoD9ZWjukpfA/cHfuOoTlI1kDpe3zrqY/Q7R3WPvgceCfzBUR2jHx3V
+c+nj5yY0J8/EM97ETCxrhRthOqPhrUwdZfjyAQRKwYSkIyvzFQ6x64isxOUAXHeWSr+uc+ckacEiAP3K
 */

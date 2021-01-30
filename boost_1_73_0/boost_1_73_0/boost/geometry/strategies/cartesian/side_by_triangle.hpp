@@ -298,5 +298,5 @@ struct default_strategy<cartesian_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_SIDE_BY_TRIANGLE_HPP
 
 /* side_by_triangle.hpp
-SxHykc9VwHUImxAadME7XdT+Ve8uKnAwDiGKQGb4IoSlCCu6qF2samCw
+1BpeEdm9H5C9ryUohQu/NtjZfvZlhvOHS/tRCraBcM69moAzY1A4f5ZwvtEfzvOXDIDz7KsDKI4bB4V2
 */

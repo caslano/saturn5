@@ -78,5 +78,5 @@ inline void write_single_value(const T &value,
 #endif // BOOST_COMPUTE_DETAIL_READ_WRITE_SINGLE_VALUE_HPP
 
 /* read_write_single_value.hpp
-UARbGWlgZIzf7HYcbKGPLtXr0IDiPE7XZIkawrQ7g2mVtJKYafs60kr5
+7i+grNgZJ4u72H3oaToWyiVlQsHRkE+yp7KmoWFIrsKVQej8BZKZPrQYlKautfGd/rlSQ5dWa3sh+l2r
 */

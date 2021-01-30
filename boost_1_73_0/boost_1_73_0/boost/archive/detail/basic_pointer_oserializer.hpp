@@ -68,5 +68,5 @@ public:
 #endif // BOOST_ARCHIVE_BASIC_POINTER_OSERIALIZER_HPP
 
 /* basic_pointer_oserializer.hpp
-2nd1eHbYH/xLSn16NyWHzNkxS5X/tIzY/SJm/E9W8XdBjeE6dI6O10cX
+UkYH00SvtNK5cWSEVSSlli335pjwkt2NMpTcj87rhSJ5y7Ek0EyhG4rjX+hXO/sLIw7LBfPEPLV/Mph3
 */

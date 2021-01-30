@@ -392,5 +392,5 @@ void fill_pixels( const indexed_image_view< Locator >& view
 #endif
 
 /* indexed_image.hpp
-UwPLKwSgPWbaS8fyjL5y/FxeDZe3lMt7WJAvjGWCfPTA+kP6hIBuJX1B
+EB4Oa7r34qxELqS6kKjOV5TwcNHEL6TE2760ueEpLtmIv1LY4j4Nri2XuTbi3fL0Mjexb3oZLdgcvSy7
 */

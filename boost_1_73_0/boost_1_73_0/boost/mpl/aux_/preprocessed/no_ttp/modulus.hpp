@@ -111,5 +111,5 @@ struct modulus_impl< integral_c_tag,integral_c_tag >
 }}
 
 /* modulus.hpp
-gCq8vK7Gy2gu1NdMtYVQkNSLgEHWyl7C96+fZv5k6yLB3AcK33G9FyP6
+6HvgnW3YDtbVxke/dT059VNgLihK15Cm2mnn2mn829fBx64XX39KrOEOQ8+4/FCgWAxt9dowMeYmxm7x
 */

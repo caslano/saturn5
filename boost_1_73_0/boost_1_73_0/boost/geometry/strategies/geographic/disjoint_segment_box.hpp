@@ -131,5 +131,5 @@ struct default_strategy<Box, Linear, box_tag, LinearTag, 2, 1,
 #endif // BOOST_GEOMETRY_STRATEGIES_GEOGRAPHIC_DISJOINT_SEGMENT_BOX_HPP
 
 /* disjoint_segment_box.hpp
-kTkZvP/cW3fcc/nFBQOmvL9w8OpNbT8TaWjuywXjZzT7/rKOt15+XsOC
+H31ahXnah6Yp7h8v1cHzHoH8L4d2eznt6C7Lo1GayEGmW8fHVY/YzjAzlEdcrni3Jcmuz23MdSeZvGWG
 */

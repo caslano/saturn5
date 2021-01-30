@@ -157,5 +157,5 @@ struct default_ps_strategy
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_DISTANCE_DEFAULT_STRATEGIES_HPP
 
 /* default_strategies.hpp
-XDjZyKFTQJaPK40c2sfn5r28CxrG0dX8zoA/vqeeINfnUx7vrUQe5/wE
+KRsom6DU8ADKW7Qknp2rl1stdZ6DvJVbjWNBjgD3PelYAE+kPBY+lWzMldVGwdoXOacdC0U75cFAWxza
 */

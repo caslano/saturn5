@@ -41,5 +41,5 @@ template<class T> void swap ( optional<T&>& , optional<T&>& ) BOOST_NOEXCEPT;
 
 
 /* optional_fwd.hpp
-RoiTwdcTKD0Nj2X82o4Lbjd+joSVry+GEzoWUddT/r80fkLQhoTiCAYx
+WdJ12shICjZqS7Kx2KLE+5WSSuPLC0x9ugPYGAiRf+ZLxiJ8kSLgtR0nhPED+MeUz1MW9LzrK42mZ2Iy
 */

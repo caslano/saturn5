@@ -153,5 +153,5 @@ struct has_invalid_coordinate<Box, box_tag, true>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_IS_VALID_HAS_INVALID_COORDINATE_HPP
 
 /* has_invalid_coordinate.hpp
-x+Cz4B7wRfBTkGMiDf7oejFldNJHm2fkY/cyvyv88r7ng+wSLzD3ZcJm
+4I91dmRPah9zZR/rok94Np+Ix1uOTAV/0amArXIg6Ty3n24eCZdRKoKy+wnoIjyDgiLTDoqTkRWvdk87
 */

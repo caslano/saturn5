@@ -39,5 +39,5 @@ struct is_device_iterator<const Iterator> : is_device_iterator<Iterator> {};
 #endif // BOOST_COMPUTE_TYPE_TRAITS_IS_DEVICE_ITERATOR_HPP
 
 /* is_device_iterator.hpp
-siL85ty5597Jbe4Q2oT4h9NPuMn9MueeOXfuPO7MnGHppI8s2ZI14HFG
+GYIxlpAfYaiILsoNf46ZKPLLDhh/PnH9AtKW6yu1o5b4mG6l33A2CytQjy6uUPxdvPaNM6Umryqt2S/v
 */

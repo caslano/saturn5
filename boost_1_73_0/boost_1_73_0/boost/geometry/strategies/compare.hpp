@@ -226,5 +226,5 @@ struct default_strategy<ComparePolicy, Point1, Point2, Dimension, cartesian_tag,
 #endif // BOOST_GEOMETRY_STRATEGIES_COMPARE_HPP
 
 /* compare.hpp
-VOaxsaOyUE0sL7qpozzz3Rw9m2oGLBGVdaBsBP20TBH103KaqJ+WQ4Nm
+gk84eHuoHQKco0aXL4C3j4fOEZujqX7suqlUbdhEcgmUl78kpl5Du5J+615VBD9it8r1m+ActUqFQKuG
 */

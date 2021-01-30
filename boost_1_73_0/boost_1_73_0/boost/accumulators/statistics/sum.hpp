@@ -146,5 +146,5 @@ struct feature_of<tag::sum_of_variates<VariateType, VariateTag> >
 #endif
 
 /* sum.hpp
-93EfdNQC+Ww09/GeOerjxi6PbC2bj2tn2/JBoXsvmIEx5CnMATdjHfyO
+aOpux+lidgSyEaZ/DyzIF4YQSUOEnL00AhwgLJJSlKHDQPJTKQb86SMlaq88MsJ2bcg15XoKwl2jDUjG
 */

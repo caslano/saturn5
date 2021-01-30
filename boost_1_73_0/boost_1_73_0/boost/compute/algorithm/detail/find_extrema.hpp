@@ -70,5 +70,5 @@ inline InputIterator find_extrema(InputIterator first,
 #endif // BOOST_COMPUTE_ALGORITHM_DETAIL_FIND_EXTREMA_HPP
 
 /* find_extrema.hpp
-Wku5nKN1MF5wtA7EE8dk6TXKQzLl4ZdDru5gT7A7ul4ebO+RLEl6+StN
+tE1KZlKPoYjuofh0lew0o+f8hC6fKgl9NA5bM5/FPUmXWA097PQM+FAF5g2SQLIJUajD8kk6QMtiZ1eC
 */

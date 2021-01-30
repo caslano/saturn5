@@ -1297,5 +1297,5 @@ public:
 #endif // BOOST_MATH_QUADRATURE_GAUSS_HPP
 
 /* gauss.hpp
-e660t6JJD95x+oAQHN6ZszfX3exyzGXUlxypTxdWp/sKA+jTKvhQts8F
+PQlNCWZbZyITBn1qCECayKNM6DtaOh39rKaYK1Lnl5cWZq1W61fkZ+vLExjo+bQlxflsSRn2fQnOOKJ/
 */

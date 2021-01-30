@@ -79,5 +79,5 @@ struct segment_intersection_points
 #endif // BOOST_GEOMETRY_STRATEGIES_INTERSECTION_RESULT_HPP
 
 /* intersection_result.hpp
-MrtHcO0mePcF1bbc8kTrl7J5LfFuonFKuamBJ9n6vqCZZ1+QXldc2zfN
+Eva3GNF1ijkrpUkHTUonI8XtK3DsUM4eC7PTjx24VA7BsV2AwcF0YxhBNGpOwHIqwOqfrIp1UCz+BSPo
 */

@@ -267,5 +267,5 @@ public:
 #endif // BOOST_COROUTINES_DETAIL_SYMMETRIC_COROUTINE_OBJECT_H
 
 /* symmetric_coroutine_object.hpp
-+X5HfIYVdSltnavpIh0Fbsg17RkutfX4OtrzOsGwWS5f/zZ0L1H1Y318
+9y29DyHg9lHF/xKvMVVA5X306hZeWfVz9immC+dFO1RZiE6F7uT9DTSF8RdCpWjeTHbKkxrbKHtEG1/M
 */

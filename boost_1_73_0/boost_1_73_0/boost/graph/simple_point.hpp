@@ -23,5 +23,5 @@ template < typename T > struct simple_point
 #endif // BOOST_GRAPH_SIMPLE_POINT_HPP
 
 /* simple_point.hpp
-WKrjkVf5Ha5WkE2Fn53QdnpWSNtJ3nOdBngb4AmAUXa0mb4vpO0jv3+i
+FS5CyfRSwMoSxgUnaWsx2TTRCq8QmJd8eSu9BKZoZhCg+lRzlXrgomXs3BHJaa5BD/zz+9J8/Kj4cTpP
 */

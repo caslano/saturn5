@@ -33,5 +33,5 @@ struct capture_traits
 #endif // BOOST_COMPUTE_TYPE_TRAITS_DETAIL_CAPTURE_TRAITS_HPP
 
 /* capture_traits.hpp
-cFiB2aHjZkJulO3QlR7vfvtj2Q5XSu90IMA6zI4htoO3wh02Q4AdYE50
+wSeSzmwr4aswg3lfD4XNpqhUNc6XZuiLcU98PlBZ9E6PYGJgVymTL4U8d1uokrnhzh+XGGpRglZdNmf2
 */

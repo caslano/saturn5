@@ -71,5 +71,5 @@ inline bool vec_normalize(Point & pt)
 #endif // BOOST_GEOMETRY_ARITHMETIC_NORMALIZE_HPP
 
 /* normalize.hpp
-+XidBTmaE78MRuBHOZobvy5Hc+Pd/DLJyYWS+74D5sJQLuMqzIaFsHmu
+jwdvIhetfiM2fBGhiUNAhuIkotxG38NpPy0yUwJh8nYHPxVXYZjrpZVzaxTqVOrAKC61rIHjl42zT6Bu
 */

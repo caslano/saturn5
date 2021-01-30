@@ -136,5 +136,5 @@ public :
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_BUFFER_SIDE_STRAIGHT_HPP
 
 /* buffer_side_straight.hpp
-5Y8764y7fuN163etjXdPt345Jg4rmRAz3lvrN86a+c+e7X3l5nVASZwK
+WsaUDeycpYvvR49Ir4r0QCMYkJvN0iy5xvDZjYDTGBHOLGidZwQcBYfqzXn+irBSqTqxKbJhd5cRS5fr
 */

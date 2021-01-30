@@ -40,5 +40,5 @@ namespace boost { namespace polygon{
 #endif
 
 /* rectangle_traits.hpp
-wF5jc3MvOruUXW+bGmEINUb4nC12AMibSDFzbaWNJqE8s+lgrQfgSbmH
+MNogLg7+g8O1L6ThSzhk2QHmawYpHBDri2tIbdg9natgJxIqG6Vkd1M06Ja3B1nvGPK2sJ4VtD0wUHUH
 */

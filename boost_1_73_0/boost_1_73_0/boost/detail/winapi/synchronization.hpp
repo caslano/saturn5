@@ -24,5 +24,5 @@ BOOST_HEADER_DEPRECATED("<boost/winapi/synchronization.hpp>")
 #endif // BOOST_DETAIL_WINAPI_SYNCHRONIZATION_HPP
 
 /* synchronization.hpp
-oTQjKY1hL1VISyU6tw+KYdiun3hwSezeRopLI5eOn4cgFPxM7N4mqEJ0
++0sL3Df3S1zmhhNp014/W/kvVKoN5/5zg5UnEEdWLmgPXozKYLUs4p/d1DPnuhreSbJEgoskYXmb0QRe
 */

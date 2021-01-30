@@ -442,5 +442,5 @@ template<class T, BOOST_SCOPED_ENUM(order) Order> struct endian_store_impl<T, 8,
 #endif  // BOOST_ENDIAN_DETAIL_ENDIAN_STORE_HPP_INCLUDED
 
 /* endian_store.hpp
-TZCtjLyYk5RqfqLmlRoZcMiqliw9vA/L0Qo5NZNnMpSJTNvhxvjjzGlZ
+sFIEStiGkJ5DqxlhTlTblw+kEze2Vp1OZm8cGRnaMLYGf4BWZmlFPUZRWbfYyLWHVjqyIuKDQfUQZ+6U
 */

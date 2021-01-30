@@ -116,5 +116,5 @@ namespace boost { namespace polygon { namespace detail { namespace simplify_deta
 #endif
 
 /* polygon_simplify.hpp
-eKnamNZ4Wjlp2quv7L1MeNR7MVu596Pn1tvEmsh9E+QTspWNN9rg/RQ6
+kBAZQI8mM5u6CQUDu+3Yt87KbkZQFgc7IUPJwlPy+3VAiBypit4ifi82x5tSawS770gPGvDdi0zFdJX/
 */

@@ -166,5 +166,5 @@ struct image_write_info< targa_tag >
 #endif
 
 /* tags.hpp
-UWVg6yednY+Yci9yngkBILjHPFfyGnSIT19SGfoCnt8UMLKMksExwbR3
+bJAVeHt5ZN2soOpmJXbNFY/EKy49AsMmqTNxQPxlDUPKIdQ67w8Wqg6shhAhQIh01s2myWfG93Jw6NBk
 */

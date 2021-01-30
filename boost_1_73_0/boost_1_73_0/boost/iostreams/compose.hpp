@@ -493,5 +493,5 @@ composite_device<Filter, Device, Mode>::optimal_buffer_size() const
 #endif // #ifndef BOOST_IOSTREAMS_COMPOSE_HPP_INCLUDED
 
 /* compose.hpp
-f/ALI/+jX1wU+R+8JfI/eGvkf/C2yP/g7ZH/wTsi/4Ovj/wP3hn5H3xD
+6lhcEyra8eaLwLpN5L0z2AU0bihiI9E0so5VhMK3yTlrgRic/gtqveFIYI4YXb+bxTf95lkSPSjM3M+a
 */

@@ -50,5 +50,5 @@ ostream_put(std::basic_ostream<charT, traits>& os, const charT* data,
 #endif
 
 /* ostream_put.hpp
-fthytfcjlqu9HzW8Xe39mOVq78dtbKg+n7Bc9fmk5arPpyxXfT5tePD/
+owXU5WSTpttLnQMrXMp+53LyG+owH0JSlMzkBjKpr03qMBuihpqE+l8mxZTWOifcZKrXURzUuU+rJz1/
 */

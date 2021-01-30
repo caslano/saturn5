@@ -60,5 +60,5 @@ template<typename T, typename U> struct class_transform< T, mpl::always<U> >
 
 
 /* class_transform.hpp
-7H49q8383bbbKRw+Owte9TJ4uKmfgSdLpeG3b3B9yUJWR8DP7MT9q2BN
+rKisKsNfMkHmHPMxc5Ph+f9YDazqwl/i6/gYTGFTFPkSBbW9UM/zF2HxgiA1oAbk/BeISwmXCwpgajWM
 */

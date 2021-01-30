@@ -111,5 +111,5 @@ struct default_strategy<point_tag, geographic_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_ENVELOPE_POINT_HPP
 
 /* envelope_point.hpp
-xhz+n+P5nn74nzt/mH+4+OSTTz755JNPPvnkk08+/X9HO2z/X8X9d1Gk
+Z9EE7Li+onqp1ZJLb4UfLlekJxV2NOnqUMR3SIv0DNFSCo+xxS+1/LmvK/3IktOuelhXsGE/g9FrtogP
 */

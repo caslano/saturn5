@@ -42,5 +42,5 @@ struct BOOST_COROUTINES_DECL stack_traits
 #endif // BOOST_COROUTINES_STACK_TRAITS_H
 
 /* stack_traits.hpp
-pWbBedxRWhbgb0dpeYCvHaUzWRj4WVopAnwsna3C90v+rRkazZezev8W
+EwCx0lLbtImUIWQadJbP4kJRn+H+WxF4Bf4k4qtLB7078hDtTFdUEAX8RvYiBDQaaZ63hA9IMvFEA7VO
 */

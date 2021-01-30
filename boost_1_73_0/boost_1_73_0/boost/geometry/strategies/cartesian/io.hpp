@@ -74,5 +74,5 @@ struct default_strategy<cartesian_tag>
 #endif // BOOST_GEOMETRY_EXTENSIONS_STRATEGIES_CARTESIAN_IO_HPP
 
 /* io.hpp
-J5988sknn3zyqVbinmnCjtj/F8cLCsvLJ5dEavMDyL1/k1rPAGqzAUg7
+wN541YCW1rwpLeLSZbelzfSnoU2U0N65Sqo+WdAKB0L7wkBomweF9vYhhvbD/tDeo4OAWCvz9s5IM0N7
 */

@@ -511,5 +511,5 @@ inline typename tools::promote_args<T>::type log1pmx(T x)
 
 
 /* log1p.hpp
-PuHuGHMZ6D3Eqo7LlUzc/tOpUT4o8aeUBAmV6ypYkS10ooGZ4mg9XOfW
+D/QwD+0HZQjy4G+G8vT34B+7SM3IpDf793/4FnKNB1SJVNO/gbi/u6qK7D+qq6sj5cYtR2indA9JYvb1
 */

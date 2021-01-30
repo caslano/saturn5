@@ -142,5 +142,5 @@
 #endif // BOOST_ATOMIC_DETAIL_FLOAT_SIZES_HPP_INCLUDED_
 
 /* float_sizes.hpp
-3gvfewyaN7leRuo/i5yua18vgnxOJ7c/NDS9YmZCH9SVNHOr7YPE+8E/
+BqRfzoXXAUx7UjsXwM3kN+tdPCAVSQVxp2hrfjek2ox3+dd07lwTDJYE67kYeJ8yiXOcBrrRNRDOsTB8
 */

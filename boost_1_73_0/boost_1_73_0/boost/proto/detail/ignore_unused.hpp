@@ -32,7 +32,3 @@ namespace boost { namespace proto
 #endif
 
 #endif
-
-/* ignore_unused.hpp
-ZS96bGliL3ZjcGtnX2FiaV9pbmZvLnR4dFBLBQYAAAAAGQAZAIIHAAA9
-*/

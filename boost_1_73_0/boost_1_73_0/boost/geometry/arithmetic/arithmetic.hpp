@@ -335,5 +335,5 @@ inline void assign_point(Point1& p1, Point2 const& p2)
 #endif // BOOST_GEOMETRY_ARITHMETIC_ARITHMETIC_HPP
 
 /* arithmetic.hpp
-r0v6B5+Cl8Gn4WQ4F14P58H74bPwNfgcXAJfgKvgS3ALfBlua+RqNjuR
+WqnQqg2ck0W9/kV045yziB/CQcEWJxulNrQaCPNMrb/etAjSPGb+uWzJWYvwGo4/V5JzG1IaqoNwZrtT
 */

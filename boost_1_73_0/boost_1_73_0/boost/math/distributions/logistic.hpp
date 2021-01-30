@@ -306,5 +306,5 @@ namespace boost { namespace math {
 #endif // BOOST_MATH_DISTRIBUTIONS_LOGISTIC
 
 /* logistic.hpp
-8CjTMgXhVN0q/puXfAv8e/Jkiv/OYhT/dVhY/Hc6fJlRPKJGxHimwxz5
+YJQIMQrKZffnVF46Pqf9tkCe35qDV1xz5fOnj+KGP4xuftvGr9olV8kYdZi9feZdJUPUqyTFFzDKUYzy
 */

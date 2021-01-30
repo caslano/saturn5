@@ -34,5 +34,5 @@ struct default_strategy {};
 #endif // BOOST_GEOMETRY_STRATEGIES_DEFAULT_STRATEGY_HPP
 
 /* default_strategy.hpp
-x10dh0lst6vt+/THwzGa/nYwxBh/O0wPZV0pg0FZV/KIKOvKAY6yrmxP
+C12Re7HBy3OjXj+1ZCp95hN3oYpffsGmnPISA1H/JUi2tPk0qS3eLV8DN7GddgGOHFolUe8Sv/hkG2+9
 */

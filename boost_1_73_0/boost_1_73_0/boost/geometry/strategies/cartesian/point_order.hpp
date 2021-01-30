@@ -48,5 +48,5 @@ struct default_strategy<cartesian_tag>
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_POINT_ORDER_HPP
 
 /* point_order.hpp
-CLM6qb2q+cAlCE8grELY0EntV20CNsAmvTVCR4TenVWQYBxCFOEShAUI
+TJIm8fCgYE/vY7C/JThQs7fAnrt0ANgzr33O8mgbFPLPJOSKy/pN4mMDIf/i8yAfHxTyDAn59KX9IM++
 */

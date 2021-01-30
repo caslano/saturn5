@@ -161,5 +161,5 @@ public:
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_IS_VALID_IS_ACCEPTABLE_TURN_HPP
 
 /* is_acceptable_turn.hpp
-AvkNe4X1C+FsB+eCb4Coowp54twAvglSF/yWib/M5+pZRf9KczJs0KTl
+WhMbIuoOVgcKyauVn896juSOV6IzTdqeS7hH4hhAIL/2S8JRw70gRE20smpNwVOiZtIMzXhZIvq0/p/p
 */

@@ -55,5 +55,5 @@ struct coordinate_cast
 #endif // BOOST_GEOMETRY_UTIL_COORDINATE_CAST_HPP
 
 /* coordinate_cast.hpp
-AXTIjVcWmbOA5o2TZwGuDQDaoSNPlvz716kHYG0A0PpfvDIcq6yqKKhJ
+4ulSL6AWnVgiw0xJZ+mvJ2wxWJIRLm34FfjJPIVdRuxY954PrsazuthPfieLXDiwtrPw2IyISHfVsYaf
 */

@@ -331,5 +331,5 @@ operator<<(std::ostream& stream,
 #endif // BOOST_COMPUTE_CONTAINER_BASIC_STRING_HPP
 
 /* basic_string.hpp
-w9LoEljwXI+CyzDTxIsbFFzriYS/u0nBL3n1qjA29snNEs7Xlxl+7U4J
+NtUvqKpukw6IaKzJIIbjmqFJI/IvZgE/0ADbVh4AvNQ9weCBfgvyrxCoUcC9rlOYstoq3wGVvS/8yL4f
 */

@@ -36,5 +36,5 @@ int main(int argc, char* argv[])
 }
 
 /* lightweight_main.hpp
-8Bv8Br/Bb/Ab/Aa/wW/wG/w6/0792/SxefhDQ+hX2Cd/7wOEFtAXX8BS
+iatM04RxGOZY7LfHtZM87nF2GiQSVtglpryArxCEV54oc6QtYxAXox+XXSwkC+5GzbpB+D04AYqRN12V
 */

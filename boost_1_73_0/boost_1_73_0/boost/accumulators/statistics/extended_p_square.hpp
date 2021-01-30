@@ -309,5 +309,5 @@ struct feature_of<tag::weighted_extended_p_square>
 #endif
 
 /* extended_p_square.hpp
-PZwWjR8lS/j+ZHLrss6SfhFkqZXzD2wvSaG51nh0Jo3HqPU4bYrxrg77
+mLTK7qQHS7TyshamqtAGGK1OugkdAA9cAHSCQeqQAEQ5eNGQQNAFg9XtV1UClZUUFQJ7jYa7RAwaK0Cn
 */

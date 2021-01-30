@@ -34,5 +34,5 @@ BOOST_HANA_NAMESPACE_END
 #endif // !BOOST_HANA_CONCEPT_MONOID_HPP
 
 /* monoid.hpp
-rmEr4+EDxts04++xNRqaUuc4faS/9X0N45wHa77E8RD/+jc0TDJ+2mnf
+1J2xG9n872HaEadHJEg5jsuMGdAYRxzmfqOMtq9ikL6bZysFrSTomnfkkCjre4pl3rf6iTb7HivWfXPo
 */

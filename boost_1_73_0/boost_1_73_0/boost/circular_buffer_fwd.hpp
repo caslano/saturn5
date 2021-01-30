@@ -43,5 +43,5 @@ class circular_buffer_space_optimized;
 #endif // #if !defined(BOOST_CIRCULAR_BUFFER_FWD_HPP)
 
 /* circular_buffer_fwd.hpp
-bN4xgfIRmMIee1rP5HOsTxJWBdNWznKzNMwdD3ucwKt9nAm/ebEVVjaj
+tNmtoSX61gSV4oMEYlC0sOizny7aFmxD4OG0QFkiNkcpyEmfsC3BkiCAiynMSk65xU1DWwIJb4wEDym8
 */

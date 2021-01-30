@@ -627,5 +627,5 @@ auto sup_distance(Container const & v, Container const & w)
 #endif
 
 /* norms.hpp
-QiM6hhHSw76LUytMxtaGJeNVhjUfbYzguVFz3vR4QmMhjhoh39O88Phk
+V/Q9VI5soj6UOirjDrCYcI4sH+mWR2z8seAH9TjOHpFm2YGctAxMz5d5KIEXnLK/XNE1W6e+Vbs9UsSo
 */

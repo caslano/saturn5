@@ -81,5 +81,5 @@ struct get_radius<Point, point_tag>
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_GET_RADIUS_HPP
 
 /* get_radius.hpp
-NVwSDU+IRgzj3+z5h3jynZ38eTb3/DvLIUbvvhl2/7TPvxK/K3E/GglP
+HMDF0IWMAwDNwiaoboP+sA5mldTqHTAEY/oNWG6SVqZUuqTXIO8vP3O9aaahhDWQya7GyhyFjQl3UclN
 */

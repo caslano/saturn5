@@ -62,5 +62,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_SIDE_HPP
 
 /* side.hpp
-0MsvMi9Jks+3JTmAGlvWNh13hTQNlLFnOlalpIOSAJqWHKmV/nBaXH4c
+zC2UR++D5hFP82ONALIm5E4k7ELCypCSSNiDhAWhzvfiCfuRMDPUlkg4jITC0J5EAtqjXhp6JpHQhoSR
 */

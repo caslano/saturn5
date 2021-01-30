@@ -345,5 +345,5 @@ inline auto m2m4_snr_estimator_db(Container const & noisy_signal,  typename Cont
 #endif
 
 /* signal_statistics.hpp
-AvUSSfOYl2HYckHjcKHbn1/sCsfdVijI8vmdufpzkQG6tvG2KLckDKOl
+pndXcVTkKmbVKwG9WPP/zLhkzpz3nsvIqpbs6vQSsTid7JFA/lWIoQNhPcKsvdPGjuS5n6j8Qn7ebmNH
 */

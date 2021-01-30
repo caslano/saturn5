@@ -282,5 +282,5 @@ void direct_adapter<Direct>::close(BOOST_IOS::openmode which)
 #endif // #ifndef BOOST_IOSTREAMS_DETAIL_DIRECT_ADAPTER_HPP_INCLUDED
 
 /* direct_adapter.hpp
-rLPchxcwk/vwQmaSTyxiJvnEYmaSTzQyk3yiiZnkE83MJJ/IMpN8Ygkz
+H6ev1wl3SP3ZXPVD9GsRnhovEX82wH+vbq1bZq48fzMwwzlhlekzxFiN36v46M5Bm7qq8nyaaKUxN4mM
 */

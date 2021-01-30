@@ -263,5 +263,5 @@ public:
 #endif // BOOST_GEOMETRY_FORMULAS_KARNEY_DIRECT_HPP
 
 /* karney_direct.hpp
-nnlyvy3/xfu0/7icmq0blfFE3nkW8fmOdacltCseS2caLrtsU3J8nGxI
+t+gGnr0fqzkcVOPXyj5CI+z6sRAbkXhkSowQMJdWD2hRobIyc8Rvw20QqYBVsIJIFRQOF0b8eFEqjlTg
 */

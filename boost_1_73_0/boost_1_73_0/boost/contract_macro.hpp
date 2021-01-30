@@ -1409,5 +1409,5 @@ Disable Contract Compilation}).
 
 
 /* contract_macro.hpp
-w3lfC3g0o4c663wcwvl4PZxzjALX3avRPD+zQOH3feD1mlmwchlzTuhR
+OVHsS5SCTaXztuvYEXhQQkIRqEKuWKLsGarqqBdTiSoufzBVz9wbKFEFk6ehKmicKMvRG0QmAdvcftnm
 */

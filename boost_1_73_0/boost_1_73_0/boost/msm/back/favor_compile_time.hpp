@@ -319,5 +319,5 @@ dispatch_table<Fsm,Stt, Event,favor_compile_time>::instance;
 #endif //BOOST_MSM_BACK_FAVOR_COMPILE_TIME_H
 
 /* favor_compile_time.hpp
-ncy4eCU12w+tJlZ+Jzn7ST5LMefxpprr2FIvJyzdNN+JDE93aqofz/ji
+8SJclJOH35Aqh5ha3Zs86F3cjokN4qYLTc4swzIhWLCbGbGw5uwrLZwQbuLO4NJu5HL4NUmq4SRtRprj
 */

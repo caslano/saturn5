@@ -85,5 +85,5 @@ struct is_simple<Box, box_tag>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_IS_SIMPLE_ALWAYS_SIMPLE_HPP
 
 /* always_simple.hpp
-lr9T6+CnAXYz3DZ6/LX0nWK42Z0lvR9Pbfk71YQwszpLev15h/5OMdxK
+Ujo0mNvbYQ0Obf6R2aRan7TGrmn2DnO03kfJnhwau7R02MD4s5q9Qx2tQcQPiw1dfbD1kKN1AX01b/Ys
 */

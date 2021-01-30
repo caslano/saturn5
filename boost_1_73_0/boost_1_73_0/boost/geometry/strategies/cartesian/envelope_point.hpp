@@ -111,5 +111,5 @@ struct default_strategy<point_tag, cartesian_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_ENVELOPE_POINT_HPP
 
 /* envelope_point.hpp
-1O7AfFH/OpQTP0NUTvxsMT6kjE2kBaL2CCj/jTiM/De+beS/8U0j/32F
+UZrL3n5A1dnsCee9LII0VvvV8bA9DNukVv1KOu6h5momTOGSvGudEaePSsBrjaUq016Z8kKDWput+1Tj
 */

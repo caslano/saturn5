@@ -70,5 +70,5 @@ ResultType flattening(Geometry const& geometry)
 #endif // BOOST_GEOMETRY_FORMULAS_FLATTENING_HPP
 
 /* flattening.hpp
-SxMTH8P88TZ2PLTz38g19qM9hnm63G9T4vL4TYnXoO1/Ly+/g5/TPU+H
+4//WT29Ha4Pcnrl0JVYg0qO92h/5HdleN0sxzqWtURPaafbVaY/wsDu9J4TmaA1DwlqbTJgnOhm7jTCJ
 */

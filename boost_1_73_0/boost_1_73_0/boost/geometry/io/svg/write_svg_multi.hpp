@@ -27,5 +27,5 @@
 #endif // BOOST_GEOMETRY_IO_SVG_WRITE_SVG_MULTI_HPP
 
 /* write_svg_multi.hpp
-PfJ1veNNsfl/r9xWt2gZvpSjZXqsvXZ5tMX2Op1HSzsCpA52nCGSz7/0
+Kzy2VK9aYpEAtKHuosrr6PN7+hxJ+myzPo1JaXF+r7+War6TfZR9ZCzNDhLJcsw4A2NULEN9PuujTnDV
 */

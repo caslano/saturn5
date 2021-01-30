@@ -102,5 +102,5 @@ struct default_strategy<segment_tag, geographic_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_GEOGRAPHIC_EXPAND_SEGMENT_HPP
 
 /* expand_segment.hpp
-bbnMsOUy05bLabZcTrflcoYtl7NtuZxjy+VcWy70I89yoR/5hKgfeZbL
+1z0Sm8bvsVWnP9yb8E4PegtuUxMqt+yyjW/Ac2El2aINL6r18xqY6WlRLwyKiWzHRJP0lwOMrzGvP5kP
 */

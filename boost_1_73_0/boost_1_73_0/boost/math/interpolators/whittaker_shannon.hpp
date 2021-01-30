@@ -47,5 +47,5 @@ private:
 #endif
 
 /* whittaker_shannon.hpp
-Et1Z0WA9vuLTAdKF6es1H+2qcfruDUNfCDd9yl8x7fe5ZbhP+C9Gmad9
+1/F/FfAD+W/p7+D/Qhnl/2PAb+T/lcEqZp8PvAepCP/PAC7y3whpPgk4RTn52YX5+mIW2sLU0TlMXBzg
 */

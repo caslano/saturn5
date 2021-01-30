@@ -364,5 +364,5 @@ outer_prod(ublas::vector<T, A> const &a,
 #endif 
 
 /* prod.hpp
-0KnQcmg5VA+qBz0EPQQNhAZCX0NfQ9Wh6tAd0B3QudC50IfQh9Bx0HHQ
+5T7nPijU8vaiVnsxwwfjxLHFW5yBlIqw+TNrm0pz09e5ygrbE9uReKU1kOjVh0bHWTvAXTduKJTUxP2Q
 */

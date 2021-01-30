@@ -696,5 +696,5 @@ euclidean_distance(const Segment1& segment1, const Segment2& segment2) {
 #endif  // BOOST_POLYGON_SEGMENT_CONCEPT_HPP
 
 /* segment_concept.hpp
-WgWJocySMRi8DqHr4BbxvM0TnXogwo53GU8OnuU5jE6mLv6iXgicTEux
+ekYa4bAz+slGNCIA1W1cY16j3EkVGyVjpJ/lntyG7ihvQkKkxLEW3kcjuuVBBqYjFz8kimgnilmuG8Bf
 */

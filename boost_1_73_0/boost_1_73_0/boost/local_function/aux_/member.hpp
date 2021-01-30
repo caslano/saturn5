@@ -51,5 +51,5 @@ template<typename T> T& member_deref(T* data) { return *data; }
 
 
 /* member.hpp
-hcHKTcO+zYuG+f7QbZiPhR7D2q28/DTy8tPIy08jLz+NvMJg3zT69U2j
+cOQ1FsuHErjqJ3CHytGJ5MxbhzpS9ukigyOlKSI1G0U59zpo2YGW5A5ma21EtovEzNQ3GrnqJVRjL8EE
 */

@@ -213,5 +213,5 @@ inline void file_wrapper::priv_close()
 #endif   //BOOST_INTERPROCESS_DETAIL_FILE_WRAPPER_HPP
 
 /* file_wrapper.hpp
-qI+u6qukqzyTKgR1DfeMVjWSinLVgejnKtYMLM586YHUW8nYuXIVFkL+
+x5CxcaHqA22jqfoAcJrHqE9wPK/efK2hyGoHbmJTIjk9OkgMMF9y4lfGXCtp5F5akmzLo+T1T6huXFTS
 */

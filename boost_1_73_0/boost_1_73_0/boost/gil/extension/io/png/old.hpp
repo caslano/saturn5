@@ -159,5 +159,5 @@ void png_write_view( const String& filename
 #endif
 
 /* old.hpp
-V3RDMl0C9pav3yf7oUiJPP9Rn/89IM/48InnjoDfHrpNeVZB7h3ev8WG
+Bddc3p46dx3r7khZMJ3V5e1Us2+VrHlLUs2tNO2pLxNfUE4YjaZeDF6zb5WBcULNAJm6x/Q6qWYnlUmu
 */

@@ -1077,5 +1077,5 @@ struct default_strategy<Geometry1, Geometry2, AnyTag1, AnyTag2, polygonal_tag, p
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_INTERSECTION_HPP
 
 /* intersection.hpp
-Dh1Qgv/a99bY71ZEw5V8ZXRJcZn5gqjd9vfxfxSTDI6UVZWURVj+UcZJ
++lma/S/TbGYNJiPDqO6OLrVViv+58px5L7Elm5yTEFts+xXnzISUSThOJfl0O76xv083v6JJF6vVuEIo
 */

@@ -259,5 +259,5 @@ struct feature_of<tag::immediate_rolling_variance>
 #endif
 
 /* rolling_variance.hpp
-vdsr0zM8befTgb045V61u6rayjEVNTViexg2s8Z9coV2RDhf0rxJk2aD
+/B1/I8Jp/UTacyLGJmTePBJIgpLRMM3dfrOdSShZgr4nLjMUxYMXR2YEMjlub4NkICPP0z9qS6oPKBz0
 */

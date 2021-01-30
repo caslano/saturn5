@@ -203,5 +203,5 @@ http://www-igm.univ-mlv.fr/%7Elecroq/string/node18.html
 #endif  //  BOOST_ALGORITHM_BOYER_MOORE_HORSPOOOL_SEARCH_HPP
 
 /* boyer_moore_horspool.hpp
-Y5gfTIfXRanbgBOAdwMnkq4Xa4CPEZ+qwvqC9PtB/wSsB/6FZH0q6y5O
+MkOlvDR3xKzHBuaRWixKDui8tB4eE06WTh9zGdb3mEDsNXj3tsMiutGe0UXSQmBzTlPER/spY1LcDIF8
 */

@@ -144,5 +144,5 @@ struct default_strategy<spherical_equatorial_tag>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DENSIFY_HPP
 
 /* densify.hpp
-+fktAvoFXmTY+KWpyJxk/FagoSYZW+Chp6bjN086vHzshI0TWz+T5wMQ
+DEpcK7Pp3mztizC+44yvnucl5u2MNC6kPSrEbdXQ4xOIifRkC3Ghv15FXKhRhYuzcEb0roWLohq1Uswf
 */

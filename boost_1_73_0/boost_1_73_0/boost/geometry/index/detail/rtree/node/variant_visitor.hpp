@@ -68,5 +68,5 @@ inline void apply_visitor(Visitor & v,
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_RTREE_NODE_VARIANT_VISITOR_HPP
 
 /* variant_visitor.hpp
-eY6Ob7Rtmy9q27YX0w0cwXQ7enZK27YxUdu2PCuca9sZbdrOET1zvUvU
+Av4paxZoKsgmiVJUbSkT7linA0qZS6U0eYrlkwaLT8ezMWrYapNVXF/ABDLFjshNy2M58hqKrlV2xuMt
 */

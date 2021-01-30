@@ -181,5 +181,5 @@ inline typename tools::promote_args<T1, T2>::type ellint_d(T1 k, T2 phi, const P
 
 
 /* ellint_d.hpp
-7/2O4/V7xV2LBqyqBzeyUMzgDg6PNxRzOW7P8aTOzYa47wkcfx0aCJxb
+88uzqQvxKdfUJdnlycCzkrLV4KcqLCnX/zP5gURWlpQtR7qaYja/TG/z+CdoqUqKcgqXAWtmlegKs7L1
 */

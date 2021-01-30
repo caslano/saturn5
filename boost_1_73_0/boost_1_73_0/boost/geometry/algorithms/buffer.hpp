@@ -267,5 +267,5 @@ inline void buffer(GeometryIn const& geometry_in,
 #endif // BOOST_GEOMETRY_ALGORITHMS_BUFFER_HPP
 
 /* buffer.hpp
-Tu53T+fIz6lzWGN2+rE4yspnspSmNQ51Rkwt8EbVz1jj3nB18r2Ng2ex
+a7Zn9o8SJfbGJt1ktRP6ZVEC+II26UbTnVTsWz+gwJFMtzTpBoS1939IYcwXdKdbTC8Ts6aKveNeDn0G
 */

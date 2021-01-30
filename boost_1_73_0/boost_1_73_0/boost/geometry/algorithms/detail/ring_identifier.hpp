@@ -85,5 +85,5 @@ struct ring_identifier
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_RING_IDENTIFIER_HPP
 
 /* ring_identifier.hpp
-GH0HNyrZ/BnSd7uI3Urt/U/RlrsIe0fEjpP/pHn8QWqbFC+PkQ8eELGn
+ltpq7YEvTzGhWuZrOEPGfn3iNl4TMjVD0a0VdqyP0uY7F5iCV6+avkBUlSo+GqoPv4zHeyvKLMFzhb+0
 */

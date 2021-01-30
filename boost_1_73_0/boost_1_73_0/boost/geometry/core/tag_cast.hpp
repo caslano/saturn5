@@ -84,5 +84,5 @@ struct tag_cast<Tag, void, void, void, void, void, void, void>
 #endif // BOOST_GEOMETRY_CORE_TAG_CAST_HPP
 
 /* tag_cast.hpp
-dv19sR36/lzHvyO89+cytslxvtxorILjjmN2/IvHKfjGvZ3GwF/6/Rp6
+52i9nArpOYv+rOVKmiAw0605ocEVpGlVVOROgiz5Mtb/G9pm9m67ExJkL2oPTgWtPhe4i5jROoOgJix0
 */

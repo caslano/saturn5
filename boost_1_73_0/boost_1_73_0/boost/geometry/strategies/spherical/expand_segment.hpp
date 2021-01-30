@@ -118,5 +118,5 @@ struct default_strategy<segment_tag, spherical_polar_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_EXPAND_SEGMENT_HPP
 
 /* expand_segment.hpp
-/19YUVVQVBKvqCfef5PGUqMDv9bu/TtnUHddpH2G7v3HL7F7/5J4uCA8
+Z4zyhUnD0V+Xcf5nj2tx0rhOKip3q91F5Znqh0Xl2er7ycM78MYroUiZZ8Ed2Jeavq6M++ypWiKnqg9E
 */

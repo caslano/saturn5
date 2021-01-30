@@ -69,5 +69,5 @@ inline void throw_on_empty_input(Geometry const& geometry)
 
 
 /* throw_on_empty_input.hpp
-WLaRykpzZxtiL0lr2cZI+ZqyBbHT94tYN+m7VayjD7Ezb4rYLsRAsm+A
+VGcsrwDlKbI8yNUaMo10fWAkRzTQYFmZC8MSP5wUZNKDUvf3adXg7p7I5qZe5CouM5p8oQ4h5jLwdYa1
 */

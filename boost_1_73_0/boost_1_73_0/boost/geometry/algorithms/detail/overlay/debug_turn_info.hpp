@@ -66,5 +66,5 @@ inline char visited_char(detail::overlay::visit_info const& v)
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_DEBUG_TURN_INFO_HPP
 
 /* debug_turn_info.hpp
-FIDOB48BLwB/AY4CS5Fe/HauBbPY/wMvYvjgxeCDyXhO8ClwPEjdxwQ7
+q5zg3rY5whfh+3E6LHvOBhF1p6PVZdYtOB4XO55x2M6g/w4mGxvnVtMYa78caiixbj0Ia/VlbKrbplCt
 */

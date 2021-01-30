@@ -89,5 +89,5 @@ struct disjoint<Point, Segment, DimensionCount, point_tag, segment_tag, false>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_DISJOINT_POINT_GEOMETRY_HPP
 
 /* point_geometry.hpp
-CZMwCZMwP9OwH33V4Zb/zbpD0QAcHh1AlpGrKANQFuB6a55bZfR6ntWP
+GM8mP3Xh2QRf8sBoOdI0JHl/Lx/C+7t5CNs0njAb70AljtY+bOJzNb7kjrD/CPsPY0P6641N3c6tkJua
 */

@@ -142,5 +142,5 @@ private :
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_BUFFER_JOIN_MITER_HPP
 
 /* buffer_join_miter.hpp
-+P/6jLu9jXu5jTvXHdMQWcWgWCSyg+LLtzL6u3jj6xuNlhfWb3xum1pq
+Fxuc/Bi3ae7+bzr5zXr5JnJHrmLY1FRz+XJzK1gOXEjAaKyUxuZSCPPZYxJGKulOFPKfHJz5o5PTaFJz
 */

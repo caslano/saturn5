@@ -16,5 +16,5 @@
 #endif //BOOST_MSM_PROTO_CONFIG_H
 
 /* proto_config.hpp
-isRwLKevW8SXknhBzzyzdANWUF7HEV8qR5M7FZDO8ww6Tb1XQv/Ek0ey
+FDOfw/VNQyuszzGdD/k8iEnPUk9PxF0k06ccDGVIQGlHHuLb/UpxGf4hxKoebVygJzJ+IR07kV9iSNHk
 */

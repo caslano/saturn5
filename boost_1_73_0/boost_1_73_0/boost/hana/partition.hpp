@@ -116,5 +116,5 @@ BOOST_HANA_NAMESPACE_END
 #endif // !BOOST_HANA_PARTITION_HPP
 
 /* partition.hpp
-xW2Fz+lwM4tWeJdTh0sWCd+V97zXLGOriI0HDXdeJ/Gk57VwIJH6/hjf
+ponQMRPCLlo72v7bNyvom+6/+hLuv5YdZd2DdDCJHxj0dZpzhTugQipzQVdy/+8YVgkqlFYwUttjAeea
 */

@@ -26,5 +26,5 @@ std::string error_string(int err_code);
 #endif // BOOST_MPI_ERROR_STRING_HPP
 
 /* error_string.hpp
-GaPmw0+9zINWzitBNkAhx4LsdyI7qacRUjieC45WdGyVtY6jqbJOL7BS
+3U8iI5aOrt88yb/+t/KENCl+iP7Fe13gTxCXL2UcvhRxt6E4e+5s5crZyy/HnlBxUfEbe+dIoMPaF3mr
 */

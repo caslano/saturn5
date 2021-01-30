@@ -80,5 +80,5 @@ struct default_strategy<spherical_polar_tag>
 #endif // BOOST_GEOMETRY_EXTENSIONS_STRATEGIES_SPHERICAL_IO_HPP
 
 /* io.hpp
-e+x3Adcg738FPn6HnjswrpfwziqkZXphLL8gXomq+vN22Q9uy/v3TD3x
+s1VgtPxi7w/PmZJ2V0G700CGTdF9xTlp0wk5xVJzKxRJkgm2MebqTDEp3SZFSZLycsay4EQjU/zydILQ
 */

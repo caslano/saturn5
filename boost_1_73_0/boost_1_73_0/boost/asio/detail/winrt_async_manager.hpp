@@ -307,5 +307,5 @@ private:
 #endif // BOOST_ASIO_DETAIL_WINRT_ASYNC_MANAGER_HPP
 
 /* winrt_async_manager.hpp
-UYDzB367gv2bbPh1W+479r7Tu3ssPSsoV+/69haYe8PeAmMm7C16sr8q
+90CQa77TfCnXI9oXy9KXA7XYw6C5N8IE3CrfVuKAEwynxul+NVLaD41xOX03slN6Enniz3w8f8/MPKD0
 */

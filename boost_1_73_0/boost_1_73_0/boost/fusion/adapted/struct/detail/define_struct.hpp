@@ -479,5 +479,5 @@ namespace boost { namespace fusion { namespace detail
 #endif
 
 /* define_struct.hpp
-5VfpNEn21rSAuvIDHBTYZ+fF3n5K7mAkTMVFm3Eq4FhD4LT2EspRwXtZ
+c4YqP9FWzHnAkauByJAHUYGEinqyux0LNGIi1DNc5p9LwkIUAjAzanH4796AZq4UsE5STXGhmvr2CzPI
 */

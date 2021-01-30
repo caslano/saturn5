@@ -112,5 +112,5 @@ auto anderson_darling_normality_statistic(RandomAccessContainer const & v,
 #endif
 
 /* anderson_darling.hpp
-hLawjGuT4QYw6RrGrTuIw1fRbq/lM/PVX5iLf/Q8sVDnhcMlbv6ReMY5
+yqF9oJWl29dV7SoGy4xTz3SRmazceEjFkV+cuSyx1yy4luUXg34kpSTMo3m2xXfrrX+RTh8s8EyutDyr
 */

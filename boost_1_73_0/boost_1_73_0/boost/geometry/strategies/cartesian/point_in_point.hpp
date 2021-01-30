@@ -126,5 +126,5 @@ struct default_strategy<PointLike1, PointLike2, Tag1, Tag2, pointlike_tag, point
 #endif // BOOST_GEOMETRY_STRATEGY_CARTESIAN_POINT_IN_POINT_HPP
 
 /* point_in_point.hpp
-/Rad10w7OadBcOyUBcc2vXD4aJExAd5fcN60s46M37r8vvkjXrqjywHr
+D3nvFQMgv3T0cyA/NSjkWyXk8f0hf2cg5G8etYSkCci4gCB+wgL+9KDAnRJ4I0GjcykOfNRA4CM+r9nP
 */

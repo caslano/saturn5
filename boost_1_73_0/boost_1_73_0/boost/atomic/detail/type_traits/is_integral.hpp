@@ -43,5 +43,5 @@ using boost::is_integral;
 #endif // BOOST_ATOMIC_DETAIL_TYPE_TRAITS_IS_INTEGRAL_HPP_INCLUDED_
 
 /* is_integral.hpp
-zgPrgpwG8iY+1dgHz6Ug5vzoFDDLaH81B3nd3sKoDzTIsugZ+2i6itT3
+uYhwRozosFLQO0kNBwrbzqaZUxH3Wx19YxRBCEkPvwZyNJr6ipwwyZ/PYLPEu2J56QquU5K4ZHnPBvu0
 */

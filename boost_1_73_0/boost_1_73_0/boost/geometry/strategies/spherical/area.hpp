@@ -195,5 +195,5 @@ struct default_strategy<spherical_polar_tag>
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_AREA_HPP
 
 /* area.hpp
-J5/+lxP3EBN3yP6/KhwrSjkC+NNnAM/mJnnzHexemfyrLBuexn/G36B7
+zW7lbwUjSC2s+7acQL8mVUoSF07UJ4envEu7gahaIuq165IYKL+4XbZ2mLFHRL/Da2OsxLU50k3QENYj
 */

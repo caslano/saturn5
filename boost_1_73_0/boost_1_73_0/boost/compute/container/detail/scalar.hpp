@@ -62,5 +62,5 @@ private:
 #endif // BOOST_COMPUTE_CONTAINER_DETAIL_SCALAR_HPP
 
 /* scalar.hpp
-/ViU9LuxqOYKr0MpYa8lMxBAL5zFinjOPGvjnfN0K5/LXvXhKnizvYyX
+CC4iQZYYVObSsPVekjhU4V1rAWCq3sxpFOJj48thxB+NDx7TqvzHxl3/ewauEqcZxJNjBWcl0aZQKTZT
 */

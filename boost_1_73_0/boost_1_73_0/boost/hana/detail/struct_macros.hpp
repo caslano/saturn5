@@ -2803,5 +2803,5 @@ struct BOOST_HANA_ADAPT_ADT_must_be_called_in_the_global_namespace;
 #endif // !BOOST_HANA_DETAIL_STRUCT_MACROS_HPP
 
 /* struct_macros.hpp
-Pxc2ul+purevRYauU6Ld/MnAHJpOTbZ0+d2yia5Th22ekfzGuMgZLT1S
+Xl/HqR3ZEYgogztyD+2tX+tIX4fcJKkjd3FHbj81I5sbn/M4T7qyDu7EjmPvVQxOEifxTshyinwdteeh
 */

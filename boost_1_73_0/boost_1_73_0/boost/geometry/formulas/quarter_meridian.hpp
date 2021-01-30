@@ -112,5 +112,5 @@ ResultType quarter_meridian(Geometry const& geometry)
 #endif // BOOST_GEOMETRY_FORMULAS_QUARTER_MERIDIAN_HPP
 
 /* quarter_meridian.hpp
-2K3nzWFW28lrg9gxchxkAJI2zP4+4dyVb/b1Du1uPRYxLasmugGJ7ZAx
+KOtffe9LCkWBS3Wlrj6sZaup0aOd+oHckF2qu2inIY4dqbRHDE6GCHMyYH+eJtoGbdRy0j2Rilw6a3Jv
 */

@@ -70,5 +70,5 @@ struct gcc_ppc_operations_base
 #endif // BOOST_ATOMIC_DETAIL_OPS_GCC_PPC_COMMON_HPP_INCLUDED_
 
 /* ops_gcc_ppc_common.hpp
-RFl0PYi8aT14G7gBvBO8CeTnI54DnwU3gm+Cm8Bj4K/AVAzkrSAL62bw
+QMHcqYdJIWpNH8wjSCEgDEIhbQNQFqw7UJ2AwQRB0WI+IiqXOeR4kxgEZrrbIHVHuIPB862+nkBCrDlQ
 */

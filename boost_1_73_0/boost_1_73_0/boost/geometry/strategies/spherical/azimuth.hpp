@@ -130,5 +130,5 @@ struct default_strategy<spherical_polar_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_AZIMUTH_HPP
 
 /* azimuth.hpp
-ZY3eMJMLSgrD0WhBWXmFbGmvnLfZXnlMOFYcqdS9cmcb72IbbxPRstsV
+qfyIus/GkVMbbgA5uXtUipK0HH98PaydCxuhmUvUnV7V6dlJi3MqnSHRGQvDGUbXomjNCx8/QWNr1Lgj
 */

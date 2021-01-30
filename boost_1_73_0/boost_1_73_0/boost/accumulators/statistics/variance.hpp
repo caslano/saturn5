@@ -247,5 +247,5 @@ struct feature_of<tag::lazy_weighted_variance>
 #endif
 
 /* variance.hpp
-38FBtjysj/tWaH/ItrZnnoeLfndh5Bpiy3H6CRr1F89KnvJGeY5c+e/z
+714O/Y7v/s/ro63AFOPp+x5sXZ44hV1qNh3X2oto+7sBv1zrlPUJgLcd8bBws9zh9pgOT/6u9uz+8Bvr
 */

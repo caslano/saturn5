@@ -130,5 +130,5 @@ static const winsock_init<>& winsock_init_instance = winsock_init<>(false);
 #endif // BOOST_ASIO_DETAIL_WINSOCK_INIT_HPP
 
 /* winsock_init.hpp
-zGMrnevpOexL2X+J/fM8HRdhL8FjHy3ztB8v93R8hF3Nb0ntKCAvL/Z8
+t4P9U89DcFDZTp/tqHsH1119AUP8txXx4PogRMUYn0ShiYsrhmycIfEPo4N8SWPDnG9vxqho3ATVJ8/c
 */

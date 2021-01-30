@@ -142,5 +142,5 @@ struct bitor_impl< integral_c_tag,integral_c_tag >
 }}
 
 /* bitor.hpp
-JZk5pyYzKMjqsklS0TmmGPJm53C6H3Jqc5hp1Y/RqKqtXN1ZDuuyVsEI
+n7ZbNv1kgMWQNdlEHitkJ0r14b828bdKxpzSTZ6d6w9azp4QYPFhwedHzGDjO8tNRxt5LAmDvUZ16W1S
 */

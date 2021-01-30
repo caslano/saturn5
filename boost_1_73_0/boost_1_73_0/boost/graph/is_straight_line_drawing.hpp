@@ -209,5 +209,5 @@ bool is_straight_line_drawing(const Graph& g, GridPositionMap drawing)
 #endif // __IS_STRAIGHT_LINE_DRAWING_HPP__
 
 /* is_straight_line_drawing.hpp
-bf4vUSJ41xDanhhgiMi1JJgeoh5idi/B9eBhwz1gk9UyD93fjXvYfGcX
+6cZqbsOH6Dr3pvfQ5DZqciV32KCO0oTk3DqJMTLDq2iczHcxGp/3w4q+qyKc8+UshTYyT4AGzxy7nL6x
 */

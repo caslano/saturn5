@@ -67,5 +67,5 @@ struct envelope<Point, point_tag>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_ENVELOPE_POINT_HPP
 
 /* point.hpp
-PPW08HQJ022j8/PmROJmG9AnILrikHFjfe8Lt1BFuDzPxLHLDVPF5v1+
+OTDwgY3zf+BC/oXhdlkCuIHkeztBOAdYdJjm7oe/0VXCUWG7TFzYBvP8VRXfXFXxra6Kb+uss/J997h8
 */

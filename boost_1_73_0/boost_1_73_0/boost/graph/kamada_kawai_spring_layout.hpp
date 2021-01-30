@@ -688,5 +688,5 @@ bool kamada_kawai_spring_layout(const Graph& g, PositionMap position,
 #endif // BOOST_GRAPH_KAMADA_KAWAI_SPRING_LAYOUT_HPP
 
 /* kamada_kawai_spring_layout.hpp
-p9c3QuB+IP02v8RL32HoTpxmmecXwT24XtX4HB3UOZWZENTJ0Gpdn9Hw
+L33a6Ig9iDcFr0dbMxuOZ1AhT9WsPBcseKzs84KOCiJNxzmEpVWC+BnJfSDpFkF/agYIepIh/PzupCnF
 */

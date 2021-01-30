@@ -126,5 +126,5 @@ make_suite_info(
 #endif
 
 /* suite_info.hpp
-8u52pQOQZ+MZZiOE/P+Gi+/VPjyQ5f9OoC+LvL1jzufbrnwCmufzcTmj
++27ohqEEBFEG8MDpoJxQI2q1Ya9HVmaxW+MAdr0xi0RXNXuSU5l4QicIG1l6Uhj4fJDfJIDYJtAimEng
 */

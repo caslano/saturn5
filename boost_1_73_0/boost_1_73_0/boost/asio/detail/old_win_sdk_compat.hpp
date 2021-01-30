@@ -216,5 +216,5 @@ struct addrinfo_emulation
 #endif // BOOST_ASIO_DETAIL_OLD_WIN_SDK_COMPAT_HPP
 
 /* old_win_sdk_compat.hpp
-JaNM+zL2Wxg5ZzrZ2kj9BQ92Cfu9jeJT+xvBGyePZv9K9lHn1aT2xFej
+V6FXNz9f8zp6FXqCZ/90nSl3NKQ8dddaOb16Xwfme6V6eNrYuGeJJ4IOc3/+e0PNnOc3no6QDojnvoQE
 */

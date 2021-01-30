@@ -70,5 +70,5 @@ interval<T, Policies> operator/ (int x, const interval<T, Policies>& y)
 #endif // BOOST_NUMERIC_INTERVAL_EXT_INTEGER_HPP
 
 /* integer.hpp
-1i6kW6jRuNfdr79kZmasIn5XRbF4e3ye40hGR0d4YvONmuou3L6JfrNP
++I2+VBcD8upSNW5NBBr0O5Z3RQ4Dq6+1lfruu11d2do40vHb8HdE8DO50jr1Bmbt5+jQFChHIpgw1DfM
 */

@@ -134,5 +134,5 @@ auto trapezoidal(F f, Real a, Real b, Real tol = boost::math::tools::root_epsilo
 #endif
 
 /* trapezoidal.hpp
-yDTssNdD1yXGj2b7sPFscQ9taNUE7BLlEtuW8SyAZOuDBY47R/hsE38f
+kANpDlsAuhrgdYDrADMWqphWSG8XhK0B++T6CmrjyE/2bc+hjfHP2nMBW/719lzWKld7rmNbPNMGsD3p
 */

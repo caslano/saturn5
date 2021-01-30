@@ -61,5 +61,5 @@ struct get_write_device
 #endif
 
 /* get_write_device.hpp
-nG8g57tD6N9dGjnfEM6Hw2wo50vmfPBalL+nv1vQXSCpBr7U/2lcWPmO
++Z5CVM1bWptMXFLfiAf1Sqt0kB17qxkEHXD7A9sf+5EM0u4gvC++dBNWwdTmCsOGZulziITz5xtdhf8q
 */

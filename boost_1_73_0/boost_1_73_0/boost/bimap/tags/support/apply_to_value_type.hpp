@@ -70,5 +70,5 @@ struct apply_to_value_type<F, tagged<ValueType,Tag> >
 #endif // BOOST_BIMAP_TAGS_SUPPORT_APPLY_TO_VALUE_TYPE_HPP
 
 /* apply_to_value_type.hpp
-y6vx+9QT2SMkkllTsUFIuEdd2R4ksjswbQ6WDGnY3nQNDQ0NDQ0NDQ0N
+26Y6IiepzklX6Va6pcIUwTPqLUHjd8bfn307cLn8id8D3WaEHli1CvJP/Had53Npfz1jUB3tNYsGNd85
 */

@@ -525,5 +525,5 @@ namespace boost { namespace polygon{
 #endif
 
 /* isotropy.hpp
-i7l5ipNKbHac6ES1DB5IXyetUpkJEj8sQsIRJkigou6pWTTy0HbNmruC
+90CqYWMsFtxKYw91P3j6xtiyX1Q6iyPIJUo3/9Ikp0j1XXqw+waqukH3paqlKpJMuvbUqKvk9kY6G5xa
 */

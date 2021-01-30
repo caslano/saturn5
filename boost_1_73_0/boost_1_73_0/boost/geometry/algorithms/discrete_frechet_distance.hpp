@@ -249,5 +249,5 @@ discrete_frechet_distance(Geometry1 const& geometry1, Geometry2 const& geometry2
 #endif // BOOST_GEOMETRY_ALGORITHMS_DISCRETE_FRECHET_DISTANCE_HPP
 
 /* discrete_frechet_distance.hpp
-ZOxOwK5i+xVvj/YJoL0L7s2Bzg4AGLK0x4a1yOuQ1wPtVwDqkTE0oQFo
+jgKc06tw8TWmQyCD1k1lPPsJIMo1OQole5OSNdpkkCKm5BAsfRDmEqfkSnui8ez1r7EAgquonS321Urj
 */

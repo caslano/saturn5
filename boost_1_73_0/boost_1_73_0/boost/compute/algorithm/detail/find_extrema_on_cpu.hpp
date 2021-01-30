@@ -138,5 +138,5 @@ inline InputIterator find_extrema_on_cpu(InputIterator first,
 #endif // BOOST_COMPUTE_ALGORITHM_DETAIL_FIND_EXTREMA_ON_CPU_HPP
 
 /* find_extrema_on_cpu.hpp
-Ytqw7PP5QlGXy22kTadKSiGeduzn+36MLNA3N9eu2iSk7n0r6jXuDzpc
+8Q8CcDAipCGePrWx5SgIgx90z1PAHrqCvECPgHQIuKMhLBjmmdFkRIlHz80rJPteqaS23ftJ7NQNIyu0
 */

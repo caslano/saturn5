@@ -27,5 +27,5 @@ namespace boost { namespace fusion { namespace detail
 #endif
 
 /* is_native_fusion_sequence.hpp
-jtAV+6s7qjzTPZTu4Y4X5He74eqyqNUGu/fnIvT5jz76d/PRf/TR/+ij
+xxEX1JOUyCTXJTInxmCqjLkwEZMYhgUyJisRkxiJxTLm+E4aCb3niWY2ybj9SXGJhrbKuE1JcYkpelDG
 */

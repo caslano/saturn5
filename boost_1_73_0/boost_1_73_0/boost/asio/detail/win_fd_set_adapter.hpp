@@ -151,5 +151,5 @@ private:
 #endif // BOOST_ASIO_DETAIL_WIN_FD_SET_ADAPTER_HPP
 
 /* win_fd_set_adapter.hpp
-VqPn0t9ufLu0/Tafj20+PNYl7dJ+bdTe49+N2nv8xqg9yWH2K9j/0Gi/
+NskODXh0eFINIK1ddvKTq2yxrFtoVzkK3GohurWoqEEHq5yJMb9MruxvM/aLPJJ4B0RLPo3uyBWXUbTs
 */

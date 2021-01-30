@@ -22,5 +22,5 @@
 # endif
 
 /* enum.hpp
-ALrsCyy7DKnJ/l7OYoX+Ncp/460+uEyERDrRR0OHcboPdsjsYOKiT67R
+hE5pTHmub5PZM8jHotXQmMCcNv1GOfV62rCyqVeBgMep+hteSlf5v1WibhVCYvnMM1l03C0H4lH33tuf
 */

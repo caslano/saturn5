@@ -573,5 +573,5 @@ inline typename channel_traits<Channel>::value_type channel_invert(Channel x) {
 #endif
 
 /* channel_algorithm.hpp
-9uD9PteNXXvzO78e+s4lR723PtzjqLrPY7f3vLq+ZMPqOu/9b5QZO0Hc
+j7S1cTdP8vn0pWtgk29nyXp5Zv1eYh1s4FM/qOqYfQ6ePxvWofk3nrRBjbbG2fsivPK5OO4gLq7h3Bz6
 */

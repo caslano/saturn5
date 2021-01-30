@@ -55,5 +55,5 @@ struct robust_point_type<Point, detail::no_rescale_policy>
 #endif // BOOST_GEOMETRY_POLICIES_ROBUSTNESS_NO_RESCALE_POLICY_HPP
 
 /* no_rescale_policy.hpp
-OSDmUiMjtBcQbcrYR1nJfARURmhcQGWEYsAXmc6A2u04K6AyQhxPULaJ
+UkBs5tCSX4VQWbSWqEuNfPbC9J52gljEK9XokiNLIB1+ObL1jdoIOu+H0niMWycHdrgycGCJFqDOI8b9
 */

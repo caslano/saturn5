@@ -90,5 +90,5 @@ void buffers(T const&)
 #endif
 
 /* ostream.hpp
-+BLwQWCtKfPUG6bMT38CbgK+DXwB+GdT1rtbgNu4v4G7uL9NuVt3G5Bt
+RYzAU87Li3BomsJsuf5Q4s3ggqduuyE7mBtvS0KFCQMcyhZTQukBS+F92kM76SwmnofC/q7asVEc6JYw
 */

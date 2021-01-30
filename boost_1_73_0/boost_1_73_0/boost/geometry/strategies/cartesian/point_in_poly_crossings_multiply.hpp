@@ -134,5 +134,5 @@ public :
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_POINT_IN_POLY_CROSSINGS_MULTIPLY_HPP
 
 /* point_in_poly_crossings_multiply.hpp
-RN4yzwcPe+Xn74b3jN3+8/F7dJ/U5Uzsy1vz/munvf787z9e/sOMi9s1
+DAr5TwcY8sor+jW74fIBW++ZIwO2XsOg0FZIaNlX9Nt64YHQVg6E9sKg0MZIaC9f3g9azuUDep195HN6
 */

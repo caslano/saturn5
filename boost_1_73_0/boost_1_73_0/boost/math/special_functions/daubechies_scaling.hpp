@@ -478,5 +478,5 @@ private:
 #endif
 
 /* daubechies_scaling.hpp
-BduKLstfd/1Vfdkil8HDoUNyQB2cb+jmAkM3dT7dXGToBstcKHXzTZ9u
+LeIVlWezheWLy9kslitfmoXbGpgF/snMl98BL/ol/KKdOKDjf9f4P0/o207E8T7pn4B/54F/VbJf5t/t
 */

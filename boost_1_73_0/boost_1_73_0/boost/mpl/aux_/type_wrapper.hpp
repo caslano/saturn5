@@ -47,5 +47,5 @@ template< typename W > struct wrapped_type
 #endif // BOOST_MPL_AUX_TYPE_WRAPPER_HPP_INCLUDED
 
 /* type_wrapper.hpp
-VjgdLPGf3CnWKio8LjY+NjIh5PGo+MReMSHtExL7RMUmmVbsgAGJA72N
+sozZUubPsBiS5aDzd+cLlEI7qMbGkCP33y/NsqScwb6ufHEF5kslZ11eTq/2X1TOOnJs6rfnyyFSYCM5
 */

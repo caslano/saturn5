@@ -242,5 +242,5 @@ BOOST_HOF_DECLARE_STATIC_VAR(fix, detail::make<fix_adaptor>);
 #endif
 
 /* fix.hpp
-yfYH7LWdtzRwtgEzt8Ku9d/1KmeHbpJ9K7DlI/ecx9nAzVh3TbKTH/WJ
+rV+saDOMchdJJ+esKSJGkt5cHN0CzYWi5csXGUujRYp2ulWvSHk8U27LIbHh8n4zCTDIi2/4Nlp85bWv
 */

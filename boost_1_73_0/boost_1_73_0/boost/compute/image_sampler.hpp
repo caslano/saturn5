@@ -12,5 +12,5 @@
 #include <boost/compute/image/image_sampler.hpp>
 
 /* image_sampler.hpp
-v/fd8967z/HMdpfd7R/rVz69eufcH+ee++Pp+d6r4IFVDXaBRtAMOkAA
+VhWYnmgZ3qOPJEe1IN1mWrpc2aDVNi9iWR8s56bpNbnGfehzjThNmOf/kc+l4pJPOG+Y4dYHv7a5c7gp
 */

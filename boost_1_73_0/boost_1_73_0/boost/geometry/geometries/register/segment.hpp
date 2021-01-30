@@ -129,5 +129,5 @@ namespace boost { namespace geometry { namespace traits {  \
 #endif // BOOST_GEOMETRY_GEOMETRIES_REGISTER_SEGMENT_HPP
 
 /* segment.hpp
-aPt+FIggKHPT754S9X37NPAN4HLgB6K2EJnuhLj8MeWbkbCNMWfOpH/b
+6TnBotNKt3Ph4lNtEkFcVNCi0wqSTID8Pp8YEZ5TD1p19R4eDn0skueUCjtbL8zcP0yJYl8iQLEGApP1
 */

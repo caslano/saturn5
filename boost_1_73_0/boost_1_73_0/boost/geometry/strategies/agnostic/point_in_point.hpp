@@ -60,5 +60,5 @@ struct point_in_point<Point1, Point2, geographic_tag>
 #endif // BOOST_GEOMETRY_STRATEGY_AGNOSTIC_POINT_IN_POINT_HPP
 
 /* point_in_point.hpp
-LxYr/y963vQXYLWoL3nqVS0RPXe63ZMv7SN18LBsvh616XxMkjysLrvz
+0o7YAaM8P3IJld5vwadD8QlT66FPt6xoYcd7KfFW4+nzW/0bKSUatMnzO34qIdFs/JQJ6Vw5IU2OiuRJ
 */

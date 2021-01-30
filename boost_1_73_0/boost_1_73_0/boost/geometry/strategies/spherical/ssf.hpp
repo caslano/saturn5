@@ -166,5 +166,5 @@ struct default_strategy<geographic_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_SSF_HPP
 
 /* ssf.hpp
-wxEiDfqIdEQYhhBFuARhKcIqhA19UuVKtiSHUvEnbFrXJnfy0jbasq6x
+E/1TcE56QjNKc2OXJsKUSWf7QyypQ4zDjzHpkojl1kePG12BWKrR5Re/kCRfd0BMIfhMOVewZt8+UNjl
 */

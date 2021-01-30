@@ -38,5 +38,5 @@ typedef basic_serial_port<> serial_port;
 #endif // BOOST_ASIO_SERIAL_PORT_HPP
 
 /* serial_port.hpp
-dJTflSq6ye9OFd3kK1OlXHanik7y/eBF4KFU0U3+QaroJg+niW5y1p/L
+DTBBaa/p2o7qhQIGQMJtWq/RqA+dMSI+FKcBkEk5XQAdkq7FQopZYpHsoo2vuLJWhOqnSaOjXaUPyZHq
 */

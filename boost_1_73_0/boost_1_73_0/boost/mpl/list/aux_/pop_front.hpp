@@ -34,5 +34,5 @@ struct pop_front_impl< aux::list_tag >
 #endif // BOOST_MPL_LIST_AUX_POP_FRONT_HPP_INCLUDED
 
 /* pop_front.hpp
-LjU6LKawN57TIHNo/VXsfVspc2jjVWJ2lbIO270O3uuOjDr38LFgBGrp
+40z1LxOcUWWc41Lk9nlqrvFjt5+cgn+jt7VKmHVRWX+4y6VFHRPRT0rtzmShrTy48kE59eaDd/+y1JYM
 */

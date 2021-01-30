@@ -32,5 +32,5 @@ struct rgb_to_luminance_fn< double, double, double, GrayChannelValue >
 #endif
 
 /* rgb_to_luminance.hpp
-t3v57zkM+e/po/z3ZJG/9M+u8vnQ5B2QXofP/Ixk4bWnyPX9P5fdRK7v
+d7soPsPzI5e3EBP5Zys7utp4Cs9PY22vPhVf240iTM9i0e/YtRcNkx52x28zxAV/ZKMivsdgjzvlDnb2
 */

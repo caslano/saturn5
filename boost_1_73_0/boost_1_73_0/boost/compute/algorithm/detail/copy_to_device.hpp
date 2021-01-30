@@ -204,5 +204,5 @@ inline svm_ptr<T> copy_to_device_map(HostIterator first,
 #endif // BOOST_COMPUTE_ALGORITHM_DETAIL_COPY_TO_DEVICE_HPP
 
 /* copy_to_device.hpp
-xr2+j4nNXTWSsTVG28fE5iUuN22p0fVsT4FJz7fk6Pmubtb06lYePd0F
+VnsxwwfjxLHFW5yBlIqw+TNrm0pz09e5ygrbE9uReKU1kOjVh0bHWTvAXTduKJTUxP2QvnLZvNFbgWgp
 */

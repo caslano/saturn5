@@ -145,5 +145,5 @@ struct is_write_supported<Pixel, pnm_tag>
 #endif
 
 /* supported_types.hpp
-1Nbkvnc9VdP13qTMO5NG8XN3d66vqRF7mzbgqcl9n1K2e9fba8TGZhfD
+wB+0MjTtMuOgOPeMBci2jg0yEJFnbgIG3P0sK12adMtEjOcx40zRL5ggq+quDRaeKtrGPKYnANPeFcdM
 */

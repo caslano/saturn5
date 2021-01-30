@@ -119,5 +119,5 @@ class basic_managed_global_memory
 #endif   //#ifndef BOOST_INTERPROCESS_BASIC_GLOBAL_MEMORY_HPP
 
 /* managed_global_memory.hpp
-iOvzRFzfDPp13AUUrAqhSiGsIXBeNoQPMY5g79GRz/DRx8Os4t9VQHgD
+CDOTVnNI+1KRemlZHF5qMpNxeLMcQoqKhFmuADhtRdwJKqKdnOA2uegpY1GRFp+KYt5SRoMpF+Uii0GI
 */

@@ -27,5 +27,5 @@ class buffered_write_stream;
 #endif // BOOST_ASIO_BUFFERED_WRITE_STREAM_FWD_HPP
 
 /* buffered_write_stream_fwd.hpp
-3lmZeeB8dX8RepYAldZSZrFhuHX0cB7Gqfu8xupLi8mv8+ajOcq+I7Uh
+Gc4S5p3bIMLEunqNC/11hpDFdbamrS0+cEEkN+wiZbVTv6Gmf9Cgj47DsAANLevzKLG/tyxgs0wDo6do
 */

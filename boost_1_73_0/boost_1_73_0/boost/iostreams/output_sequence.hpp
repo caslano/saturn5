@@ -72,5 +72,5 @@ struct output_sequence_impl<direct_tag> {
 #endif // #ifndef BOOST_IOSTREAMS_OUTPUT_SEQUENCE_HPP_INCLUDED
 
 /* output_sequence.hpp
-gy1X3zzEcn2WvcVyfZY9Cl6taVvfFpja+fDA1MZHBKb2PTIwte1Rgald
+LhFWmJSbK4yCL65mFkRLDsJ6b9RfGO9U/cXsnQQvVQ6Ck8E7Wg8M80bDS+WF68Qk4PGgc5XtftT4q+c8
 */

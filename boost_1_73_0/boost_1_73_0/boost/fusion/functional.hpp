@@ -18,5 +18,5 @@
 
 
 /* functional.hpp
-DERGM/F2GHNDh96ES40gR01kUKm3Z0ZUqD2ERA21B4DhMoktTFuwhWgL
+Owbxpsyaty1cmjV5lsy6bI92hGc64y2mpVHXfgS35f8JabvTj2LFM6TwzExWYw4jGs2Ld6s14/8If7rT
 */

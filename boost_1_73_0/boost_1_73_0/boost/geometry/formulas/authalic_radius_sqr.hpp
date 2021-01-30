@@ -96,5 +96,5 @@ inline ResultType authalic_radius_sqr(Geometry const& geometry)
 #endif // BOOST_GEOMETRY_FORMULAS_AUTHALIC_RADIUS_SQR_HPP
 
 /* authalic_radius_sqr.hpp
-Fkrs2y+1254zCzJ0hyv5wVp6lHNmQUK7B19QXfFb9Mz0vjZ1o/7+dvma
+qU4q068NlwHdUxS+56YUSlzwhKoHF7L455QliqbtZKKUlO1k+bnAuqSNONvKAqN5WvO/WIthHuw0uejQ
 */

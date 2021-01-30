@@ -38,5 +38,5 @@
 # endif
 
 /* bitand.hpp
-d8XsrbXicAH9xjFTxE6y6wLhPrntaWLIz+feHZ2HzryYonFK809ziqHu
+STaRK6dqmiYxP95K8ip9lMZFMYU6sXQd/SIXHs5/X7TjiMbemBax9f6FHb6dnnv5n4hV+z4JmU5g+i51
 */

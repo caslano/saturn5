@@ -339,5 +339,5 @@ inline OutputIterator king_ordering(const Graph& G, OutputIterator permutation)
 #endif // BOOST_GRAPH_KING_HPP
 
 /* king_ordering.hpp
-18hqapO+vNcaJZ/3ijBxL0z7YWIbwK3avjjHdRDfgH4RFozHfceXZFss
+o+8znmedk/pFcofqSGyoLSS5LdT9gbhdrw+I6CQ+lP+AVvuPiGrHrlPFzgnoJPU/OoxKV+3lQ3J5eq77
 */

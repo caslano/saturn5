@@ -93,5 +93,5 @@ struct default_strategy<segment_tag, cartesian_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_ENVELOPE_SEGMENT_HPP
 
 /* envelope_segment.hpp
-qPz3lcA7RP1G3SlqQ2kZcCHwQVFbV0+J2r1/WtTP0zOi9uafFfUf+Zyo
+ZrsfKrVufe5aq4/wNqkwBd67TKdCc9dKal9aD2pQ2ifsh9vKhElKIVu3OGqngEKDFlD4PN/NFi20q1dX
 */

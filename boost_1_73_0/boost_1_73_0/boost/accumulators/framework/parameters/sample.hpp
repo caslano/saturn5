@@ -22,5 +22,5 @@ BOOST_ACCUMULATORS_IGNORE_GLOBAL(sample)
 #endif
 
 /* sample.hpp
-/Vzy0Tc0D1pHaJrZPPH7cP+khs+dujL2SJnjyO2HKM/J6CtDJc9w0a0q
+W4Fet/q7fK/d75bsjt7uCzeEsUgC9OlqFoL37Zuxz+CXdwD89HrhKJBmKdaKJXGM+SoN9hFZAA5DeT3c
 */

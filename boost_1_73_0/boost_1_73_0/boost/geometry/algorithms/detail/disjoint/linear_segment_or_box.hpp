@@ -204,5 +204,5 @@ struct disjoint<Linear, Box, DimensionCount, linear_tag, box_tag, false>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_DISJOINT_LINEAR_SEGMENT_OR_BOX_HPP
 
 /* linear_segment_or_box.hpp
-kW9qT5lYOfyvk1BGXtfu1ce9/ETquM9HlZ80+v1Zm+dPVKp7e7ovSF+1
+DDOPb66j9Qspdjc1MZTaqHN1hTgn3hrT2/Ivij/V0kV/CRLxNnnKeEOAM+6+9qKdIc18IUWVZR2jqAJc
 */

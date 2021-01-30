@@ -142,5 +142,5 @@ inline std::size_t num_interior_rings(Geometry const& geometry)
 #endif // BOOST_GEOMETRY_ALGORITHMS_NUM_INTERIOR_RINGS_HPP
 
 /* num_interior_rings.hpp
-Ll9PP7WFHnLowfMUr8xuzLOxN7xzlFdmD+m38iMGHuz4YZfPk9dqPPJp
+XnlY0SnqCbWnh3rSMcEMFlLlQceAyWID0Nvw2vHLVHlkBv2MB48E7GdNwHxIAAZEhJp8oW1WROyVEW49
 */

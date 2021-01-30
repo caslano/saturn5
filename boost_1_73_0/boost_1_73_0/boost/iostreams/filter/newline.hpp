@@ -441,5 +441,5 @@ BOOST_IOSTREAMS_PIPABLE(newline_checker, 0)
 #endif // #ifndef BOOST_IOSTREAMS_NEWLINE_FILTER_HPP_INCLUDED
 
 /* newline.hpp
-7XsJMbTvpcTQvpcRQ/teTgztu4X8DDtyxGBHFzHYkSem61uJ6fpWYrq+
+wpBf+oPyi7QhKL+sCcov/ma+zWxwF8hxnzMb5SnngiUeW0pLhNll0RwtOE5Rjgm0/UthQfwPdw1O2Bo6
 */

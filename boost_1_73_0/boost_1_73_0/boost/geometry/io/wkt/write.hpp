@@ -560,5 +560,5 @@ inline wkt_manipulator<Geometry> wkt(Geometry const& geometry)
 #endif // BOOST_GEOMETRY_IO_WKT_WRITE_HPP
 
 /* write.hpp
-G/4l9Xpvz7XXlszHNu/kj/CMcqBtA1Tm0rwXRVTiYdvlvbYk7+Gt50nh
+Exv8sxR53757XQpECcfgPP2s+hUwbAW7QZXfkY61HnOVsPanAwQXntiecafN8xorgV7CgU1rx0IFdID+
 */

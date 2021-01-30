@@ -141,5 +141,5 @@ bool is_palindrome(const char* str, Predicate p)
 #endif // BOOST_ALGORITHM_IS_PALINDROME_HPP
 
 /* is_palindrome.hpp
-5QOfQoM1A/7J1/sP7P12YCHfwz9grE59CSwB7gI2B/4ALAUmIHcZ6wHY
+P6OtgvbXD6SlIPiESGYz6HT1enLuJ7Rc96dDWn2+6vwUv2ZNdPWB66pVcFjZwscs2YQpJOM6KN/CXL+T
 */

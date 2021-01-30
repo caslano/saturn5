@@ -117,5 +117,5 @@ inline void swap ( optional<T>& x, optional<T>& y )
 #endif // header guard
 
 /* optional_swap.hpp
-eT0tD5L5OZ9U8rODnKQoCyEiSkeoVxn5+UF+I1WirJJfVkT8eyN/WTDH
+Bxm/BaSz67MFmT3Nk5hm5unOiCfQPFnHNCblM7xxEZJ19fYgWe3MxNBpyYfDBXgxQc2LWIZYRwNtJKgy
 */

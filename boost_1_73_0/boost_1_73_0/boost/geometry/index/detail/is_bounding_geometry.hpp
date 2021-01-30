@@ -35,5 +35,5 @@ struct is_bounding_geometry<Box, box_tag>
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_IS_BOUNDING_GEOMETRY_HPP
 
 /* is_bounding_geometry.hpp
-J2MvgWPjIkftgNzk6PqHdhMwFxj7CBjbjX2Ev4naR1glah+BcyvtI6Av
+qyfgZ4dNYdhRSzuFwwov4sGzejttBDSMBvG/vqZa00Amncp8rDlGOcb6VrRLd9JdUGXcBToRwwyQSepL
 */

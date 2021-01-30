@@ -259,5 +259,5 @@ struct default_strategy<cartesian_tag, areal_tag, 2, Point, Geometry>
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_CENTROID_BASHEIN_DETMER_HPP
 
 /* centroid_bashein_detmer.hpp
-8sknn3zyySeffPLJJ5982jHklf8fcMi4cHGkrHJcwbTy2ORxXcfFxw0l
+rXJADjqf5BsHrap84li0TH+ol8Yv3AulxOeeAiW5jui4ZmNaPnQyDIffrMhhE72+37nyd8BwsF+9KO2E
 */

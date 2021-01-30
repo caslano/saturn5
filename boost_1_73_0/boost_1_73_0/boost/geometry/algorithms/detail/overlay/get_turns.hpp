@@ -1211,5 +1211,5 @@ inline void get_turns(Geometry1 const& geometry1,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_GET_TURNS_HPP
 
 /* get_turns.hpp
-cZjDvv6/qKSwMG9O+HCu/1dG33O7GfMluwYi+/yak5FzGa0ebwnGPaMx
+10ArzFG1JO49cetF+nnm2DLcp21JynjtBcGhEgj1nlj6DvQwXW3oyM+prjcgPDWTicQxcz3tqeV9UovN
 */

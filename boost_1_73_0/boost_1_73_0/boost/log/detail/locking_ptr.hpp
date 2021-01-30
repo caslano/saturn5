@@ -148,5 +148,5 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #endif // BOOST_LOG_DETAIL_LOCKING_PTR_HPP_INCLUDED_
 
 /* locking_ptr.hpp
-Kbe3jEVL1S/+/ryU2lWutXiptmlap3Ep+Rh9bSm3kZfdzPWK3o/ZcD3f
+pvum8s0ZmfVmKVlY+oBsUf/EqAnkp0v5gfK9n+E3LqpG48752nNGrocdpPw7K6uuZ+KghUZ8YF0Lj3A8
 */

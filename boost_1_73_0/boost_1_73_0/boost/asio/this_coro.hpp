@@ -47,5 +47,5 @@ __declspec(selectany) executor_t executor;
 #endif // BOOST_ASIO_THIS_CORO_HPP
 
 /* this_coro.hpp
-Rn0MPgm+BT4Nvg2+Dx4EPwDfAX8CD4PJiP9dS85m/zvYCnwfvBjEHFGt
+G1AFICe1VPgZyCIlRWXvXHQEWJ19fqlr85lLzkaKDZGgcimEdffuBI2V519ZbM5txxtGucGXSU1X5oA/
 */

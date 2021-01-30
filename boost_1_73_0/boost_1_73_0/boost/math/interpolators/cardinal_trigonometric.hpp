@@ -58,5 +58,5 @@ private:
 #endif
 
 /* cardinal_trigonometric.hpp
-3yflx0+FygMs2iD/5u2o9ciaTaXM6zp2mTmRXBxelyF9FbDvN+qgO78E
+pbLZCnr7EkCzqL8DRZnFvx+aEpmrAD5gQ1YC/AHgFYCsDxOZlwHeAmgAGNuYyGwF8AbcEoBXAL4CGAC4
 */

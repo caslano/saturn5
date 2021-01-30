@@ -29,5 +29,5 @@ namespace boost { namespace fusion { namespace detail
 
 
 /* adapt_value_traits.hpp
-GtOY9XpNm+5IpMLy39OqgzGeeKXjrUpa0Unt2ETvKSmpE9/cSc/urU/p
+RiOj6/h4qWbz2lwiA5IwW53t3ivBsTuRTRan3tZCO+3fNEUrFm9CqrZi6ioV4pJV4tlC236clX44fY3m
 */

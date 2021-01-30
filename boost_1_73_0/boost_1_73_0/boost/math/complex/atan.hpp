@@ -36,5 +36,5 @@ std::complex<T> atan(const std::complex<T>& x)
 #endif // BOOST_MATH_COMPLEX_ATAN_INCLUDED
 
 /* atan.hpp
-eaL1KdJlxeJr3UsVrWHx/gzupiHsDYrWsINexWt6ozaH8kYVOd+OKF7f
+nBTpFSK90E/Eag40m3+mUS/87NY4Tv+BjE1oN374D6gTMernx2gp3vzZra94meCn0KSeQvyIWMB//RjV
 */

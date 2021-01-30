@@ -44,5 +44,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_AZIMUTH_HPP
 
 /* azimuth.hpp
-O5S9Zpv6TpRvmGfH3TwbOdPewf7+1vL88aw5g/5ekjzhPva94+yYx0KY
+TZP4/tIRCMHjvZgcPmfKeEZdrCUint7ODR4ZHhrgaeO9lirv4Z1hU/z51nN8ZMR1jF+fnaKEoPQqLtz1
 */

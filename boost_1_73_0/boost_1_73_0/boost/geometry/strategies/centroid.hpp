@@ -72,5 +72,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_CENTROID_HPP
 
 /* centroid.hpp
-orzAj0V5Sp+Iyqx9Ksob/AzYA7ge2C+gMgqcv76QpEyDzglaZiRv/pY6
+Ghd2iCuX4ASH3raYTbgJa11mwDbceficNCGrdG0zg/3UZ4He+M6509w8WRoW5VqrujgMnVJWob0Wj83i
 */

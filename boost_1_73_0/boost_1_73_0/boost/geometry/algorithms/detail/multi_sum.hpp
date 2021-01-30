@@ -52,5 +52,5 @@ struct multi_sum
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_MULTI_SUM_HPP
 
 /* multi_sum.hpp
-z52iPnon2Sj5j96fNn5ZxOi7iAcljF6sHfyCqI/ewZ2+W5SjbwmdXi3K
+g5Xnap40EadY8GLvsWBmVzo+zHrJ7bLkUVxyl16yrDup/GO9FS6zekuNaLDTOgvQLmn7PB6XjOgKGNIv
 */

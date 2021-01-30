@@ -154,5 +154,5 @@ inline std::pair<T, T> brent_find_minima(F f, T min, T max, int digits)
 
 
 /* minima.hpp
-S+B06Ve+gmdG9La8L1+bvtdv3Vlmnemx6S7r/bBk89sb1tmRVuzDaino
+tF1a/12Xq3atVP9xlVoKhlkfTFw4K6hMCgVXW7UgJceojnX6e0hXc1hQ5DQIcFtpTtZO3wIrhtopwMXA
 */

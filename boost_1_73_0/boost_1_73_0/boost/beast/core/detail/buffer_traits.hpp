@@ -98,5 +98,5 @@ buffers_empty(ConstBufferSequence const& buffers)
 #endif
 
 /* buffer_traits.hpp
-rzNieYUH8TMj2tJXGpgxpZwtRDRr05zobZoZ0S7hsLkx7LFGhE0j3Ya5
+RTzG3aayiWLb6G0Av3X6zDannO5E26YzqMHyBK7ZdOH0PjY8gR8Vi2euxcxCzQGZyCUPavbq+FZB1h4i
 */

@@ -191,5 +191,5 @@ struct indexed_access<model::box<Point>, max_corner, Dimension>
 #endif // BOOST_GEOMETRY_GEOMETRIES_BOX_HPP
 
 /* box.hpp
-f55oqMj8eWvg/LBqqCwJq3bKZ3At3C+iGipdI6qh0huuh4PhBng7/CJN
+nS3vDKUlK/qGzHJK2/Ziujv0TvaQShslhLE5lRYfBN9q9fOcGTd2MIHnk9h14Z3CGTmLjqEJsSKcBctt
 */

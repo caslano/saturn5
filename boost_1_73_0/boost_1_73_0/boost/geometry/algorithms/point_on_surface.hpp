@@ -365,5 +365,5 @@ return_point_on_surface(Geometry const& geometry)
 #endif // BOOST_GEOMETRY_ALGORITHMS_POINT_ON_SURFACE_HPP
 
 /* point_on_surface.hpp
-QV046Yfwh/z6RPxhv86ZcF4v5vj4owzXecND8o9z3PZmUa9NT3GcNZ6i
+aJf8VSoP7WYNVgP0r2r5Vl4tNplnQKzsr02kCcXO2n0CmyHV8WJ8H5gE+CU6gXCymkxCOC80XguvlO/F
 */

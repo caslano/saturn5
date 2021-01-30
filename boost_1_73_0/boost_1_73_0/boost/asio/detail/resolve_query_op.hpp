@@ -150,5 +150,5 @@ private:
 #endif // BOOST_ASIO_DETAIL_RESOLVE_QUERY_OP_HPP
 
 /* resolve_query_op.hpp
-vCDxF9E8ioR+c/bzo82z9wr/wwjVLZMoHC+SkV+en8ZLob4vj1A9NM1i
+ZrWlWB+Fe4uMQOTovqL2pR1ARp92LUBj5uUCZyDMRZo+ApQP+T0GT9X48J9Dc8VSQD0FDYhK0EiQeBjy
 */

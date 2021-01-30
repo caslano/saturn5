@@ -123,5 +123,5 @@ struct default_strategy<segment_tag, geographic_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_GEOGRAPHIC_ENVELOPE_SEGMENT_HPP
 
 /* envelope_segment.hpp
-E9tTb1suo2y5jLblcqwtlwpbLlNsucRsucRtuVTacqmy5TLVlss0Wy7T
+9To40WuFDuBLo1NgDhjZ5dS9bbSToN5IJ3CaVB9v8bbi7NSrDlsm5r5cowTHbLgXukfwbr8YXvV9uZwA
 */

@@ -46,5 +46,5 @@ struct point_type<boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)> >
 #endif // BOOST_GEOMETRY_GEOMETRIES_VARIANT_GEOMETRY_HPP
 
 /* variant.hpp
-l/NUo/BfcJb0D86W/UDRLJSnS9Es3Ac+KduFc2S78ClYAefCqnzVNKyD
+Ac0yCqQKCHjDPAcUttIxW4+Lam/3dKmFvd4tLHqupPcFGgDn6oNSPwpEztg2obSrnkaDsvrF3tfrIAdV
 */

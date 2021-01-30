@@ -173,5 +173,5 @@ inline std::string adapt_struct_insert_member(T (Struct::*)[N], const char *name
 #endif // BOOST_COMPUTE_TYPES_STRUCT_HPP
 
 /* struct.hpp
-MxVaVvwb6/8gpKz9KPu//eU5iQ2Jf/mk/Ia58HWTdR0G1T+iaq35NnpF
+955leSqfL0CfKXctD632e4oO5YZ5wDBS/PvBUccskgHlFPXH3OTV1mcq85MK7149npUJtavN/kZMV0+8
 */

@@ -88,5 +88,5 @@ class xsi_shared_memory_file_wrapper
 #endif   //BOOST_INTERPROCESS_XSI_SHARED_MEMORY_FILE_WRAPPER_HPP
 
 /* xsi_shared_memory_file_wrapper.hpp
-HjfV82Vsk3du8X/8Y0x/ZjbEnjCpbv60GXw2je3yWTb+33svboh9RvT9
+lh2AMCbKQDLRj3u3tK7HhO6BcBGT1/XI9/jWPkObhG/38O16OzbzLWbDiDF/GE0Z8m1kA96CoAavZf6E
 */

@@ -27,5 +27,5 @@ class buffered_stream;
 #endif // BOOST_ASIO_BUFFERED_STREAM_FWD_HPP
 
 /* buffered_stream_fwd.hpp
-VnD+M/azplzk+a2RnXtsN2OYe0yXfLrLan8bCfSYsif6lmSu2Px6VVaV
+XmcFDNwGiitC/ycglvprR7FTF8RUVJFQ3rkQF444RxJiWUo3qKCRATHgGVIMNq5hl4NHeudVx8RbbhmG
 */

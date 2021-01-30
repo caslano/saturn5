@@ -69,5 +69,5 @@ BOOST_HANA_NAMESPACE_BEGIN namespace detail {
 #endif // !BOOST_HANA_DETAIL_HAS_COMMON_EMBEDDING_HPP
 
 /* has_common_embedding.hpp
-urTOMRCDseCtu1rGA5FIMCiN5RfhRnCXfDEBptUN9aYLMYvo7ywILYEE
+ksZeoCPJ6W4Fhq0/F+Nz2UmJRZvOoYkna/ZonpKc8x/IYeB95ODjqcjN5fVUrVoqu01ath+kgtmkqP40
 */

@@ -48,5 +48,5 @@ struct point_mutable_traits {
 #endif  // BOOST_POLYGON_POINT_TRAITS_HPP
 
 /* point_traits.hpp
-/8hsj6hwHWQfkO3ROSFdbeiKpQgPqDZCUOeGXHu9dJCJ5yasvjKC9/BG
+KiN4Jq/BaHcqHufWMwtHRZFuaJ7f8SngtGfOztCZmU8PAZ6k9UzTalIwF6r2l5yonr+HVFkMZ1HGpX7R
 */

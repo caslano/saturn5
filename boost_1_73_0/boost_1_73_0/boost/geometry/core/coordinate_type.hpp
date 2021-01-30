@@ -108,5 +108,5 @@ struct fp_coordinate_type
 #endif // BOOST_GEOMETRY_CORE_COORDINATE_TYPE_HPP
 
 /* coordinate_type.hpp
-55IWe89N8nwmRW7FR3n/l5x9ef6RnH15Dyo5+/sazdnvZzRn/0SjOfsn
+zqY+UqAiqmZQYK3wg5F1oaiYS4FzRVUtBS4Q/tkUuERUBCKwvF21gAIXC/9CCmwSFU3hdgpWRdViCl4u
 */

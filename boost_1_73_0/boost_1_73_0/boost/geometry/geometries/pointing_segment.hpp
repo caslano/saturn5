@@ -142,5 +142,5 @@ struct indexed_access<model::pointing_segment<Point>, 1, Dimension>
 #endif // BOOST_GEOMETRY_GEOMETRIES_POINTING_SEGMENT_HPP
 
 /* pointing_segment.hpp
-o1mqBbMYDoUr4CnwQzhMtpet2jDt4XDYF46AI2AZHAPL4VhYEdS4aNFu
+FiQt61l+eX8V0jautFItXbTEjrNq6VtsdF9OttHAdE9m9SKiHOBPUq8i5bniepukKjk1G5v1lRUn2XMu
 */

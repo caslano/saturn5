@@ -98,5 +98,5 @@ struct indexed_access<std::pair<Point, Point>, 1, Dimension>
 #endif // BOOST_GEOMETRY_GEOMETRIES_ADAPTED_STD_PAIR_AS_SEGMENT_HPP
 
 /* std_pair_as_segment.hpp
-w7UwC34Fucc630Ie5J3tMB9mNGOch01gU3gAbAZHweawFkbhI7AIzoUt
+B2a5ugBYYQldG99o8oFIxG+RH3XBpog2612osCk65DfUFK+a68nXoAcNpBWXzpV7FahM4pTBVXtyEPkK
 */

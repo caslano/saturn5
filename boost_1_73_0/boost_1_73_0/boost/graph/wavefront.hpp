@@ -125,5 +125,5 @@ template < typename Graph > double rms_wavefront(const Graph& g)
 #endif // BOOST_GRAPH_WAVEFRONT_HPP
 
 /* wavefront.hpp
-j/XtwussZzin8SrxqvhjklDyGsi8ZvE39oc1PRYs8XnK3H6P01+Kygwl
+PlVRTASrugbxVtuCQn/Acqc+XzIwliIhJybDmlEnjjAUiaCBZi9hQwBojucby2jwP6XWfamdJZ6RMKYj
 */

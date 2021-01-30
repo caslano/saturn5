@@ -62,5 +62,5 @@ struct envelope<MultiLinestring, multi_linestring_tag>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_ENVELOPE_LINEAR_HPP
 
 /* linear.hpp
-EtZ+XUR0WgdG0/dvp7VXQOtnC5TxU+/JN287Rd0iy2et+V86L1ReyLPT
+vnIadxunjfbMGGZ8zGXGx0MdOuPjwPHov9PwMtpS6X5+SCH9FOCx/JmFYHot8+DuiCjOiOLit96sMRbj
 */

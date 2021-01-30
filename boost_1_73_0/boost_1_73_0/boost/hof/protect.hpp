@@ -80,5 +80,5 @@ BOOST_HOF_DECLARE_STATIC_VAR(protect, detail::make<protect_adaptor>);
 #endif
 
 /* protect.hpp
-NuXCI59KVl6L3wZ3WWDpkb+UrLbW9iWb/fPId56SrEmwYoVNnX3oQsm6
+Z0rED6w1Jj89TNfERE1MAICgfSoQBdAxdTG6JJlf1mx+7IYck0JvHQFnEI3mOJ2k+h5YS6kX3Y+UTVsL
 */

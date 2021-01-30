@@ -84,5 +84,5 @@ struct select_calculation_type_alt
 #endif // BOOST_GEOMETRY_UTIL_SELECT_CALCULATION_TYPE_HPP
 
 /* select_calculation_type.hpp
-uVa27keiNh8SfQZsLpvhlctYsfO2yWaMGbBtfiyLBqgcRuWA2uUwZg1I
+hFkMQkmfHSmtZmmqCDNkgDDbLKxAX6+yT6kuKMB0/A5+K87O1a42yt1FNlfdc+wQP7qgax5f9hw0OSYj
 */

@@ -43,5 +43,5 @@ inline void rotate_copy(InputIterator first,
 #endif // BOOST_COMPUTE_ALGORITHM_ROTATE_COPY_HPP
 
 /* rotate_copy.hpp
-+0+7KL6Fh4/IT5/TOLtN/WEf9cOLlK6d7PyK6vmt1o/IL61tlC7Ewx9o
+2GirQ7I35cGN47OswIlaRHxc/T4qQrbWEpGeDR6GCG3wkxvSgxmKq7m+uYLmZKTREQ0ZOaavILF807y4
 */

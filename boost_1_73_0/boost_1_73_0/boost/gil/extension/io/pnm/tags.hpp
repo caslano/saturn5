@@ -95,5 +95,5 @@ struct image_write_info< pnm_tag >
 #endif
 
 /* tags.hpp
-h9YziLraYMwiORfl7mlsvuZ4yu1Z756nZpaboOUmkpynTiLXZmm/lruZ
+ayawrbibtkyk5aeJa710OKazzbK6A3FRx/dQ5h6L4V1zKTa/u4KauLEFaQNLBmM3Re/pk0qWhV3yJ8sk
 */

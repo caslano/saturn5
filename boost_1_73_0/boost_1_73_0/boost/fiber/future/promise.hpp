@@ -222,5 +222,5 @@ void swap( promise< R > & l, promise< R > & r) noexcept {
 #endif // BOOST_FIBERS_PROMISE_HPP
 
 /* promise.hpp
-wfqzuJblaRCA2y7PAzYLOGmLqwkz76z/Q7b6b7PVv/Fst2UdNIi9a5fp
+BjzuWxqqLI9DMiGxx+q8O6ovX7ijlDimOWfdTSdxa9vD1VlhMo0xNCUf/88f0JWCjXdHCS67YLDuYHdt
 */

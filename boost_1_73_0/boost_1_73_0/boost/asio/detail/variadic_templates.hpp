@@ -151,5 +151,5 @@
 #endif // BOOST_ASIO_DETAIL_VARIADIC_TEMPLATES_HPP
 
 /* variadic_templates.hpp
-xH7hLJvJHxjF/59v8+O5wMTq2pau56HuFaRzN1xHGuUXP0v6L/DdXdjn
+aoabcI9skF6ouhDG/OCT2WPuPyRunjgzRV0VQTLI93pL+TvsAgZGHFXJJw9b1PPcjygrLftt17dbWOzT
 */

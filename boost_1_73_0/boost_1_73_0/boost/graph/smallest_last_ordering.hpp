@@ -152,5 +152,5 @@ smallest_last_vertex_ordering(const VertexListGraph& G)
 #endif
 
 /* smallest_last_ordering.hpp
-qeA7hO6Fnivo9xPzAA8D7BT0+xCoUwDHFdpOkSDk7vGhtZf+X9tKbX0f
+H/ORt4wOHjDKDmHCX7KuzxR//L60XMOpM6yXrKNoj3UM/cy51jG0uTibRu1nqHNHhCPNUq1LPIU7ZspQ
 */

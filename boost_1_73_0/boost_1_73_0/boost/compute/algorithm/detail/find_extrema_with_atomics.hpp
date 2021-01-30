@@ -108,5 +108,5 @@ inline InputIterator find_extrema_with_atomics(InputIterator first,
 #endif // BOOST_COMPUTE_ALGORITHM_DETAIL_FIND_EXTREMA_WITH_ATOMICS_HPP
 
 /* find_extrema_with_atomics.hpp
-To9k3oNWLZmqr++rsr2q7ovSlIlcfqyQGhpmQ1Pf37V6yuQ//XwEK+/f
+HOGxmLreLBm9xEW+kf7MB5fBmWxZDgAxUaBkl05Y1RzQHk/4iBBeZmMjqw2nkfaj4Zl4bpNaPG4orAPe
 */

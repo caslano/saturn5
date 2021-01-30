@@ -216,5 +216,5 @@ bool binary_search(ForwardIter first, ForwardIter last,
 #endif // BINARY_SEARCH_DWA_122600_H_
 
 /* binary_search.hpp
-mb+r0N4WSIPCc7OAG+TyJJPLTzAflbyra+JJ1Sg0L+ah1MYjZuOPad8Q
+ZFRXDLMPwrl+zHoXcE44LbK2cw/O6Hn46OG2evBi0MO04mLoYRYDoDMki6GaSiHstkCIEhP0SjW4Uflw
 */

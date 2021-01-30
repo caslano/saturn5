@@ -70,5 +70,5 @@ inline void append_no_duplicates(Range& range, Point const& point,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_APPEND_NO_DUPLICATES_HPP
 
 /* append_no_duplicates.hpp
-ShTKjEM56nmQ5xHVgvz4vgiy7/EynxOsYzrAVyxpP14FKUO8Zsn73A5+
+ShpHuikdA0aRxqVranGl2RF9Wz5Wu2kdWEEHoasXOlBoB3ljjh/vlVq1S58095yghC+xdQl70aEJ80zq
 */

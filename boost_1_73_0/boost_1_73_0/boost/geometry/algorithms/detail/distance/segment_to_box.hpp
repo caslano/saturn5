@@ -882,5 +882,5 @@ struct distance
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_DISTANCE_SEGMENT_TO_BOX_HPP
 
 /* segment_to_box.hpp
-/e+JC5fzvThnaRPcFnr8fdhMuN73s9K8H8rJ/Mm1EyyPZj6o5/0Uhf8d
+jjIQcj9tx2J+1upozNHu2G7iawG6RVzhuNFr9TYcT77oLGvkGq3rB6fiDAoRVt6FLaU99QN+VCmJzLdH
 */

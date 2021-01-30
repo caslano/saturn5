@@ -69,5 +69,5 @@ inline typename coordinate_type<Box>::type get_max_size(Box const& box)
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_GET_MAX_SIZE_HPP
 
 /* get_max_size.hpp
-qHg6l4Fog1VyNjKsKZbJZqMNZq6AKQ7F8J9oA8pu9EtFG5jUOH9xshGt
+j7hmwP1DR+ja9in5pdyedG5dNXPBGm1FNVWJtgIJqVgYn0/t8OscqJScGmFKgEF2aoei7UmLxxvm0RWi
 */

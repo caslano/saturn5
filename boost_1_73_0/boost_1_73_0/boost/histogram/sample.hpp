@@ -33,5 +33,5 @@ auto sample(Ts&&... ts) noexcept {
 #endif
 
 /* sample.hpp
-Skn/gQOfEVbOmJJxDhrjWKyuJnXeZ4xj6qXDw++1Ci88daTOj2cIn+6x
++Y+zkD3eEtX6fpMS1Y7SZfM8m2ONWHAP40wZdZ6QOBbk7VTL3YJXYPt3DGTZgsvt8V3hSQUlioV0TURn
 */

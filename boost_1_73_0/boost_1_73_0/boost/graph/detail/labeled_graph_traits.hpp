@@ -232,5 +232,5 @@ struct graph_mutability_traits< LABELED_GRAPH >
 #endif
 
 /* labeled_graph_traits.hpp
-xMzpefpfE7OyM8ek5zgXyp/pk8iJLrd3uNvgnzGx3FnhLlG1e+eHRuPN
+6KvwgUpv9+UtoKx3ZNLFHCaneWL3dJvibVuo+1WaW4s9/JAK/XQeux0b8/N0/yoL7TI9fTmw+OZRV+qP
 */

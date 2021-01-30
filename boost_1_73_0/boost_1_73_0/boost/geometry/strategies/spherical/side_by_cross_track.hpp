@@ -89,5 +89,5 @@ public :
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_SIDE_BY_CROSS_TRACK_HPP
 
 /* side_by_cross_track.hpp
-xuGtwIuBDwIvBT4NvAz4ckBtBuyUobYCmgCvBtIXwgIg+zptHzZwVG5k
+rUViD+2ralaubNe1tLwrxdtMf2ofGF438a/l3RUIcrGReKu5SgWCdni74XabA3U4E7EfadUHxAvsy1J1
 */

@@ -259,5 +259,5 @@ inline bool covered_by(Geometry1 const& geometry1, Geometry2 const& geometry2,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_COVERED_BY_INTERFACE_HPP
 
 /* interface.hpp
-/Sa9vUwa+B54lqHp1y4o0KcC/rz0ppr00q0sXK7T1e9qSdeNaZKOZJUd
+j8dBMg114eo1lAhqtxF2K672928m2azXXzT3HzSsYerYf3TSJNmQbV5pB3ktmEmn99rPgbZaw+316vkn
 */

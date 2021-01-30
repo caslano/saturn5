@@ -72,5 +72,5 @@ T& std_global()
 #endif // BOOST_ASIO_DETAIL_STD_GLOBAL_HPP
 
 /* std_global.hpp
-tsHjIwQ2n15bLun+Tp8LTl5p1bylZjOdlKnjPFlr8PSNw1ZfKfEf2TCP
+AMiBMhumJsTPz6l9ACa9hs7Sk0tk6e+HS65gzoBjZv/m456WH4L17PFwugkKuNwcF1fi+h278+XtPdYD
 */

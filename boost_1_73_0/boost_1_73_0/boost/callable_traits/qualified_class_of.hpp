@@ -81,5 +81,5 @@ struct qualified_class_of : detail::qualified_class_of_impl<T> {};
 #endif // #ifndef BOOST_CLBL_TRTS_QUALIFIED_class_of_HPP
 
 /* qualified_class_of.hpp
-uJV99a97eF+9+Fjn4NveZ8ka2r3EL1DMJ/Y61Vr4WAuqQmH5+lh0Tzzv
+7AO3VYKWlbbbVRtYdZygBv8SfhbiqtFsUphgwLJxE5FZgCYjET5x/hqhiczGyYs+7ynr4fS77dH7VDT5
 */

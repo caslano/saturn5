@@ -46,5 +46,5 @@ struct closure_as_bool<open>
 #endif // BOOST_GEOMETRY_UTIL_CLOSURE_AS_BOOL_HPP
 
 /* closure_as_bool.hpp
-7n9Xu+/PlSTS7n/Oaek+8tT2v+vvru79/2xrAz+U20p9Xdc4n28muTW+
+vak1NKSgvjS2K2YlULfSYuORmyZHbhqPXMs0CKMbhUk8f8cPJsnIb2YpHayZGMw59GN2ZsD4bqY2rI9l
 */

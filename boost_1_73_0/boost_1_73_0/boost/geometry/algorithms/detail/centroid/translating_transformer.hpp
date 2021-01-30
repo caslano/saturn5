@@ -119,5 +119,5 @@ struct translating_transformer<Geometry, areal_tag, cartesian_tag>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_CENTROID_TRANSLATING_TRANSFORMER_HPP
 
 /* translating_transformer.hpp
-vSXWLc9/cPkr5PPGPdtMuNXHteNlDK9H7L1zmQdxbeIChvdo7L3XM+/j
+6r5njfohyiTr30ggaHSWTekCs6n2wL8IhEJrAG+E2o+dcbDQ5LhuiZHSdU23m79qYJ1JA+vq7L9vAy8z
 */

@@ -37,5 +37,5 @@
 #endif // BOOST_ATOMIC_DETAIL_CAPS_GCC_PPC_HPP_INCLUDED_
 
 /* caps_gcc_ppc.hpp
-sq4uLi0rWiimwY371nqcPkKV135O13fK+a1Sl/qx8nK9TKzrhlFPWkOz
+2DuVwL6yGfZQRX8snzNRTbkKMaVXviP5y2H3Ozt8ypbmOBETVzDeaJac1fxF1MMSaEuXyHzxkMxyI8wB
 */

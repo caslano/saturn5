@@ -110,5 +110,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_DISTANCE_HPP
 
 /* distance.hpp
-+5y3/1HWlNeUNWU/oqzpD6Jnj6Na8Mzwl5tmbvz4m/XOwhfmnXPmTcvf
+oTlRbz4m7PsfWQBdnwLY+oMEwI+OElqZZHiX6N5nDO98pOrerS3eh4EqxWGEZyZO9OkZsVHwfEhjhnS8
 */

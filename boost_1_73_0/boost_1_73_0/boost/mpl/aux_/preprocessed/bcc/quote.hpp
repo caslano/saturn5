@@ -119,5 +119,5 @@ struct quote5
 
 
 /* quote.hpp
-8PCUVkZD8Ksr+Oi2pajlXkYv4iPPHZTm1JYmr7d6ZQb+AX80/wTdMMrp
+NjQ+/mkNR5OVcf0R9bp+6b3hD2TsXtsZtuMSaRAFMkP93//XsOv9dlQuwStHmXkAPhnrnr57/7CEvVaE
 */

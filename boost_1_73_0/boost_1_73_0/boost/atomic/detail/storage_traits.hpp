@@ -193,5 +193,5 @@ struct storage_size_of
 #endif // BOOST_ATOMIC_DETAIL_STORAGE_TRAITS_HPP_INCLUDED_
 
 /* storage_traits.hpp
-fw1+CW4H/wFuBb8B93rq++IA2BJ8DmwN7vPUjnI4G9wEdrJhbnc6/j2w
+AkhTk4XviHXfCBRNaUVDTJuPKV1oRJNr3P/tNGZ6CkJErgGmgOiTUj9NSPWbyvyfUTBR2MMIu7Tag+Is
 */

@@ -53,5 +53,5 @@ struct simplicity_failure_policy
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_IS_SIMPLE_FAILURE_POLICY_HPP
 
 /* failure_policy.hpp
-uNcGvxnnw56BK5lB+WYU5aKjFCqf48oPnjroNTHzs7x1JlV52mvkX6qn
+vZjtqKb19cqGDFcXBGgW7+Q/YpfmoQFpLMWabqQ7dOPVUlwNp4zYBTBAF1gDbatMtylTpk2jTGIattbs
 */

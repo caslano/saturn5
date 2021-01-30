@@ -48,5 +48,5 @@ template< typename T > struct nested_type_wknd
 #endif // BOOST_MPL_AUX_NESTED_TYPE_WKND_HPP_INCLUDED
 
 /* nested_type_wknd.hpp
-AX3g2h0AUyjrZy2ydUkf0LGPPn4LQPCqxjQUpH9F6vLfFXtZz03iZt2T
+rGhJOVGxgMBYFOUeEG8zFx1BRrmJpLXS//l3lAbsARJmfuQORjuU4gKEVLuD/knn9Ci4cGJ4LP5Zn2bG
 */

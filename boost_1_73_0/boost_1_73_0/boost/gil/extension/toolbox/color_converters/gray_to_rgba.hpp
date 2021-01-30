@@ -36,5 +36,5 @@ struct default_color_converter_impl<gray_t,rgba_t>
 #endif
 
 /* gray_to_rgba.hpp
-k+VSiY6T4IXlBMYutAHtdVtr14SiA00nCSXYp0EH4KP+DNe7R3QgrQGC
+VUpnYxBF0xJFxc8+xPpWVsr1ndSmw9Tu3comRbYvOXmQnNBntBr7TxzZtFExps+IN84kj/C+M4nl3S6X
 */

@@ -196,5 +196,5 @@ namespace boost { namespace accumulators
 #endif
 
 /* rolling_mean.hpp
-Frym1k4Jx6hBQjObiqmGLkMutwYYK8/nUiW0Vy/+Nxw74TzSz9G1E9rX
+a9uXaRZruebaRpKlGFGQVjXVZTm0tglMAwwI8Ai/MIECAyL87IgqgggQIL+IgOu/mB+A8EThkYXnHWy6
 */

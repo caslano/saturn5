@@ -49,5 +49,5 @@ struct envelope<MultiPoint, multi_point_tag>
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_ENVELOPE_MULTIPOINT_HPP
 
 /* multipoint.hpp
-VXROmve56bbT+DVNlHbbbtwqjKPbptONbX1BaTCSb3Vw74HfhcbfHo8/
+/Rf2rbXAWRbYSw9mZDHbA/Sf0Ql/Z6MpcJU1QYIvah/IcolXTi17tIWZHaSyN/BQUbZpVuN1BedqoJJL
 */

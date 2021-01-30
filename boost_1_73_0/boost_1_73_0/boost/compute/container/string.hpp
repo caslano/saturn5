@@ -25,5 +25,5 @@ typedef basic_string<char_> string;
 #endif // BOOST_COMPUTE_CONTAINER_STRING_HPP
 
 /* string.hpp
-RxNGD68KfAsV9NBddssVA4fKJLzkkaYzHPO4BJ/1mjNWXgTztASvVNW4
+ZVf5djmzsEqlYqyVwXdWMZy2mqooDdiRl5F3ksijEKUfT6+DpAOgHDCvkh6+H981SgAAMDFN98Z7/pul
 */

@@ -221,5 +221,5 @@ inline bool within_no_turns(Geometry1 const& geometry1, Geometry2 const& geometr
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_WITHIN_WITHIN_NO_TURNS_HPP
 
 /* within_no_turns.hpp
-HQ6HH8ER8HN4urQXniHbhSNhgHO5LKDxLeWwKayA+4Tc3GCnDRwL75J7
+BPhYGRF4yShrf3+MPFTsLydybeqPk4dKYX/cQ/1x8lCp7Y9r6Y+Th0prf9zN/XFujnuqP+56GZe8B6/+
 */

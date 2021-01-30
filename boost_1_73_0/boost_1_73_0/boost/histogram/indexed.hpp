@@ -372,5 +372,5 @@ auto indexed(Histogram&& hist, coverage cov = coverage::inner) {
 #endif
 
 /* indexed.hpp
-6IsnMRv3IbD+m4bEItewGnZPJBXyh9gGzHBfNQ0GaiiRDMJU0WSoO94Z
+LaRao+2Gwh3jtxa06mXr1ZxS1VWqndHug71RS9wjL4rjmfJijdEWPbw8YqtRs6O9HtUd7c1Ti6O9k9Ur
 */

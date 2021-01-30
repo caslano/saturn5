@@ -251,5 +251,5 @@ typename singleton_pool<Tag, RequestedSize, UserAllocator, Mutex, NextSize, MaxS
 #endif
 
 /* singleton_pool.hpp
-XK7FwiuXpnpYoJxbX1int29h4CRo0qKHgL+Xfjh+YnT1d/M4deTFEGnX
+I/qA0PxtQUHw+vveNDT+s5qOYf7MCsK96Vy6P2AQ0T+cx5V+UPJANBKT1xQKkhI/iH5v2uYRZ6NmXqP4
 */

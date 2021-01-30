@@ -24,5 +24,5 @@ struct map_tag;
 #endif // BOOST_MPL_MAP_AUX_TAG_HPP_INCLUDED
 
 /* tag.hpp
-BO3r+YqGHjHExSi5HoLpRcBjmWOCMavIr2BUpG8wVE4daGOPUHOBufGh
+hSYiPVfja8hjOZWyjwCafScEu0tkNQPF8udg+YxtVMQ+x3AaYnK5xVLrGPORdSCAC5c8DXFpb0Qo8HCZ
 */

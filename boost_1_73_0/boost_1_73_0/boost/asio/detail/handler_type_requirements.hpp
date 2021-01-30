@@ -558,5 +558,5 @@ struct handler_type_requirements
 #endif // BOOST_ASIO_DETAIL_HANDLER_TYPE_REQUIREMENTS_HPP
 
 /* handler_type_requirements.hpp
-Wb9oSd10fMoXfl0Y4P5snh+mbSYGS9r76C4KtxPRssLHScjp8RK/nm6X
+P0sqxXvwErM+ADDhC1HkLSHXKvBURQQbIdmimvkoObVkp3Cjy08UjshO6NPu59P6lDTvSo7cF5G4dUYL
 */

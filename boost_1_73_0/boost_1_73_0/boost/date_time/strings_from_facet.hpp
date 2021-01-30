@@ -127,5 +127,5 @@ gather_weekday_strings(const std::locale& locale, bool short_strings=true)
 #endif
 
 /* strings_from_facet.hpp
-+4GsDGoZKo7LSgy1/VvzJSLNJ5G9i1MAo3k6K1ySv35FdbzVb1pYba1r
+KIALbLa4qDTiO14InfQlMCGiYykt7IK5IsgOg1KMfpcDeQnmPbI3QheNwhGlHgJgHuSLlHqQNHeCaArM
 */

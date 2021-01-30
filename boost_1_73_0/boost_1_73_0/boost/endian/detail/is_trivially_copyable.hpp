@@ -39,5 +39,5 @@ template<class T> struct is_trivially_copyable: boost::integral_constant<bool,
 #endif  // BOOST_ENDIAN_DETAIL_IS_TRIVIALLY_COPYABLE_HPP_INCLUDED
 
 /* is_trivially_copyable.hpp
-YeQcdvCwq54dbIL/eBbQqCnfXrcVD7TPTkU8wRo7/Zqr3mzmKpDjWAQ9
+06VMlD8O/SD/Zo+nNEGl8FzaTp9EM/sjho+MH0QIbfn4xTidIhClbB4XA4CkZS2aFuOoxir7OQ0fttkf
 */

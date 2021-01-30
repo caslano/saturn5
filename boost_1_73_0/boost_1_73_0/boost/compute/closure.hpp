@@ -347,5 +347,5 @@ make_closure_impl(const char *name,
 #endif // BOOST_COMPUTE_CLOSURE_HPP
 
 /* closure.hpp
-JnY3Eb4z3Rm2VPM7SRRPscZtIhGua4JxJ7l9CV6TwBlz6T++kxN9CVRu
+kxOMXWsJV+pRt0lJRp9Mc7wr9d7is3rKkSwu3IoY6ld59512xnqtQ1rYpxKwQuCUKdt9mV8mrfPHfGaQ
 */

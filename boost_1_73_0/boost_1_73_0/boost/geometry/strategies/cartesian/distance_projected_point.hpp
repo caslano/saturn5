@@ -309,5 +309,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_DISTANCE_PROJECTED_POINT_HPP
 
 /* distance_projected_point.hpp
-EYmNK+lSUzLhOE041eg35Fs+9v2SxDvxn/yZPGeWgrB5iyUXyh2p94Z1
+iBKYyt3mKhlCX2sc88Tv75NGY9IK3i5afmuai6CeP6040u6GXr6x0XLrMKoEasvqsBJoMkMDuJRfxy/P
 */

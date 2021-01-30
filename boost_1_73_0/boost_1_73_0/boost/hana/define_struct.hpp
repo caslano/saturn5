@@ -17,5 +17,5 @@ Distributed under the Boost Software License, Version 1.0.
 #endif // !BOOST_HANA_DEFINE_STRUCT_HPP
 
 /* define_struct.hpp
-r0i9OiDl1y3t7pp5nLSTWzK+Pms+D+X+R+R+fir94buS74tyvg/kuOt+
+H3mHEq9H4ubJp6GSvWMtP9sLHdDTzbNQkaj1kOO0kRGnWDsb2qyJ8/4JD+C83yrKGkV1N5RPwlHCBBjo
 */

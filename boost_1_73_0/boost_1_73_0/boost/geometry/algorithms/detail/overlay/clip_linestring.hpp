@@ -263,5 +263,5 @@ OutputIterator clip_range_with_box(Box const& b, Range const& range,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_CLIP_LINESTRING_HPP
 
 /* clip_linestring.hpp
-66wCA+BaMB38A3gk+DjYifeDqNPOM9Tbgq+BR/O7Ax5jvjPst4mOR2Q+
+fY2X4ewt0DoTodb8rtgoqWJmgHx5dOq1w+TAbBjRPzB9gw0MK7qLTqZhmZ4R2mUlX7g9Ot+2KPJDq3hx
 */

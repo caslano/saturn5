@@ -282,5 +282,5 @@ private :
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_BUFFER_TURN_IN_ORIGINAL_VISITOR
 
 /* turn_in_original_visitor.hpp
-xHFw2xTXjmfAbUDct6w33JwOsf76wa0uNdbtNLjVtIl1G8h702PdhjDN
+9NtjHUnvVbb60wm4tKO6tXFQcL17BOpfbsXfahu4PQKmb083BQ4/O12SSCQD5zV72aYTwxhoQeAYxfu0
 */

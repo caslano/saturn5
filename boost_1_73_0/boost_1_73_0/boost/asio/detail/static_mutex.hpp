@@ -54,5 +54,5 @@ typedef std_static_mutex static_mutex;
 #endif // BOOST_ASIO_DETAIL_STATIC_MUTEX_HPP
 
 /* static_mutex.hpp
-mZTbb917aTtJN5xS73MSniKnrGW8z52Vv/+CkEkS35LcHHW2hBV3G2YT
+c0Fz1+bAS2heNUacluvKb5720AWseLfkaj10k0M9X01vN6el+QCI7Z3DUg7ZbeE9aXYLus6Lcgp3Kpg+
 */

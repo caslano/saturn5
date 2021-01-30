@@ -45,5 +45,5 @@ using poly_collection::base_collection;
 #endif
 
 /* base_collection_fwd.hpp
-b68OrpskAc+PQJYBGvhgue7y7WGeknB3+GlvyxTgw5ny6KyfKLCHpz2p
+WRJS2+zWA+S1p964YoxoTAPHrcvppGAvJaom3tF+Aq2xlUNw6VixgWllQhS7VZ5N1N9IsZ9rwezXrHTo
 */

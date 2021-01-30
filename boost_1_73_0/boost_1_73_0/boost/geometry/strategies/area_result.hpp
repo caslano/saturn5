@@ -116,5 +116,5 @@ struct area_result<boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>, default_strateg
 #endif // BOOST_GEOMETRY_STRATEGIES_AREA_RESULT_HPP
 
 /* area_result.hpp
-Sun7m2w5YXtn+j5lXXbCcxV7bl5OdAS3tb7/Z/KmOiANcvfMMeeKuE4O
+K77/HZtF3oucIjhcuClFakl4YIcDG9OcgTamQ4MJ/nmZcJ1VLLn+hZDrZ0XWrlI0F50jKRbLXcwimqUd
 */

@@ -225,5 +225,5 @@ struct default_strategy
 #endif // BOOST_GEOMETRY_STRATEGIES_CARTESIAN_DISTANCE_SEGMENT_BOX_HPP
 
 /* distance_segment_box.hpp
-+nhgE1G58t2AY0VtFZ0o6n/rJFGbRZQvpwwy5cv3FpUv31eM3HECaTHy
+MrlZVX3Nqj86oFkXcbMcUm9skNYcvPK/b032gNawL8gh5rU0p+eOQMfdBPbgv+6wTd6xZL1wCP4IpWZh
 */

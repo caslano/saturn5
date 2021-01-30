@@ -117,5 +117,5 @@ void mode_adapter<Mode, T>::close(BOOST_IOS::openmode which)
 #endif // #ifndef BOOST_IOSTREAMS_DETAIL_MODE_ADAPTER_HPP_INCLUDED //-----//
 
 /* mode_adapter.hpp
-dpzKsYFvpJiJHWvB8n4e67RQ1nHn9MB0zFkXmI43ZwSmY82Zgek4c1Zg
+UNwA369GDDi+H3D0V1ZYgEO+QUNG5JwJRpE4QuGfV1JlfqdUz8DwqqzoN8liSxNvMYmj6iJn5wvs7Kwm
 */

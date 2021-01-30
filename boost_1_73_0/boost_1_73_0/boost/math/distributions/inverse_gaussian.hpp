@@ -527,5 +527,5 @@ inline RealType kurtosis_excess(const inverse_gaussian_distribution<RealType, Po
 
 
 /* inverse_gaussian.hpp
-m4vE7LdEQL+FPwMR6GWl8uD/IHmShv79OHVexDyP8OvKcN0NuLqjsc+M
+xTWij+NXuukhH4y3C+PdYc+PqaMHSj75IXv/0kP6lx5S8lMVTv1LUwXKC8Y+t9chL6aLGH+wLYvr2kj8
 */

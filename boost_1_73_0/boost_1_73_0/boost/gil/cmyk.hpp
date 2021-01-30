@@ -52,5 +52,5 @@ planar_cmyk_view(std::size_t width, std::size_t height, IC c, IC m, IC y, IC k, 
 #endif
 
 /* cmyk.hpp
-dZWusyj7xbY4zDbQNVb265+i/m/eAR4EXAscDnwXeDzwPWAY+AFwIvBD
+7a77OIK+bwJBC7O3tnEgwenNuurILU5aqF0Gq2JGFzjnhZwsUB1Z37juKlrB0cDkedHApHm6b4KUgJur
 */

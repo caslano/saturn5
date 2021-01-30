@@ -468,5 +468,5 @@ inline typename tools::promote_args<T>::type
 
 
 /* trigamma.hpp
-mXLmzDnneyYzdy77rCLx/VCB1LckNn0psDxGomepRKtCiSLS8hpwzZcG
+q/5ylqNDN+h6wzc/9b3ecHfnL683jL1M1xuEDjrXOaNY53zNJZM7dUEZW7RgRTYL4/lyeN5XmL8U22d+
 */

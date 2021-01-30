@@ -30,5 +30,5 @@ using protected_fixedsize_stack = boost::context::protected_fixedsize_stack;
 #endif // BOOST_FIBERS_PROTECTED_FIXEDSIZE_STACK_H
 
 /* protected_fixedsize_stack.hpp
-0c28ldAr6Uw38wZywQ/txO1Gfb15a/vf3Jo85x/WC6DRErotlctwS/Li
+ouMjhqSf80yPm7u5fm9e4ahSQlEUjTKfm5a+JdfWN9KyOhze67Oe4KMC+bT8ghkVRhjnlKvdhsDzZW1t
 */

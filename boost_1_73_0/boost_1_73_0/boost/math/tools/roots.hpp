@@ -1015,5 +1015,5 @@ inline std::pair<typename tools::promote_args<T1, T2, T3>::type, typename tools:
 #endif // BOOST_MATH_TOOLS_NEWTON_SOLVER_HPP
 
 /* roots.hpp
-RPaZaD9fwyXEOzGWfrVt6LPG3sLQe20xJv6VBs/WaNuJgz6N5CnKc2aX
+R+UkdJs464osz5npM4PHJaCkgJoGEdZj/fFgKjsYQIewfqjZUBoPoYMJXvbE1RnNEom7GvapoQ7S5Z8l
 */

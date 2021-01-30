@@ -444,5 +444,5 @@ InputIterator find_extrema_with_reduce(InputIterator first,
 #endif // BOOST_COMPUTE_ALGORITHM_DETAIL_FIND_EXTREMA_WITH_REDUCE_HPP
 
 /* find_extrema_with_reduce.hpp
-beyTO+LxHtLvLVLI23PI0FdInuCh3kPIr6b272q1Mh8vUrR3m2QuTtu3
+IY48XJKKfQ9sA5IM7sg7f9ZQPum7geK+XLxrrlMa6mVy/xdWYNq52hYcuA+QweKPGofI9lgwkYHuWpqM
 */

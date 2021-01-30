@@ -36,5 +36,5 @@ auto empty(const histogram<A, S>& h, coverage cov) {
 #endif
 
 /* empty.hpp
-nYZO5tFfMH4TBhpqXfnW3UOrrCFVrqt9PEJJG9UVVKt559JtVJupyF5E
+WY55fCwMSnE+BYwTJ0N24SjpImq9+FkDa5witthswBUBOxa2pXBWT4W9BYfOXHSORLvK5hMJPBzr2Sut
 */

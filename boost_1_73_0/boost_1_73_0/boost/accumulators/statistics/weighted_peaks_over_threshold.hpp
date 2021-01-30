@@ -302,5 +302,5 @@ struct as_feature<tag::weighted_peaks_over_threshold<LeftRight>(with_threshold_p
 #endif
 
 /* weighted_peaks_over_threshold.hpp
-WQ9IxgpD/2YY1UPK6DsKNxvNd6ooR/PtoIbtWelre8IWUpcCz/a1Pc/x
+L+CsBMoQo7GRUSntqqnb55iNLRU8iwXrq4AhxRVOpEoxjQeJEgL1n3SXSmWaiFGOqpT0vljB1Xg9a30C
 */

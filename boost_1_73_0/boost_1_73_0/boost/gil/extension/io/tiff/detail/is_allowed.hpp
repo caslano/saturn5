@@ -253,5 +253,5 @@ bool is_allowed( const image_read_info< tiff_tag >& /* info */
 #endif
 
 /* is_allowed.hpp
-y3lkwVwCOR1j8s8iO+9OtTImN3hk7DubBW+845qVLd5bjpXoOAm+CFfc
+r7CxOewQji+yvxh1WIuynM59eEGIR17mYq4BxazTDA46kFeWosRTM+XFV0v6/o+BzwPijWsTOrJ9L4X1
 */

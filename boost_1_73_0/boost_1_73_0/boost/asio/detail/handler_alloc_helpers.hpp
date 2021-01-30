@@ -244,5 +244,5 @@ struct get_hook_allocator<Handler, std::allocator<T> >
 #endif // BOOST_ASIO_DETAIL_HANDLER_ALLOC_HELPERS_HPP
 
 /* handler_alloc_helpers.hpp
-R8VLorF4pDQe4+zBOOGH2stB9kAT9FY+/bhpLOhbSAnuk/nG1sclTdyG
+d9q8n+0GmOP+IkNnJqq5ArpoaeU+jlMokUUIasltzkMHklFBDh3mbFwG2L8Nasrp18f/aba88LXdvZk3
 */

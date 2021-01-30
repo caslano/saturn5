@@ -81,5 +81,5 @@ struct is_stateful_value_traits
 #endif   //@ifndef BOOST_INTRUSIVE_DETAIL_IS_STATEFUL_VALUE_TRAITS_HPP
 
 /* is_stateful_value_traits.hpp
-FNZOviLrv0ly+fvLnR1z6jOvzGbCM4zMWb2M/r5N//bP89ifqSV1QF3m
+I05GpG5Ux3kWd9DwV3RsMYriex9Dc2GVRYy8VH9nlEWsvBSVHFULMEAS8Bsia/+Yq67UXdh5rEeVIoBm
 */

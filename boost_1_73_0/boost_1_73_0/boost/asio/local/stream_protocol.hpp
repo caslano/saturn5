@@ -92,5 +92,5 @@ public:
 #endif // BOOST_ASIO_LOCAL_STREAM_PROTOCOL_HPP
 
 /* stream_protocol.hpp
-g8vnaxuOO583S3rPp43TQq8NeUwOPH3iGlcc8Ht7gnDl/FTwM4Uf8P/U
+Ern7tJRjZsrq9cgclKvKKwhVRiuWO/boEZzY9ZPabX88jXQjN4uBalfCmzTKsikl+EgRivELu04OtAgm
 */

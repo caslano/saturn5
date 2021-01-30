@@ -15,5 +15,5 @@
 
 
 /* amigaos.hpp
-35aCbEc8e8cCDOrI+7rc0xtZY7w0jKKw9S8bTyCLTmDvwZDd9s5HNchM
+22DwrLhp+syIL3iaGW6AIDOV8ZcDIb7REL/FOpKZTL9ZfO0dhwIhLxfFCKgyNMEUsSDZn0ZoyyTnkDt3
 */

@@ -177,5 +177,5 @@ public :
 #endif // BOOST_GEOMETRY_STRATEGIES_SIDE_INFO_HPP
 
 /* side_info.hpp
-r939uYdPas4VvPvqqN1X8/8sN1cGINEwJb01UgDbXX6dUvlt5l7nLckA
+vOFa0tBuju7brI9H9fr4Xfx3D//dz39b+e9h/ovChBd2iXR5GZpuXo6skO6mBoLa1VCYhWG9o3Zckc9Z
 */

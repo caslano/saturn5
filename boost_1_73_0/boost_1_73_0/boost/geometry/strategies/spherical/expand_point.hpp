@@ -233,5 +233,5 @@ struct default_strategy<point_tag, geographic_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_EXPAND_POINT_HPP
 
 /* expand_point.hpp
-7oWbWdlnJCuRp98ze+K8I0SGHCE++eSTTz755JNPPvnkk08++fQfox0m
+/h/LF3N56aincG9RmaMPxISicmccQG5Rea7abdmBOPpflljqiFAI+X9vx8x+/fgvll3Z/26Vzvk/rVL/
 */

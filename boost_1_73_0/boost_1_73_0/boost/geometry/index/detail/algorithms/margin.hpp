@@ -169,5 +169,5 @@ typename default_margin_result<Geometry>::type comparable_margin(Geometry const&
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_ALGORITHMS_MARGIN_HPP
 
 /* margin.hpp
-9LDWzbk5ev1K2vXGtOvcR/T67/a6yyPJ/6fIaWZpAr909MzoXeBHeGb8
+8bTg/486QgmHCZb20ztDMzhMSDPGid6pQ6NgpO4539Bl6jc05OtFrfRs3QsUTj9Hz6iEK/XICbevHD3J
 */

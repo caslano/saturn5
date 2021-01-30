@@ -314,5 +314,5 @@ struct is_dynamic_buffer_v2
 #endif // BOOST_ASIO_DETAIL_IS_BUFFER_SEQUENCE_HPP
 
 /* is_buffer_sequence.hpp
-aZ8x9qbrjLR4gN+eftvVt9aHtbcPRZ3e5rSbXNs1NM5b2DQ7hz+htl8e
+DH+U8y1WnVlF+fK1r/PNFfx8iuZan02itMQRSt6uf2zn2fvsai1ig4j9Vy0FJoJTS/lmXx7kExYy95hz
 */

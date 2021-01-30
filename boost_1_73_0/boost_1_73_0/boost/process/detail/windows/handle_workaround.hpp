@@ -262,5 +262,5 @@ inline ::boost::winapi::BOOL_ nt_query_object(
 #endif /* BOOST_PROCESS_DETAIL_WINDOWS_JOB_WORKAROUND_HPP_ */
 
 /* handle_workaround.hpp
-iyCz3JCyEAMTYBJMhmtgCsTCVIiD6+BauB4SYQbcANPhZpgDM+FGmA0J
+WhUjD28GB41JNbjGhDKtRtEcr8JWVc/Da/GRIZMUTfEWejNLmmJ/CqnW+AmrZC00UzAHNgKISJdaaTpg
 */

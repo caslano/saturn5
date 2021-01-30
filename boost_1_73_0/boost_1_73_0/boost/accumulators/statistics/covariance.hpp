@@ -219,5 +219,5 @@ struct feature_of<tag::weighted_covariance<VariateType, VariateTag> >
 #endif
 
 /* covariance.hpp
-hO4bsw9dSIvNCaFvUp6ds/ZV1t29kq9xvcXzOBsYJPVfiHa9itxa4Ut5
+SqLJLWZ+2wHrylkld9s7H0qLrpuATswB+9AdnMdwo9tY/WITSfz9xDrSJ0c1NBEvZfi2HfbfCsCoCZcT
 */

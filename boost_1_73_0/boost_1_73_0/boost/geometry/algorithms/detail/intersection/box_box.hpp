@@ -54,5 +54,5 @@ struct intersection
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_INTERSECTION_BOX_BOX_HPP
 
 /* box_box.hpp
-TXHvJQt+VsM+zXg8/hpbeN8MtzEg73vm5VH/8XLyOvhpCMj7Xurx15Kc
+uFV/xSiex/C6lfpRqGjH3055GLD+pw8DA4Q1kvB1d42f9cQwDR9yD3vMUon4LHc100sDr5n6X+pZb4MT
 */

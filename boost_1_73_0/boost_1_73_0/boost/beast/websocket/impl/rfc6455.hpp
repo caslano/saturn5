@@ -40,5 +40,5 @@ is_upgrade(http::header<true,
 #endif
 
 /* rfc6455.hpp
-dJPwMCIECIgKDASUhwIJCYq8B1B5ZL12Oh3SQ9OJ3Z3w0NFWUOKKfsii
+XLpyHP0tu+K4iaPr2wSD87Cs/+EKCcJC62t+/H+Izu0PTP8E9PpunCLoF5k/L/8QtwdCF0GrwW8JChNc
 */

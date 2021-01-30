@@ -71,5 +71,5 @@ class aligned_storage
 #endif // header guard
 
 /* optional_aligned_storage.hpp
-+edY4yxfRBSH+HtjIqLZiK8gRJc+vorYXdHp0/U0YCFF/unfFflhSEcj
+BWppoA1tEiFrAZwBk147owmFt2qenPgkDYz65JhzESAGM9JCebc/d5mwYf6hpjczhRF+i8+w8jdbu91v
 */

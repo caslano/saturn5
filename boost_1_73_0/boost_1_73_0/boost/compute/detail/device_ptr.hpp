@@ -215,5 +215,5 @@ struct is_device_iterator<detail::device_ptr<T> > : boost::true_type {};
 #endif // BOOST_COMPUTE_DEVICE_PTR_HPP
 
 /* device_ptr.hpp
-oLUt65Nw9WyFtovb7pBw69kKXeYjhVPPScB6IuHNOyUcn5Ng2j39Cqb8
+U1LkvVqrh+fdG3BNPSQdlJCCFqe4uxeia9xj51/+GwJa6mBPX6BZ41W4ugTfbE+rRaHIqeGdoOC5kGC6
 */

@@ -139,5 +139,5 @@ std::vector< std::tuple< cudaStream_t, cudaError_t > > waitfor_all( cudaStream_t
 #endif // BOOST_FIBERS_CUDA_WAITFOR_H
 
 /* waitfor.hpp
-W5VhyRg7TnmuclvvYqiJbV0sJsNmgjuwiPR2sUgCfy0RP0euk0h/DbKz
+tQLBblSn5TAxEv91/xg3pIhbEH2vlhDmjvqU+kzrZDIhMWdn4v5hd+IFwA6Dm69URD4uq23ks0kYHS4f
 */

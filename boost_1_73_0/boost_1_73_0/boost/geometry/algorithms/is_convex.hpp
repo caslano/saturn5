@@ -228,5 +228,5 @@ inline bool is_convex(Geometry const& geometry, Strategy const& strategy)
 #endif // BOOST_GEOMETRY_ALGORITHMS_IS_CONVEX_HPP
 
 /* is_convex.hpp
-nWyKNceamurbW1oaO4zWuNEWS2eNVD7pKY6lpdYsFlpT69pSSbbY6Zbm
+YuMgcoSbdf27QnGHflRsUpeKbZTFW1mifpcOJDEJp00AKsqq4wd44WBcK2t93N7bc6m9OLZQOYHcAa17
 */

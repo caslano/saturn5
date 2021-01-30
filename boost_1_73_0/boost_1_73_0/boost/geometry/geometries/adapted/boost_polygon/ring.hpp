@@ -182,5 +182,5 @@ inline std::size_t range_calculate_size(polygon_data<CoordinateType> const& poly
 #endif // BOOST_GEOMETRY_GEOMETRIES_ADAPTED_BOOST_POLYGON_RING_HPP
 
 /* ring.hpp
-I6yAP8DRUB7+K2EYnglz4Vi453/Y+w7wqMq07edMZpKogAkgIDUidtTQ
+Fj5UR/fXAjEF167WQwuLynTi7S5LwvuvgewsPtaq0B7GkRhDUsfVA5uBlkfGZuYTOP+9ToDzxxsS4HyN
 */

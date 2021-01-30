@@ -118,5 +118,5 @@ struct default_strategy<Tag, geographic_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_GEOGRAPHIC_ENVELOPE_HPP
 
 /* envelope.hpp
-ukChgOoAZQOvAjYJqI5PU+DtwGbAB4DNgSuAbYEcs9vZchniuGOljqHM
+VxvplUIndl5fllu0Jk9L1ZflGXPLPPvYC5zfry8toxYVHptBjUpnv/V2NKhuabE6WzxBsIy1xVB4hDM2
 */

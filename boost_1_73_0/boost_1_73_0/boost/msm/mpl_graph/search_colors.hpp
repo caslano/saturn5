@@ -39,5 +39,5 @@ struct search_color_map_ops {
 #endif // BOOST_MSM_MPL_GRAPH_SEARCH_COLORS_HPP_INCLUDED
 
 /* search_colors.hpp
-j9kUT1Oiaho07C+2HDVZsCfNnGIa5rwqBuUnOm9u8Kh61KmWh0zPOOiA
+nBPdgQrORZKyG35SJTN+M5lX/ybwQkKdS0FBzvG7SLhfPXSkBm1VOpYGdFl6HLmWdcCDqHiqBnSxlWXX
 */

@@ -93,5 +93,5 @@
 #define BOOST_STDLIB "Comeau standard library " BOOST_STRINGIZE(__LIBCOMO_VERSION__)
 
 /* libcomo.hpp
-w/Zgc1adx+a0WU2mZs/R01w8bfo252E/x9TsedjG6all7+Wx913AtM/m
+kIpm7oO8lxOQ6aFgO5X6cRvs+a8Wb84+OgWBKIv5lnX15GuM4OsHn0VMYGDSo/9U0CcHxfWdxfethUW/
 */

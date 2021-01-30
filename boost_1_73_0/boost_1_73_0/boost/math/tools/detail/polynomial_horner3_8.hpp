@@ -112,5 +112,5 @@ inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::integral
 
 
 /* polynomial_horner3_8.hpp
-JFAGVl0bDuUBDMs05s3SJ0ORXVtNOptQBO1M/FLD8NiUfULQ4bEUyLHM
+pqidlaA7QJZQeZp1asQINuLAg5KCQyNOB48hHkgA9QE14SqgJlwFpA35NSSnEadQGjAKgaVB3ipGceSA
 */

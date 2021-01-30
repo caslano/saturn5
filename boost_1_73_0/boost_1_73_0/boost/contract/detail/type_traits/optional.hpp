@@ -42,5 +42,5 @@ T& optional_get(boost::optional<T&>& x) { return x.get(); }
 
 
 /* optional.hpp
-0xWypjfTnvD6oKwzl4t1IJ+ZSj7tsWk5TJKaJhHK7EGlpxFxQW+b19t2
+8A8g6iJwOLCX9EC8on1sCLL4DN0aUZosrcaT9pOLe8jGhxeu/q9eZtOau4mfcBOEkmySh5QFRIl5lRw4
 */

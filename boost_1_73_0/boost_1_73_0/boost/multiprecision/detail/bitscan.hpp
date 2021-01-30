@@ -316,5 +316,5 @@ BOOST_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR unsigned find_msb(Unsigned mask)
 #endif
 
 /* bitscan.hpp
-hGUKRI4j17FYik0v5XTXBrHNTkyO5cVKumEAdaYI1PT3WAMGC7V51iSP
+bc9Va66jmTCWzlgaqimtaK3Wy+uyn/eAC+J8q5dXPlp8IsMrb5llwuKDglz79g785DHrWH+RORv7KxtD
 */

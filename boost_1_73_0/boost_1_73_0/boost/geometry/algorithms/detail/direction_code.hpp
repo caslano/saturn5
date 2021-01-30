@@ -256,5 +256,5 @@ inline int direction_code(Point1 const& segment_a, Point1 const& segment_b,
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_DIRECTION_CODE_HPP
 
 /* direction_code.hpp
-pU/1sOmB9A6wNK7JCZQ0s0Yv+0NC3oZBL2+/YRexdaBIkSJFihQp+ljQ
+61azCChwWlQrqhTDPPJ5x6UQhkMXwdh8oIWyViDO28xqjuB9KxOZkeizS+Wr4BpPKU3PfDolWKBq53gI
 */

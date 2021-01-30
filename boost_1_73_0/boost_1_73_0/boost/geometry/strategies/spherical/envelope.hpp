@@ -148,5 +148,5 @@ struct default_strategy<Tag, spherical_polar_tag, CalculationType>
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_ENVELOPE_HPP
 
 /* envelope.hpp
-J5988smnLdMO4/8XzSgrqIzGjai6PQT4s2cAi3PpE87ywR1NP7aHht9I
+2a2wZ/4jfHzd0hh3Xc7r5iSyBs6x79mh7OVQ3EvZxGwXS6D4ItEGb+uOldIzg4v9zLmZb7FQccTyzGCh
 */

@@ -586,5 +586,5 @@ SGB_UTIL_ACCESSOR(edge, b)
 #endif // BOOST_GRAPH_SGB_GRAPH_HPP
 
 /* stanford_graph.hpp
-gM+8RvsCJHpBi8oQL/O5WEMw2f+HgVOmZpdOU4srvS5pq+E3tmeAVyYY
+GeOoKXPkQ5pmJGaeRn+MkmyWX9bK86tbaGugJvM0py5qpG2nMuxMOXuk8Le5GvEiY3W25QAl88cniJIz
 */

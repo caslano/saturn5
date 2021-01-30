@@ -53,5 +53,5 @@ std::string make_literal(T x)
 #endif // BOOST_COMPUTE_DETAIL_LITERAL_HPP
 
 /* literal.hpp
-493GDQJXWQdMsKnr+gjCGxCHguQuucQC7/IeGJD76jB39DNEW7U/TzDy
+q4T9/dGTP74yh3eknGllgXAj7bGyOD0dvPB7RtWwP9e6GMv4hafHxurUwMOSeYHcZU2a2Ff+YEMhHnML
 */

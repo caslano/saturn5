@@ -142,5 +142,5 @@ struct common_type<boost::histogram::accumulators::weighted_mean<T>,
 #endif
 
 /* weighted_mean.hpp
-Dvji0e7Ayp5kQ2pj4OKu2ObuwMZUTziI7wpCicC2cM/GwNaqysV0+YXE
+O/fNGvzhSvrw9V//8KxZ9OHajO2ZV5fEy4hExKY0MFrjbKsO5hWS8BUTK/BuPzyg+i70wSvA3hvP47rN
 */

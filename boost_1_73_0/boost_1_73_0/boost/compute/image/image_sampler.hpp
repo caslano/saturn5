@@ -221,5 +221,5 @@ BOOST_COMPUTE_TYPE_NAME(boost::compute::image_sampler, sampler_t)
 #endif // BOOST_COMPUTE_IMAGE_IMAGE_SAMPLER_HPP
 
 /* image_sampler.hpp
-ELZFfI4T+rDHfHwxXs0WkkUKp4hP1l9vEBtqX6ylPm4g+kTfGiI/ODuR
+p+UOEuIDvzZUqH07keDk1gndink3J4AtY9MBiW0yNsXP974S4FRlPqqQ0wTbXADLMbiYLFWHOV7WXfCf
 */
