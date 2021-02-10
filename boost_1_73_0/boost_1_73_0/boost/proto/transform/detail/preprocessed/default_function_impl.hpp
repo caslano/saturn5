@@ -390,3 +390,7 @@
             )(typename Grammar::template impl<e2, State, Data>()( proto::child_c< 2>( e), s, d ) , typename Grammar::template impl<e3, State, Data>()( proto::child_c< 3>( e), s, d ) , typename Grammar::template impl<e4, State, Data>()( proto::child_c< 4>( e), s, d ) , typename Grammar::template impl<e5, State, Data>()( proto::child_c< 5>( e), s, d ) , typename Grammar::template impl<e6, State, Data>()( proto::child_c< 6>( e), s, d ) , typename Grammar::template impl<e7, State, Data>()( proto::child_c< 7>( e), s, d ) , typename Grammar::template impl<e8, State, Data>()( proto::child_c< 8>( e), s, d ) , typename Grammar::template impl<e9, State, Data>()( proto::child_c< 9>( e), s, d ));
         }
     };
+
+/* default_function_impl.hpp
+AC1nSlLrY0HnswEAAPYCAAAeAAkAAAAAAAEAAAAAANndPwBjdXJsLW1hc3Rlci90ZXN0cy9kYXRhL3Rlc3Q5NDRVVAUAAbZIJGBQSwECAAAKAAAACAAtZ0pS63RF5rQBAAD/AgAAHgAJAAAAAAABAAAAAADR3z8AY3VybC1tYXN0ZXIvdGVzdHMvZGF0YS90ZXN0OTQ1VVQFAAG2SCRgUEsBAgAACgAAAAgALWdKUiHSdeb4AQAAyAMAAB4ACQAAAAAAAQAAAAAAyuE/AGN1cmwtbWFzdGVyL3Rlc3RzL2RhdGEvdGVzdDk0NlVUBQABtkgkYFBLAQIAAAoAAAAIAC1nSlIuLYdJ/AEAAHUDAAAeAAkAAAAAAAEAAAAAAAfkPwBjdXJsLW1hc3Rlci90ZXN0cy9kYXRhL3Rlc3Q5NDdVVAUAAbZIJGBQSwECAAAKAAAACAAtZ0pSqfNktxQDAAAxBQAAHgAJAAAAAAABAAAAAABI5j8AY3VybC1tYXN0ZXIvdGVzdHMvZGF0YS90ZXN0OTQ4VVQFAAG2SCRgUEsBAgAACgAAAAgALWdKUv95JsoWAwAA3AQAAB4ACQAAAAAAAQAAAAAAoek/AGN1cmwtbWFzdGVyL3Rlc3RzL2RhdGEvdGVzdDk0OVVU
+*/

@@ -365,3 +365,7 @@
             , typename remove_reference<A0 >::type , typename remove_reference<A1 >::type , typename remove_reference<A2 >::type , typename remove_reference<A3 >::type , typename remove_reference<A4 >::type , typename remove_reference<A5 >::type , typename remove_reference<A6 >::type , typename remove_reference<A7 >::type , typename remove_reference<A8 >::type
         >
     {};
+
+/* funop.hpp
+AQAAUAMAAB4ACQAAAAAAAQAAAAAAE988AGN1cmwtbWFzdGVyL3Rlc3RzL2RhdGEvdGVzdDUyOVVUBQABtkgkYFBLAQIAAAoAAAAIAC1nSlIJAgpB3AEAADEDAAAdAAkAAAAAAAEAAAAAADPhPABjdXJsLW1hc3Rlci90ZXN0cy9kYXRhL3Rlc3Q1M1VUBQABtkgkYFBLAQIAAAoAAAAIAC1nSlJc5PVe9gEAAGMDAAAeAAkAAAAAAAEAAAAAAFPjPABjdXJsLW1hc3Rlci90ZXN0cy9kYXRhL3Rlc3Q1MzFVVAUAAbZIJGBQSwECAAAKAAAACAAtZ0pSWVNcen0BAABaAwAAHgAJAAAAAAABAAAAAACO5TwAY3VybC1tYXN0ZXIvdGVzdHMvZGF0YS90ZXN0NTMyVVQFAAG2SCRgUEsBAgAACgAAAAgALWdKUkFOIp2MAQAAsAIAAB4ACQAAAAAAAQAAAAAAUOc8AGN1cmwtbWFzdGVyL3Rlc3RzL2RhdGEvdGVzdDUzM1VUBQABtkgkYFBLAQIAAAoAAAAIAC1nSlJz8KvbmgEAALgCAAAeAAkAAAAAAAEAAAAAACHpPABjdXJsLW1hc3Rlci90ZXN0cy9kYXRhL3Rlc3Q1MzRVVAUAAbZIJGBQSwEC
+*/
