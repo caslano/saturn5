@@ -1,0 +1,85 @@
+/*!
+@file
+Forward declares `boost::hana::filter`.
+
+@copyright Louis Dionne 2013-2017
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
+ */
+
+#ifndef BOOST_HANA_FWD_FILTER_HPP
+#define BOOST_HANA_FWD_FILTER_HPP
+
+#include <boost/hana/config.hpp>
+#include <boost/hana/core/when.hpp>
+
+
+BOOST_HANA_NAMESPACE_BEGIN
+    //! Filter a monadic structure using a custom predicate.
+    //! @ingroup group-MonadPlus
+    //!
+    //! Given a monadic structure and a predicate, `filter` returns a new
+    //! monadic structure containing only those elements that satisfy the
+    //! predicate. This is a generalization of the usual `filter` function
+    //! for sequences; it works for any MonadPlus. Intuitively, `filter` is
+    //! somewhat equivalent to:
+    //! @code
+    //!     filter(xs, pred) == flatten(transform(xs, [](auto x) {
+    //!         return pred(x) ? lift<Xs>(x) : empty<Xs>();
+    //!     })
+    //! @endcode
+    //! In other words, we basically turn a monadic structure containing
+    //! `[x1, ..., xn]` into a monadic structure containing
+    //! @code
+    //!     [
+    //!         pred(x1) ? [x1] : [],
+    //!         pred(x2) ? [x2] : [],
+    //!         ...
+    //!         pred(xn) ? [xn] : []
+    //!     ]
+    //! @endcode
+    //! and we then `flatten` that.
+    //!
+    //!
+    //! Signature
+    //! ---------
+    //! Given a `MonadPlus` `M` and an `IntegralConstant` `Bool` holding a
+    //! value of type `bool`, the signature is
+    //! @f$ \mathtt{filter} : M(T) \times (T \to \mathtt{Bool}) \to M(T) @f$.
+    //!
+    //! @param xs
+    //! The monadic structure to filter.
+    //!
+    //! @param pred
+    //! A function called as `pred(x)` for each element `x` in the monadic
+    //! structure and returning whether that element should be __kept__ in
+    //! the resulting structure. In the current version of the library, the
+    //! predicate has to return an `IntegralConstant` holding a value
+    //! convertible to a `bool`.
+    //!
+    //!
+    //! Example
+    //! -------
+    //! @include example/filter.cpp
+#ifdef BOOST_HANA_DOXYGEN_INVOKED
+    constexpr auto filter = [](auto&& xs, auto&& pred) {
+        return tag-dispatched;
+    };
+#else
+    template <typename M, typename = void>
+    struct filter_impl : filter_impl<M, when<true>> { };
+
+    struct filter_t {
+        template <typename Xs, typename Pred>
+        constexpr auto operator()(Xs&& xs, Pred&& pred) const;
+    };
+
+    constexpr filter_t filter{};
+#endif
+BOOST_HANA_NAMESPACE_END
+
+#endif // !BOOST_HANA_FWD_FILTER_HPP
+
+/* filter.hpp
+uAc413jOc6LXMRxtQqb5NZiI5+rA1Ed0U7TAop8Urm3glWYihT1wZSwFB9opPGcedn/TL/NOVL/mVOIjzIsJd2jdsANa1FFAha0T5KbOeYIE00TLsWoJRiz2snzr9skuBUi91uWv8kYZkWmsr7xuO26cGnB2+sy7uG3Kv+twVM1SuU+fkbTQCQEIF7IdBgaRFW6VLnpwdJPo1qJ/Hioir70WG2ZVkrhnVI4AEsRmKIVtTE78KtxqarslyoSVwMKvziPC/ZQgDQ8bsCHSvKAlxzt0SbhLZYp2qw74h9EuZMxQxOFAni77j4pzstSGx2RxgEfg2/L/R1EdzjGXxjDQHp+0ASvtYsnAIw0HmvT0xli+LJEv9Q9c2S5rD+GBxKHBsIGg6GN56kUzZWDCnsd3O29C2TdMlyCDxBv0YQBVLdUdzpH/hB5YDRcP1Q6TFiim+gJ9kdAZQ13BfGz0/8q12K1OwK4LIZwXIY5VhTqmVqiy8aKFnIgobcv2wGLCT4vwpIDdr8oFbOyTWVIVtTh7bF63vqYdv4/W4NkcGisBbk//i+6fDgNKRkGbkQ==
+*/

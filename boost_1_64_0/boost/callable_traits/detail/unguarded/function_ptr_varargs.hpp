@@ -1,0 +1,26 @@
+/*
+Copyright (c) 2016 Modified Work Barrett Adair
+
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
+
+HEADER GUARDS INTENTIONALLY OMITTED
+DO NOT INCLUDE THIS HEADER DIRECTLY
+*/
+
+#define BOOST_CLBL_TRTS_INCLUDE_TRANSACTION_SAFE
+#define BOOST_CLBL_TRTS_IS_TRANSACTION_SAFE std::false_type
+#include <boost/callable_traits/detail/unguarded/function_ptr_varargs_2.hpp>
+#undef BOOST_CLBL_TRTS_INCLUDE_TRANSACTION_SAFE
+#undef BOOST_CLBL_TRTS_IS_TRANSACTION_SAFE
+
+#ifdef BOOST_CLBL_TRTS_ENABLE_TRANSACTION_SAFE
+#define BOOST_CLBL_TRTS_IS_TRANSACTION_SAFE std::true_type
+#define BOOST_CLBL_TRTS_INCLUDE_TRANSACTION_SAFE transaction_safe
+#include <boost/callable_traits/detail/unguarded/function_ptr_varargs_2.hpp>
+#undef BOOST_CLBL_TRTS_INCLUDE_TRANSACTION_SAFE
+#undef BOOST_CLBL_TRTS_IS_TRANSACTION_SAFE
+#endif // #ifdef BOOST_CLBL_TRTS_ENABLE_TRANSACTION_SAFE
+/* function_ptr_varargs.hpp
+WWcgy8DGMg/s3+4Kdfor6ECeFbfklaGG9Y+Ip2oWzqpZqrYmQbHXt4yCBahSLq3ye20sGOcGYZRO4P25bSccXD8JLgCaIf/s7Br4+EFRabbz1n4HVYEq3306Q+e7iwgzMmcHpTCaBEOQwVwzat9dEZRZBT7ZtTvivAVGw8JdIErPnXdgw8nUdFPjDkvriqHdeIbU8am2q4F3OtlFabYCbDjqK23DGmEzbukBIghgzO0+v00VaM0ofiLaszjyb9eJmQpeq9qYq7af8rUUfNU35ghpFJmkbRYadN8uXJiGZ8yKtiANvU/SP9xiRmW94sLFtG7/FVt/yU9JxSaQgyz/8H8OnWGyh+atBU5X+zZiI1hM0IWSm5Q9pFddAOfOCK5n33FvGFN2VvgkAOtgatAgdYStjKaUW900HQ/RCvsn4mD40XdrBOwz13r5tx8mai9Ks5ahhWWe4rmkiKPn5zwyImdrxX3uN1tywudgLZNONMRtJ+s3PtrNGzTxov4+5u4BTmRIrsC9Ca3+CO99RzJtRnwc3w172zBVwfM8b0zc81L96/wZL45E/iXiQQ==
+*/

@@ -1,0 +1,10 @@
+
+// Copyright 2017 Daniel James.
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <boost/container_hash/extensions.hpp>
+
+/* extensions.hpp
+5MK2SVcBhIWILTuCuYRuBShjB8ruCSHT9cVfYNRSpaoh4DiQlFlcZMKi6W7JtjveGpz97xqZSgnorvAOh0Df7w7TmNinrsMqRpZRUt4Ho1W9yum5ZkNMEX9f9Sut9qxYYC6BWFlMt3z2docoNSKDbPdUbGaHhsz1oqiRIQj2huTwYlRAHpYBDE1ZZa8vrm/KfAMFZAeT92TC/uR4TkR+t2zIflPSC49aPfjqZSKrpIg+0o8wdsJQIhwncaQfoe1mv0D9qSFX6TkM2No6b2HzZRlCwpXgPH2TiDdcnQt7buE7HkqIw/diVTJAn2sphajiLIem89QF8KItaAySZYnC+Ee2uj/7znZg9xZyP/hX+UMNUV3be4wgq5WcqK5xlM4QxN7l90tWwPHgLBcfPnG3KQTCedOX+KBMpxXu8eDdLe/0Rxid1s2vY+C2S2cCffxCpurtxseqrHopFvBB6WisXwQtg2Y2iguwTWnBdFtMubsrEAeEoRimxoe60aY6o5Xj6j29Xlz1V+Pwj0zaqdSnJ1XJM9Uixn6HwfdHN/OPiOP2fzzkRO1BnP6sNw==
+*/
