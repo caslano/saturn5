@@ -1,0 +1,78 @@
+/*!
+@file
+Forward declares `boost::hana::when` and `boost::hana::when_valid`.
+
+@copyright Louis Dionne 2013-2017
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
+ */
+
+#ifndef BOOST_HANA_FWD_CORE_WHEN_HPP
+#define BOOST_HANA_FWD_CORE_WHEN_HPP
+
+#include <boost/hana/config.hpp>
+
+
+BOOST_HANA_NAMESPACE_BEGIN
+    //! @ingroup group-core
+    //! Enable a partial specialization only if a boolean condition is true.
+    //!
+    //! You might also want to take a look at `when_valid`, which provides
+    //! similar functionality but enables a specialziation only when some
+    //! expression is well-formed.
+    //!
+    //! > #### Rationale for using `when` instead of `std::enable_if`
+    //! > `when` is used to control the priority of partial specializations
+    //! > in a finer grained manner than what can be achieved with the usual
+    //! > `typename Enable = void` and `std::enable_if` pattern. For example,
+    //! > a partially specialized tag-dispatched method will have a higher
+    //! > priority than an equivalent specialization that uses `when`. For
+    //! > more details, see the tutorial section on [tag-dispatching][1].
+    //!
+    //!
+    //! Example
+    //! -------
+    //! @include example/core/when.cpp
+    //!
+    //! [1]: @ref tutorial-core-tag_dispatching
+    template <bool condition>
+    struct when;
+
+    namespace core_detail {
+        template <typename ...>
+        struct always_true { static constexpr bool value = true; };
+    }
+
+    //! @ingroup group-core
+    //! Variant of `when` allowing specializations to be enabled only if an
+    //! expression is well-formed.
+    //!
+    //! `when_valid<...>` is always equivalent to `when<true>`. However, when
+    //! used inside a partial specialization, SFINAE will cause the partial
+    //! specialization to be ignored when the expression is ill-formed.
+    //!
+    //!
+    //! Example
+    //! -------
+    //! @include example/core/when_valid.cpp
+    //!
+    //!
+    //! @bug
+    //! Using `when_valid` seems to trigger ambiguous partial specializations
+    //! on GCC.
+#ifdef BOOST_HANA_DOXYGEN_INVOKED
+    template <typename ...>
+    using when_valid = when<true>;
+#else
+    template <typename ...Dummy>
+    using when_valid = when<
+        core_detail::always_true<Dummy...>::value
+    >;
+#endif
+BOOST_HANA_NAMESPACE_END
+
+#endif // !BOOST_HANA_FWD_CORE_WHEN_HPP
+
+/* when.hpp
+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
+*/

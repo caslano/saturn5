@@ -1,0 +1,111 @@
+//
+// Copyright (c) 2016-2019 Vinnie Falco (vinnie dot falco at gmail dot com)
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+// Official repository: https://github.com/boostorg/beast
+//
+
+#ifndef BOOST_BEAST_MAKE_PRINTABLE_HPP
+#define BOOST_BEAST_MAKE_PRINTABLE_HPP
+
+#include <boost/beast/core/detail/config.hpp>
+#include <boost/beast/core/buffer_traits.hpp>
+#include <boost/asio/buffer.hpp>
+#include <ostream>
+
+namespace boost {
+namespace beast {
+
+namespace detail {
+
+template<class Buffers>
+class make_printable_adaptor
+{
+    Buffers b_;
+
+public:
+    explicit
+    make_printable_adaptor(Buffers const& b)
+        : b_(b)
+    {
+    }
+
+    template<class B>
+    friend
+    std::ostream&
+    operator<<(std::ostream& os,
+        make_printable_adaptor<B> const& v);
+};
+
+template<class Buffers>
+std::ostream&
+operator<<(std::ostream& os,
+    make_printable_adaptor<Buffers> const& v)
+{
+    for(
+        auto it = net::buffer_sequence_begin(v.b_),
+        end = net::buffer_sequence_end(v.b_);
+        it != end;
+        ++it)
+    {
+        net::const_buffer cb = *it;
+        os.write(static_cast<char const*>(
+            cb.data()), cb.size());
+    }
+    return os;
+}
+
+} // detail
+
+/** Helper to permit a buffer sequence to be printed to a std::ostream
+
+    This function is used to wrap a buffer sequence to allow it to
+    be interpreted as characters and written to a `std::ostream` such
+    as `std::cout`. No character translation is performed; unprintable
+    and null characters will be transferred as-is to the output stream.
+
+    @par Example
+    This function prints the size and contents of a buffer sequence
+    to standard output:
+    @code
+    template <class ConstBufferSequence>
+    void
+    print (ConstBufferSequence const& buffers)
+    {
+        std::cout <<
+            "Buffer size: " << buffer_bytes(buffers) << " bytes\n"
+            "Buffer data: '" << make_printable(buffers) << "'\n";
+    }
+    @endcode
+
+    @param buffers An object meeting the requirements of
+    <em>ConstBufferSequence</em> to be streamed. The implementation
+    will make a copy of this object. Ownership of the underlying
+    memory is not transferred, the application is still responsible
+    for managing its lifetime.
+*/
+template<class ConstBufferSequence>
+#if BOOST_BEAST_DOXYGEN
+__implementation_defined__
+#else
+detail::make_printable_adaptor<ConstBufferSequence>
+#endif
+make_printable(ConstBufferSequence const& buffers)
+{
+    static_assert(net::is_const_buffer_sequence<
+        ConstBufferSequence>::value,
+            "ConstBufferSequence type requirements not met");
+    return detail::make_printable_adaptor<
+        ConstBufferSequence>{buffers};
+}
+
+} // beast
+} // boost
+
+#endif
+
+/* make_printable.hpp
+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
+*/

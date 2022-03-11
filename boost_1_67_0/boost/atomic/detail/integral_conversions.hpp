@@ -1,0 +1,109 @@
+/*
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See accompanying file LICENSE_1_0.txt or copy at
+ * http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * Copyright (c) 2018 Andrey Semashev
+ */
+/*!
+ * \file   atomic/detail/integral_conversions.hpp
+ *
+ * This header defines sign/zero extension and truncation utilities for Boost.Atomic. The tools assume two's complement signed integer representation.
+ */
+
+#ifndef BOOST_ATOMIC_DETAIL_INTEGRAL_CONVERSIONS_HPP_INCLUDED_
+#define BOOST_ATOMIC_DETAIL_INTEGRAL_CONVERSIONS_HPP_INCLUDED_
+
+#include <boost/atomic/detail/config.hpp>
+#include <boost/atomic/detail/bitwise_cast.hpp>
+#include <boost/atomic/detail/type_traits/integral_constant.hpp>
+#include <boost/atomic/detail/type_traits/is_signed.hpp>
+#include <boost/atomic/detail/type_traits/make_signed.hpp>
+#include <boost/atomic/detail/type_traits/make_unsigned.hpp>
+
+#ifdef BOOST_HAS_PRAGMA_ONCE
+#pragma once
+#endif
+
+namespace boost {
+namespace atomics {
+namespace detail {
+
+template< typename Output, typename Input >
+BOOST_FORCEINLINE Output zero_extend_impl(Input input, atomics::detail::true_type) BOOST_NOEXCEPT
+{
+    // Note: If we are casting with truncation or to the same-sized output, don't cause signed integer overflow by this chain of conversions
+    return atomics::detail::bitwise_cast< Output >(static_cast< typename atomics::detail::make_unsigned< Output >::type >(
+        static_cast< typename atomics::detail::make_unsigned< Input >::type >(input)));
+}
+
+template< typename Output, typename Input >
+BOOST_FORCEINLINE Output zero_extend_impl(Input input, atomics::detail::false_type) BOOST_NOEXCEPT
+{
+    return static_cast< Output >(static_cast< typename atomics::detail::make_unsigned< Input >::type >(input));
+}
+
+//! Zero-extends or truncates (wraps) input operand to fit in the output type
+template< typename Output, typename Input >
+BOOST_FORCEINLINE Output zero_extend(Input input) BOOST_NOEXCEPT
+{
+    return atomics::detail::zero_extend_impl< Output >(input, atomics::detail::integral_constant< bool, atomics::detail::is_signed< Output >::value >());
+}
+
+//! Truncates (wraps) input operand to fit in the output type
+template< typename Output, typename Input >
+BOOST_FORCEINLINE Output integral_truncate(Input input) BOOST_NOEXCEPT
+{
+    // zero_extend does the truncation
+    return atomics::detail::zero_extend< Output >(input);
+}
+
+template< typename Output, typename Input >
+BOOST_FORCEINLINE Output sign_extend_impl(Input input, atomics::detail::true_type) BOOST_NOEXCEPT
+{
+    return atomics::detail::integral_truncate< Output >(input);
+}
+
+template< typename Output, typename Input >
+BOOST_FORCEINLINE Output sign_extend_impl(Input input, atomics::detail::false_type) BOOST_NOEXCEPT
+{
+    return static_cast< Output >(atomics::detail::bitwise_cast< typename atomics::detail::make_signed< Input >::type >(input));
+}
+
+//! Sign-extends or truncates (wraps) input operand to fit in the output type
+template< typename Output, typename Input >
+BOOST_FORCEINLINE Output sign_extend(Input input) BOOST_NOEXCEPT
+{
+    return atomics::detail::sign_extend_impl< Output >(input, atomics::detail::integral_constant< bool, sizeof(Output) <= sizeof(Input) >());
+}
+
+//! Sign-extends or truncates (wraps) input operand to fit in the output type
+template< typename Output, typename Input >
+BOOST_FORCEINLINE Output integral_extend(Input input, atomics::detail::true_type) BOOST_NOEXCEPT
+{
+    return atomics::detail::sign_extend< Output >(input);
+}
+
+//! Zero-extends or truncates (wraps) input operand to fit in the output type
+template< typename Output, typename Input >
+BOOST_FORCEINLINE Output integral_extend(Input input, atomics::detail::false_type) BOOST_NOEXCEPT
+{
+    return atomics::detail::zero_extend< Output >(input);
+}
+
+//! Sign- or zero-extends or truncates (wraps) input operand to fit in the output type
+template< bool Signed, typename Output, typename Input >
+BOOST_FORCEINLINE Output integral_extend(Input input) BOOST_NOEXCEPT
+{
+    return atomics::detail::integral_extend< Output >(input, atomics::detail::integral_constant< bool, Signed >());
+}
+
+} // namespace detail
+} // namespace atomics
+} // namespace boost
+
+#endif // BOOST_ATOMIC_DETAIL_INTEGRAL_CONVERSIONS_HPP_INCLUDED_
+
+/* integral_conversions.hpp
+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
+*/

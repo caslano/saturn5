@@ -1,0 +1,116 @@
+//---------------------------------------------------------------------------//
+// Copyright (c) 2016 Jakub Szuppe <j.szuppe@gmail.com>
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//
+// See http://boostorg.github.com/compute for more information.
+//---------------------------------------------------------------------------//
+
+#ifndef BOOST_COMPUTE_DETAIL_DIAGNOSTIC_HPP
+#define BOOST_COMPUTE_DETAIL_DIAGNOSTIC_HPP
+
+// Macros for suppressing warnings for GCC version 4.6 or later. Usage:
+//
+//   BOOST_COMPUTE_BOOST_COMPUTE_GCC_DIAG_OFF(sign-compare);
+//   if(a < b){
+//   BOOST_COMPUTE_BOOST_COMPUTE_GCC_DIAG_ON(sign-compare);
+//
+// Source: https://svn.boost.org/trac/boost/wiki/Guidelines/WarningsGuidelines
+#if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 402
+#define BOOST_COMPUTE_GCC_DIAG_STR(s) #s
+#define BOOST_COMPUTE_GCC_DIAG_JOINSTR(x,y) BOOST_COMPUTE_GCC_DIAG_STR(x ## y)
+# define BOOST_COMPUTE_GCC_DIAG_DO_PRAGMA(x) _Pragma (#x)
+# define BOOST_COMPUTE_GCC_DIAG_PRAGMA(x) BOOST_COMPUTE_GCC_DIAG_DO_PRAGMA(GCC diagnostic x)
+# if ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+#  define BOOST_COMPUTE_GCC_DIAG_OFF(x) BOOST_COMPUTE_GCC_DIAG_PRAGMA(push) \
+      BOOST_COMPUTE_GCC_DIAG_PRAGMA(ignored BOOST_COMPUTE_GCC_DIAG_JOINSTR(-W,x))
+#  define BOOST_COMPUTE_GCC_DIAG_ON(x) BOOST_COMPUTE_GCC_DIAG_PRAGMA(pop)
+# else
+#  define BOOST_COMPUTE_GCC_DIAG_OFF(x) \
+      BOOST_COMPUTE_GCC_DIAG_PRAGMA(ignored BOOST_COMPUTE_GCC_DIAG_JOINSTR(-W,x))
+#  define BOOST_COMPUTE_GCC_DIAG_ON(x) \
+      BOOST_COMPUTE_GCC_DIAG_PRAGMA(warning BOOST_COMPUTE_GCC_DIAG_JOINSTR(-W,x))
+# endif
+#else // Ensure these macros do nothing for other compilers.
+# define BOOST_COMPUTE_GCC_DIAG_OFF(x)
+# define BOOST_COMPUTE_GCC_DIAG_ON(x)
+#endif
+
+// Macros for suppressing warnings for Clang.
+//
+//   BOOST_COMPUTE_BOOST_COMPUTE_CLANG_DIAG_OFF(sign-compare);
+//   if(a < b){
+//   BOOST_COMPUTE_BOOST_COMPUTE_CLANG_DIAG_ON(sign-compare);
+//
+// Source: https://svn.boost.org/trac/boost/wiki/Guidelines/WarningsGuidelines
+#ifdef __clang__
+#  define BOOST_COMPUTE_CLANG_DIAG_STR(s) # s
+// stringize s to "no-sign-compare"
+#  define BOOST_COMPUTE_CLANG_DIAG_JOINSTR(x,y) BOOST_COMPUTE_CLANG_DIAG_STR(x ## y)
+//  join -W with no-unused-variable to "-Wno-sign-compare"
+#  define BOOST_COMPUTE_CLANG_DIAG_DO_PRAGMA(x) _Pragma (#x)
+// _Pragma is unary operator  #pragma ("")
+#  define BOOST_COMPUTE_CLANG_DIAG_PRAGMA(x) \
+      BOOST_COMPUTE_CLANG_DIAG_DO_PRAGMA(clang diagnostic x)
+#  define BOOST_COMPUTE_CLANG_DIAG_OFF(x) BOOST_COMPUTE_CLANG_DIAG_PRAGMA(push) \
+      BOOST_COMPUTE_CLANG_DIAG_PRAGMA(ignored BOOST_COMPUTE_CLANG_DIAG_JOINSTR(-W,x))
+// For example: #pragma clang diagnostic ignored "-Wno-sign-compare"
+#  define BOOST_COMPUTE_CLANG_DIAG_ON(x) BOOST_COMPUTE_CLANG_DIAG_PRAGMA(pop)
+// For example: #pragma clang diagnostic warning "-Wno-sign-compare"
+#else // Ensure these macros do nothing for other compilers.
+#  define BOOST_COMPUTE_CLANG_DIAG_OFF(x)
+#  define BOOST_COMPUTE_CLANG_DIAG_ON(x)
+#  define BOOST_COMPUTE_CLANG_DIAG_PRAGMA(x)
+#endif
+
+// Macros for suppressing warnings for MSVC. Usage:
+//
+//   BOOST_COMPUTE_BOOST_COMPUTE_MSVC_DIAG_OFF(4018); //sign-compare
+//   if(a < b){
+//   BOOST_COMPUTE_BOOST_COMPUTE_MSVC_DIAG_ON(4018);
+//
+#if defined(_MSC_VER)
+#  define BOOST_COMPUTE_MSVC_DIAG_DO_PRAGMA(x) __pragma(x)
+#  define BOOST_COMPUTE_MSVC_DIAG_PRAGMA(x) \
+          BOOST_COMPUTE_MSVC_DIAG_DO_PRAGMA(warning(x))
+#  define BOOST_COMPUTE_MSVC_DIAG_OFF(x) BOOST_COMPUTE_MSVC_DIAG_PRAGMA(push) \
+          BOOST_COMPUTE_MSVC_DIAG_PRAGMA(disable: x)
+#  define BOOST_COMPUTE_MSVC_DIAG_ON(x) BOOST_COMPUTE_MSVC_DIAG_PRAGMA(pop)
+#else // Ensure these macros do nothing for other compilers.
+#  define BOOST_COMPUTE_MSVC_DIAG_OFF(x)
+#  define BOOST_COMPUTE_MSVC_DIAG_ON(x)
+#endif
+
+// Macros for suppressing warnings for GCC, Clang and MSVC. Usage:
+//
+//   BOOST_COMPUTE_DIAG_OFF(sign-compare, sign-compare, 4018);
+//   if(a < b){
+//   BOOST_COMPUTE_DIAG_ON(sign-compare, sign-compare, 4018);
+//
+#if defined(_MSC_VER) // MSVC
+#  define BOOST_COMPUTE_DIAG_OFF(gcc, clang, msvc) BOOST_COMPUTE_MSVC_DIAG_OFF(msvc)
+#  define BOOST_COMPUTE_DIAG_ON(gcc, clang, msvc) BOOST_COMPUTE_MSVC_DIAG_ON(msvc)
+#elif defined(__clang__) // Clang
+#  define BOOST_COMPUTE_DIAG_OFF(gcc, clang, msvc) BOOST_COMPUTE_CLANG_DIAG_OFF(clang)
+#  define BOOST_COMPUTE_DIAG_ON(gcc, clang, msvc) BOOST_COMPUTE_CLANG_DIAG_ON(clang)
+#elif defined(__GNUC__) // GCC/G++
+#  define BOOST_COMPUTE_DIAG_OFF(gcc, clang, msvc) BOOST_COMPUTE_GCC_DIAG_OFF(gcc)
+#  define BOOST_COMPUTE_DIAG_ON(gcc, clang, msvc) BOOST_COMPUTE_GCC_DIAG_ON(gcc)
+#else // Ensure these macros do nothing for other compilers.
+#  define BOOST_COMPUTE_DIAG_OFF(gcc, clang, msvc)
+#  define BOOST_COMPUTE_DIAG_ON(gcc, clang, msvc)
+#endif
+
+#define BOOST_COMPUTE_DISABLE_DEPRECATED_DECLARATIONS() \
+    BOOST_COMPUTE_DIAG_OFF(deprecated-declarations, deprecated-declarations, 4996)
+#define BOOST_COMPUTE_ENABLE_DEPRECATED_DECLARATIONS() \
+    BOOST_COMPUTE_DIAG_ON(deprecated-declarations, deprecated-declarations, 4996);
+
+
+#endif /* BOOST_COMPUTE_DETAIL_DIAGNOSTIC_HPP */
+
+/* diagnostic.hpp
+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
+*/

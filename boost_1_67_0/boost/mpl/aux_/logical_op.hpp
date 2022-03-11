@@ -1,0 +1,169 @@
+
+// Copyright Aleksey Gurtovoy 2000-2004
+//
+// Distributed under the Boost Software License, Version 1.0. 
+// (See accompanying file LICENSE_1_0.txt or copy at 
+// http://www.boost.org/LICENSE_1_0.txt)
+//
+// See http://www.boost.org/libs/mpl for documentation.
+
+// $Id$
+// $Date$
+// $Revision$
+
+// NO INCLUDE GUARDS, THE HEADER IS INTENDED FOR MULTIPLE INCLUSION!
+
+#if !defined(BOOST_MPL_PREPROCESSING_MODE)
+#   include <boost/mpl/bool.hpp>
+#   include <boost/mpl/aux_/nested_type_wknd.hpp>
+#   include <boost/mpl/aux_/na_spec.hpp>
+#   include <boost/mpl/aux_/lambda_support.hpp>
+#endif
+
+#include <boost/mpl/limits/arity.hpp>
+#include <boost/mpl/aux_/preprocessor/params.hpp>
+#include <boost/mpl/aux_/preprocessor/ext_params.hpp>
+#include <boost/mpl/aux_/preprocessor/def_params_tail.hpp>
+#include <boost/mpl/aux_/preprocessor/enum.hpp>
+#include <boost/mpl/aux_/preprocessor/sub.hpp>
+#include <boost/mpl/aux_/config/ctps.hpp>
+#include <boost/mpl/aux_/config/workaround.hpp>
+
+#include <boost/preprocessor/dec.hpp>
+#include <boost/preprocessor/inc.hpp>
+#include <boost/preprocessor/cat.hpp>
+
+namespace boost { namespace mpl {
+
+#   define AUX778076_PARAMS(param, sub) \
+    BOOST_MPL_PP_PARAMS( \
+          BOOST_MPL_PP_SUB(BOOST_MPL_LIMIT_METAFUNCTION_ARITY, sub) \
+        , param \
+        ) \
+    /**/
+
+#   define AUX778076_SHIFTED_PARAMS(param, sub) \
+    BOOST_MPL_PP_EXT_PARAMS( \
+          2, BOOST_MPL_PP_SUB(BOOST_PP_INC(BOOST_MPL_LIMIT_METAFUNCTION_ARITY), sub) \
+        , param \
+        ) \
+    /**/
+
+#   define AUX778076_SPEC_PARAMS(param) \
+    BOOST_MPL_PP_ENUM( \
+          BOOST_PP_DEC(BOOST_MPL_LIMIT_METAFUNCTION_ARITY) \
+        , param \
+        ) \
+    /**/
+
+namespace aux {
+
+#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+
+template< bool C_, AUX778076_PARAMS(typename T, 1) >
+struct BOOST_PP_CAT(AUX778076_OP_NAME,impl)
+    : BOOST_PP_CAT(AUX778076_OP_VALUE1,_)
+{
+};
+
+template< AUX778076_PARAMS(typename T, 1) >
+struct BOOST_PP_CAT(AUX778076_OP_NAME,impl)< AUX778076_OP_VALUE2,AUX778076_PARAMS(T, 1) >
+    : BOOST_PP_CAT(AUX778076_OP_NAME,impl)<
+          BOOST_MPL_AUX_NESTED_TYPE_WKND(T1)::value
+        , AUX778076_SHIFTED_PARAMS(T, 1)
+        , BOOST_PP_CAT(AUX778076_OP_VALUE2,_)
+        >
+{
+};
+
+template<>
+struct BOOST_PP_CAT(AUX778076_OP_NAME,impl)<
+          AUX778076_OP_VALUE2
+        , AUX778076_SPEC_PARAMS(BOOST_PP_CAT(AUX778076_OP_VALUE2,_))
+        >
+    : BOOST_PP_CAT(AUX778076_OP_VALUE2,_)
+{
+};
+
+#else
+
+template< bool C_ > struct BOOST_PP_CAT(AUX778076_OP_NAME,impl)
+{
+    template< AUX778076_PARAMS(typename T, 1) > struct result_
+        : BOOST_PP_CAT(AUX778076_OP_VALUE1,_)
+    {
+    };
+};
+
+template<> struct BOOST_PP_CAT(AUX778076_OP_NAME,impl)<AUX778076_OP_VALUE2>
+{
+    template< AUX778076_PARAMS(typename T, 1) > struct result_
+        : BOOST_PP_CAT(AUX778076_OP_NAME,impl)< 
+              BOOST_MPL_AUX_NESTED_TYPE_WKND(T1)::value
+            >::template result_< AUX778076_SHIFTED_PARAMS(T,1),BOOST_PP_CAT(AUX778076_OP_VALUE2,_) >
+    {
+    };
+
+#if BOOST_WORKAROUND(BOOST_MSVC, == 1300)
+    template<> struct result_<AUX778076_SPEC_PARAMS(BOOST_PP_CAT(AUX778076_OP_VALUE2,_))>
+        : BOOST_PP_CAT(AUX778076_OP_VALUE2,_)
+    {
+    };
+};
+#else
+};
+
+template<>
+struct BOOST_PP_CAT(AUX778076_OP_NAME,impl)<AUX778076_OP_VALUE2>
+    ::result_< AUX778076_SPEC_PARAMS(BOOST_PP_CAT(AUX778076_OP_VALUE2,_)) >
+        : BOOST_PP_CAT(AUX778076_OP_VALUE2,_)
+{
+};
+#endif // BOOST_MSVC == 1300
+
+#endif // BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
+
+} // namespace aux
+
+template<
+      typename BOOST_MPL_AUX_NA_PARAM(T1)
+    , typename BOOST_MPL_AUX_NA_PARAM(T2)
+    BOOST_MPL_PP_DEF_PARAMS_TAIL(2, typename T, BOOST_PP_CAT(AUX778076_OP_VALUE2,_))
+    >
+struct AUX778076_OP_NAME
+#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+    : aux::BOOST_PP_CAT(AUX778076_OP_NAME,impl)<
+          BOOST_MPL_AUX_NESTED_TYPE_WKND(T1)::value
+        , AUX778076_SHIFTED_PARAMS(T,0)
+        >
+#else
+    : aux::BOOST_PP_CAT(AUX778076_OP_NAME,impl)< 
+          BOOST_MPL_AUX_NESTED_TYPE_WKND(T1)::value
+        >::template result_< AUX778076_SHIFTED_PARAMS(T,0) >
+#endif
+{
+    BOOST_MPL_AUX_LAMBDA_SUPPORT(
+          BOOST_MPL_LIMIT_METAFUNCTION_ARITY
+        , AUX778076_OP_NAME
+        , (AUX778076_PARAMS(T, 0))
+        )
+};
+
+BOOST_MPL_AUX_NA_SPEC2(
+      2
+    , BOOST_MPL_LIMIT_METAFUNCTION_ARITY
+    , AUX778076_OP_NAME
+    )
+
+}}
+
+#undef AUX778076_SPEC_PARAMS
+#undef AUX778076_SHIFTED_PARAMS
+#undef AUX778076_PARAMS
+#undef AUX778076_OP_NAME
+#undef AUX778076_OP_VALUE1
+#undef AUX778076_OP_VALUE2
+
+/* logical_op.hpp
++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
+*/

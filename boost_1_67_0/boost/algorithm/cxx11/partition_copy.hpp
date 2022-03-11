@@ -1,0 +1,75 @@
+/* 
+   Copyright (c) Marshall Clow 2011-2012.
+
+   Distributed under the Boost Software License, Version 1.0. (See accompanying
+   file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+*/
+
+/// \file  partition_copy.hpp
+/// \brief Copy a subset of a sequence to a new sequence
+/// \author Marshall Clow
+
+#ifndef BOOST_ALGORITHM_PARTITION_COPY_HPP
+#define BOOST_ALGORITHM_PARTITION_COPY_HPP
+
+#include <utility>  // for std::pair
+
+#include <boost/config.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
+
+namespace boost { namespace algorithm {
+
+/// \fn partition_copy ( InputIterator first, InputIterator last,
+///     OutputIterator1 out_true, OutputIterator2 out_false, UnaryPredicate p )
+/// \brief Copies the elements that satisfy the predicate p from the range [first, last) 
+///     to the range beginning at d_first_true, and
+///     copies the elements that do not satisfy p to the range beginning at d_first_false.
+///
+/// 
+/// \param first     The start of the input sequence
+/// \param last      One past the end of the input sequence
+/// \param out_true  An output iterator to write the elements that satisfy the predicate into
+/// \param out_false An output iterator to write the elements that do not satisfy the predicate into
+/// \param p         A predicate for dividing the elements of the input sequence.
+///
+/// \note            This function is part of the C++2011 standard library.
+template <typename InputIterator, 
+        typename OutputIterator1, typename OutputIterator2, typename UnaryPredicate>
+BOOST_CXX14_CONSTEXPR std::pair<OutputIterator1, OutputIterator2>
+partition_copy ( InputIterator first, InputIterator last,
+        OutputIterator1 out_true, OutputIterator2 out_false, UnaryPredicate p )
+{
+    for ( ; first != last; ++first )
+        if ( p (*first))
+            *out_true++ = *first;
+        else
+            *out_false++ = *first;
+    return std::pair<OutputIterator1, OutputIterator2> ( out_true, out_false );
+}
+
+/// \fn partition_copy ( const Range &r, 
+///     OutputIterator1 out_true, OutputIterator2 out_false, UnaryPredicate p )
+/// 
+/// \param r         The input range
+/// \param out_true  An output iterator to write the elements that satisfy the predicate into
+/// \param out_false An output iterator to write the elements that do not satisfy the predicate into
+/// \param p         A predicate for dividing the elements of the input sequence.
+///
+template <typename Range, typename OutputIterator1, typename OutputIterator2, 
+            typename UnaryPredicate>
+BOOST_CXX14_CONSTEXPR std::pair<OutputIterator1, OutputIterator2>
+partition_copy ( const Range &r, OutputIterator1 out_true, OutputIterator2 out_false, 
+                                UnaryPredicate p )
+{
+    return boost::algorithm::partition_copy 
+                      (boost::begin(r), boost::end(r), out_true, out_false, p );
+}
+
+}} // namespace boost and algorithm
+
+#endif  // BOOST_ALGORITHM_PARTITION_COPY_HPP
+
+/* partition_copy.hpp
+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
+*/

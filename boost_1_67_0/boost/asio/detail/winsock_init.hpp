@@ -1,0 +1,134 @@
+//
+// detail/winsock_init.hpp
+// ~~~~~~~~~~~~~~~~~~~~~~~
+//
+// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+
+#ifndef BOOST_ASIO_DETAIL_WINSOCK_INIT_HPP
+#define BOOST_ASIO_DETAIL_WINSOCK_INIT_HPP
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+# pragma once
+#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+
+#include <boost/asio/detail/config.hpp>
+
+#if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
+
+#include <boost/asio/detail/push_options.hpp>
+
+namespace boost {
+namespace asio {
+namespace detail {
+
+class winsock_init_base
+{
+protected:
+  // Structure to track result of initialisation and number of uses. POD is used
+  // to ensure that the values are zero-initialised prior to any code being run.
+  struct data
+  {
+    long init_count_;
+    long result_;
+  };
+
+  BOOST_ASIO_DECL static void startup(data& d,
+      unsigned char major, unsigned char minor);
+
+  BOOST_ASIO_DECL static void manual_startup(data& d);
+
+  BOOST_ASIO_DECL static void cleanup(data& d);
+
+  BOOST_ASIO_DECL static void manual_cleanup(data& d);
+
+  BOOST_ASIO_DECL static void throw_on_error(data& d);
+};
+
+template <int Major = 2, int Minor = 0>
+class winsock_init : private winsock_init_base
+{
+public:
+  winsock_init(bool allow_throw = true)
+  {
+    startup(data_, Major, Minor);
+    if (allow_throw)
+      throw_on_error(data_);
+  }
+
+  winsock_init(const winsock_init&)
+  {
+    startup(data_, Major, Minor);
+    throw_on_error(data_);
+  }
+
+  ~winsock_init()
+  {
+    cleanup(data_);
+  }
+
+  // This class may be used to indicate that user code will manage Winsock
+  // initialisation and cleanup. This may be required in the case of a DLL, for
+  // example, where it is not safe to initialise Winsock from global object
+  // constructors.
+  //
+  // To prevent asio from initialising Winsock, the object must be constructed
+  // before any Asio's own global objects. With MSVC, this may be accomplished
+  // by adding the following code to the DLL:
+  //
+  //   #pragma warning(push)
+  //   #pragma warning(disable:4073)
+  //   #pragma init_seg(lib)
+  //   boost::asio::detail::winsock_init<>::manual manual_winsock_init;
+  //   #pragma warning(pop)
+  class manual
+  {
+  public:
+    manual()
+    {
+      manual_startup(data_);
+    }
+
+    manual(const manual&)
+    {
+      manual_startup(data_);
+    }
+
+    ~manual()
+    {
+      manual_cleanup(data_);
+    }
+  };
+
+private:
+  friend class manual;
+  static data data_;
+};
+
+template <int Major, int Minor>
+winsock_init_base::data winsock_init<Major, Minor>::data_;
+
+// Static variable to ensure that winsock is initialised before main, and
+// therefore before any other threads can get started.
+static const winsock_init<>& winsock_init_instance = winsock_init<>(false);
+
+} // namespace detail
+} // namespace asio
+} // namespace boost
+
+#include <boost/asio/detail/pop_options.hpp>
+
+#if defined(BOOST_ASIO_HEADER_ONLY)
+# include <boost/asio/detail/impl/winsock_init.ipp>
+#endif // defined(BOOST_ASIO_HEADER_ONLY)
+
+#endif // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
+
+#endif // BOOST_ASIO_DETAIL_WINSOCK_INIT_HPP
+
+/* winsock_init.hpp
+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
+*/

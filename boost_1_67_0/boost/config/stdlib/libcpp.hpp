@@ -1,0 +1,149 @@
+//  (C) Copyright Christopher Jefferson 2011.
+//  Use, modification and distribution are subject to the
+//  Boost Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+//  See http://www.boost.org for most recent version.
+
+//  config for libc++
+//  Might need more in here later.
+
+#if !defined(_LIBCPP_VERSION)
+#  include <ciso646>
+#  if !defined(_LIBCPP_VERSION)
+#      error "This is not libc++!"
+#  endif
+#endif
+
+#define BOOST_STDLIB "libc++ version " BOOST_STRINGIZE(_LIBCPP_VERSION)
+
+#define BOOST_HAS_THREADS
+
+#ifdef _LIBCPP_HAS_NO_VARIADICS
+#    define BOOST_NO_CXX11_HDR_TUPLE
+#endif
+
+// BOOST_NO_CXX11_ALLOCATOR should imply no support for the C++11
+// allocator model. The C++11 allocator model requires a conforming
+// std::allocator_traits which is only possible with C++11 template
+// aliases since members rebind_alloc and rebind_traits require it.
+#if defined(_LIBCPP_HAS_NO_TEMPLATE_ALIASES)
+#    define BOOST_NO_CXX11_ALLOCATOR
+#    define BOOST_NO_CXX11_POINTER_TRAITS
+#endif
+
+#if __cplusplus < 201103
+//
+// These two appear to be somewhat useable in C++03 mode, there may be others...
+//
+//#  define BOOST_NO_CXX11_HDR_ARRAY
+//#  define BOOST_NO_CXX11_HDR_FORWARD_LIST
+
+#  define BOOST_NO_CXX11_HDR_CODECVT
+#  define BOOST_NO_CXX11_HDR_CONDITION_VARIABLE
+#  define BOOST_NO_CXX11_HDR_EXCEPTION
+#  define BOOST_NO_CXX11_HDR_INITIALIZER_LIST
+#  define BOOST_NO_CXX11_HDR_MUTEX
+#  define BOOST_NO_CXX11_HDR_RANDOM
+#  define BOOST_NO_CXX11_HDR_RATIO
+#  define BOOST_NO_CXX11_HDR_REGEX
+#  define BOOST_NO_CXX11_HDR_SYSTEM_ERROR
+#  define BOOST_NO_CXX11_HDR_THREAD
+#  define BOOST_NO_CXX11_HDR_TUPLE
+#  define BOOST_NO_CXX11_HDR_TYPEINDEX
+#  define BOOST_NO_CXX11_HDR_UNORDERED_MAP
+#  define BOOST_NO_CXX11_HDR_UNORDERED_SET
+#  define BOOST_NO_CXX11_NUMERIC_LIMITS
+#  define BOOST_NO_CXX11_ALLOCATOR
+#  define BOOST_NO_CXX11_POINTER_TRAITS
+#  define BOOST_NO_CXX11_SMART_PTR
+#  define BOOST_NO_CXX11_HDR_FUNCTIONAL
+#  define BOOST_NO_CXX11_STD_ALIGN
+#  define BOOST_NO_CXX11_ADDRESSOF
+#  define BOOST_NO_CXX11_HDR_ATOMIC
+#  define BOOST_NO_CXX11_ATOMIC_SMART_PTR
+#  define BOOST_NO_CXX11_HDR_CHRONO
+#  define BOOST_NO_CXX11_HDR_TYPE_TRAITS
+#  define BOOST_NO_CXX11_HDR_FUTURE
+#elif _LIBCPP_VERSION < 3700
+//
+// These appear to be unusable/incomplete so far:
+//
+#  define BOOST_NO_CXX11_HDR_ATOMIC
+#  define BOOST_NO_CXX11_ATOMIC_SMART_PTR
+#  define BOOST_NO_CXX11_HDR_CHRONO
+#  define BOOST_NO_CXX11_HDR_TYPE_TRAITS
+#  define BOOST_NO_CXX11_HDR_FUTURE
+#endif
+
+
+#if _LIBCPP_VERSION < 3700
+// libc++ uses a non-standard messages_base
+#define BOOST_NO_STD_MESSAGES
+#endif
+
+// C++14 features
+#if (_LIBCPP_VERSION < 3700) || (__cplusplus <= 201402L)
+#  define BOOST_NO_CXX14_STD_EXCHANGE
+#endif
+
+// C++17 features
+#if (_LIBCPP_VERSION < 4000) || (__cplusplus <= 201402L)
+#  define BOOST_NO_CXX17_STD_APPLY
+#  define BOOST_NO_CXX17_HDR_OPTIONAL
+#  define BOOST_NO_CXX17_HDR_STRING_VIEW
+#  define BOOST_NO_CXX17_HDR_VARIANT
+#endif
+#if (_LIBCPP_VERSION > 4000) && (__cplusplus > 201402L) && !defined(_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR)
+#  define BOOST_NO_AUTO_PTR
+#endif
+#if (_LIBCPP_VERSION > 4000) && (__cplusplus > 201402L) && !defined(_LIBCPP_ENABLE_CXX17_REMOVED_RANDOM_SHUFFLE)
+#  define BOOST_NO_CXX98_RANDOM_SHUFFLE
+#endif
+#if (_LIBCPP_VERSION > 4000) && (__cplusplus > 201402L) && !defined(_LIBCPP_ENABLE_CXX17_REMOVED_BINDERS)
+#  define BOOST_NO_CXX98_BINDERS
+#endif
+
+#define BOOST_NO_CXX17_ITERATOR_TRAITS
+#define BOOST_NO_CXX17_STD_INVOKE      // Invoke support is incomplete (no invoke_result)
+
+#if (_LIBCPP_VERSION <= 1101) && !defined(BOOST_NO_CXX11_THREAD_LOCAL)
+// This is a bit of a sledgehammer, because really it's just libc++abi that has no
+// support for thread_local, leading to linker errors such as
+// "undefined reference to `__cxa_thread_atexit'".  It is fixed in the
+// most recent releases of libc++abi though...
+#  define BOOST_NO_CXX11_THREAD_LOCAL
+#endif
+
+#if defined(__linux__) && (_LIBCPP_VERSION < 6000) && !defined(BOOST_NO_CXX11_THREAD_LOCAL)
+// After libc++-dev is installed on Trusty, clang++-libc++ almost works,
+// except uses of `thread_local` fail with undefined reference to
+// `__cxa_thread_atexit`.
+//
+// clang's libc++abi provides an implementation by deferring to the glibc
+// implementation, which may or may not be available (it is not on Trusty).
+// clang 4's libc++abi will provide an implementation if one is not in glibc
+// though, so thread local support should work with clang 4 and above as long
+// as libc++abi is linked in.
+#  define BOOST_NO_CXX11_THREAD_LOCAL
+#endif
+
+#if defined(__has_include)
+#if !__has_include(<shared_mutex>)
+#  define BOOST_NO_CXX14_HDR_SHARED_MUTEX
+#elif __cplusplus <= 201103
+#  define BOOST_NO_CXX14_HDR_SHARED_MUTEX
+#endif
+#elif __cplusplus < 201402
+#  define BOOST_NO_CXX14_HDR_SHARED_MUTEX
+#endif
+
+#if !defined(BOOST_NO_CXX14_HDR_SHARED_MUTEX) && (_LIBCPP_VERSION < 5000)
+#  define BOOST_NO_CXX14_HDR_SHARED_MUTEX
+#endif
+
+//  --- end ---
+
+/* libcpp.hpp
+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
+*/

@@ -1,0 +1,472 @@
+//  (C) Copyright John Maddock 2006.
+//  Use, modification and distribution are subject to the
+//  Boost Software License, Version 1.0. (See accompanying file
+//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_MATH_SF_TRIGAMMA_HPP
+#define BOOST_MATH_SF_TRIGAMMA_HPP
+
+#ifdef _MSC_VER
+#pragma once
+#endif
+
+#include <boost/math/special_functions/math_fwd.hpp>
+#include <boost/math/tools/rational.hpp>
+#include <boost/math/tools/series.hpp>
+#include <boost/math/tools/promotion.hpp>
+#include <boost/math/policies/error_handling.hpp>
+#include <boost/math/constants/constants.hpp>
+#include <boost/mpl/comparison.hpp>
+#include <boost/math/tools/big_constant.hpp>
+#include <boost/math/special_functions/polygamma.hpp>
+
+#if defined(__GNUC__) && defined(BOOST_MATH_USE_FLOAT128)
+//
+// This is the only way we can avoid
+// warning: non-standard suffix on floating constant [-Wpedantic]
+// when building with -Wall -pedantic.  Neither __extension__
+// nor #pragma diagnostic ignored work :(
+//
+#pragma GCC system_header
+#endif
+
+namespace boost{
+namespace math{
+namespace detail{
+
+template<class T, class Policy>
+T polygamma_imp(const int n, T x, const Policy &pol);
+
+template <class T, class Policy>
+T trigamma_prec(T x, const boost::integral_constant<int, 53>*, const Policy&)
+{
+   // Max error in interpolated form: 3.736e-017
+   static const T offset = BOOST_MATH_BIG_CONSTANT(T, 53, 2.1093254089355469);
+   static const T P_1_2[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 53, -1.1093280605946045),
+      BOOST_MATH_BIG_CONSTANT(T, 53, -3.8310674472619321),
+      BOOST_MATH_BIG_CONSTANT(T, 53, -3.3703848401898283),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 0.28080574467981213),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 1.6638069578676164),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 0.64468386819102836),
+   };
+   static const T Q_1_2[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 53, 1.0),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 3.4535389668541151),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 4.5208926987851437),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 2.7012734178351534),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 0.64468798399785611),
+      BOOST_MATH_BIG_CONSTANT(T, 53, -0.20314516859987728e-6),
+   };
+   // Max error in interpolated form: 1.159e-017
+   static const T P_2_4[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 53, -0.13803835004508849e-7),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 0.50000049158540261),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 1.6077979838469348),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 2.5645435828098254),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 2.0534873203680393),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 0.74566981111565923),
+   };
+   static const T Q_2_4[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 53, 1.0),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 2.8822787662376169),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 4.1681660554090917),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 2.7853527819234466),
+      BOOST_MATH_BIG_CONSTANT(T, 53, 0.74967671848044792),
+      BOOST_MATH_BIG_CONSTANT(T, 53, -0.00057069112416246805),
+   };
+   // Maximum Deviation Found:                     6.896e-018
+   // Expected Error Term :                       -6.895e-018
+   // Maximum Relative Change in Control Points :  8.497e-004
+   static const T P_4_inf[] = {
+      static_cast<T>(0.68947581948701249e-17L),
+      static_cast<T>(0.49999999999998975L),
+      static_cast<T>(1.0177274392923795L),
+      static_cast<T>(2.498208511343429L),
+      static_cast<T>(2.1921221359427595L),
+      static_cast<T>(1.5897035272532764L),
+      static_cast<T>(0.40154388356961734L),
+   };
+   static const T Q_4_inf[] = {
+      static_cast<T>(1.0L),
+      static_cast<T>(1.7021215452463932L),
+      static_cast<T>(4.4290431747556469L),
+      static_cast<T>(2.9745631894384922L),
+      static_cast<T>(2.3013614809773616L),
+      static_cast<T>(0.28360399799075752L),
+      static_cast<T>(0.022892987908906897L),
+   };
+
+   if(x <= 2)
+   {
+      return (offset + boost::math::tools::evaluate_polynomial(P_1_2, x) / tools::evaluate_polynomial(Q_1_2, x)) / (x * x);
+   }
+   else if(x <= 4)
+   {
+      T y = 1 / x;
+      return (1 + tools::evaluate_polynomial(P_2_4, y) / tools::evaluate_polynomial(Q_2_4, y)) / x;
+   }
+   T y = 1 / x;
+   return (1 + tools::evaluate_polynomial(P_4_inf, y) / tools::evaluate_polynomial(Q_4_inf, y)) / x;
+}
+   
+template <class T, class Policy>
+T trigamma_prec(T x, const boost::integral_constant<int, 64>*, const Policy&)
+{
+   // Max error in interpolated form: 1.178e-020
+   static const T offset_1_2 = BOOST_MATH_BIG_CONSTANT(T, 64, 2.109325408935546875);
+   static const T P_1_2[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 64, -1.10932535608960258341),
+      BOOST_MATH_BIG_CONSTANT(T, 64, -4.18793841543017129052),
+      BOOST_MATH_BIG_CONSTANT(T, 64, -4.63865531898487734531),
+      BOOST_MATH_BIG_CONSTANT(T, 64, -0.919832884430500908047),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 1.68074038333180423012),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 1.21172611429185622377),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 0.259635673503366427284),
+   };
+   static const T Q_1_2[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 64, 1.0),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 3.77521119359546982995),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 5.664338024578956321),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 4.25995134879278028361),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 1.62956638448940402182),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 0.259635512844691089868),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 0.629642219810618032207e-8),
+   };
+   // Max error in interpolated form: 3.912e-020
+   static const T P_2_8[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 64, -0.387540035162952880976e-11),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 0.500000000276430504),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 3.21926880986360957306),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 10.2550347708483445775),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 18.9002075150709144043),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 21.0357215832399705625),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 13.4346512182925923978),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 3.98656291026448279118),
+   };
+   static const T Q_2_8[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 64, 1.0),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 6.10520430478613667724),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 18.475001060603645512),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 31.7087534567758405638),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 31.908814523890465398),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 17.4175479039227084798),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 3.98749106958394941276),
+      BOOST_MATH_BIG_CONSTANT(T, 64, -0.000115917322224411128566),
+   };
+   // Maximum Deviation Found:                     2.635e-020
+   // Expected Error Term :                        2.635e-020
+   // Maximum Relative Change in Control Points :  1.791e-003
+   static const T P_8_inf[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 64, -0.263527875092466899848e-19),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 0.500000000000000058145),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 0.0730121433777364138677),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 1.94505878379957149534),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 0.0517092358874932620529),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 1.07995383547483921121),
+   };
+   static const T Q_8_inf[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 64, 1.0),
+      BOOST_MATH_BIG_CONSTANT(T, 64, -0.187309046577818095504),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 3.95255391645238842975),
+      BOOST_MATH_BIG_CONSTANT(T, 64, -1.14743283327078949087),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 2.52989799376344914499),
+      BOOST_MATH_BIG_CONSTANT(T, 64, -0.627414303172402506396),
+      BOOST_MATH_BIG_CONSTANT(T, 64, 0.141554248216425512536),
+   };
+
+   if(x <= 2)
+   {
+      return (offset_1_2 + boost::math::tools::evaluate_polynomial(P_1_2, x) / tools::evaluate_polynomial(Q_1_2, x)) / (x * x);
+   }
+   else if(x <= 8)
+   {
+      T y = 1 / x;
+      return (1 + tools::evaluate_polynomial(P_2_8, y) / tools::evaluate_polynomial(Q_2_8, y)) / x;
+   }
+   T y = 1 / x;
+   return (1 + tools::evaluate_polynomial(P_8_inf, y) / tools::evaluate_polynomial(Q_8_inf, y)) / x;
+}
+
+template <class T, class Policy>
+T trigamma_prec(T x, const boost::integral_constant<int, 113>*, const Policy&)
+{
+   // Max error in interpolated form: 1.916e-035
+
+   static const T P_1_2[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 113, -0.999999999999999082554457936871832533),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -4.71237311120865266379041700054847734),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -7.94125711970499027763789342500817316),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -5.74657746697664735258222071695644535),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -0.404213349456398905981223965160595687),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 2.47877781178642876561595890095758896),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 2.07714151702455125992166949812126433),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.858877899162360138844032265418028567),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.20499222604410032375789018837922397),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.0272103140348194747360175268778415049),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.0015764849020876949848954081173520686),
+   };
+   static const T Q_1_2[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 113, 1.0),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 4.71237311120863419878375031457715223),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 9.58619118655339853449127952145877467),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 11.0940067269829372437561421279054968),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 8.09075424749327792073276309969037885),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 3.87705890159891405185343806884451286),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 1.22758678701914477836330837816976782),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.249092040606385004109672077814668716),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.0295750413900655597027079600025569048),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.00157648490200498142247694709728858139),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.161264050344059471721062360645432809e-14),
+   };
+
+   // Max error in interpolated form: 8.958e-035
+   static const T P_2_4[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 113, -2.55843734739907925764326773972215085),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -12.2830208240542011967952466273455887),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -23.9195022162767993526575786066414403),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -24.9256431504823483094158828285470862),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -14.7979122765478779075108064826412285),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -4.46654453928610666393276765059122272),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -0.0191439033405649675717082465687845002),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.515412052554351265708917209749037352),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.195378348786064304378247325360320038),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.0334761282624174313035014426794245393),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.002373665205942206348500250056602687),
+   };
+   static const T Q_2_4[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 113, 1.0),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 4.80098558454419907830670928248659245),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 9.99220727843170133895059300223445265),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 11.8896146167631330735386697123464976),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 8.96613256683809091593793565879092581),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 4.47254136149624110878909334574485751),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 1.48600982028196527372434773913633152),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.319570735766764237068541501137990078),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.0407358345787680953107374215319322066),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.00237366520593271641375755486420859837),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.239554887903526152679337256236302116e-15),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -0.294749244740618656265237072002026314e-17),
+   };
+
+   static const T y_offset_2_4 = BOOST_MATH_BIG_CONSTANT(T, 113, 3.558437347412109375);
+
+   // Max error in interpolated form: 4.319e-035
+   static const T P_4_8[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.166626112697021464248967707021688845e-16),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.499999999999997739552090249208808197),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 6.40270945019053817915772473771553187),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 41.3833374155000608013677627389343329),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 166.803341854562809335667241074035245),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 453.39964786925369319960722793414521),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 851.153712317697055375935433362983944),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 1097.70657567285059133109286478004458),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 938.431232478455316020076349367632922),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 487.268001604651932322080970189930074),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 119.953445242335730062471193124820659),
+   };
+   static const T Q_4_8[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 113, 1.0),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 12.4720855670474488978638945855932398),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 78.6093129753298570701376952709727391),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 307.470246050318322489781182863190127),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 805.140686101151538537565264188630079),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 1439.12019760292146454787601409644413),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 1735.6105285756048831268586001383127),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 1348.32500712856328019355198611280536),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 607.225985860570846699704222144650563),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 119.952317857277045332558673164517227),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.000140165918355036060868680809129436084),
+   };
+
+   // Maximum Deviation Found:                     2.867e-035
+   // Expected Error Term :                        2.866e-035
+   // Maximum Relative Change in Control Points :  2.662e-004
+   static const T P_8_16[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 113, -0.184828315274146610610872315609837439e-19),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.500000000000000004122475157735807738),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 3.02533865247313349284875558880415875),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 13.5995927517457371243039532492642734),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 35.3132224283087906757037999452941588),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 67.1639424550714159157603179911505619),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 83.5767733658513967581959839367419891),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 71.073491212235705900866411319363501),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 35.8621515614725564575893663483998663),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 8.72152231639983491987779743154333318),
+   };
+   static const T Q_8_16[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 113, 1.0),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 5.71734397161293452310624822415866372),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 25.293404179620438179337103263274815),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 62.2619767967468199111077640625328469),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 113.955048909238993473389714972250235),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 130.807138328938966981862203944329408),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 102.423146902337654110717764213057753),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 44.0424772805245202514468199602123565),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 8.89898032477904072082994913461386099),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -0.0296627336872039988632793863671456398),
+   };
+   // Maximum Deviation Found:                     1.079e-035
+   // Expected Error Term :                       -1.079e-035
+   // Maximum Relative Change in Control Points :  7.884e-003
+   static const T P_16_inf[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.0),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.500000000000000000000000000000087317),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.345625669885456215194494735902663968),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 9.62895499360842232127552650044647769),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 3.5936085382439026269301003761320812),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 49.459599118438883265036646019410669),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 7.77519237321893917784735690560496607),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 74.4536074488178075948642351179304121),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 2.75209340397069050436806159297952699),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 23.9292359711471667884504840186561598),
+   };
+   static const T Q_16_inf[] = {
+      BOOST_MATH_BIG_CONSTANT(T, 113, 1.0),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.357918006437579097055656138920742037),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 19.1386039850709849435325005484512944),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 0.874349081464143606016221431763364517),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 98.6516097434855572678195488061432509),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -16.1051972833382893468655223662534306),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 154.316860216253720989145047141653727),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -40.2026880424378986053105969312264534),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 60.1679136674264778074736441126810223),
+      BOOST_MATH_BIG_CONSTANT(T, 113, -13.3414844622256422644504472438320114),
+      BOOST_MATH_BIG_CONSTANT(T, 113, 2.53795636200649908779512969030363442),
+   };
+
+   if(x <= 2)
+   {
+      return (2 + boost::math::tools::evaluate_polynomial(P_1_2, x) / tools::evaluate_polynomial(Q_1_2, x)) / (x * x);
+   }
+   else if(x <= 4)
+   {
+      return (y_offset_2_4 + boost::math::tools::evaluate_polynomial(P_2_4, x) / tools::evaluate_polynomial(Q_2_4, x)) / (x * x);
+   }
+   else if(x <= 8)
+   {
+      T y = 1 / x;
+      return (1 + tools::evaluate_polynomial(P_4_8, y) / tools::evaluate_polynomial(Q_4_8, y)) / x;
+   }
+   else if(x <= 16)
+   {
+      T y = 1 / x;
+      return (1 + tools::evaluate_polynomial(P_8_16, y) / tools::evaluate_polynomial(Q_8_16, y)) / x;
+   }
+   T y = 1 / x;
+   return (1 + tools::evaluate_polynomial(P_16_inf, y) / tools::evaluate_polynomial(Q_16_inf, y)) / x;
+}
+
+template <class T, class Tag, class Policy>
+T trigamma_imp(T x, const Tag* t, const Policy& pol)
+{
+   //
+   // This handles reflection of negative arguments, and all our
+   // error handling, then forwards to the T-specific approximation.
+   //
+   BOOST_MATH_STD_USING // ADL of std functions.
+
+   T result = 0;
+   //
+   // Check for negative arguments and use reflection:
+   //
+   if(x <= 0)
+   {
+      // Reflect:
+      T z = 1 - x;
+      // Argument reduction for tan:
+      if(floor(x) == x)
+      {
+         return policies::raise_pole_error<T>("boost::math::trigamma<%1%>(%1%)", 0, (1-x), pol);
+      }
+      T s = fabs(x) < fabs(z) ? boost::math::sin_pi(x, pol) : boost::math::sin_pi(z, pol);
+      return -trigamma_imp(z, t, pol) + boost::math::pow<2>(constants::pi<T>()) / (s * s);
+   }
+   if(x < 1)
+   {
+      result = 1 / (x * x);
+      x += 1;
+   }
+   return result + trigamma_prec(x, t, pol);
+}
+
+template <class T, class Policy>
+T trigamma_imp(T x, const boost::integral_constant<int, 0>*, const Policy& pol)
+{
+   return polygamma_imp(1, x, pol);
+}
+//
+// Initializer: ensure all our constants are initialized prior to the first call of main:
+//
+template <class T, class Policy>
+struct trigamma_initializer
+{
+   struct init
+   {
+      init()
+      {
+         typedef typename policies::precision<T, Policy>::type precision_type;
+         do_init(boost::integral_constant<bool, precision_type::value && (precision_type::value <= 113)>());
+      }
+      void do_init(const boost::true_type&)
+      {
+         boost::math::trigamma(T(2.5), Policy());
+      }
+      void do_init(const boost::false_type&){}
+      void force_instantiate()const{}
+   };
+   static const init initializer;
+   static void force_instantiate()
+   {
+      initializer.force_instantiate();
+   }
+};
+
+template <class T, class Policy>
+const typename trigamma_initializer<T, Policy>::init trigamma_initializer<T, Policy>::initializer;
+
+} // namespace detail
+
+template <class T, class Policy>
+inline typename tools::promote_args<T>::type 
+   trigamma(T x, const Policy&)
+{
+   typedef typename tools::promote_args<T>::type result_type;
+   typedef typename policies::evaluation<result_type, Policy>::type value_type;
+   typedef typename policies::precision<T, Policy>::type precision_type;
+   typedef boost::integral_constant<int,
+      precision_type::value <= 0 ? 0 :
+      precision_type::value <= 53 ? 53 :
+      precision_type::value <= 64 ? 64 :
+      precision_type::value <= 113 ? 113 : 0
+   > tag_type;
+   typedef typename policies::normalise<
+      Policy,
+      policies::promote_float<false>,
+      policies::promote_double<false>,
+      policies::discrete_quantile<>,
+      policies::assert_undefined<> >::type forwarding_policy;
+
+   // Force initialization of constants:
+   detail::trigamma_initializer<value_type, forwarding_policy>::force_instantiate();
+
+   return policies::checked_narrowing_cast<result_type, Policy>(detail::trigamma_imp(
+      static_cast<value_type>(x),
+      static_cast<const tag_type*>(0), forwarding_policy()), "boost::math::trigamma<%1%>(%1%)");
+}
+
+template <class T>
+inline typename tools::promote_args<T>::type 
+   trigamma(T x)
+{
+   return trigamma(x, policies::policy<>());
+}
+
+} // namespace math
+} // namespace boost
+#endif
+
+
+/* trigamma.hpp
+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
+*/

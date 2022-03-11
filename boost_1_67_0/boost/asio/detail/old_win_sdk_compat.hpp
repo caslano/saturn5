@@ -1,0 +1,220 @@
+//
+// detail/old_win_sdk_compat.hpp
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+
+#ifndef BOOST_ASIO_DETAIL_OLD_WIN_SDK_COMPAT_HPP
+#define BOOST_ASIO_DETAIL_OLD_WIN_SDK_COMPAT_HPP
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+# pragma once
+#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+
+#include <boost/asio/detail/config.hpp>
+
+#if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
+
+// Guess whether we are building against on old Platform SDK.
+#if !defined(IN6ADDR_ANY_INIT)
+#define BOOST_ASIO_HAS_OLD_WIN_SDK 1
+#endif // !defined(IN6ADDR_ANY_INIT)
+
+#if defined(BOOST_ASIO_HAS_OLD_WIN_SDK)
+
+// Emulation of types that are missing from old Platform SDKs.
+//
+// N.B. this emulation is also used if building for a Windows 2000 target with
+// a recent (i.e. Vista or later) SDK, as the SDK does not provide IPv6 support
+// in that case.
+
+#include <boost/asio/detail/push_options.hpp>
+
+namespace boost {
+namespace asio {
+namespace detail {
+
+enum
+{
+  sockaddr_storage_maxsize = 128, // Maximum size.
+  sockaddr_storage_alignsize = (sizeof(__int64)), // Desired alignment.
+  sockaddr_storage_pad1size = (sockaddr_storage_alignsize - sizeof(short)),
+  sockaddr_storage_pad2size = (sockaddr_storage_maxsize -
+      (sizeof(short) + sockaddr_storage_pad1size + sockaddr_storage_alignsize))
+};
+
+struct sockaddr_storage_emulation
+{
+  short ss_family;
+  char __ss_pad1[sockaddr_storage_pad1size];
+  __int64 __ss_align;
+  char __ss_pad2[sockaddr_storage_pad2size];
+};
+
+struct in6_addr_emulation
+{
+  union
+  {
+    u_char Byte[16];
+    u_short Word[8];
+  } u;
+};
+
+#if !defined(s6_addr)
+# define _S6_un u
+# define _S6_u8 Byte
+# define s6_addr _S6_un._S6_u8
+#endif // !defined(s6_addr)
+
+struct sockaddr_in6_emulation
+{
+  short sin6_family;
+  u_short sin6_port;
+  u_long sin6_flowinfo;
+  in6_addr_emulation sin6_addr;
+  u_long sin6_scope_id;
+};
+
+struct ipv6_mreq_emulation
+{
+  in6_addr_emulation ipv6mr_multiaddr;
+  unsigned int ipv6mr_interface;
+};
+
+struct addrinfo_emulation
+{
+  int ai_flags;
+  int ai_family;
+  int ai_socktype;
+  int ai_protocol;
+  size_t ai_addrlen;
+  char* ai_canonname;
+  sockaddr* ai_addr;
+  addrinfo_emulation* ai_next;
+};
+
+#if !defined(AI_PASSIVE)
+# define AI_PASSIVE 0x1
+#endif
+
+#if !defined(AI_CANONNAME)
+# define AI_CANONNAME 0x2
+#endif
+
+#if !defined(AI_NUMERICHOST)
+# define AI_NUMERICHOST 0x4
+#endif
+
+#if !defined(EAI_AGAIN)
+# define EAI_AGAIN WSATRY_AGAIN
+#endif
+
+#if !defined(EAI_BADFLAGS)
+# define EAI_BADFLAGS WSAEINVAL
+#endif
+
+#if !defined(EAI_FAIL)
+# define EAI_FAIL WSANO_RECOVERY
+#endif
+
+#if !defined(EAI_FAMILY)
+# define EAI_FAMILY WSAEAFNOSUPPORT
+#endif
+
+#if !defined(EAI_MEMORY)
+# define EAI_MEMORY WSA_NOT_ENOUGH_MEMORY
+#endif
+
+#if !defined(EAI_NODATA)
+# define EAI_NODATA WSANO_DATA
+#endif
+
+#if !defined(EAI_NONAME)
+# define EAI_NONAME WSAHOST_NOT_FOUND
+#endif
+
+#if !defined(EAI_SERVICE)
+# define EAI_SERVICE WSATYPE_NOT_FOUND
+#endif
+
+#if !defined(EAI_SOCKTYPE)
+# define EAI_SOCKTYPE WSAESOCKTNOSUPPORT
+#endif
+
+#if !defined(NI_NOFQDN)
+# define NI_NOFQDN 0x01
+#endif
+
+#if !defined(NI_NUMERICHOST)
+# define NI_NUMERICHOST 0x02
+#endif
+
+#if !defined(NI_NAMEREQD)
+# define NI_NAMEREQD 0x04
+#endif
+
+#if !defined(NI_NUMERICSERV)
+# define NI_NUMERICSERV 0x08
+#endif
+
+#if !defined(NI_DGRAM)
+# define NI_DGRAM 0x10
+#endif
+
+#if !defined(IPPROTO_IPV6)
+# define IPPROTO_IPV6 41
+#endif
+
+#if !defined(IPV6_UNICAST_HOPS)
+# define IPV6_UNICAST_HOPS 4
+#endif
+
+#if !defined(IPV6_MULTICAST_IF)
+# define IPV6_MULTICAST_IF 9
+#endif
+
+#if !defined(IPV6_MULTICAST_HOPS)
+# define IPV6_MULTICAST_HOPS 10
+#endif
+
+#if !defined(IPV6_MULTICAST_LOOP)
+# define IPV6_MULTICAST_LOOP 11
+#endif
+
+#if !defined(IPV6_JOIN_GROUP)
+# define IPV6_JOIN_GROUP 12
+#endif
+
+#if !defined(IPV6_LEAVE_GROUP)
+# define IPV6_LEAVE_GROUP 13
+#endif
+
+} // namespace detail
+} // namespace asio
+} // namespace boost
+
+#include <boost/asio/detail/pop_options.hpp>
+
+#endif // defined(BOOST_ASIO_HAS_OLD_WIN_SDK)
+
+// Even newer Platform SDKs that support IPv6 may not define IPV6_V6ONLY.
+#if !defined(IPV6_V6ONLY)
+# define IPV6_V6ONLY 27
+#endif
+
+// Some SDKs (e.g. Windows CE) don't define IPPROTO_ICMPV6.
+#if !defined(IPPROTO_ICMPV6)
+# define IPPROTO_ICMPV6 58
+#endif
+
+#endif // defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
+
+#endif // BOOST_ASIO_DETAIL_OLD_WIN_SDK_COMPAT_HPP
+
+/* old_win_sdk_compat.hpp
+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
+*/

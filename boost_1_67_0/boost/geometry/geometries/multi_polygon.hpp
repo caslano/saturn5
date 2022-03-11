@@ -1,0 +1,121 @@
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
+// Copyright (c) 2014 Adam Wulkiewicz, Lodz, Poland.
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
+// Use, modification and distribution is subject to the Boost Software License,
+// Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_GEOMETRY_GEOMETRIES_MULTI_POLYGON_HPP
+#define BOOST_GEOMETRY_GEOMETRIES_MULTI_POLYGON_HPP
+
+#include <memory>
+#include <vector>
+
+#include <boost/concept/requires.hpp>
+
+#include <boost/geometry/core/tags.hpp>
+#include <boost/geometry/geometries/concepts/polygon_concept.hpp>
+
+#include <boost/config.hpp>
+#ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
+#include <initializer_list>
+#endif
+
+namespace boost { namespace geometry
+{
+
+namespace model
+{
+
+/*!
+\brief multi_polygon, a collection of polygons
+\details Multi-polygon can be used to group polygons belonging to each other,
+        e.g. Hawaii
+\ingroup geometries
+
+\qbk{[include reference/geometries/multi_polygon.qbk]}
+\qbk{before.synopsis,
+[heading Model of]
+[link geometry.reference.concepts.concept_multi_polygon MultiPolygon Concept]
+}
+*/
+template
+<
+    typename Polygon,
+    template<typename, typename> class Container = std::vector,
+    template<typename> class Allocator = std::allocator
+>
+class multi_polygon : public Container<Polygon, Allocator<Polygon> >
+{
+    BOOST_CONCEPT_ASSERT( (concepts::Polygon<Polygon>) );
+
+#ifndef BOOST_NO_CXX11_HDR_INITIALIZER_LIST
+
+    // default constructor and base_type definitions are required only
+    // if the constructor taking std::initializer_list is defined
+
+    typedef Container<Polygon, Allocator<Polygon> > base_type;
+
+public:
+    /// \constructor_default{multi_polygon}
+    multi_polygon()
+        : base_type()
+    {}
+
+    /// \constructor_initializer_list{multi_polygon}
+    inline multi_polygon(std::initializer_list<Polygon> l)
+        : base_type(l.begin(), l.end())
+    {}
+
+// Commented out for now in order to support Boost.Assign
+// Without this assignment operator first the object should be created
+//   from initializer list, then it shoudl be moved.
+//// Without this workaround in MSVC the assignment operator is ambiguous
+//#ifndef BOOST_MSVC
+//    /// \assignment_initializer_list{multi_polygon}
+//    inline multi_polygon & operator=(std::initializer_list<Polygon> l)
+//    {
+//        base_type::assign(l.begin(), l.end());
+//        return *this;
+//    }
+//#endif
+
+#endif
+};
+
+
+} // namespace model
+
+
+#ifndef DOXYGEN_NO_TRAITS_SPECIALIZATIONS
+namespace traits
+{
+
+template
+<
+    typename Polygon,
+    template<typename, typename> class Container,
+    template<typename> class Allocator
+>
+struct tag< model::multi_polygon<Polygon, Container, Allocator> >
+{
+    typedef multi_polygon_tag type;
+};
+
+} // namespace traits
+#endif // DOXYGEN_NO_TRAITS_SPECIALIZATIONS
+
+}} // namespace boost::geometry
+
+#endif // BOOST_GEOMETRY_GEOMETRIES_MULTI_POLYGON_HPP
+
+/* multi_polygon.hpp
+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
+*/

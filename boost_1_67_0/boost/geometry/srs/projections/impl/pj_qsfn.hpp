@@ -1,0 +1,99 @@
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+// This file is manually converted from PROJ4
+
+// Copyright (c) 2008-2012 Barend Gehrels, Amsterdam, the Netherlands.
+
+// This file was modified by Oracle on 2017.
+// Modifications copyright (c) 2017, Oracle and/or its affiliates.
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
+
+// Use, modification and distribution is subject to the Boost Software License,
+// Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+// This file is converted from PROJ4, http://trac.osgeo.org/proj
+// PROJ4 is originally written by Gerald Evenden (then of the USGS)
+// PROJ4 is maintained by Frank Warmerdam
+// PROJ4 is converted to Geometry Library by Barend Gehrels (Geodan, Amsterdam)
+
+// Original copyright notice:
+
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
+// Software is furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#ifndef BOOST_GEOMETRY_PROJECTIONS_PJ_QSFN_HPP
+#define BOOST_GEOMETRY_PROJECTIONS_PJ_QSFN_HPP
+
+
+namespace boost { namespace geometry { namespace projections
+{
+    
+namespace detail {
+
+/* determine small q */
+template <typename T>
+inline T pj_qsfn(T const& sinphi, T const& e, T const& one_es)
+{
+    static const T EPSILON = 1.0e-7;
+
+    if (e >= EPSILON)
+    {
+        T con = e * sinphi;
+        return (one_es * (sinphi / (1. - con * con) -
+           (.5 / e) * log ((1. - con) / (1. + con))));
+    } else
+        return (sinphi + sinphi);
+}
+
+
+static const int MAX_C = 9;
+
+template <typename T>
+struct AUTHALIC
+{
+    T C[MAX_C], CP[MAX_C], CQ[MAX_C];
+};
+
+/**
+ * @brief determine authalic latitude
+ * @param[in] phi geographic latitude
+ * @param[in] a initialized structure pointer
+ * @return authalic latitude
+ */
+template <typename T>
+inline T proj_qsfn(T const& phi, AUTHALIC<T> const& a)
+{
+    T s, s2, sum;
+    int i = MAX_C;
+
+    s = sin(phi);
+    s2 = s * s;
+    sum = a.CQ[MAX_C - 1];
+    while (--i) sum = a.CQ[i] + s2 * sum;
+    return(s * sum);
+}
+
+} // namespace detail
+
+}}} // namespace boost::geometry::projections
+
+#endif
+
+/* pj_qsfn.hpp
+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
+*/

@@ -1,0 +1,104 @@
+//
+// ssl/rfc2818_verification.hpp
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+
+#ifndef BOOST_ASIO_SSL_RFC2818_VERIFICATION_HPP
+#define BOOST_ASIO_SSL_RFC2818_VERIFICATION_HPP
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+# pragma once
+#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+
+#include <boost/asio/detail/config.hpp>
+
+#if !defined(BOOST_ASIO_NO_DEPRECATED)
+
+#include <string>
+#include <boost/asio/ssl/detail/openssl_types.hpp>
+#include <boost/asio/ssl/verify_context.hpp>
+
+#include <boost/asio/detail/push_options.hpp>
+
+namespace boost {
+namespace asio {
+namespace ssl {
+
+/// (Deprecated. Use ssl::host_name_verification.) Verifies a certificate
+/// against a hostname according to the rules described in RFC 2818.
+/**
+ * @par Example
+ * The following example shows how to synchronously open a secure connection to
+ * a given host name:
+ * @code
+ * using boost::asio::ip::tcp;
+ * namespace ssl = boost::asio::ssl;
+ * typedef ssl::stream<tcp::socket> ssl_socket;
+ *
+ * // Create a context that uses the default paths for finding CA certificates.
+ * ssl::context ctx(ssl::context::sslv23);
+ * ctx.set_default_verify_paths();
+ *
+ * // Open a socket and connect it to the remote host.
+ * boost::asio::io_context io_context;
+ * ssl_socket sock(io_context, ctx);
+ * tcp::resolver resolver(io_context);
+ * tcp::resolver::query query("host.name", "https");
+ * boost::asio::connect(sock.lowest_layer(), resolver.resolve(query));
+ * sock.lowest_layer().set_option(tcp::no_delay(true));
+ *
+ * // Perform SSL handshake and verify the remote host's certificate.
+ * sock.set_verify_mode(ssl::verify_peer);
+ * sock.set_verify_callback(ssl::rfc2818_verification("host.name"));
+ * sock.handshake(ssl_socket::client);
+ *
+ * // ... read and write as normal ...
+ * @endcode
+ */
+class rfc2818_verification
+{
+public:
+  /// The type of the function object's result.
+  typedef bool result_type;
+
+  /// Constructor.
+  explicit rfc2818_verification(const std::string& host)
+    : host_(host)
+  {
+  }
+
+  /// Perform certificate verification.
+  BOOST_ASIO_DECL bool operator()(bool preverified, verify_context& ctx) const;
+
+private:
+  // Helper function to check a host name against a pattern.
+  BOOST_ASIO_DECL static bool match_pattern(const char* pattern,
+      std::size_t pattern_length, const char* host);
+
+  // Helper function to check a host name against an IPv4 address
+  // The host name to be checked.
+  std::string host_;
+};
+
+} // namespace ssl
+} // namespace asio
+} // namespace boost
+
+#include <boost/asio/detail/pop_options.hpp>
+
+#if defined(BOOST_ASIO_HEADER_ONLY)
+# include <boost/asio/ssl/impl/rfc2818_verification.ipp>
+#endif // defined(BOOST_ASIO_HEADER_ONLY)
+
+#endif // !defined(BOOST_ASIO_NO_DEPRECATED)
+
+#endif // BOOST_ASIO_SSL_RFC2818_VERIFICATION_HPP
+
+/* rfc2818_verification.hpp
+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
+*/

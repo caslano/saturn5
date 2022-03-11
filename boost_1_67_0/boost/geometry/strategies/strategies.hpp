@@ -1,0 +1,153 @@
+// Boost.Geometry (aka GGL, Generic Geometry Library)
+
+// Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
+// Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
+// Copyright (c) 2017 Adam Wulkiewicz, Lodz, Poland.
+
+// This file was modified by Oracle on 2014-2019.
+// Modifications copyright (c) 2014-2019 Oracle and/or its affiliates.
+
+// Contributed and/or modified by Vissarion Fysikopoulos, on behalf of Oracle
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
+
+// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
+// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
+
+// Use, modification and distribution is subject to the Boost Software License,
+// Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_GEOMETRY_STRATEGIES_STRATEGIES_HPP
+#define BOOST_GEOMETRY_STRATEGIES_STRATEGIES_HPP
+
+
+#include <boost/geometry/strategies/tags.hpp>
+
+#include <boost/geometry/strategies/area.hpp>
+#include <boost/geometry/strategies/azimuth.hpp>
+#include <boost/geometry/strategies/buffer.hpp>
+#include <boost/geometry/strategies/centroid.hpp>
+#include <boost/geometry/strategies/compare.hpp>
+#include <boost/geometry/strategies/convex_hull.hpp>
+#include <boost/geometry/strategies/covered_by.hpp>
+#include <boost/geometry/strategies/densify.hpp>
+#include <boost/geometry/strategies/disjoint.hpp>
+#include <boost/geometry/strategies/distance.hpp>
+#include <boost/geometry/strategies/envelope.hpp>
+#include <boost/geometry/strategies/intersection.hpp>
+#include <boost/geometry/strategies/intersection_strategies.hpp> // for backward compatibility
+#include <boost/geometry/strategies/relate.hpp>
+#include <boost/geometry/strategies/side.hpp>
+#include <boost/geometry/strategies/transform.hpp>
+#include <boost/geometry/strategies/within.hpp>
+
+#include <boost/geometry/strategies/cartesian/area.hpp>
+#include <boost/geometry/strategies/cartesian/azimuth.hpp>
+#include <boost/geometry/strategies/cartesian/box_in_box.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_end_flat.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_end_round.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_join_miter.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_join_round.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_join_round_by_divide.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_point_circle.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_point_square.hpp>
+#include <boost/geometry/strategies/cartesian/buffer_side_straight.hpp>
+#include <boost/geometry/strategies/cartesian/centroid_average.hpp>
+#include <boost/geometry/strategies/cartesian/centroid_bashein_detmer.hpp>
+#include <boost/geometry/strategies/cartesian/centroid_weighted_length.hpp>
+#include <boost/geometry/strategies/cartesian/densify.hpp>
+#include <boost/geometry/strategies/cartesian/disjoint_segment_box.hpp>
+#include <boost/geometry/strategies/cartesian/distance_pythagoras.hpp>
+#include <boost/geometry/strategies/cartesian/distance_pythagoras_point_box.hpp>
+#include <boost/geometry/strategies/cartesian/distance_pythagoras_box_box.hpp>
+#include <boost/geometry/strategies/cartesian/distance_projected_point.hpp>
+#include <boost/geometry/strategies/cartesian/distance_projected_point_ax.hpp>
+#include <boost/geometry/strategies/cartesian/distance_segment_box.hpp>
+#include <boost/geometry/strategies/cartesian/envelope_box.hpp>
+#include <boost/geometry/strategies/cartesian/envelope_point.hpp>
+#include <boost/geometry/strategies/cartesian/envelope_multipoint.hpp>
+#include <boost/geometry/strategies/cartesian/envelope_segment.hpp>
+#include <boost/geometry/strategies/cartesian/expand_box.hpp>
+#include <boost/geometry/strategies/cartesian/expand_point.hpp>
+#include <boost/geometry/strategies/cartesian/expand_segment.hpp>
+#include <boost/geometry/strategies/cartesian/index.hpp>
+#include <boost/geometry/strategies/cartesian/intersection.hpp>
+#include <boost/geometry/strategies/cartesian/point_in_box.hpp>
+#include <boost/geometry/strategies/cartesian/point_in_point.hpp>
+#include <boost/geometry/strategies/cartesian/point_in_poly_franklin.hpp>
+#include <boost/geometry/strategies/cartesian/point_in_poly_crossings_multiply.hpp>
+#include <boost/geometry/strategies/cartesian/point_in_poly_winding.hpp>
+#include <boost/geometry/strategies/cartesian/line_interpolate.hpp>
+#include <boost/geometry/strategies/cartesian/side_by_triangle.hpp>
+
+#include <boost/geometry/strategies/spherical/area.hpp>
+#include <boost/geometry/strategies/spherical/azimuth.hpp>
+#include <boost/geometry/strategies/spherical/densify.hpp>
+#include <boost/geometry/strategies/spherical/disjoint_segment_box.hpp>
+#include <boost/geometry/strategies/spherical/distance_haversine.hpp>
+#include <boost/geometry/strategies/spherical/distance_cross_track.hpp>
+#include <boost/geometry/strategies/spherical/distance_cross_track_box_box.hpp>
+#include <boost/geometry/strategies/spherical/distance_cross_track_point_box.hpp>
+#include <boost/geometry/strategies/spherical/distance_segment_box.hpp>
+#include <boost/geometry/strategies/spherical/compare.hpp>
+#include <boost/geometry/strategies/spherical/envelope_box.hpp>
+#include <boost/geometry/strategies/spherical/envelope_point.hpp>
+#include <boost/geometry/strategies/spherical/envelope_multipoint.hpp>
+#include <boost/geometry/strategies/spherical/envelope_segment.hpp>
+#include <boost/geometry/strategies/spherical/expand_box.hpp>
+#include <boost/geometry/strategies/spherical/expand_point.hpp>
+#include <boost/geometry/strategies/spherical/expand_segment.hpp>
+#include <boost/geometry/strategies/spherical/index.hpp>
+#include <boost/geometry/strategies/spherical/intersection.hpp>
+#include <boost/geometry/strategies/spherical/point_in_point.hpp>
+#include <boost/geometry/strategies/spherical/point_in_poly_winding.hpp>
+#include <boost/geometry/strategies/spherical/line_interpolate.hpp>
+#include <boost/geometry/strategies/spherical/ssf.hpp>
+
+#include <boost/geometry/strategies/geographic/area.hpp>
+#include <boost/geometry/strategies/geographic/azimuth.hpp>
+#include <boost/geometry/strategies/geographic/buffer_point_circle.hpp>
+#include <boost/geometry/strategies/geographic/densify.hpp>
+#include <boost/geometry/strategies/geographic/disjoint_segment_box.hpp>
+#include <boost/geometry/strategies/geographic/distance.hpp>
+#include <boost/geometry/strategies/geographic/distance_andoyer.hpp>
+#include <boost/geometry/strategies/geographic/distance_cross_track.hpp>
+#include <boost/geometry/strategies/geographic/distance_cross_track_box_box.hpp>
+#include <boost/geometry/strategies/geographic/distance_cross_track_point_box.hpp>
+#include <boost/geometry/strategies/geographic/distance_segment_box.hpp>
+#include <boost/geometry/strategies/geographic/distance_thomas.hpp>
+#include <boost/geometry/strategies/geographic/distance_vincenty.hpp>
+//#include <boost/geometry/strategies/geographic/distance_karney.hpp>
+#include <boost/geometry/strategies/geographic/envelope_segment.hpp>
+#include <boost/geometry/strategies/geographic/expand_segment.hpp>
+#include <boost/geometry/strategies/geographic/index.hpp>
+#include <boost/geometry/strategies/geographic/intersection.hpp>
+//#include <boost/geometry/strategies/geographic/intersection_elliptic.hpp>
+#include <boost/geometry/strategies/geographic/point_in_poly_winding.hpp>
+#include <boost/geometry/strategies/geographic/line_interpolate.hpp>
+#include <boost/geometry/strategies/geographic/side.hpp>
+#include <boost/geometry/strategies/geographic/side_andoyer.hpp>
+#include <boost/geometry/strategies/geographic/side_thomas.hpp>
+#include <boost/geometry/strategies/geographic/side_vincenty.hpp>
+
+#include <boost/geometry/strategies/agnostic/buffer_distance_symmetric.hpp>
+#include <boost/geometry/strategies/agnostic/buffer_distance_asymmetric.hpp>
+#include <boost/geometry/strategies/agnostic/hull_graham_andrew.hpp>
+#include <boost/geometry/strategies/agnostic/point_in_box_by_side.hpp>
+#include <boost/geometry/strategies/agnostic/point_in_point.hpp>
+#include <boost/geometry/strategies/agnostic/point_in_poly_winding.hpp>
+#include <boost/geometry/strategies/agnostic/simplify_douglas_peucker.hpp>
+
+#include <boost/geometry/strategies/strategy_transform.hpp>
+
+#include <boost/geometry/strategies/transform/matrix_transformers.hpp>
+#include <boost/geometry/strategies/transform/map_transformer.hpp>
+#include <boost/geometry/strategies/transform/inverse_transformer.hpp>
+
+
+#endif // BOOST_GEOMETRY_STRATEGIES_STRATEGIES_HPP
+
+/* strategies.hpp
+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
+*/
