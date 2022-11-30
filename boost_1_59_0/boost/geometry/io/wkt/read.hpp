@@ -4,9 +4,10 @@
 // Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
 // Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 // Copyright (c) 2017 Adam Wulkiewicz, Lodz, Poland.
+// Copyright (c) 2020 Baidyanath Kundu, Haldia, India
 
-// This file was modified by Oracle on 2014, 2015, 2018.
-// Modifications copyright (c) 2014-2018 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2014-2021.
+// Modifications copyright (c) 2014-2021 Oracle and/or its affiliates.
 
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
@@ -27,14 +28,11 @@
 #include <boost/tokenizer.hpp>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/mpl/if.hpp>
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
 #include <boost/range/size.hpp>
 #include <boost/range/value_type.hpp>
 #include <boost/throw_exception.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/type_traits/remove_reference.hpp>
 
 #include <boost/geometry/algorithms/assign.hpp>
 #include <boost/geometry/algorithms/append.hpp>
@@ -46,17 +44,26 @@
 #include <boost/geometry/core/exception.hpp>
 #include <boost/geometry/core/exterior_ring.hpp>
 #include <boost/geometry/core/geometry_id.hpp>
+#include <boost/geometry/core/geometry_types.hpp>
 #include <boost/geometry/core/interior_rings.hpp>
 #include <boost/geometry/core/mutable_range.hpp>
 #include <boost/geometry/core/point_type.hpp>
-#include <boost/geometry/core/tag_cast.hpp>
+#include <boost/geometry/core/tag.hpp>
 #include <boost/geometry/core/tags.hpp>
 
+#include <boost/geometry/geometries/adapted/boost_variant.hpp> // For consistency with other functions
 #include <boost/geometry/geometries/concepts/check.hpp>
 
-#include <boost/geometry/util/coordinate_cast.hpp>
-
 #include <boost/geometry/io/wkt/detail/prefix.hpp>
+
+#include <boost/geometry/strategies/io/cartesian.hpp>
+#include <boost/geometry/strategies/io/geographic.hpp>
+#include <boost/geometry/strategies/io/spherical.hpp>
+
+#include <boost/geometry/util/coordinate_cast.hpp>
+#include <boost/geometry/util/range.hpp>
+#include <boost/geometry/util/sequence.hpp>
+#include <boost/geometry/util/type_traits.hpp>
 
 namespace boost { namespace geometry
 {
@@ -266,14 +273,10 @@ struct stateful_range_appender<Geometry, open>
     typedef typename geometry::point_type<Geometry>::type point_type;
     typedef typename boost::range_size
         <
-            typename util::bare_type<Geometry>::type
+            typename util::remove_cptrref<Geometry>::type
         >::type size_type;
 
-    BOOST_STATIC_ASSERT(( boost::is_same
-                            <
-                                typename tag<Geometry>::type,
-                                ring_tag
-                            >::value ));
+    BOOST_STATIC_ASSERT(( util::is_ring<Geometry>::value ));
 
     inline stateful_range_appender()
         : pt_index(0)
@@ -309,9 +312,9 @@ private:
     static inline bool disjoint(point_type const& p1, point_type const& p2)
     {
         // TODO: pass strategy
-        typedef typename strategy::disjoint::services::default_strategy
+        typedef typename strategies::io::services::default_strategy
             <
-                point_type, point_type
+                point_type
             >::type strategy_type;
 
         return detail::disjoint::disjoint_point_point(p1, p2, strategy_type());
@@ -439,13 +442,7 @@ struct polygon_parser
             {
                 typename ring_type<Polygon>::type ring;
                 appender::apply(it, end, wkt, ring);
-                traits::push_back
-                    <
-                        typename boost::remove_reference
-                        <
-                            typename traits::interior_mutable_type<Polygon>::type
-                        >::type
-                    >::apply(interior_rings(poly), ring);
+                range::push_back(geometry::interior_rings(poly), std::move(ring));
             }
 
             if (it != end && *it == ",")
@@ -514,21 +511,36 @@ inline void handle_empty_z_m(tokenizer::iterator& it,
     }
 }
 
+
+template <typename Geometry, typename Tag = typename geometry::tag<Geometry>::type>
+struct dimension
+    : geometry::dimension<Geometry>
+{};
+
+// TODO: For now assume the dimension of the first type defined for GC
+//       This should probably be unified for all algorithms
+template <typename Geometry>
+struct dimension<Geometry, geometry_collection_tag>
+    : geometry::dimension
+        <
+            typename util::sequence_front
+                <
+                    typename traits::geometry_types<Geometry>::type
+                >::type
+        >
+{};
+
+
 /*!
 \brief Internal, starts parsing
-\param tokens boost tokens, parsed with separator " " and keeping separator "()"
-\param geometry string to compare with first token
+\param geometry_name string to compare with first token
 */
 template <typename Geometry>
-inline bool initialize(tokenizer const& tokens,
-                       std::string const& geometry_name,
+inline bool initialize(tokenizer::iterator& it,
+                       tokenizer::iterator const& end,
                        std::string const& wkt,
-                       tokenizer::iterator& it,
-                       tokenizer::iterator& end)
+                       std::string const& geometry_name)
 {
-    it = tokens.begin();
-    end = tokens.end();
-
     if (it == end || ! boost::iequals(*it++, geometry_name))
     {
         BOOST_THROW_EXCEPTION(read_wkt_exception(std::string("Should start with '") + geometry_name + "'", wkt));
@@ -544,7 +556,7 @@ inline bool initialize(tokenizer const& tokens,
 #pragma warning(disable : 4127)  
 #endif
 
-    if (has_z && dimension<Geometry>::type::value < 3)
+    if (has_z && dimension<Geometry>::value < 3)
     {
         BOOST_THROW_EXCEPTION(read_wkt_exception("Z only allowed for 3 or more dimensions", wkt));
     }
@@ -555,7 +567,6 @@ inline bool initialize(tokenizer const& tokens,
 
     if (has_empty)
     {
-        check_end(it, end, wkt);
         return false;
     }
     // M is ignored at all.
@@ -572,11 +583,22 @@ struct geometry_parser
         geometry::clear(geometry);
 
         tokenizer tokens(wkt, boost::char_separator<char>(" ", ",()"));
-        tokenizer::iterator it, end;
-        if (initialize<Geometry>(tokens, PrefixPolicy::apply(), wkt, it, end))
+        tokenizer::iterator it = tokens.begin();
+        tokenizer::iterator const end = tokens.end();
+
+        apply(it, end, wkt, geometry);
+
+        check_end(it, end, wkt);
+    }
+
+    static inline void apply(tokenizer::iterator& it,
+                             tokenizer::iterator const& end,
+                             std::string const& wkt,
+                             Geometry& geometry)
+    {
+        if (initialize<Geometry>(it, end, wkt, PrefixPolicy::apply()))
         {
             Parser<Geometry>::apply(it, end, wkt, geometry);
-            check_end(it, end, wkt);
         }
     }
 };
@@ -590,8 +612,20 @@ struct multi_parser
         traits::clear<MultiGeometry>::apply(geometry);
 
         tokenizer tokens(wkt, boost::char_separator<char>(" ", ",()"));
-        tokenizer::iterator it, end;
-        if (initialize<MultiGeometry>(tokens, PrefixPolicy::apply(), wkt, it, end))
+        tokenizer::iterator it = tokens.begin();
+        tokenizer::iterator const end = tokens.end();
+
+        apply(it, end, wkt, geometry);
+
+        check_end(it, end, wkt);
+    }
+
+    static inline void apply(tokenizer::iterator& it,
+                             tokenizer::iterator const& end,
+                             std::string const& wkt,
+                             MultiGeometry& geometry)
+    {
+        if (initialize<MultiGeometry>(it, end, wkt, PrefixPolicy::apply()))
         {
             handle_open_parenthesis(it, end, wkt);
 
@@ -612,8 +646,6 @@ struct multi_parser
 
             handle_close_parenthesis(it, end, wkt);
         }
-
-        check_end(it, end, wkt);
     }
 };
 
@@ -637,9 +669,20 @@ struct multi_point_parser
         traits::clear<MultiGeometry>::apply(geometry);
 
         tokenizer tokens(wkt, boost::char_separator<char>(" ", ",()"));
-        tokenizer::iterator it, end;
+        tokenizer::iterator it = tokens.begin();
+        tokenizer::iterator const end = tokens.end();
 
-        if (initialize<MultiGeometry>(tokens, PrefixPolicy::apply(), wkt, it, end))
+        apply(it, end, wkt, geometry);
+
+        check_end(it, end, wkt);
+    }
+
+    static inline void apply(tokenizer::iterator& it,
+                             tokenizer::iterator const& end,
+                             std::string const& wkt,
+                             MultiGeometry& geometry)
+    {
+        if (initialize<MultiGeometry>(it, end, wkt, PrefixPolicy::apply()))
         {
             handle_open_parenthesis(it, end, wkt);
 
@@ -675,8 +718,6 @@ struct multi_point_parser
 
             handle_close_parenthesis(it, end, wkt);
         }
-
-        check_end(it, end, wkt);
     }
 };
 
@@ -694,10 +735,21 @@ struct box_parser
 {
     static inline void apply(std::string const& wkt, Box& box)
     {
-        bool should_close = false;
         tokenizer tokens(wkt, boost::char_separator<char>(" ", ",()"));
         tokenizer::iterator it = tokens.begin();
         tokenizer::iterator end = tokens.end();
+
+        apply(it, end, wkt, box);
+
+        check_end(it, end, wkt);
+    }
+
+    static inline void apply(tokenizer::iterator& it,
+                             tokenizer::iterator const& end,
+                             std::string const& wkt,
+                             Box& box)
+    {
+        bool should_close = false;
         if (it != end && boost::iequals(*it, "POLYGON"))
         {
             ++it;
@@ -728,7 +780,6 @@ struct box_parser
         {
             handle_close_parenthesis(it, end, wkt);
         }
-        check_end(it, end, wkt);
 
         unsigned int index = 0;
         std::size_t n = boost::size(points);
@@ -767,9 +818,18 @@ struct segment_parser
         tokenizer tokens(wkt, boost::char_separator<char>(" ", ",()"));
         tokenizer::iterator it = tokens.begin();
         tokenizer::iterator end = tokens.end();
-        if (it != end &&
-            (boost::iequals(*it, "SEGMENT")
-            || boost::iequals(*it, "LINESTRING") ))
+
+        apply(it, end, wkt, segment);
+
+        check_end(it, end, wkt);
+    }
+
+    static inline void apply(tokenizer::iterator& it,
+                             tokenizer::iterator const& end,
+                             std::string const& wkt,
+                             Segment& segment)
+    {
+        if (it != end && (boost::iequals(*it, "SEGMENT") || boost::iequals(*it, "LINESTRING")))
         {
             ++it;
         }
@@ -782,8 +842,6 @@ struct segment_parser
         std::vector<point_type> points;
         container_inserter<point_type>::apply(it, end, wkt, std::back_inserter(points));
 
-        check_end(it, end, wkt);
-
         if (boost::size(points) == 2)
         {
             geometry::detail::assign_point_to_index<0>(points.front(), segment);
@@ -793,7 +851,134 @@ struct segment_parser
         {
             BOOST_THROW_EXCEPTION(read_wkt_exception("Segment should have 2 points", wkt));
         }
+    }
+};
 
+
+struct dynamic_move_assign
+{
+    template <typename DynamicGeometry, typename Geometry>
+    static void apply(DynamicGeometry& dynamic_geometry, Geometry & geometry)
+    {
+        dynamic_geometry = std::move(geometry);
+    }
+};
+
+struct dynamic_move_emplace_back
+{
+    template <typename GeometryCollection, typename Geometry>
+    static void apply(GeometryCollection& geometry_collection, Geometry & geometry)
+    {
+        traits::emplace_back<GeometryCollection>::apply(geometry_collection, std::move(geometry));
+    }
+};
+
+template
+<
+    typename Geometry,
+    template <typename, typename> class ReadWkt,
+    typename AppendPolicy
+>
+struct dynamic_readwkt_caller
+{
+    static inline void apply(tokenizer::iterator& it,
+                             tokenizer::iterator const& end,
+                             std::string const& wkt,
+                             Geometry& geometry)
+    {
+        if (boost::iequals(*it, "POINT"))
+        {
+            parse_geometry<util::is_point>("POINT", it, end, wkt, geometry);
+        }
+        else if (boost::iequals(*it, "MULTIPOINT"))
+        {
+            parse_geometry<util::is_multi_point>("MULTIPOINT", it, end, wkt, geometry);
+        }
+        else if (boost::iequals(*it, "SEGMENT"))
+        {
+            parse_geometry<util::is_segment>("SEGMENT", it, end, wkt, geometry);
+        }
+        else if (boost::iequals(*it, "LINESTRING"))
+        {
+            parse_geometry<util::is_linestring>("LINESTRING", it, end, wkt, geometry, false)
+            || parse_geometry<util::is_segment>("LINESTRING", it, end, wkt, geometry);
+        }
+        else if (boost::iequals(*it, "MULTILINESTRING"))
+        {
+            parse_geometry<util::is_multi_linestring>("MULTILINESTRING", it, end, wkt, geometry);
+        }
+        else if (boost::iequals(*it, "BOX"))
+        {
+            parse_geometry<util::is_box>("BOX", it, end, wkt, geometry);
+        }
+        else if (boost::iequals(*it, "POLYGON"))
+        {
+            parse_geometry<util::is_polygon>("POLYGON", it, end, wkt, geometry, false)
+            || parse_geometry<util::is_ring>("POLYGON", it, end, wkt, geometry, false)
+            || parse_geometry<util::is_box>("POLYGON", it, end, wkt, geometry);
+        }
+        else if (boost::iequals(*it, "MULTIPOLYGON"))
+        {
+            parse_geometry<util::is_multi_polygon>("MULTIPOLYGON", it, end, wkt, geometry);
+        }
+        else if (boost::iequals(*it, "GEOMETRYCOLLECTION"))
+        {
+            parse_geometry<util::is_geometry_collection>("GEOMETRYCOLLECTION", it, end, wkt, geometry);
+        }
+        else
+        {
+            BOOST_THROW_EXCEPTION(read_wkt_exception(
+                "Should start with geometry's name, e.g. 'POINT', 'LINESTRING', 'POLYGON', etc.",
+                wkt));
+        }
+    }
+
+private:
+    template
+    <
+        template <typename> class UnaryPred,
+        typename Geom = typename util::sequence_find_if
+            <
+                typename traits::geometry_types<Geometry>::type, UnaryPred
+            >::type,
+        std::enable_if_t<! std::is_void<Geom>::value, int> = 0
+    >
+    static bool parse_geometry(const char * ,
+                               tokenizer::iterator& it,
+                               tokenizer::iterator const& end,
+                               std::string const& wkt,
+                               Geometry& geometry,
+                               bool = true)
+    {
+        Geom g;
+        ReadWkt<Geom, typename tag<Geom>::type>::apply(it, end, wkt, g);
+        AppendPolicy::apply(geometry, g);
+        return true;
+    }
+
+    template
+    <
+        template <typename> class UnaryPred,
+        typename Geom = typename util::sequence_find_if
+            <
+                typename traits::geometry_types<Geometry>::type, UnaryPred
+            >::type,
+        std::enable_if_t<std::is_void<Geom>::value, int> = 0
+    >
+    static bool parse_geometry(const char * name,
+                               tokenizer::iterator& ,
+                               tokenizer::iterator const& ,
+                               std::string const& wkt,
+                               Geometry& ,
+                               bool throw_on_misfit = true)
+    {
+        if (throw_on_misfit)
+        {
+            std::string msg = std::string("Unable to store '") + name + "' in this geometry";
+            BOOST_THROW_EXCEPTION(read_wkt_exception(msg, wkt));
+        }
+
+        return false;
     }
 };
 
@@ -805,12 +990,12 @@ struct segment_parser
 namespace dispatch
 {
 
-template <typename Tag, typename Geometry>
+template <typename Geometry, typename Tag = typename tag<Geometry>::type>
 struct read_wkt {};
 
 
 template <typename Point>
-struct read_wkt<point_tag, Point>
+struct read_wkt<Point, point_tag>
     : detail::wkt::geometry_parser
         <
             Point,
@@ -821,7 +1006,7 @@ struct read_wkt<point_tag, Point>
 
 
 template <typename L>
-struct read_wkt<linestring_tag, L>
+struct read_wkt<L, linestring_tag>
     : detail::wkt::geometry_parser
         <
             L,
@@ -831,7 +1016,7 @@ struct read_wkt<linestring_tag, L>
 {};
 
 template <typename Ring>
-struct read_wkt<ring_tag, Ring>
+struct read_wkt<Ring, ring_tag>
     : detail::wkt::geometry_parser
         <
             Ring,
@@ -841,7 +1026,7 @@ struct read_wkt<ring_tag, Ring>
 {};
 
 template <typename Geometry>
-struct read_wkt<polygon_tag, Geometry>
+struct read_wkt<Geometry, polygon_tag>
     : detail::wkt::geometry_parser
         <
             Geometry,
@@ -852,7 +1037,7 @@ struct read_wkt<polygon_tag, Geometry>
 
 
 template <typename MultiGeometry>
-struct read_wkt<multi_point_tag, MultiGeometry>
+struct read_wkt<MultiGeometry, multi_point_tag>
     : detail::wkt::multi_point_parser
             <
                 MultiGeometry,
@@ -861,7 +1046,7 @@ struct read_wkt<multi_point_tag, MultiGeometry>
 {};
 
 template <typename MultiGeometry>
-struct read_wkt<multi_linestring_tag, MultiGeometry>
+struct read_wkt<MultiGeometry, multi_linestring_tag>
     : detail::wkt::multi_parser
             <
                 MultiGeometry,
@@ -871,7 +1056,7 @@ struct read_wkt<multi_linestring_tag, MultiGeometry>
 {};
 
 template <typename MultiGeometry>
-struct read_wkt<multi_polygon_tag, MultiGeometry>
+struct read_wkt<MultiGeometry, multi_polygon_tag>
     : detail::wkt::multi_parser
             <
                 MultiGeometry,
@@ -883,15 +1068,86 @@ struct read_wkt<multi_polygon_tag, MultiGeometry>
 
 // Box (Non-OGC)
 template <typename Box>
-struct read_wkt<box_tag, Box>
+struct read_wkt<Box, box_tag>
     : detail::wkt::box_parser<Box>
 {};
 
 // Segment (Non-OGC)
 template <typename Segment>
-struct read_wkt<segment_tag, Segment>
+struct read_wkt<Segment, segment_tag>
     : detail::wkt::segment_parser<Segment>
 {};
+
+
+template <typename DynamicGeometry>
+struct read_wkt<DynamicGeometry, dynamic_geometry_tag>
+{
+    static inline void apply(std::string const& wkt, DynamicGeometry& dynamic_geometry)
+    {
+        detail::wkt::tokenizer tokens(wkt, boost::char_separator<char>(" ", ",()"));
+        detail::wkt::tokenizer::iterator it = tokens.begin();
+        detail::wkt::tokenizer::iterator end = tokens.end();
+        if (it == end)
+        {
+            BOOST_THROW_EXCEPTION(read_wkt_exception(
+                "Should start with geometry's name, e.g. 'POINT', 'LINESTRING', 'POLYGON', etc.",
+                wkt));
+        }
+
+        detail::wkt::dynamic_readwkt_caller
+            <
+                DynamicGeometry, dispatch::read_wkt, detail::wkt::dynamic_move_assign
+            >::apply(it, end, wkt, dynamic_geometry);
+
+        detail::wkt::check_end(it, end, wkt);
+    }
+};
+
+
+template <typename Geometry>
+struct read_wkt<Geometry, geometry_collection_tag>
+{
+    static inline void apply(std::string const& wkt, Geometry& geometry)
+    {
+        range::clear(geometry);
+
+        detail::wkt::tokenizer tokens(wkt, boost::char_separator<char>(" ", ",()"));
+        detail::wkt::tokenizer::iterator it = tokens.begin();
+        detail::wkt::tokenizer::iterator const end = tokens.end();
+
+        apply(it, end, wkt, geometry);
+
+        detail::wkt::check_end(it, end, wkt);
+    }
+
+    static inline void apply(detail::wkt::tokenizer::iterator& it,
+                             detail::wkt::tokenizer::iterator const& end,
+                             std::string const& wkt,
+                             Geometry& geometry)
+    {
+        if (detail::wkt::initialize<Geometry>(it, end, wkt, "GEOMETRYCOLLECTION"))
+        {
+            detail::wkt::handle_open_parenthesis(it, end, wkt);
+
+            // Stop at ")"
+            while (it != end && *it != ")")
+            {
+                detail::wkt::dynamic_readwkt_caller
+                    <
+                        Geometry, dispatch::read_wkt, detail::wkt::dynamic_move_emplace_back
+                    >::apply(it, end, wkt, geometry);
+
+                if (it != end && *it == ",")
+                {
+                    // Skip "," after geometry is parsed
+                    ++it;
+                }
+            }
+
+            detail::wkt::handle_close_parenthesis(it, end, wkt);
+        }
+    }
+};
 
 
 } // namespace dispatch
@@ -910,9 +1166,30 @@ template <typename Geometry>
 inline void read_wkt(std::string const& wkt, Geometry& geometry)
 {
     geometry::concepts::check<Geometry>();
-    dispatch::read_wkt<typename tag<Geometry>::type, Geometry>::apply(wkt, geometry);
+    dispatch::read_wkt<Geometry>::apply(wkt, geometry);
+}
+
+/*!
+\brief Parses OGC Well-Known Text (\ref WKT) into a geometry (any geometry) and returns it
+\ingroup wkt
+\tparam Geometry \tparam_geometry
+\param wkt string containing \ref WKT
+\ingroup wkt
+\qbk{[include reference/io/from_wkt.qbk]}
+*/
+template <typename Geometry>
+inline Geometry from_wkt(std::string const& wkt)
+{
+    Geometry geometry;
+    geometry::concepts::check<Geometry>();
+    dispatch::read_wkt<Geometry>::apply(wkt, geometry);
+    return geometry;
 }
 
 }} // namespace boost::geometry
 
 #endif // BOOST_GEOMETRY_IO_WKT_READ_HPP
+
+/* read.hpp
+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
+*/

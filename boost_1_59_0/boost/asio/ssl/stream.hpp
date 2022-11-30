@@ -2,7 +2,7 @@
 // ssl/stream.hpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2022 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -101,12 +101,68 @@ public:
       core_(ctx.native_handle(), next_layer_.lowest_layer().get_executor())
   {
   }
+
+  /// Construct a stream from an existing native implementation.
+  /**
+   * This constructor creates a stream and initialises the underlying stream
+   * object. On success, ownership of the native implementation is transferred
+   * to the stream, and it will be cleaned up when the stream is destroyed.
+   *
+   * @param arg The argument to be passed to initialise the underlying stream.
+   *
+   * @param handle An existing native SSL implementation.
+   */
+  template <typename Arg>
+  stream(Arg&& arg, native_handle_type handle)
+    : next_layer_(BOOST_ASIO_MOVE_CAST(Arg)(arg)),
+      core_(handle, next_layer_.lowest_layer().get_executor())
+  {
+  }
 #else // defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
   template <typename Arg>
   stream(Arg& arg, context& ctx)
     : next_layer_(arg),
       core_(ctx.native_handle(), next_layer_.lowest_layer().get_executor())
   {
+  }
+
+  template <typename Arg>
+  stream(Arg& arg, native_handle_type handle)
+    : next_layer_(arg),
+      core_(handle, next_layer_.lowest_layer().get_executor())
+  {
+  }
+#endif // defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+
+#if defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+  /// Move-construct a stream from another.
+  /**
+   * @param other The other stream object from which the move will occur. Must
+   * have no outstanding asynchronous operations associated with it. Following
+   * the move, @c other has a valid but unspecified state where the only safe
+   * operation is destruction, or use as the target of a move assignment.
+   */
+  stream(stream&& other)
+    : next_layer_(BOOST_ASIO_MOVE_CAST(Stream)(other.next_layer_)),
+      core_(BOOST_ASIO_MOVE_CAST(detail::stream_core)(other.core_))
+  {
+  }
+
+  /// Move-assign a stream from another.
+  /**
+   * @param other The other stream object from which the move will occur. Must
+   * have no outstanding asynchronous operations associated with it. Following
+   * the move, @c other has a valid but unspecified state where the only safe
+   * operation is destruction, or use as the target of a move assignment.
+   */
+  stream& operator=(stream&& other)
+  {
+    if (this != &other)
+    {
+      next_layer_ = BOOST_ASIO_MOVE_CAST(Stream)(other.next_layer_);
+      core_ = BOOST_ASIO_MOVE_CAST(detail::stream_core)(other.core_);
+    }
+    return *this;
   }
 #endif // defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
 
@@ -419,37 +475,59 @@ public:
   /// Start an asynchronous SSL handshake.
   /**
    * This function is used to asynchronously perform an SSL handshake on the
-   * stream. This function call always returns immediately.
+   * stream. It is an initiating function for an @ref asynchronous_operation,
+   * and always returns immediately.
    *
    * @param type The type of handshaking to be performed, i.e. as a client or as
    * a server.
    *
-   * @param handler The handler to be called when the handshake operation
-   * completes. Copies will be made of the handler as required. The equivalent
-   * function signature of the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the handshake completes.
+   * Potential completion tokens include @ref use_future, @ref use_awaitable,
+   * @ref yield_context, or a function object with the correct completion
+   * signature. The function signature of the completion handler must be:
    * @code void handler(
    *   const boost::system::error_code& error // Result of operation.
    * ); @endcode
+   * Regardless of whether the asynchronous operation completes immediately or
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
+   * manner equivalent to using boost::asio::post().
+   *
+   * @par Completion Signature
+   * @code void(boost::system::error_code) @endcode
+   *
+   * @par Per-Operation Cancellation
+   * This asynchronous operation supports cancellation for the following
+   * boost::asio::cancellation_type values:
+   *
+   * @li @c cancellation_type::terminal
+   *
+   * @li @c cancellation_type::partial
+   *
+   * if they are also supported by the @c Stream type's @c async_read_some and
+   * @c async_write_some operations.
    */
   template <
       BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code))
-        HandshakeHandler
+        HandshakeToken
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(HandshakeHandler,
+  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(HandshakeToken,
       void (boost::system::error_code))
   async_handshake(handshake_type type,
-      BOOST_ASIO_MOVE_ARG(HandshakeHandler) handler
+      BOOST_ASIO_MOVE_ARG(HandshakeToken) token
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
-    return async_initiate<HandshakeHandler,
+    return async_initiate<HandshakeToken,
       void (boost::system::error_code)>(
-        initiate_async_handshake(this), handler, type);
+        initiate_async_handshake(this), token, type);
   }
 
   /// Start an asynchronous SSL handshake.
   /**
    * This function is used to asynchronously perform an SSL handshake on the
-   * stream. This function call always returns immediately.
+   * stream. It is an initiating function for an @ref asynchronous_operation,
+   * and always returns immediately.
    *
    * @param type The type of handshaking to be performed, i.e. as a client or as
    * a server.
@@ -457,29 +535,49 @@ public:
    * @param buffers The buffered data to be reused for the handshake. Although
    * the buffers object may be copied as necessary, ownership of the underlying
    * buffers is retained by the caller, which must guarantee that they remain
-   * valid until the handler is called.
+   * valid until the completion handler is called.
    *
-   * @param handler The handler to be called when the handshake operation
-   * completes. Copies will be made of the handler as required. The equivalent
-   * function signature of the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the handshake completes.
+   * Potential completion tokens include @ref use_future, @ref use_awaitable,
+   * @ref yield_context, or a function object with the correct completion
+   * signature. The function signature of the completion handler must be:
    * @code void handler(
    *   const boost::system::error_code& error, // Result of operation.
    *   std::size_t bytes_transferred // Amount of buffers used in handshake.
    * ); @endcode
+   * Regardless of whether the asynchronous operation completes immediately or
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
+   * manner equivalent to using boost::asio::post().
+   *
+   * @par Completion Signature
+   * @code void(boost::system::error_code, std::size_t) @endcode
+   *
+   * @par Per-Operation Cancellation
+   * This asynchronous operation supports cancellation for the following
+   * boost::asio::cancellation_type values:
+   *
+   * @li @c cancellation_type::terminal
+   *
+   * @li @c cancellation_type::partial
+   *
+   * if they are also supported by the @c Stream type's @c async_read_some and
+   * @c async_write_some operations.
    */
   template <typename ConstBufferSequence,
       BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
-        std::size_t)) BufferedHandshakeHandler
+        std::size_t)) BufferedHandshakeToken
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(BufferedHandshakeHandler,
+  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(BufferedHandshakeToken,
       void (boost::system::error_code, std::size_t))
   async_handshake(handshake_type type, const ConstBufferSequence& buffers,
-      BOOST_ASIO_MOVE_ARG(BufferedHandshakeHandler) handler
+      BOOST_ASIO_MOVE_ARG(BufferedHandshakeToken) token
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
-    return async_initiate<BufferedHandshakeHandler,
+    return async_initiate<BufferedHandshakeToken,
       void (boost::system::error_code, std::size_t)>(
-        initiate_async_buffered_handshake(this), handler, type, buffers);
+        initiate_async_buffered_handshake(this), token, type, buffers);
   }
 
   /// Shut down SSL on the stream.
@@ -511,29 +609,50 @@ public:
 
   /// Asynchronously shut down SSL on the stream.
   /**
-   * This function is used to asynchronously shut down SSL on the stream. This
-   * function call always returns immediately.
+   * This function is used to asynchronously shut down SSL on the stream. It is
+   * an initiating function for an @ref asynchronous_operation, and always
+   * returns immediately.
    *
-   * @param handler The handler to be called when the handshake operation
-   * completes. Copies will be made of the handler as required. The equivalent
-   * function signature of the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the shutdown completes.
+   * Potential completion tokens include @ref use_future, @ref use_awaitable,
+   * @ref yield_context, or a function object with the correct completion
+   * signature. The function signature of the completion handler must be:
    * @code void handler(
    *   const boost::system::error_code& error // Result of operation.
    * ); @endcode
+   * Regardless of whether the asynchronous operation completes immediately or
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
+   * manner equivalent to using boost::asio::post().
+   *
+   * @par Completion Signature
+   * @code void(boost::system::error_code) @endcode
+   *
+   * @par Per-Operation Cancellation
+   * This asynchronous operation supports cancellation for the following
+   * boost::asio::cancellation_type values:
+   *
+   * @li @c cancellation_type::terminal
+   *
+   * @li @c cancellation_type::partial
+   *
+   * if they are also supported by the @c Stream type's @c async_read_some and
+   * @c async_write_some operations.
    */
   template <
       BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code))
-        ShutdownHandler
+        ShutdownToken
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ShutdownHandler,
+  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ShutdownToken,
       void (boost::system::error_code))
   async_shutdown(
-      BOOST_ASIO_MOVE_ARG(ShutdownHandler) handler
+      BOOST_ASIO_MOVE_ARG(ShutdownToken) token
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
-    return async_initiate<ShutdownHandler,
+    return async_initiate<ShutdownToken,
       void (boost::system::error_code)>(
-        initiate_async_shutdown(this), handler);
+        initiate_async_shutdown(this), token);
   }
 
   /// Write some data to the stream.
@@ -588,39 +707,60 @@ public:
   /// Start an asynchronous write.
   /**
    * This function is used to asynchronously write one or more bytes of data to
-   * the stream. The function call always returns immediately.
+   * the stream. It is an initiating function for an @ref
+   * asynchronous_operation, and always returns immediately.
    *
    * @param buffers The data to be written to the stream. Although the buffers
    * object may be copied as necessary, ownership of the underlying buffers is
    * retained by the caller, which must guarantee that they remain valid until
-   * the handler is called.
+   * the completion handler is called.
    *
-   * @param handler The handler to be called when the write operation completes.
-   * Copies will be made of the handler as required. The equivalent function
-   * signature of the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the write completes.
+   * Potential completion tokens include @ref use_future, @ref use_awaitable,
+   * @ref yield_context, or a function object with the correct completion
+   * signature. The function signature of the completion handler must be:
    * @code void handler(
    *   const boost::system::error_code& error, // Result of operation.
-   *   std::size_t bytes_transferred           // Number of bytes written.
+   *   std::size_t bytes_transferred // Number of bytes written.
    * ); @endcode
+   * Regardless of whether the asynchronous operation completes immediately or
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
+   * manner equivalent to using boost::asio::post().
+   *
+   * @par Completion Signature
+   * @code void(boost::system::error_code, std::size_t) @endcode
    *
    * @note The async_write_some operation may not transmit all of the data to
    * the peer. Consider using the @ref async_write function if you need to
    * ensure that all data is written before the asynchronous operation
    * completes.
+   *
+   * @par Per-Operation Cancellation
+   * This asynchronous operation supports cancellation for the following
+   * boost::asio::cancellation_type values:
+   *
+   * @li @c cancellation_type::terminal
+   *
+   * @li @c cancellation_type::partial
+   *
+   * if they are also supported by the @c Stream type's @c async_read_some and
+   * @c async_write_some operations.
    */
   template <typename ConstBufferSequence,
       BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
-        std::size_t)) WriteHandler
+        std::size_t)) WriteToken
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteHandler,
+  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WriteToken,
       void (boost::system::error_code, std::size_t))
   async_write_some(const ConstBufferSequence& buffers,
-      BOOST_ASIO_MOVE_ARG(WriteHandler) handler
+      BOOST_ASIO_MOVE_ARG(WriteToken) token
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
-    return async_initiate<WriteHandler,
+    return async_initiate<WriteToken,
       void (boost::system::error_code, std::size_t)>(
-        initiate_async_write_some(this), handler, buffers);
+        initiate_async_write_some(this), token, buffers);
   }
 
   /// Read some data from the stream.
@@ -675,39 +815,60 @@ public:
   /// Start an asynchronous read.
   /**
    * This function is used to asynchronously read one or more bytes of data from
-   * the stream. The function call always returns immediately.
+   * the stream. It is an initiating function for an @ref
+   * asynchronous_operation, and always returns immediately.
    *
    * @param buffers The buffers into which the data will be read. Although the
    * buffers object may be copied as necessary, ownership of the underlying
    * buffers is retained by the caller, which must guarantee that they remain
-   * valid until the handler is called.
+   * valid until the completion handler is called.
    *
-   * @param handler The handler to be called when the read operation completes.
-   * Copies will be made of the handler as required. The equivalent function
-   * signature of the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the read completes.
+   * Potential completion tokens include @ref use_future, @ref use_awaitable,
+   * @ref yield_context, or a function object with the correct completion
+   * signature. The function signature of the completion handler must be:
    * @code void handler(
    *   const boost::system::error_code& error, // Result of operation.
-   *   std::size_t bytes_transferred           // Number of bytes read.
+   *   std::size_t bytes_transferred // Number of bytes read.
    * ); @endcode
+   * Regardless of whether the asynchronous operation completes immediately or
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
+   * manner equivalent to using boost::asio::post().
+   *
+   * @par Completion Signature
+   * @code void(boost::system::error_code, std::size_t) @endcode
    *
    * @note The async_read_some operation may not read all of the requested
    * number of bytes. Consider using the @ref async_read function if you need to
    * ensure that the requested amount of data is read before the asynchronous
    * operation completes.
+   *
+   * @par Per-Operation Cancellation
+   * This asynchronous operation supports cancellation for the following
+   * boost::asio::cancellation_type values:
+   *
+   * @li @c cancellation_type::terminal
+   *
+   * @li @c cancellation_type::partial
+   *
+   * if they are also supported by the @c Stream type's @c async_read_some and
+   * @c async_write_some operations.
    */
   template <typename MutableBufferSequence,
       BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code,
-        std::size_t)) ReadHandler
+        std::size_t)) ReadToken
           BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadHandler,
+  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ReadToken,
       void (boost::system::error_code, std::size_t))
   async_read_some(const MutableBufferSequence& buffers,
-      BOOST_ASIO_MOVE_ARG(ReadHandler) handler
+      BOOST_ASIO_MOVE_ARG(ReadToken) token
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
-    return async_initiate<ReadHandler,
+    return async_initiate<ReadToken,
       void (boost::system::error_code, std::size_t)>(
-        initiate_async_read_some(this), handler, buffers);
+        initiate_async_read_some(this), token, buffers);
   }
 
 private:
@@ -885,3 +1046,7 @@ private:
 #include <boost/asio/detail/pop_options.hpp>
 
 #endif // BOOST_ASIO_SSL_STREAM_HPP
+
+/* stream.hpp
+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
+*/

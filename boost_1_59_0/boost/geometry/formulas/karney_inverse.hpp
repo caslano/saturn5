@@ -4,9 +4,10 @@
 
 // Contributed and/or modified by Adeel Ahmad, as part of Google Summer of Code 2018 program.
 
-// This file was modified by Oracle on 2019.
-// Modifications copyright (c) 2019 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2019-2021.
+// Modifications copyright (c) 2019-2021 Oracle and/or its affiliates.
 
+// Contributed and/or modified by Vissarion Fysikopoulos, on behalf of Oracle
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
@@ -35,6 +36,7 @@
 
 #include <boost/geometry/util/condition.hpp>
 #include <boost/geometry/util/math.hpp>
+#include <boost/geometry/util/precise_math.hpp>
 #include <boost/geometry/util/series_expansion.hpp>
 #include <boost/geometry/util/normalize_spheroidal_coordinates.hpp>
 
@@ -44,24 +46,26 @@
 
 namespace boost { namespace geometry { namespace math {
 
-// TODO: Moved temporarily because of C++11 is used
-
 /*!
 \brief The exact difference of two angles reduced to (-180deg, 180deg].
 */
 template<typename T>
 inline T difference_angle(T const& x, T const& y, T& e)
 {
-    T t, d = math::sum_error(std::remainder(-x, T(360)), std::remainder(y, T(360)), t);
+    auto res1 = boost::geometry::detail::precise_math::two_sum(
+        std::remainder(-x, T(360)), std::remainder(y, T(360)));
 
-    normalize_azimuth<degree, T>(d);
+    normalize_azimuth<degree, T>(res1[0]);
 
     // Here y - x = d + t (mod 360), exactly, where d is in (-180,180] and
     // abs(t) <= eps (eps = 2^-45 for doubles).  The only case where the
     // addition of t takes the result outside the range (-180,180] is d = 180
     // and t > 0.  The case, d = -180 + eps, t = -eps, can't happen, since
     // sum_error would have returned the exact result in such a case (i.e., given t = 0).
-    return math::sum_error(d == 180 && t > 0 ? -180 : d, t, e);
+    auto res2 = boost::geometry::detail::precise_math::two_sum(
+        res1[0] == 180 && res1[1] > 0 ? -180 : res1[0], res1[1]);
+    e = res2[1];
+    return res2[0];
 }
 
 }}} // namespace boost::geometry::math
@@ -72,13 +76,9 @@ namespace boost { namespace geometry { namespace formula
 
 namespace se = series_expansion;
 
-/*!
-\brief The solution of the inverse problem of geodesics on latlong coordinates,
-       after Karney (2011).
-\author See
-- Charles F.F Karney, Algorithms for geodesics, 2011
-https://arxiv.org/pdf/1109.4448.pdf
-*/
+namespace detail
+{
+
 template <
     typename CT,
     bool EnableDistance,
@@ -122,11 +122,11 @@ public:
 
         result_type result;
 
-        CT lat1 = la1;
-        CT lat2 = la2;
+        CT lat1 = la1 * r2d;
+        CT lat2 = la2 * r2d;
 
-        CT lon1 = lo1;
-        CT lon2 = lo2;
+        CT lon1 = lo1 * r2d;
+        CT lon2 = lo2 * r2d;
 
         CT const a = CT(get_radius<0>(spheroid));
         CT const b = CT(get_radius<2>(spheroid));
@@ -237,7 +237,9 @@ public:
         CT const dn2 = sqrt(c1 + ep2 * math::sqr(sin_beta2));
 
         CT sigma12;
-        CT m12x, s12x, M21;
+        CT m12x = c0;
+        CT s12x;
+        CT M21;
 
         // Index zero element of coeffs_C1 is unused.
         se::coeffs_C1<SeriesOrder, CT> const coeffs_C1(n);
@@ -316,7 +318,7 @@ public:
             // meridian and geodesic is neither meridional nor equatorial.
 
             // Find the starting point for Newton's method.
-            CT dnm;
+            CT dnm = c1;
             sigma12 = newton_start(sin_beta1, cos_beta1, dn1,
                                    sin_beta2, cos_beta2, dn2,
                                    lam12, sin_lam12, cos_lam12,
@@ -357,7 +359,7 @@ public:
                      iteration < max_iterations;
                      ++iteration)
                 {
-                    CT dv;
+                    CT dv = c0;
                     CT v = lambda12(sin_beta1, cos_beta1, dn1,
                                     sin_beta2, cos_beta2, dn2,
                                     sin_alpha1, cos_alpha1,
@@ -465,12 +467,12 @@ public:
         {
             if (BOOST_GEOMETRY_CONDITION(CalcFwdAzimuth))
             {
-                result.azimuth = atan2(sin_alpha1, cos_alpha1) * r2d;
+                result.azimuth = atan2(sin_alpha1, cos_alpha1);
             }
 
             if (BOOST_GEOMETRY_CONDITION(CalcRevAzimuth))
             {
-                result.reverse_azimuth = atan2(sin_alpha2, cos_alpha2) * r2d;
+                result.reverse_azimuth = atan2(sin_alpha2, cos_alpha2);
             }
         }
 
@@ -583,7 +585,8 @@ public:
                                   CT& sin_alpha1, CT& cos_alpha1,
                                   CT& sin_alpha2, CT& cos_alpha2,
                                   CT& dnm, CoeffsC1 const& coeffs_C1, CT const& ep2,
-                                  CT const& tol1, CT const& tol2, CT const& etol2, CT const& n, CT const& f)
+                                  CT const& tol1, CT const& tol2, CT const& etol2, CT const& n,
+                                  CT const& f)
     {
         static CT const c0 = 0;
         static CT const c0_01 = 0.01;
@@ -690,7 +693,9 @@ public:
                 CT cos_beta12a = cos_beta2 * cos_beta1 - sin_beta2 * sin_beta1;
                 CT beta12a = atan2(sin_beta12a, cos_beta12a);
 
-                CT m12b, m0, dummy;
+                CT m12b = c0;
+                CT m0 = c1;
+                CT dummy;
                 meridian_length(n, ep2, pi + beta12a,
                                 sin_beta1, -cos_beta1, dn1,
                                 sin_beta2, cos_beta2, dn2,
@@ -950,7 +955,41 @@ public:
 
 };
 
+} // namespace detail
+
+/*!
+\brief The solution of the inverse problem of geodesics on latlong coordinates,
+       after Karney (2011).
+\author See
+- Charles F.F Karney, Algorithms for geodesics, 2011
+https://arxiv.org/pdf/1109.4448.pdf
+*/
+
+template <
+    typename CT,
+    bool EnableDistance,
+    bool EnableAzimuth,
+    bool EnableReverseAzimuth = false,
+    bool EnableReducedLength = false,
+    bool EnableGeodesicScale = false
+>
+struct karney_inverse
+    : detail::karney_inverse
+        <
+            CT,
+            EnableDistance,
+            EnableAzimuth,
+            EnableReverseAzimuth,
+            EnableReducedLength,
+            EnableGeodesicScale
+        >
+{};
+
 }}} // namespace boost::geometry::formula
 
 
 #endif // BOOST_GEOMETRY_FORMULAS_KARNEY_INVERSE_HPP
+
+/* karney_inverse.hpp
+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
+*/

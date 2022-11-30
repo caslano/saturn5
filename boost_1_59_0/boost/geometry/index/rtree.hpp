@@ -4,9 +4,10 @@
 //
 // Copyright (c) 2008 Federico J. Fernandez.
 // Copyright (c) 2011-2019 Adam Wulkiewicz, Lodz, Poland.
+// Copyright (c) 2020 Caian Benedicto, Campinas, Brazil.
 //
-// This file was modified by Oracle on 2019.
-// Modifications copyright (c) 2019 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2019-2021.
+// Modifications copyright (c) 2019-2021 Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 //
 // Use, modification and distribution is subject to the Boost Software License,
@@ -18,6 +19,7 @@
 
 // STD
 #include <algorithm>
+#include <type_traits>
 
 // Boost
 #include <boost/container/new_allocator.hpp>
@@ -25,6 +27,8 @@
 #include <boost/tuple/tuple.hpp>
 
 // Boost.Geometry
+#include <boost/geometry/core/static_assert.hpp>
+
 #include <boost/geometry/algorithms/detail/comparable_distance/interface.hpp>
 #include <boost/geometry/algorithms/detail/covered_by/interface.hpp>
 #include <boost/geometry/algorithms/detail/disjoint/interface.hpp>
@@ -90,6 +94,9 @@
 #include <boost/geometry/index/detail/serialization.hpp>
 #endif
 
+#include <boost/geometry/util/range.hpp>
+#include <boost/geometry/util/type_traits.hpp>
+
 // TODO change the name to bounding_tree
 
 /*!
@@ -111,7 +118,7 @@ algorithm with specific parameters like min and max number of elements in node.
 
 \par
 Predefined algorithms with compile-time parameters are:
-\li <tt>boost::geometry::index::linear</tt>,
+ \li <tt>boost::geometry::index::linear</tt>,
  \li <tt>boost::geometry::index::quadratic</tt>,
  \li <tt>boost::geometry::index::rstar</tt>.
 
@@ -128,8 +135,8 @@ access. Therefore the IndexableGetter should return the Indexable by
 a reference type. The Indexable should not be calculated since it could harm
 the performance. The default IndexableGetter can translate all types adapted
 to Point, Box or Segment concepts (called Indexables). Furthermore, it can
-handle <tt>std::pair<Indexable, T></tt>, <tt>boost::tuple<Indexable, ...></tt>
-and <tt>std::tuple<Indexable, ...></tt> when possible. For example, for Value
+handle <tt>std::pair<Indexable, T></tt>, <tt>std::tuple<Indexable, ...></tt>
+and <tt>boost::tuple<Indexable, ...></tt>. For example, for Value
 of type <tt>std::pair<Box, int></tt>, the default IndexableGetter translates
 from <tt>std::pair<Box, int> const&</tt> to <tt>Box const&</tt>.
 
@@ -398,13 +405,7 @@ public:
                  allocator_type const& allocator = allocator_type())
         : m_members(getter, equal, parameters, allocator)
     {
-        typedef detail::rtree::pack<members_holder> pack;
-        size_type vc = 0, ll = 0;
-        m_members.root = pack::apply(first, last, vc, ll,
-                                     m_members.parameters(), m_members.translator(),
-                                     m_members.allocators());
-        m_members.values_count = vc;
-        m_members.leafs_level = ll;
+        pack_construct(first, last, boost::container::new_allocator<void>());
     }
 
     /*!
@@ -431,13 +432,156 @@ public:
                           allocator_type const& allocator = allocator_type())
         : m_members(getter, equal, parameters, allocator)
     {
-        typedef detail::rtree::pack<members_holder> pack;
-        size_type vc = 0, ll = 0;
-        m_members.root = pack::apply(::boost::begin(rng), ::boost::end(rng), vc, ll,
-                                     m_members.parameters(), m_members.translator(),
-                                     m_members.allocators());
-        m_members.values_count = vc;
-        m_members.leafs_level = ll;
+        pack_construct(::boost::begin(rng), ::boost::end(rng), boost::container::new_allocator<void>());
+    }
+
+    /*!
+    \brief The constructor.
+
+    The tree is created using packing algorithm and a temporary packing allocator.
+
+    \param first             The beginning of the range of Values.
+    \param last              The end of the range of Values.
+    \param parameters        The parameters object.
+    \param getter            The function object extracting Indexable from Value.
+    \param equal             The function object comparing Values.
+    \param allocator         The allocator object for persistent data in the tree.
+    \param temp_allocator    The temporary allocator object used when packing.
+
+    \par Throws
+    \li If allocator copy constructor throws.
+    \li If Value copy constructor or copy assignment throws.
+    \li If allocation throws or returns invalid value.
+    */
+    template<typename Iterator, typename PackAlloc>
+    inline rtree(Iterator first, Iterator last,
+                 parameters_type const& parameters,
+                 indexable_getter const& getter,
+                 value_equal const& equal,
+                 allocator_type const& allocator,
+                 PackAlloc const& temp_allocator)
+        : m_members(getter, equal, parameters, allocator)
+    {
+        pack_construct(first, last, temp_allocator);
+    }
+
+    /*!
+    \brief The constructor.
+
+    The tree is created using packing algorithm and a temporary packing allocator.
+
+    \param rng               The range of Values.
+    \param parameters        The parameters object.
+    \param getter            The function object extracting Indexable from Value.
+    \param equal             The function object comparing Values.
+    \param allocator         The allocator object for persistent data in the tree.
+    \param temp_allocator    The temporary allocator object used when packing.
+
+    \par Throws
+    \li If allocator copy constructor throws.
+    \li If Value copy constructor or copy assignment throws.
+    \li If allocation throws or returns invalid value.
+    */
+    template<typename Range, typename PackAlloc>
+    inline explicit rtree(Range const& rng,
+                          parameters_type const& parameters,
+                          indexable_getter const& getter,
+                          value_equal const& equal,
+                          allocator_type const& allocator,
+                          PackAlloc const& temp_allocator)
+        : m_members(getter, equal, parameters, allocator)
+    {
+        pack_construct(::boost::begin(rng), ::boost::end(rng), temp_allocator);
+    }
+
+    /*!
+    \brief The constructor.
+
+    The tree is created using packing algorithm and a temporary packing allocator.
+
+    \param first        The beginning of the range of Values.
+    \param last         The end of the range of Values.
+    \param allocator    The allocator object for persistent data in the tree.
+
+    \par Throws
+    \li If allocator copy constructor throws.
+    \li If Value copy constructor or copy assignment throws.
+    \li If allocation throws or returns invalid value.
+    */
+    template<typename Iterator>
+    inline rtree(Iterator first, Iterator last,
+                 allocator_type const& allocator)
+        : m_members(indexable_getter(), value_equal(), parameters_type(), allocator)
+    {
+        pack_construct(first, last, boost::container::new_allocator<void>());
+    }
+
+    /*!
+    \brief The constructor.
+
+    The tree is created using packing algorithm and a temporary packing allocator.
+
+    \param rng          The range of Values.
+    \param allocator    The allocator object for persistent data in the tree.
+
+    \par Throws
+    \li If allocator copy constructor throws.
+    \li If Value copy constructor or copy assignment throws.
+    \li If allocation throws or returns invalid value.
+    */
+    template<typename Range>
+    inline explicit rtree(Range const& rng,
+                          allocator_type const& allocator)
+        : m_members(indexable_getter(), value_equal(), parameters_type(), allocator)
+    {
+        pack_construct(::boost::begin(rng), ::boost::end(rng), boost::container::new_allocator<void>());
+    }
+
+    /*!
+    \brief The constructor.
+
+    The tree is created using packing algorithm and a temporary packing allocator.
+
+    \param first             The beginning of the range of Values.
+    \param last              The end of the range of Values.
+    \param allocator         The allocator object for persistent data in the tree.
+    \param temp_allocator    The temporary allocator object used when packing.
+
+    \par Throws
+    \li If allocator copy constructor throws.
+    \li If Value copy constructor or copy assignment throws.
+    \li If allocation throws or returns invalid value.
+    */
+    template<typename Iterator, typename PackAlloc>
+    inline rtree(Iterator first, Iterator last,
+                 allocator_type const& allocator,
+                 PackAlloc const& temp_allocator)
+        : m_members(indexable_getter(), value_equal(), parameters_type(), allocator)
+    {
+        pack_construct(first, last, temp_allocator);
+    }
+
+    /*!
+    \brief The constructor.
+
+    The tree is created using packing algorithm and a temporary packing allocator.
+
+    \param rng               The range of Values.
+    \param allocator         The allocator object for persistent data in the tree.
+    \param temp_allocator    The temporary allocator object used when packing.
+
+    \par Throws
+    \li If allocator copy constructor throws.
+    \li If Value copy constructor or copy assignment throws.
+    \li If allocation throws or returns invalid value.
+    */
+    template<typename Range, typename PackAlloc>
+    inline explicit rtree(Range const& rng,
+                          allocator_type const& allocator,
+                          PackAlloc const& temp_allocator)
+        : m_members(indexable_getter(), value_equal(), parameters_type(), allocator)
+    {
+        pack_construct(::boost::begin(rng), ::boost::end(rng), temp_allocator);
     }
 
     /*!
@@ -568,7 +712,7 @@ public:
             // (allocators stored as base classes of members_holder)
             // copying them changes values_count, in this case it doesn't cause errors since data must be copied
             
-            typedef boost::mpl::bool_<
+            typedef std::integral_constant<bool,
                 allocator_traits_type::propagate_on_container_copy_assignment::value
             > propagate;
             
@@ -618,7 +762,7 @@ public:
                 // (allocators stored as base classes of members_holder)
                 // moving them changes values_count
                 
-                typedef boost::mpl::bool_<
+                typedef std::integral_constant<bool,
                     allocator_traits_type::propagate_on_container_move_assignment::value
                 > propagate;
                 detail::move_cond(this_allocs, src_allocs, propagate());
@@ -655,7 +799,7 @@ public:
         // (allocators stored as base classes of members_holder)
         // swapping them changes values_count
         
-        typedef boost::mpl::bool_<
+        typedef std::integral_constant<bool,
             allocator_traits_type::propagate_on_container_swap::value
         > propagate;
         detail::swap_cond(m_members.allocators(), other.m_members.allocators(), propagate());
@@ -735,10 +879,11 @@ public:
         if ( !m_members.root )
             this->raw_create();
 
-        typedef boost::mpl::bool_
-            <
-                boost::is_convertible<ConvertibleOrRange, value_type>::value
-            > is_conv_t;
+        typedef std::is_convertible<ConvertibleOrRange, value_type> is_conv_t;
+        typedef range::detail::is_range<ConvertibleOrRange> is_range_t;
+        BOOST_GEOMETRY_STATIC_ASSERT((is_conv_t::value || is_range_t::value),
+            "The argument has to be convertible to Value type or be a Range.",
+            ConvertibleOrRange);
 
         this->insert_dispatch(conv_or_rng, is_conv_t());
     }
@@ -834,10 +979,11 @@ public:
         if ( !m_members.root )
             return 0;
 
-        typedef boost::mpl::bool_
-            <
-                boost::is_convertible<ConvertibleOrRange, value_type>::value
-            > is_conv_t;
+        typedef std::is_convertible<ConvertibleOrRange, value_type> is_conv_t;
+        typedef range::detail::is_range<ConvertibleOrRange> is_range_t;
+        BOOST_GEOMETRY_STATIC_ASSERT((is_conv_t::value || is_range_t::value),
+            "The argument has to be convertible to Value type or be a Range.",
+            ConvertibleOrRange);
 
         return this->remove_dispatch(conv_or_rng, is_conv_t());
     }
@@ -933,14 +1079,9 @@ public:
     template <typename Predicates, typename OutIter>
     size_type query(Predicates const& predicates, OutIter out_it) const
     {
-        if ( !m_members.root )
-            return 0;
-
-        static const unsigned distance_predicates_count = detail::predicates_count_distance<Predicates>::value;
-        static const bool is_distance_predicate = 0 < distance_predicates_count;
-        BOOST_MPL_ASSERT_MSG((distance_predicates_count <= 1), PASS_ONLY_ONE_DISTANCE_PREDICATE, (Predicates));
-
-        return query_dispatch(predicates, out_it, boost::mpl::bool_<is_distance_predicate>());
+        return m_members.root
+             ? query_dispatch(predicates, out_it)
+             : 0;
     }
 
     /*!
@@ -1034,6 +1175,15 @@ public:
         return const_query_iterator();
     }
 
+private:
+    template <typename Predicates>
+    using query_iterator_t = std::conditional_t
+        <
+            detail::predicates_count_distance<Predicates>::value == 0,
+            detail::rtree::iterators::spatial_query_iterator<members_holder, Predicates>,
+            detail::rtree::iterators::distance_query_iterator<members_holder, Predicates>
+        >;
+
 #ifndef BOOST_GEOMETRY_INDEX_DETAIL_EXPERIMENTAL
 private:
 #endif
@@ -1091,32 +1241,15 @@ private:
     \return             The iterator pointing at the begin of the query range.
     */
     template <typename Predicates>
-    typename boost::mpl::if_c<
-        detail::predicates_count_distance<Predicates>::value == 0,
-        detail::rtree::iterators::spatial_query_iterator<members_holder, Predicates>,
-        detail::rtree::iterators::distance_query_iterator<
-            members_holder, Predicates,
-            detail::predicates_find_distance<Predicates>::value
-        >
-    >::type
-    qbegin_(Predicates const& predicates) const
+    query_iterator_t<Predicates> qbegin_(Predicates const& predicates) const
     {
-        static const unsigned distance_predicates_count = detail::predicates_count_distance<Predicates>::value;
-        BOOST_MPL_ASSERT_MSG((distance_predicates_count <= 1), PASS_ONLY_ONE_DISTANCE_PREDICATE, (Predicates));
+        BOOST_GEOMETRY_STATIC_ASSERT((detail::predicates_count_distance<Predicates>::value <= 1),
+            "Only one distance predicate can be passed.",
+            Predicates);
 
-        typedef typename boost::mpl::if_c<
-            detail::predicates_count_distance<Predicates>::value == 0,
-            detail::rtree::iterators::spatial_query_iterator<members_holder, Predicates>,
-            detail::rtree::iterators::distance_query_iterator<
-                members_holder, Predicates,
-                detail::predicates_find_distance<Predicates>::value
-            >
-        >::type iterator_type;
-
-        if ( !m_members.root )
-            return iterator_type(m_members.parameters(), m_members.translator(), predicates);
-
-        return iterator_type(m_members.root, m_members.parameters(), m_members.translator(), predicates);
+        return m_members.root
+             ? query_iterator_t<Predicates>(m_members, predicates)
+             : query_iterator_t<Predicates>(predicates);
     }
 
     /*!
@@ -1152,29 +1285,13 @@ private:
     \return             The iterator pointing at the end of the query range.
     */
     template <typename Predicates>
-    typename boost::mpl::if_c<
-        detail::predicates_count_distance<Predicates>::value == 0,
-        detail::rtree::iterators::spatial_query_iterator<members_holder, Predicates>,
-        detail::rtree::iterators::distance_query_iterator<
-            members_holder, Predicates,
-            detail::predicates_find_distance<Predicates>::value
-        >
-    >::type
-    qend_(Predicates const& predicates) const
+    query_iterator_t<Predicates> qend_(Predicates const& predicates) const
     {
-        static const unsigned distance_predicates_count = detail::predicates_count_distance<Predicates>::value;
-        BOOST_MPL_ASSERT_MSG((distance_predicates_count <= 1), PASS_ONLY_ONE_DISTANCE_PREDICATE, (Predicates));
+        BOOST_GEOMETRY_STATIC_ASSERT((detail::predicates_count_distance<Predicates>::value <= 1),
+            "Only one distance predicate can be passed.",
+            Predicates);
 
-        typedef typename boost::mpl::if_c<
-            detail::predicates_count_distance<Predicates>::value == 0,
-            detail::rtree::iterators::spatial_query_iterator<members_holder, Predicates>,
-            detail::rtree::iterators::distance_query_iterator<
-                members_holder, Predicates,
-                detail::predicates_find_distance<Predicates>::value
-            >
-        >::type iterator_type;
-
-        return iterator_type(m_members.parameters(), m_members.translator(), predicates);
+        return query_iterator_t<Predicates>(m_members.parameters(), m_members.translator(), predicates);
     }
 
     /*!
@@ -1275,10 +1392,9 @@ public:
     */
     const_iterator begin() const
     {
-        if ( !m_members.root )
-            return const_iterator();
-
-        return const_iterator(m_members.root);
+        return m_members.root
+             ? const_iterator(m_members.root)
+             : const_iterator();
     }
 
     /*!
@@ -1410,10 +1526,10 @@ public:
                 indexable_type
             >::type value_or_indexable;
 
-        static const bool is_void = boost::is_same<value_or_indexable, void>::value;
-        BOOST_MPL_ASSERT_MSG((! is_void),
-                             PASSED_OBJECT_NOT_CONVERTIBLE_TO_VALUE_NOR_INDEXABLE_TYPE,
-                             (ValueOrIndexable));
+        static const bool is_void = std::is_void<value_or_indexable>::value;
+        BOOST_GEOMETRY_STATIC_ASSERT((! is_void),
+            "The argument has to be convertible to Value or Indexable type.",
+            ValueOrIndexable);
 
         // NOTE: If an object of convertible but not the same type is passed
         // into the function, here a temporary will be created.
@@ -1671,7 +1787,7 @@ private:
     */
     template <typename ValueConvertible>
     inline void insert_dispatch(ValueConvertible const& val_conv,
-                                boost::mpl::bool_<true> const& /*is_convertible*/)
+                                std::true_type /*is_convertible*/)
     {
         this->raw_insert(val_conv);
     }
@@ -1686,12 +1802,8 @@ private:
     */
     template <typename Range>
     inline void insert_dispatch(Range const& rng,
-                                boost::mpl::bool_<false> const& /*is_convertible*/)
+                                std::false_type /*is_convertible*/)
     {
-        BOOST_MPL_ASSERT_MSG((detail::is_range<Range>::value),
-                             PASSED_OBJECT_IS_NOT_CONVERTIBLE_TO_VALUE_NOR_A_RANGE,
-                             (Range));
-
         typedef typename boost::range_const_iterator<Range>::type It;
         for ( It it = boost::const_begin(rng); it != boost::const_end(rng) ; ++it )
             this->raw_insert(*it);
@@ -1707,7 +1819,7 @@ private:
     */
     template <typename ValueConvertible>
     inline size_type remove_dispatch(ValueConvertible const& val_conv,
-                                     boost::mpl::bool_<true> const& /*is_convertible*/)
+                                     std::true_type /*is_convertible*/)
     {
         return this->raw_remove(val_conv);
     }
@@ -1722,12 +1834,8 @@ private:
     */
     template <typename Range>
     inline size_type remove_dispatch(Range const& rng,
-                                     boost::mpl::bool_<false> const& /*is_convertible*/)
+                                     std::false_type /*is_convertible*/)
     {
-        BOOST_MPL_ASSERT_MSG((detail::is_range<Range>::value),
-                             PASSED_OBJECT_IS_NOT_CONVERTIBLE_TO_VALUE_NOR_A_RANGE,
-                             (Range));
-
         size_type result = 0;
         typedef typename boost::range_const_iterator<Range>::type It;
         for ( It it = boost::const_begin(rng); it != boost::const_end(rng) ; ++it )
@@ -1741,15 +1849,16 @@ private:
     \par Exception-safety
     strong
     */
-    template <typename Predicates, typename OutIter>
-    size_type query_dispatch(Predicates const& predicates, OutIter out_it, boost::mpl::bool_<false> const& /*is_distance_predicate*/) const
+    template
+    <
+        typename Predicates, typename OutIter,
+        std::enable_if_t<(detail::predicates_count_distance<Predicates>::value == 0), int> = 0
+    >
+    size_type query_dispatch(Predicates const& predicates, OutIter out_it) const
     {
         detail::rtree::visitors::spatial_query<members_holder, Predicates, OutIter>
-            find_v(m_members.parameters(), m_members.translator(), predicates, out_it);
-
-        detail::rtree::apply_visitor(find_v, *m_members.root);
-
-        return find_v.found_count;
+            query(m_members, predicates, out_it);
+        return query.apply(m_members);
     }
 
     /*!
@@ -1758,22 +1867,21 @@ private:
     \par Exception-safety
     strong
     */
-    template <typename Predicates, typename OutIter>
-    size_type query_dispatch(Predicates const& predicates, OutIter out_it, boost::mpl::bool_<true> const& /*is_distance_predicate*/) const
+    template
+    <
+        typename Predicates, typename OutIter,
+        std::enable_if_t<(detail::predicates_count_distance<Predicates>::value > 0), int> = 0
+    >
+    size_type query_dispatch(Predicates const& predicates, OutIter out_it) const
     {
-        BOOST_GEOMETRY_INDEX_ASSERT(m_members.root, "The root must exist");
+        BOOST_GEOMETRY_STATIC_ASSERT((detail::predicates_count_distance<Predicates>::value == 1),
+                                     "Only one distance predicate can be passed.",
+                                     Predicates);
 
-        static const unsigned distance_predicate_index = detail::predicates_find_distance<Predicates>::value;
-        detail::rtree::visitors::distance_query<
-            members_holder,
-            Predicates,
-            distance_predicate_index,
-            OutIter
-        > distance_v(m_members.parameters(), m_members.translator(), predicates, out_it);
+        detail::rtree::visitors::distance_query<members_holder, Predicates>
+            distance_v(m_members, predicates);
 
-        detail::rtree::apply_visitor(distance_v, *m_members.root);
-
-        return distance_v.finish();
+        return distance_v.apply(m_members, out_it);
     }
     
     /*!
@@ -1796,6 +1904,32 @@ private:
         detail::rtree::apply_visitor(count_v, *m_members.root);
 
         return count_v.found_count;
+    }
+
+    /*!
+    \brief The constructor TODO.
+
+    The tree is created using packing algorithm.
+
+    \param first             The beginning of the range of Values.
+    \param last              The end of the range of Values.
+    \param temp_allocator    The temporary allocator object to be used by the packing algorithm.
+
+    \par Throws
+    \li If allocator copy constructor throws.
+    \li If Value copy constructor or copy assignment throws.
+    \li If allocation throws or returns invalid value.
+    */
+    template<typename Iterator, typename PackAlloc>
+    inline void pack_construct(Iterator first, Iterator last, PackAlloc const& temp_allocator)
+    {
+        typedef detail::rtree::pack<members_holder> pack;
+        size_type vc = 0, ll = 0;
+        m_members.root = pack::apply(first, last, vc, ll,
+                                     m_members.parameters(), m_members.translator(),
+                                     m_members.allocators(), temp_allocator);
+        m_members.values_count = vc;
+        m_members.leafs_level = ll;
     }
 
     members_holder m_members;
@@ -2253,3 +2387,7 @@ struct range_mutable_iterator
 #include <boost/geometry/index/detail/config_end.hpp>
 
 #endif // BOOST_GEOMETRY_INDEX_RTREE_HPP
+
+/* rtree.hpp
+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
+*/

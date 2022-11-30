@@ -38,12 +38,12 @@
 #include <boost/regex/v4/primary_transform.hpp>
 #endif
 #ifndef BOOST_REGEX_OBJECT_CACHE_HPP
-#include <boost/regex/pending/object_cache.hpp>
+#include <boost/regex/v4/object_cache.hpp>
 #endif
 
-#include <istream>
-#include <ios>
 #include <climits>
+#include <ios>
+#include <istream>
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -89,9 +89,9 @@ public:
    parser_buf() : base_type() { setbuf(0, 0); }
    const charT* getnext() { return this->gptr(); }
 protected:
-   std::basic_streambuf<charT, traits>* setbuf(char_type* s, streamsize n);
-   typename parser_buf<charT, traits>::pos_type seekpos(pos_type sp, ::std::ios_base::openmode which);
-   typename parser_buf<charT, traits>::pos_type seekoff(off_type off, ::std::ios_base::seekdir way, ::std::ios_base::openmode which);
+   std::basic_streambuf<charT, traits>* setbuf(char_type* s, streamsize n) BOOST_OVERRIDE;
+   typename parser_buf<charT, traits>::pos_type seekpos(pos_type sp, ::std::ios_base::openmode which) BOOST_OVERRIDE;
+   typename parser_buf<charT, traits>::pos_type seekoff(off_type off, ::std::ios_base::seekdir way, ::std::ios_base::openmode which) BOOST_OVERRIDE;
 private:
    parser_buf& operator=(const parser_buf&);
    parser_buf(const parser_buf&);
@@ -174,7 +174,7 @@ template <class charT>
 struct cpp_regex_traits_base
 {
    cpp_regex_traits_base(const std::locale& l)
-   { imbue(l); }
+   { (void)imbue(l); }
    std::locale imbue(const std::locale& l);
 
    std::locale m_locale;
@@ -225,7 +225,7 @@ std::locale cpp_regex_traits_base<charT>::imbue(const std::locale& l)
 
 //
 // class cpp_regex_traits_char_layer:
-// implements methods that require specialisation for narrow characters:
+// implements methods that require specialization for narrow characters:
 //
 template <class charT>
 class cpp_regex_traits_char_layer : public cpp_regex_traits_base<charT>
@@ -281,7 +281,7 @@ void cpp_regex_traits_char_layer<charT>::init()
    typename std::messages<charT>::catalog cat = reinterpret_cast<std::messages<char>::catalog>(-1);
 #endif
    std::string cat_name(cpp_regex_traits<charT>::get_catalog_name());
-   if(cat_name.size() && (this->m_pmessages != 0))
+   if((!cat_name.empty()) && (this->m_pmessages != 0))
    {
       cat = this->m_pmessages->open(
          cat_name, 
@@ -352,10 +352,10 @@ typename cpp_regex_traits_char_layer<charT>::string_type
 }
 
 //
-// specialised version for narrow characters:
+// specialized version for narrow characters:
 //
 template <>
-class BOOST_REGEX_DECL cpp_regex_traits_char_layer<char> : public cpp_regex_traits_base<char>
+class cpp_regex_traits_char_layer<char> : public cpp_regex_traits_base<char>
 {
    typedef std::string string_type;
 public:
@@ -508,7 +508,7 @@ typename cpp_regex_traits_implementation<charT>::string_type
    // we work around this elsewhere, but just assert here that
    // we adhere to gcc's (buggy) preconditions...
    //
-   BOOST_ASSERT(*p2 == 0);
+   BOOST_REGEX_ASSERT(*p2 == 0);
    string_type result;
 #if defined(_CPPLIB_VER)
    //
@@ -566,7 +566,7 @@ typename cpp_regex_traits_implementation<charT>::string_type
 #ifndef BOOST_NO_EXCEPTIONS
    }catch(...){}
 #endif
-   while(result.size() && (charT(0) == *result.rbegin()))
+   while((!result.empty()) && (charT(0) == *result.rbegin()))
       result.erase(result.size() - 1);
    if(result.empty())
    {
@@ -588,7 +588,7 @@ typename cpp_regex_traits_implementation<charT>::string_type
    // we work around this elsewhere, but just assert here that
    // we adhere to gcc's (buggy) preconditions...
    //
-   BOOST_ASSERT(*p2 == 0);
+   BOOST_REGEX_ASSERT(*p2 == 0);
    //
    // swallowing all exceptions here is a bad idea
    // however at least one std lib will always throw
@@ -616,12 +616,12 @@ typename cpp_regex_traits_implementation<charT>::string_type
       // std::collate<wchar_t>::transform returns a different string!
       // So as a workaround, we'll truncate the string at the first NULL
       // which _seems_ to work....
-#if BOOST_WORKAROUND(__BORLANDC__, < 0x580)
+#if BOOST_WORKAROUND(BOOST_BORLANDC, < 0x580)
       result.erase(result.find(charT(0)));
 #else
       //
       // some implementations (Dinkumware) append unnecessary trailing \0's:
-      while(result.size() && (charT(0) == *result.rbegin()))
+      while((!result.empty()) && (charT(0) == *result.rbegin()))
          result.erase(result.size() - 1);
 #endif
       //
@@ -646,7 +646,7 @@ typename cpp_regex_traits_implementation<charT>::string_type
             result2.append(1, static_cast<charT>(1 + static_cast<uchar_type>(result[i]))).append(1, charT('b') - 1);
          }
       }
-      BOOST_ASSERT(std::find(result2.begin(), result2.end(), charT(0)) == result2.end());
+      BOOST_REGEX_ASSERT(std::find(result2.begin(), result2.end(), charT(0)) == result2.end());
 #ifndef BOOST_NO_EXCEPTIONS
    }
    catch(...)
@@ -662,14 +662,14 @@ typename cpp_regex_traits_implementation<charT>::string_type
    cpp_regex_traits_implementation<charT>::lookup_collatename(const charT* p1, const charT* p2) const
 {
    typedef typename std::map<string_type, string_type>::const_iterator iter_type;
-   if(m_custom_collate_names.size())
+   if(!m_custom_collate_names.empty())
    {
       iter_type pos = m_custom_collate_names.find(string_type(p1, p2));
       if(pos != m_custom_collate_names.end())
          return pos->second;
    }
 #if !defined(BOOST_NO_TEMPLATED_ITERATOR_CONSTRUCTORS)\
-               && !BOOST_WORKAROUND(__BORLANDC__, <= 0x0551)
+               && !BOOST_WORKAROUND(BOOST_BORLANDC, <= 0x0551)
    std::string name(p1, p2);
 #else
    std::string name;
@@ -679,11 +679,11 @@ typename cpp_regex_traits_implementation<charT>::string_type
 #endif
    name = lookup_default_collate_name(name);
 #if !defined(BOOST_NO_TEMPLATED_ITERATOR_CONSTRUCTORS)\
-               && !BOOST_WORKAROUND(__BORLANDC__, <= 0x0551)
-   if(name.size())
+               && !BOOST_WORKAROUND(BOOST_BORLANDC, <= 0x0551)
+   if(!name.empty())
       return string_type(name.begin(), name.end());
 #else
-   if(name.size())
+   if(!name.empty())
    {
       string_type result;
       typedef std::string::const_iterator iter;
@@ -709,7 +709,7 @@ void cpp_regex_traits_implementation<charT>::init()
    typename std::messages<charT>::catalog cat = reinterpret_cast<std::messages<char>::catalog>(-1);
 #endif
    std::string cat_name(cpp_regex_traits<charT>::get_catalog_name());
-   if(cat_name.size() && (this->m_pmessages != 0))
+   if((!cat_name.empty()) && (this->m_pmessages != 0))
    {
       cat = this->m_pmessages->open(
          cat_name, 
@@ -796,7 +796,7 @@ void cpp_regex_traits_implementation<charT>::init()
       for(unsigned int j = 0; j <= 13; ++j)
       {
          string_type s(this->m_pmessages->get(cat, 0, j+300, null_string));
-         if(s.size())
+         if(!s.empty())
             this->m_custom_class_names[s] = masks[j];
       }
    }
@@ -864,7 +864,7 @@ typename cpp_regex_traits_implementation<charT>::char_class_type
       ::boost::BOOST_REGEX_DETAIL_NS::char_class_xdigit,
    };
 #endif
-   if(m_custom_class_names.size())
+   if(!m_custom_class_names.empty())
    {
       typedef typename std::map<std::basic_string<charT>, char_class_type>::const_iterator map_iter;
       map_iter pos = m_custom_class_names.find(string_type(p1, p2));
@@ -872,7 +872,7 @@ typename cpp_regex_traits_implementation<charT>::char_class_type
          return pos->second;
    }
    std::size_t state_id = 1 + BOOST_REGEX_DETAIL_NS::get_default_class_id(p1, p2);
-   BOOST_ASSERT(state_id < sizeof(masks) / sizeof(masks[0]));
+   BOOST_REGEX_ASSERT(state_id < sizeof(masks) / sizeof(masks[0]));
    return masks[state_id];
 }
 
@@ -1129,6 +1129,91 @@ static_mutex& cpp_regex_traits<charT>::get_mutex_inst()
 }
 #endif
 
+namespace BOOST_REGEX_DETAIL_NS {
+
+   inline void cpp_regex_traits_char_layer<char>::init()
+   {
+      // we need to start by initialising our syntax map so we know which
+      // character is used for which purpose:
+      std::memset(m_char_map, 0, sizeof(m_char_map));
+#ifndef BOOST_NO_STD_MESSAGES
+#ifndef __IBMCPP__
+      std::messages<char>::catalog cat = static_cast<std::messages<char>::catalog>(-1);
+#else
+      std::messages<char>::catalog cat = reinterpret_cast<std::messages<char>::catalog>(-1);
+#endif
+      std::string cat_name(cpp_regex_traits<char>::get_catalog_name());
+      if ((!cat_name.empty()) && (m_pmessages != 0))
+      {
+         cat = this->m_pmessages->open(
+            cat_name,
+            this->m_locale);
+         if ((int)cat < 0)
+         {
+            std::string m("Unable to open message catalog: ");
+            std::runtime_error err(m + cat_name);
+            boost::BOOST_REGEX_DETAIL_NS::raise_runtime_error(err);
+         }
+      }
+      //
+      // if we have a valid catalog then load our messages:
+      //
+      if ((int)cat >= 0)
+      {
+#ifndef BOOST_NO_EXCEPTIONS
+         try {
+#endif
+            for (regex_constants::syntax_type i = 1; i < regex_constants::syntax_max; ++i)
+            {
+               string_type mss = this->m_pmessages->get(cat, 0, i, get_default_syntax(i));
+               for (string_type::size_type j = 0; j < mss.size(); ++j)
+               {
+                  m_char_map[static_cast<unsigned char>(mss[j])] = i;
+               }
+            }
+            this->m_pmessages->close(cat);
+#ifndef BOOST_NO_EXCEPTIONS
+         }
+         catch (...)
+         {
+            this->m_pmessages->close(cat);
+            throw;
+         }
+#endif
+      }
+      else
+      {
+#endif
+         for (regex_constants::syntax_type j = 1; j < regex_constants::syntax_max; ++j)
+         {
+            const char* ptr = get_default_syntax(j);
+            while (ptr && *ptr)
+            {
+               m_char_map[static_cast<unsigned char>(*ptr)] = j;
+               ++ptr;
+            }
+         }
+#ifndef BOOST_NO_STD_MESSAGES
+      }
+#endif
+      //
+      // finish off by calculating our escape types:
+      //
+      unsigned char i = 'A';
+      do
+      {
+         if (m_char_map[i] == 0)
+         {
+            if (this->m_pctype->is(std::ctype_base::lower, i))
+               m_char_map[i] = regex_constants::escape_type_class;
+            else if (this->m_pctype->is(std::ctype_base::upper, i))
+               m_char_map[i] = regex_constants::escape_type_not_class;
+         }
+      } while (0xFF != i++);
+   }
+
+} // namespace detail
+
 
 } // boost
 
@@ -1151,4 +1236,6 @@ static_mutex& cpp_regex_traits<charT>::get_mutex_inst()
 
 #endif
 
-
+/* cpp_regex_traits.hpp
+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
+*/

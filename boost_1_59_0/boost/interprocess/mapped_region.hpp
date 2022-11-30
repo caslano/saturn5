@@ -47,7 +47,6 @@
 
 #if defined (BOOST_INTERPROCESS_WINDOWS)
 #  include <boost/interprocess/detail/win32_api.hpp>
-#  include <boost/interprocess/sync/windows/sync_utils.hpp>
 #else
 #  ifdef BOOST_HAS_UNISTD_H
 #    include <fcntl.h>
@@ -136,11 +135,11 @@ class mapped_region
    //!Default constructor. Address will be 0 (nullptr).
    //!Size will be 0.
    //!Does not throw
-   mapped_region();
+   mapped_region() BOOST_NOEXCEPT;
 
    //!Move constructor. *this will be constructed taking ownership of "other"'s
    //!region and "other" will be left in default constructor state.
-   mapped_region(BOOST_RV_REF(mapped_region) other)
+   mapped_region(BOOST_RV_REF(mapped_region) other)  BOOST_NOEXCEPT
    #if defined (BOOST_INTERPROCESS_WINDOWS)
    :  m_base(0), m_size(0)
    ,  m_page_offset(0)
@@ -157,7 +156,7 @@ class mapped_region
 
    //!Move assignment. If *this owns a memory mapped region, it will be
    //!destroyed and it will take ownership of "other"'s memory mapped region.
-   mapped_region &operator=(BOOST_RV_REF(mapped_region) other)
+   mapped_region &operator=(BOOST_RV_REF(mapped_region) other) BOOST_NOEXCEPT
    {
       mapped_region tmp(boost::move(other));
       this->swap(tmp);
@@ -166,18 +165,18 @@ class mapped_region
 
    //!Swaps the mapped_region with another
    //!mapped region
-   void swap(mapped_region &other);
+   void swap(mapped_region &other) BOOST_NOEXCEPT;
 
    //!Returns the size of the mapping. Never throws.
-   std::size_t get_size() const;
+   std::size_t get_size() const BOOST_NOEXCEPT;
 
    //!Returns the base address of the mapping.
    //!Never throws.
-   void*       get_address() const;
+   void*       get_address() const BOOST_NOEXCEPT;
 
    //!Returns the mode of the mapping used to construct the mapped region.
    //!Never throws.
-   mode_t get_mode() const;
+   mode_t get_mode() const BOOST_NOEXCEPT;
 
    //!Flushes to the disk a byte range within the mapped memory.
    //!If 'async' is true, the function will return before flushing operation is completed
@@ -190,7 +189,7 @@ class mapped_region
    //!mapped memory page, accessing that page can trigger a segmentation fault.
    //!Depending on the OS, this operation might fail (XSI shared memory), it can decommit storage
    //!and free a portion of the virtual address space (e.g.POSIX) or this
-   //!function can release some physical memory wihout freeing any virtual address space(Windows).
+   //!function can release some physical memory without freeing any virtual address space(Windows).
    //!Returns true on success. Never throws.
    bool shrink_by(std::size_t bytes, bool from_back = true);
 
@@ -225,7 +224,7 @@ class mapped_region
    //!Returns the size of the page. This size is the minimum memory that
    //!will be used by the system when mapping a memory mappable source and
    //!will restrict the address and the offset to map.
-   static std::size_t get_page_size();
+   static std::size_t get_page_size() BOOST_NOEXCEPT;
 
    #if !defined(BOOST_INTERPROCESS_DOXYGEN_INVOKED)
    private:
@@ -269,19 +268,19 @@ class mapped_region
 
 #if !defined(BOOST_INTERPROCESS_DOXYGEN_INVOKED)
 
-inline void swap(mapped_region &x, mapped_region &y)
+inline void swap(mapped_region &x, mapped_region &y) BOOST_NOEXCEPT
 {  x.swap(y);  }
 
 inline mapped_region::~mapped_region()
 {  this->priv_close(); }
 
-inline std::size_t mapped_region::get_size()  const
+inline std::size_t mapped_region::get_size() const BOOST_NOEXCEPT
 {  return m_size; }
 
-inline mode_t mapped_region::get_mode()  const
+inline mode_t mapped_region::get_mode() const BOOST_NOEXCEPT
 {  return m_mode;   }
 
-inline void*    mapped_region::get_address()  const
+inline void*    mapped_region::get_address() const BOOST_NOEXCEPT
 {  return m_base; }
 
 inline void*    mapped_region::priv_map_address()  const
@@ -297,7 +296,7 @@ inline bool mapped_region::priv_flush_param_check
    if(m_base == 0)
       return false;
 
-   if(mapping_offset >= m_size || (mapping_offset + numbytes) > m_size){
+   if(mapping_offset >= m_size || numbytes > (m_size - size_t(mapping_offset))){
       return false;
    }
 
@@ -346,14 +345,14 @@ inline void mapped_region::priv_size_from_mapping_size
    (offset_t mapping_size, offset_t offset, offset_t page_offset, std::size_t &size)
 {
    //Check if mapping size fits in the user address space
-   //as offset_t is the maximum file size and its signed.
+   //as offset_t is the maximum file size and it's signed.
    if(mapping_size < offset ||
       boost::uintmax_t(mapping_size - (offset - page_offset)) >
          boost::uintmax_t(std::size_t(-1))){
       error_info err(size_error);
       throw interprocess_exception(err);
    }
-   size = static_cast<std::size_t>(mapping_size - (offset - page_offset));
+   size = static_cast<std::size_t>(mapping_size - offset);
 }
 
 inline offset_t mapped_region::priv_page_offset_addr_fixup(offset_t offset, const void *&address)
@@ -365,17 +364,17 @@ inline offset_t mapped_region::priv_page_offset_addr_fixup(offset_t offset, cons
    //We calculate the difference between demanded and valid offset
    //(always less than a page in std::size_t, thus, representable by std::size_t)
    const std::size_t page_offset =
-      static_cast<std::size_t>(offset - (offset / page_size) * page_size);
+      static_cast<std::size_t>(offset - (offset / offset_t(page_size)) * offset_t(page_size));
    //Update the mapping address
    if(address){
       address = static_cast<const char*>(address) - page_offset;
    }
-   return page_offset;
+   return offset_t(page_offset);
 }
 
 #if defined (BOOST_INTERPROCESS_WINDOWS)
 
-inline mapped_region::mapped_region()
+inline mapped_region::mapped_region() BOOST_NOEXCEPT
    :  m_base(0), m_size(0), m_page_offset(0), m_mode(read_only)
    ,  m_file_or_mapping_hnd(ipcdetail::invalid_file())
 {}
@@ -383,7 +382,7 @@ inline mapped_region::mapped_region()
 template<int dummy>
 inline std::size_t mapped_region::page_size_holder<dummy>::get_page_size()
 {
-   winapi::system_info info;
+   winapi::interprocess_system_info info;
    winapi::get_system_info(&info);
    return std::size_t(info.dwAllocationGranularity);
 }
@@ -442,11 +441,11 @@ inline mapped_region::mapped_region
          //Create mapping handle
          native_mapping_handle = winapi::create_file_mapping
             ( ipcdetail::file_handle_from_mapping_handle(mapping.get_mapping_handle())
-            , protection, 0, 0, 0);
+            , protection, 0, (char*)0, 0);
 
          //Check if all is correct
          if(!native_mapping_handle){
-            error_info err = winapi::get_last_error();
+            error_info err ((int)winapi::get_last_error());
             throw interprocess_exception(err);
          }
          handle_to_close = native_mapping_handle;
@@ -466,7 +465,7 @@ inline mapped_region::mapped_region
       if(size == 0){
          offset_t mapping_size;
          if(!winapi::get_file_mapping_size(native_mapping_handle, mapping_size)){
-            error_info err = winapi::get_last_error();
+            error_info err((int)winapi::get_last_error());
             throw interprocess_exception(err);
          }
          //This can throw
@@ -477,18 +476,18 @@ inline mapped_region::mapped_region
       void *base = winapi::map_view_of_file_ex
                                  (native_mapping_handle,
                                  map_access,
-                                 offset - page_offset,
+                                 ::boost::ulong_long_type(offset - page_offset),
                                  static_cast<std::size_t>(page_offset + size),
                                  const_cast<void*>(address));
       //Check error
       if(!base){
-         error_info err = winapi::get_last_error();
+         error_info err((int)winapi::get_last_error());
          throw interprocess_exception(err);
       }
 
       //Calculate new base for the user
       m_base = static_cast<char*>(base) + page_offset;
-      m_page_offset = page_offset;
+      m_page_offset = static_cast<std::size_t>(page_offset);
       m_size = size;
    }
    //Windows shared memory needs the duplication of the handle if we want to
@@ -496,7 +495,7 @@ inline mapped_region::mapped_region
    //
    //For mapped files, we duplicate the file handle to be able to FlushFileBuffers
    if(!winapi::duplicate_current_process_handle(mhandle.handle, &m_file_or_mapping_hnd)){
-      error_info err = winapi::get_last_error();
+      error_info err((int)winapi::get_last_error());
       this->priv_close();
       throw interprocess_exception(err);
    }
@@ -573,7 +572,7 @@ inline void mapped_region::dont_close_on_destruction()
 
 #else    //#if defined (BOOST_INTERPROCESS_WINDOWS)
 
-inline mapped_region::mapped_region()
+inline mapped_region::mapped_region() BOOST_NOEXCEPT
    :  m_base(0), m_size(0), m_page_offset(0), m_mode(read_only), m_is_xsi(false)
 {}
 
@@ -696,7 +695,7 @@ inline mapped_region::mapped_region
 
    //Map it to the address space
    void* base = mmap ( const_cast<void*>(address)
-                     , static_cast<std::size_t>(page_offset + size)
+                     , static_cast<std::size_t>(page_offset) + size
                      , prot
                      , flags
                      , mapping.get_mapping_handle().handle
@@ -710,7 +709,7 @@ inline mapped_region::mapped_region
 
    //Calculate new base for the user
    m_base = static_cast<char*>(base) + page_offset;
-   m_page_offset = page_offset;
+   m_page_offset = static_cast<std::size_t>(page_offset);
    m_size   = size;
 
    //Check for fixed mapping error
@@ -852,7 +851,7 @@ template<int dummy>
 const std::size_t mapped_region::page_size_holder<dummy>::PageSize
    = mapped_region::page_size_holder<dummy>::get_page_size();
 
-inline std::size_t mapped_region::get_page_size()
+inline std::size_t mapped_region::get_page_size() BOOST_NOEXCEPT
 {
    if(!page_size_holder<0>::PageSize)
       return page_size_holder<0>::get_page_size();
@@ -860,7 +859,7 @@ inline std::size_t mapped_region::get_page_size()
       return page_size_holder<0>::PageSize;
 }
 
-inline void mapped_region::swap(mapped_region &other)
+inline void mapped_region::swap(mapped_region &other) BOOST_NOEXCEPT
 {
    ::boost::adl_move_swap(this->m_base, other.m_base);
    ::boost::adl_move_swap(this->m_size, other.m_size);
@@ -921,3 +920,7 @@ inline void mapped_region::destroy_syncs_in_range(const void *addr, std::size_t 
 
 #endif   //#if !defined(BOOST_INTERPROCESS_DOXYGEN_INVOKED)
 
+
+/* mapped_region.hpp
+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
+*/

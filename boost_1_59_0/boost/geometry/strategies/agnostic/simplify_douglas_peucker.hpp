@@ -3,10 +3,10 @@
 // Copyright (c) 1995, 2007-2015 Barend Gehrels, Amsterdam, the Netherlands.
 // Copyright (c) 1995 Maarten Hilferink, Amsterdam, the Netherlands
 
-// This file was modified by Oracle on 2015.
-// Modifications copyright (c) 2015, Oracle and/or its affiliates.
-
+// This file was modified by Oracle on 2015-2021.
+// Modifications copyright (c) 2015-2021, Oracle and/or its affiliates.
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -19,21 +19,7 @@
 #define BOOST_GEOMETRY_STRATEGY_AGNOSTIC_SIMPLIFY_DOUGLAS_PEUCKER_HPP
 
 
-#include <cstddef>
-#ifdef BOOST_GEOMETRY_DEBUG_DOUGLAS_PEUCKER
-#include <iostream>
-#endif
-#include <vector>
-
-#include <boost/range.hpp>
-
-#include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/strategies/distance.hpp>
-
-
-#ifdef BOOST_GEOMETRY_DEBUG_DOUGLAS_PEUCKER
-#include <boost/geometry/io/dsv/write.hpp>
-#endif
 
 
 namespace boost { namespace geometry
@@ -43,202 +29,7 @@ namespace strategy { namespace simplify
 {
 
 
-#ifndef DOXYGEN_NO_DETAIL
-namespace detail
-{
-
-    /*!
-        \brief Small wrapper around a point, with an extra member "included"
-        \details
-            It has a const-reference to the original point (so no copy here)
-        \tparam the enclosed point type
-    */
-    template<typename Point>
-    struct douglas_peucker_point
-    {
-        Point const& p;
-        bool included;
-
-        inline douglas_peucker_point(Point const& ap)
-            : p(ap)
-            , included(false)
-        {}
-
-        // Necessary for proper compilation
-        inline douglas_peucker_point<Point> operator=(douglas_peucker_point<Point> const& )
-        {
-            return douglas_peucker_point<Point>(*this);
-        }
-    };
-
-    template
-    <
-        typename Point,
-        typename PointDistanceStrategy,
-        typename LessCompare
-            = std::less
-                <
-                    typename strategy::distance::services::return_type
-                        <
-                            PointDistanceStrategy,
-                            Point, Point
-                        >::type
-                >
-    >
-    class douglas_peucker
-        : LessCompare // for empty base optimization
-    {
-    public :
-
-        // See also ticket 5954 https://svn.boost.org/trac/boost/ticket/5954
-        // Comparable is currently not possible here because it has to be compared to the squared of max_distance, and more.
-        // For now we have to take the real distance.
-        typedef PointDistanceStrategy distance_strategy_type;
-        // typedef typename strategy::distance::services::comparable_type<PointDistanceStrategy>::type distance_strategy_type;
-
-        typedef typename strategy::distance::services::return_type
-                         <
-                             distance_strategy_type,
-                             Point, Point
-                         >::type distance_type;
-
-        douglas_peucker()
-        {}
-
-        douglas_peucker(LessCompare const& less_compare)
-            : LessCompare(less_compare)
-        {}
-
-    private :
-        typedef detail::douglas_peucker_point<Point> dp_point_type;
-        typedef typename std::vector<dp_point_type>::iterator iterator_type;
-
-
-        LessCompare const& less() const
-        {
-            return *this;
-        }
-
-        inline void consider(iterator_type begin,
-                             iterator_type end,
-                             distance_type const& max_dist,
-                             int& n,
-                             distance_strategy_type const& ps_distance_strategy) const
-        {
-            std::size_t size = end - begin;
-
-            // size must be at least 3
-            // because we want to consider a candidate point in between
-            if (size <= 2)
-            {
-#ifdef BOOST_GEOMETRY_DEBUG_DOUGLAS_PEUCKER
-                if (begin != end)
-                {
-                    std::cout << "ignore between " << dsv(begin->p)
-                        << " and " << dsv((end - 1)->p)
-                        << " size=" << size << std::endl;
-                }
-                std::cout << "return because size=" << size << std::endl;
-#endif
-                return;
-            }
-
-            iterator_type last = end - 1;
-
-#ifdef BOOST_GEOMETRY_DEBUG_DOUGLAS_PEUCKER
-            std::cout << "find between " << dsv(begin->p)
-                << " and " << dsv(last->p)
-                << " size=" << size << std::endl;
-#endif
-
-
-            // Find most far point, compare to the current segment
-            //geometry::segment<Point const> s(begin->p, last->p);
-            distance_type md(-1.0); // any value < 0
-            iterator_type candidate;
-            for(iterator_type it = begin + 1; it != last; ++it)
-            {
-                distance_type dist = ps_distance_strategy.apply(it->p, begin->p, last->p);
-
-#ifdef BOOST_GEOMETRY_DEBUG_DOUGLAS_PEUCKER
-                std::cout << "consider " << dsv(it->p)
-                    << " at " << double(dist)
-                    << ((dist > max_dist) ? " maybe" : " no")
-                    << std::endl;
-
-#endif
-                if ( less()(md, dist) )
-                {
-                    md = dist;
-                    candidate = it;
-                }
-            }
-
-            // If a point is found, set the include flag
-            // and handle segments in between recursively
-            if ( less()(max_dist, md) )
-            {
-#ifdef BOOST_GEOMETRY_DEBUG_DOUGLAS_PEUCKER
-                std::cout << "use " << dsv(candidate->p) << std::endl;
-#endif
-
-                candidate->included = true;
-                n++;
-
-                consider(begin, candidate + 1, max_dist, n, ps_distance_strategy);
-                consider(candidate, end, max_dist, n, ps_distance_strategy);
-            }
-        }
-
-
-    public :
-
-        template <typename Range, typename OutputIterator>
-        inline OutputIterator apply(Range const& range,
-                                    OutputIterator out,
-                                    distance_type max_distance) const
-        {
-#ifdef BOOST_GEOMETRY_DEBUG_DOUGLAS_PEUCKER
-                std::cout << "max distance: " << max_distance
-                          << std::endl << std::endl;
-#endif
-            distance_strategy_type strategy;
-
-            // Copy coordinates, a vector of references to all points
-            std::vector<dp_point_type> ref_candidates(boost::begin(range),
-                            boost::end(range));
-
-            // Include first and last point of line,
-            // they are always part of the line
-            int n = 2;
-            ref_candidates.front().included = true;
-            ref_candidates.back().included = true;
-
-            // Get points, recursively, including them if they are further away
-            // than the specified distance
-            consider(boost::begin(ref_candidates), boost::end(ref_candidates), max_distance, n, strategy);
-
-            // Copy included elements to the output
-            for(typename std::vector<dp_point_type>::const_iterator it
-                            = boost::begin(ref_candidates);
-                it != boost::end(ref_candidates);
-                ++it)
-            {
-                if (it->included)
-                {
-                    // copy-coordinates does not work because OutputIterator
-                    // does not model Point (??)
-                    //geometry::convert(it->p, *out);
-                    *out = it->p;
-                    out++;
-                }
-            }
-            return out;
-        }
-
-    };
-}
-#endif // DOXYGEN_NO_DETAIL
+// NOTE: Left here for backward compatibility.
 
 
 /*!
@@ -270,52 +61,28 @@ public :
 
     typedef PointDistanceStrategy distance_strategy_type;
 
-    typedef typename detail::douglas_peucker
-        <
-            Point,
-            PointDistanceStrategy
-        >::distance_type distance_type;
+    typedef typename strategy::distance::services::return_type
+                     <
+                         distance_strategy_type,
+                         Point, Point
+                     >::type distance_type;
 
     template <typename Range, typename OutputIterator>
-    static inline OutputIterator apply(Range const& range,
+    static inline OutputIterator apply(Range const& ,
                                        OutputIterator out,
-                                       distance_type const& max_distance)
+                                       distance_type const& )
     {
-        namespace services = strategy::distance::services;
-
-        typedef typename services::comparable_type
-            <
-                PointDistanceStrategy
-            >::type comparable_distance_strategy_type;
-
-        return detail::douglas_peucker
-            <
-                Point, comparable_distance_strategy_type
-            >().apply(range, out,
-                      services::result_from_distance
-                          <
-                              comparable_distance_strategy_type, Point, Point
-                          >::apply(comparable_distance_strategy_type(),
-                                   max_distance)
-                      );
+        return out;
     }
-
 };
 
 }} // namespace strategy::simplify
 
 
-namespace traits {
-
-template <typename P>
-struct point_type<geometry::strategy::simplify::detail::douglas_peucker_point<P> >
-{
-    typedef P type;
-};
-
-} // namespace traits
-
-
 }} // namespace boost::geometry
 
 #endif // BOOST_GEOMETRY_STRATEGY_AGNOSTIC_SIMPLIFY_DOUGLAS_PEUCKER_HPP
+
+/* simplify_douglas_peucker.hpp
+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
+*/

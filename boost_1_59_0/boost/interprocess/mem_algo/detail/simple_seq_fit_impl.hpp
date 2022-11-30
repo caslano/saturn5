@@ -37,6 +37,7 @@
 #include <boost/intrusive/pointer_traits.hpp>
 #include <boost/interprocess/mem_algo/detail/mem_algo_common.hpp>
 #include <boost/move/detail/type_traits.hpp> //make_unsigned, alignment_of
+#include <boost/move/detail/force_ptr.hpp>
 #include <boost/intrusive/detail/minimal_pair_header.hpp>
 #include <cstring>
 #include <boost/assert.hpp>
@@ -91,6 +92,7 @@ class simple_seq_fit_impl
    class block_ctrl
    {
       public:
+      static const size_type size_mask = size_type(-1);
       //!Offset pointer to the next block.
       block_ctrl_ptr m_next;
       //!This block's memory size (including block_ctrl
@@ -329,7 +331,7 @@ inline simple_seq_fit_impl<MutexFamily, VoidPointer>::
    //Initialize pointers
    size_type block1_off = priv_first_block_offset(this, extra_hdr_bytes);
 
-   m_header.m_root.m_next  = reinterpret_cast<block_ctrl*>
+   m_header.m_root.m_next  = move_detail::force_ptr<block_ctrl*>
       ((reinterpret_cast<char*>(this) + block1_off));
    algo_impl_t::assert_alignment(ipcdetail::to_raw_pointer(m_header.m_root.m_next));
    m_header.m_root.m_next->m_size  = (segment_size - block1_off)/Alignment;
@@ -360,7 +362,7 @@ inline void simple_seq_fit_impl<MutexFamily, VoidPointer>::grow(size_type extra_
 
    //We'll create a new free block with extra_size bytes
 
-   block_ctrl *new_block = reinterpret_cast<block_ctrl*>
+   block_ctrl *new_block = move_detail::force_ptr<block_ctrl*>
       (reinterpret_cast<char*>(this) + old_end);
 
    algo_impl_t::assert_alignment(new_block);
@@ -438,7 +440,7 @@ inline
 typename simple_seq_fit_impl<MutexFamily, VoidPointer>::block_ctrl *
    simple_seq_fit_impl<MutexFamily, VoidPointer>::priv_get_block(const void *ptr)
 {
-   return const_cast<block_ctrl*>(reinterpret_cast<const block_ctrl*>
+   return const_cast<block_ctrl*>(move_detail::force_ptr<const block_ctrl*>
       (reinterpret_cast<const char*>(ptr) - AllocatedCtrlBytes));
 }
 
@@ -707,7 +709,7 @@ void* simple_seq_fit_impl<MutexFamily, VoidPointer>::
 
          //We need a minimum size to split the previous one
          if((prev->get_user_bytes() - needs_backwards) > 2*BlockCtrlBytes){
-             block_ctrl *new_block = reinterpret_cast<block_ctrl*>
+             block_ctrl *new_block = move_detail::force_ptr<block_ctrl*>
                   (reinterpret_cast<char*>(reuse) - needs_backwards - BlockCtrlBytes);
 
             new_block->m_next = 0;
@@ -850,7 +852,7 @@ inline typename simple_seq_fit_impl<MutexFamily, VoidPointer>::block_ctrl *
          (typename simple_seq_fit_impl<MutexFamily, VoidPointer>::block_ctrl *ptr)
 {
    //Take the address where the next block should go
-   block_ctrl *next_block = reinterpret_cast<block_ctrl*>
+   block_ctrl *next_block = move_detail::force_ptr<block_ctrl*>
       (reinterpret_cast<char*>(ptr) + ptr->m_size*Alignment);
 
    //Check if the adjacent block is in the managed segment
@@ -912,7 +914,7 @@ inline bool simple_seq_fit_impl<MutexFamily, VoidPointer>::
 {
    size_type preferred_size = received_size;
    //Obtain the real size of the block
-   block_ctrl *block = reinterpret_cast<block_ctrl*>(priv_get_block(ptr));
+   block_ctrl *block = move_detail::force_ptr<block_ctrl*>(priv_get_block(ptr));
    size_type old_block_size = block->m_size;
 
    //All used blocks' next is marked with 0 so check it
@@ -995,7 +997,7 @@ void* simple_seq_fit_impl<MutexFamily, VoidPointer>::priv_check_and_allocate
       size_type total_size = block->m_size;
       block->m_size  = nunits;
 
-      block_ctrl *new_block = reinterpret_cast<block_ctrl*>
+      block_ctrl *new_block = move_detail::force_ptr<block_ctrl*>
          (reinterpret_cast<char*>(block) + Alignment*nunits);
       new_block->m_size  = total_size - nunits;
       new_block->m_next  = block->m_next;
@@ -1044,7 +1046,7 @@ void simple_seq_fit_impl<MutexFamily, VoidPointer>::priv_deallocate(void* addr)
    //(lower address) block
    block_ctrl * prev  = &m_header.m_root;
    block_ctrl * pos   = ipcdetail::to_raw_pointer(m_header.m_root.m_next);
-   block_ctrl * block = reinterpret_cast<block_ctrl*>(priv_get_block(addr));
+   block_ctrl * block = move_detail::force_ptr<block_ctrl*>(priv_get_block(addr));
 
    //All used blocks' next is marked with 0 so check it
    BOOST_ASSERT(block->m_next == 0);
@@ -1103,3 +1105,7 @@ void simple_seq_fit_impl<MutexFamily, VoidPointer>::priv_deallocate(void* addr)
 
 #endif   //#ifndef BOOST_INTERPROCESS_MEM_ALGO_DETAIL_SIMPLE_SEQ_FIT_IMPL_HPP
 
+
+/* simple_seq_fit_impl.hpp
+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
+*/

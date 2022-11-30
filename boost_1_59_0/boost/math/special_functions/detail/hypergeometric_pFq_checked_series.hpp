@@ -11,7 +11,8 @@
 #  define BOOST_MATH_PFQ_MAX_B_TERMS 5
 #endif
 
-#include <boost/array.hpp>
+#include <array>
+#include <cstdint>
 #include <boost/math/special_functions/detail/hypergeometric_series.hpp>
 
   namespace boost { namespace math { namespace detail {
@@ -116,7 +117,7 @@
      }
 
      template <class Seq, class Real, class Policy, class Terminal>
-     std::pair<Real, Real> hypergeometric_pFq_checked_series_impl(const Seq& aj, const Seq& bj, const Real& z, const Policy& pol, const Terminal& termination, int& log_scale)
+     std::pair<Real, Real> hypergeometric_pFq_checked_series_impl(const Seq& aj, const Seq& bj, const Real& z, const Policy& pol, const Terminal& termination, long long& log_scale)
      {
         BOOST_MATH_STD_USING
         Real result = 1;
@@ -124,13 +125,13 @@
         Real term = 1;
         Real term0 = 0;
         Real tol = boost::math::policies::get_epsilon<Real, Policy>();
-        boost::uintmax_t k = 0;
+        std::uintmax_t k = 0;
         Real upper_limit(sqrt(boost::math::tools::max_value<Real>())), diff;
         Real lower_limit(1 / upper_limit);
-        int log_scaling_factor = itrunc(boost::math::tools::log_max_value<Real>()) - 2;
+        long long log_scaling_factor = lltrunc(boost::math::tools::log_max_value<Real>()) - 2;
         Real scaling_factor = exp(Real(log_scaling_factor));
         Real term_m1;
-        int local_scaling = 0;
+        long long local_scaling = 0;
 
         if ((aj.size() == 1) && (bj.size() == 0))
         {
@@ -274,7 +275,7 @@
               //
               Real loop_result = 0;
               Real loop_abs_result = 0;
-              int loop_scale = 0;
+              long long loop_scale = 0;
               //
               // loop_error_scale will be used to increase the size of the error
               // estimate (absolute sum), based on the errors inherent in calculating 
@@ -287,8 +288,8 @@
               // so we need to jump forward to that term and then evaluate forwards and backwards from there:
               //
               unsigned s = crossover_locations[n];
-              boost::uintmax_t backstop = k;
-              int s1(1), s2(1);
+              std::uintmax_t backstop = k;
+              long long s1(1), s2(1);
               term = 0;
               for (auto ai = aj.begin(); ai != aj.end(); ++ai)
               {
@@ -339,7 +340,7 @@
               //
               // Convert to relative error after exp:
               //
-              loop_error_scale = fabs(expm1(loop_error_scale));
+              loop_error_scale = fabs(expm1(loop_error_scale, pol));
               //
               // Convert to multiplier for the error term:
               //
@@ -351,7 +352,7 @@
               if (term <= tools::log_min_value<Real>())
               {
                  // rescale if we can:
-                 int scale = itrunc(floor(term - tools::log_min_value<Real>()) - 2);
+                 long long scale = lltrunc(floor(term - tools::log_min_value<Real>()) - 2);
                  term -= scale;
                  loop_scale += scale;
               }
@@ -367,7 +368,7 @@
                //std::cout << "loop_scale = " << loop_scale << std::endl;
                k = s;
                term0 = term;
-               int saved_loop_scale = loop_scale;
+               long long saved_loop_scale = loop_scale;
                bool terms_are_growing = true;
                bool trivial_small_series_check = false;
                do
@@ -425,7 +426,7 @@
                      Real d; 
                      if (loop_scale > local_scaling)
                      {
-                        int rescale = local_scaling - loop_scale;
+                        long long rescale = local_scaling - loop_scale;
                         if (rescale < tools::log_min_value<Real>())
                            d = 1;  // arbitrary value, we want to keep going
                         else
@@ -433,7 +434,7 @@
                      }
                      else
                      {
-                        int rescale = loop_scale - local_scaling;
+                        long long rescale = loop_scale - local_scaling;
                         if (rescale < tools::log_min_value<Real>())
                            d = 0;  // terminate this loop
                         else
@@ -450,14 +451,14 @@
                // local results we have now.  First though, rescale abs_result by loop_error_scale
                // to factor in the error in the pochhammer terms at the start of this block:
                //
-               boost::uintmax_t next_backstop = k;
+               std::uintmax_t next_backstop = k;
                loop_abs_result += loop_error_scale * fabs(loop_result);
                if (loop_scale > local_scaling)
                {
                   //
                   // Need to shrink previous result:
                   //
-                  int rescale = local_scaling - loop_scale;
+                  long long rescale = local_scaling - loop_scale;
                   local_scaling = loop_scale;
                   log_scale -= rescale;
                   Real ex = exp(Real(rescale));
@@ -471,7 +472,7 @@
                   //
                   // Need to shrink local result:
                   //
-                  int rescale = loop_scale - local_scaling;
+                  long long rescale = loop_scale - local_scaling;
                   Real ex = exp(Real(rescale));
                   loop_result *= ex;
                   loop_abs_result *= ex;
@@ -527,7 +528,7 @@
                      Real d;
                      if (loop_scale > local_scaling)
                      {
-                        int rescale = local_scaling - loop_scale;
+                        long long rescale = local_scaling - loop_scale;
                         if (rescale < tools::log_min_value<Real>())
                            d = 1;  // keep going
                         else
@@ -535,7 +536,7 @@
                      }
                      else
                      {
-                        int rescale = loop_scale - local_scaling;
+                        long long rescale = loop_scale - local_scaling;
                         if (rescale < tools::log_min_value<Real>())
                            d = 0;  // stop, underflow
                         else
@@ -576,7 +577,7 @@
                   //
                   // Need to shrink previous result:
                   //
-                  int rescale = local_scaling - loop_scale;
+                  long long rescale = local_scaling - loop_scale;
                   local_scaling = loop_scale;
                   log_scale -= rescale;
                   Real ex = exp(Real(rescale));
@@ -590,7 +591,7 @@
                   //
                   // Need to shrink local result:
                   //
-                  int rescale = loop_scale - local_scaling;
+                  long long rescale = loop_scale - local_scaling;
                   Real ex = exp(Real(rescale));
                   loop_result *= ex;
                   loop_abs_result *= ex;
@@ -614,15 +615,15 @@
 
      struct iteration_terminator
      {
-        iteration_terminator(boost::uintmax_t i) : m(i) {}
+        iteration_terminator(std::uintmax_t i) : m(i) {}
 
-        bool operator()(boost::uintmax_t v) const { return v >= m; }
+        bool operator()(std::uintmax_t v) const { return v >= m; }
 
-        boost::uintmax_t m;
+        std::uintmax_t m;
      };
 
      template <class Seq, class Real, class Policy>
-     Real hypergeometric_pFq_checked_series_impl(const Seq& aj, const Seq& bj, const Real& z, const Policy& pol, int& log_scale)
+     Real hypergeometric_pFq_checked_series_impl(const Seq& aj, const Seq& bj, const Real& z, const Policy& pol, long long& log_scale)
      {
         BOOST_MATH_STD_USING
         iteration_terminator term(boost::math::policies::get_max_series_iterations<Policy>());
@@ -639,13 +640,17 @@
      }
 
      template <class Real, class Policy>
-     inline Real hypergeometric_1F1_checked_series_impl(const Real& a, const Real& b, const Real& z, const Policy& pol, int& log_scale)
+     inline Real hypergeometric_1F1_checked_series_impl(const Real& a, const Real& b, const Real& z, const Policy& pol, long long& log_scale)
      {
-        boost::array<Real, 1> aj = { a };
-        boost::array<Real, 1> bj = { b };
+        std::array<Real, 1> aj = { a };
+        std::array<Real, 1> bj = { b };
         return hypergeometric_pFq_checked_series_impl(aj, bj, z, pol, log_scale);
      }
 
   } } } // namespaces
 
 #endif // BOOST_HYPERGEOMETRIC_PFQ_SERIES_HPP_
+
+/* hypergeometric_pFq_checked_series.hpp
+Sb+MrDJ+YqvVlmRBkA+sp/v87zgzpxj/mvWF/i5CcyTx7o+cyb8bwnsT0adGC7z97j/iXm9tK7pO4sf3TSGC4oDTki8Kc7pNGznEKfi8VNcXSyZvlcvPof/kG2Kn+80KmL1B/bcUv7iwo5Fhf1Ug/TFyck1Q3lNTHr/+i3tr0qD7rfbL/PkYpGHfMm58zETnHo7zcLK++YB49+Jtfr9crc2XIntYOZv8+b8m45r7s5Gn9Bdv5Xj78lb4beN+fvr9y46cP5Pqpz+AuN3299dc+tH2X6p6/v7TaBJ8Xu7Q2mSUY4YCOBXlvJLp8WI2QdekHqotBKmOGd2CbAYw7iFAFUopUajwGSeF5jHGbYixkrVTG7jbP6TBzl4m/hmmOkOaAnSs2aTVN0+555Eh7P9auVpQ/9bgA2g33RLMoiEYzKuzHa/umz4L/Rn974kbWTqrzII1X/wPJ+QCfrqvj0nnDc925JReZs40OQ7rdzN6eaxrbdnxV/alypyNzN0wbTcOnkNpEO+zjRQN1giNf6WhfRD+zjNpa+5yyjaDSTaldkalqbQW1eeh5H3tzbY6gbNYFR3z1wPiF6Cnt9OgcpIvkeoJ1kBw0JmZYLKenADYqXc8mtyYO5vUCqSlKghvYU2Dxsbder1Wc9vWQJWZUe+sLGJSXcyB5Tm2XF12gBlXclIHRETTxsUTvJgVX3JNIGq51rYemVVITeYJU9ISTLmwpebMNsxgzbKoMEFj0bunDI520Z8G3/AiKk4+hnsgmhNGeGT1kCeKb97AxGYnUBBGm5zzswvL6mzgz/Og6iBmA0WzQMU09EhNJDC42pyndaczIx6BmsF2BVJ3ZcPD8N9q6hrptq+E4+K4Z+zAxKs0XSPp41uS1NxuoK23slImt/W8866L2twGYqA/zUfYC9NVx6M9xOiBQgQLoPMSmTnNreoXr45VlaLLtl8AACz/0ztrvPKFEUqf2gxvrRoVqcQwsd9j6CouKJOGeD9Fp26KWQ13sQrq6oc07PYv3dMwedJ1RZQlJOfMHDtn/6p6QsE1to/nWzrce9eHbH62fmt1M+r7drAe1XrQ2mxU3EUBY00nLskTA325ajx/2PxcFIj9IEdfxxuq2h2L3F4uU5vBlSkkQkmVLfV0+ND7Pt4bpaOjz0TipTSrq9kgHj/7pgpohkWebuvlQP5WKGQfNAOv3bXHd/0bElkJJSCpglbXGrWpl5nKbzlXWd5tZkw+lKrbE/ZKlH8AjfiI8bsv/9gc2OgYBcc+JnI6p04VQS8K/rhdDP9Q5euvM86iQWtKhOoB60K+pmLSibul+4YrcwELkoFZSB3Iq9xC/RxpaXSatgPOQ2ioSuzqPwLzOx/Fn08/NNKRw+iaOKh6BdfFlYWE9gRQEmpM0+nGPWrMGNWhYDlZgOJJXDWDruFqrbvVKTM74WaiRRnYROUcxRFs8S+W7bW49WCZiCR12yAjFYoCTFPn388h5ICOLF9mcbPX+tRAZDeeaWXFaP0tP+4FAFazFsNwQwMdO50NiyP0xTMjVtbMKJMTyzW5+NOQwC3/7QmXI4rBU1mVUURDQyh1nsTq7fcqieS95guRZEpMSFm+UZyTUuKdGcklvSn+FVAKlZCB4ozMoNRCO5oPa6gpcN1QgGF0FZX55VOMLJc4hm/wWwhr017cq4s7QJ2kErNx6XtO8uXvDT2Zv7n9UfwGLL7YX6SsX8Pn0AMrRyETcaqS2FK+hVep3pCDTw5owOsg0mhULoJO610vz+2T6s/vckwxT1v8fOuQhtbyyi1o19S0ZRXKEUYbv9j8Z/oa8i/U2KKbTogKEJ01ktu3UEx553vVtNgXXomZH0+a27K81/V/X8Q6zpU3l52f7BDpW/6wcn7lvWqc9Ceop8UJF5/+k74EV3lPRTmCZjOVD95ENbxLq1ZLpySa+EVpwNKDXL4nRb/ZsSuVn95i2QprucKZhM+5Vul3kpshbPgdeEsh0NlthPsuBLE49aYPaTReKV/7QYRbfSLb72pydlpOgJltQU28ytWRO+LDMx71OrkNdkte7ei9+dlmT0J6AzpmjpIrtHy9pLYMY+2+DNo9kJKsmCDJRvrv32H1GCEh5LGZEzZmzw6h4P1IWbVdXK5cSUJFQ4CoKW5xdujJnPzgtaXIYn2jPuq1/q69RjWbcy2MwnSLDMyy+kVj4xwVBaZrPfmwFJ2ukirASix4l9bqxPY0hsA1+1gt/VzVSndvyCs5cx3ykaLH49cDMp2k768+JYcx2vVb6zucnGDELIGYiPXInFWRVlh3rbwFv5ciC0CPk9UzpkMCZBz3+x8GORTLtqJoOcWwx6yu3s7yZC2sbX4SLMUsAK7UbLrsUDVPHnwgZehtoNmG9Qlis+yd/APpNueV+n3vrthivsR+iEBE8R9AeMzXLuL6rGi07Qq3+2VGLSiw5YW80huIw1LgMayt3NjC1MDr7vAqMpKHCKD1q/ZObJ3mo+4qVi6hKHtlRq/u/IT0cTAun6hT4SWdr5D/3jkyMxdGssgAKSA5tahgbDRGpCRQDv6Xz0Yp68hMtoO4qRP6Pad1AJCJW455BZh6mpLwk3VAOxH2hSjRPgQzDEYdHKOC8qXybM9xVePwoU0XhdJr3JJuG170RwF2g6hy79ppzEFl578fw7tn3RaSafekOTi8h1SVVXSamZcC9fHslH5kgapj8fYWgbbuN7rvoC0g3L0YMC+ZG1YBnQ2Ki1tA1xepR/tTpggtBxcn8cMoyIwmodH6d6f3LDcffUYlfmWx4g3Z4MalpMGSfcEON0D9QlGxwWFsu0IWt9e/gdmX6m+ASjWjYY2+oiF51Ou3woADRTDrZa/KYN7vrXVA+jIJliHh4bvkFWnbcyqNJhtoGLcwG9HFiiReF1C0Mp3Ha+h7FNt9pO4CIaonpd2+k8qIk69PDPVAgHzK899JAcrMLPpgyTzWcguxWrHzJ7mBIE4DsFJVrS4mAm9Gvsgmi1zL5c8SwtVkEaamOBwJgDFI7b0PPOml7o5Ypjkf3MT3gw78rd8OaMmufOToHeB6jYgcr842zzxiNVOHHMfaympD5qrhsZ6MCTScHIXRIIXSHWU4znJCEt1SDQ1OZR5uoDb3NsxsMcrweAz/hwXkqSU5L1F3DsopLNXQRd5t/HOc2MNc9vbSUMkShQdYg3ktLxkvWG9nhjXKOplLGLgn8Vx02zT1smuqehKsr991z0SyH/w99wXNObk7m8KB/DRQBSdwywTILZQ7TFJRqhSte47YtFM0pPEEf2sFfi28S+pJt5qB49FvNXi+S7TmIFxhFUl1Crjb8S01M6hnxLPK4+Ei1ETWSL6/UfC/3Z76i5iqZ9HDH3Sl7J56PxZVHTNIQiKumSs6+PKQ/sonx1J0UdD/Weuq9+KtKe7eCpwJ7xg0F3Yrfna2Dle0upexcnvXhkxeHCuIDPlOJgL3i20NMv+EEAENkpW19z8pynepvwBfnNJTm9OfifWw6IzGvn/fzQlcKqCKL63B8Z763b6U10dkMCEIbG4lw3l6plRDD/Z70y7zKmjsmuhMG4lmD/HHYbVsn2aHSHtGdrcfEvHcUPXJXS3koq/ds1S7p8YEm3e10chNZRJtiuqagUjSRbE9dgpmYaHKb6KWQZTO/IXLlIUT9fb4dLHp7TQ+MP3ov/cjf5aG343ui2k5hZnT/y8hnFukx0Ua+EWRG0/p77Yj+juxZsTkc6memgzHVF2Tr8U9wsjg0KVXK3CygZf4+/TxuoFHo/WL+MxfCz+p/gT2Zb6y9Bt7Sf9P1her8brFFrykO/Yvdun0xaYfCGTdTGStvP4fRmX3pP7g4Ps1hfIgDJNbdd+g4dd/Z/WLv8/7KFPd1F60QSZEo91+96WC+/s/f/QN2yMb8nNPQaLhYp8XE+Z+ncZZ//XRWWJb6hx14De6TvYfZqKd//yZr/U4zaE3d/2KvfZjuxHYvx/FlLC/mErO/5jo5p2K+0O3FNU2noZ+fWos/az68Nrn8M0vDLL/T/BYsClPq9eXcPR/qbm2/39OoF9xEX/UegNYIA6MeREMXN71n9fLHKvsbGtRlSpRvFgrUdbN6Kc1EjN5StaCTc5YntCYsLIvsxYYsBDV4HfC7kyDYP+92Y8zFY9ipYsCCz5qPSZ8uemfH8OjWHzvzO+v1/qx9Zv7oc4aGgECY4NIX6SOsH0SbjbJIScbdMKnoDrh3VpNq7JiXtasm+/RYOGI8TUmRJb1iJPoLYQc6lq9fPottTxIplXYwIZ5wzYWiPtYp0E9nw/Eh/0Bu6AanQ+eB+Dh9e9YmHfef5Iqi9Ox3+Li/YwWJvpjPWQ7108d97x9n6euzfvfLDphjP3+xe93TMNNRf9thHL2t+iZnT/2pQcw7/wC/9+foZXzc1N+/0v9nyS39n9q8uXVoMnoBxUjvHI7qf4W8J65KfcsQmDaVpHUKBhWLV1cqJ6KKJ3VdQvY9eHi3h9OlwGxf0XsHuWaRbvf/g9Nbe0eWRPx+9TQig1gBrn/34OFRNCFdZaPxZxi2uQQa96CUVNrp1hdWXgSdYQKTWGuDWy2Krqn2I/69Tu2W0OZK0JOE/SttXc9+xvYCS4wGGvIkVfKKvDIcTtFiBahYWoVsUwOK6EirwC26x0VyMwJw6+MvRfIGqp3DRrs1CPx3Mr0Nvjq+lL0oJS6s+ycb7Jmg17KFFfxJGql4NjzXy/0tCHoBcwakt7GY4xItTIzGHmXfVbym17KS34qU/0Fjkb/a3fR60gYrd3gBIcTPyjMLrlqJVBltJdswp4g0uXT9m6dThakqwCfIDVXYubOwrWQfmzKyrstxuDMsCXMZDzbwcU0fr2shXjPaZwsxcHsrCycrt+80QwjPVZVY9i1lmtDW2xthVfg0Zp8jUlo7lnvTtb2gjPQ4t1kbL35LQuFLVBsVh7oN1VnZQTeU+vEZpsYlPOx4DOFc3mrCKPmXBXScKHy60a6wmr/k3dhJolFSOcyCzfFhS9eLRlo9qz5LgHfOn1K5hzxG8xxyd0jU1jKOpq3Pu+n0hRjj6X3GpI7RdlfFegNKgKm0OkXDgkRuSzZgfo3lAGfp/IeK9qLGub70SrkZMSor1KjAltgpDoy0odYn4AKlcqm1TSraz1z5oY0h/PWgIEc/THs0VcYKtB6j5Qeazfe+x3up//ktJIRttD6LFEj/N1VXMIY0e8xv/LrSpjTK3GVO6/OgEzZFs7kI9ao27allWwRsRcSfbrVqDa28xp9K0EhWO8d1IVSictLtImbSD8MhAZ5VFJMXRu6ppa2pAsqW6b0S95QR2umFyjbKRjFZld0WGuxC46oqRkhjBVi4+I4xzgVFS1aTT0e2xX8BBtsrrG3pWamnZRlXuHkQS7iWBoS9KJyW0KqZXYElSVORhC2nr9FUAk7yz1/Qrh/T6PO28ny5o8UmDgcO3PZvQ00fW3WSJRzc9w2+U51iD3MZTNYptm10yE1nXHXHWNEvpHnYZp4tkr41lWzG0hR7jILyh3brLExmfAY7KyfjY2GF4kxmdbM8h75KlQZhPa0+YUGOUKNOK7Is6Cz8SToKRTyUIBgNQA32kGwqKKi1Mtx+IBlI3yJqmgTmolcIdxUUYqz7s6VlpivGlMGmuoApnzGFxIVd6U5iWfULlCzqraUUGb3BlEHiMNBMnODz/Bc9nonJRPsBJb2OWYJVGsrMiSYEhsz11dfM1AMWF4j2GfTEaHXZCPSRTc9th3G0FaZ0TZNarQaSjvgkyWh4SfhTZd3Yoq0vVz+BRD0icM/d3XvgP1CbQjxrYODFQgSC8WjDX7gSMsWpfYC/kOO2XL8uvXe9w3OiAbzy0KaBd/BvnE6Ylk66BDv9ub0iYyDD3bUWwm6mDOGchisTD3cwno7UQeAAIBDSwEAgP9/d33slEdvAFSsyh9ly2ysw8yFG37GPtJVup77LVQefXSb/SPdwsYQMyVs811zM6xMFxyfRZyCS40+LdPeqyvpcqQxM2pkAzqKxRMtERdjNGv0RZXnsQhVIHpkNYuYUr60eZOary3+ld9GLvncpe2Z+u0EzeaJ2MbzchVtsQobllIXqHhg8cWMiJ9vXVyQh2862jLOpwr+xFZf+u6M2qvqJa7KwopwnMQKxUNcEdduHiajGzzSWZD5WHjrySAz0K6Q5ruRtZfM5Ef3uqvM0dXPfDR0n0GOrNEbNfyDXldljsceXojnuCOT1q+QaKc6hfBBwuZESdNJFsxLJSMl5ru7iYr8kdj0NdKJyPdav8YbkRemH4FrekgtMzF7w3MpptHat8udd7Afv0zdF/ATKNFbipdrctvxUstR4VW2NFgeRzhf11BXNNHCy5g65fNv9BkjMRu5gUeeMu6GH82rPOXnsfq95FrxL/vUr9M3JNsgS93MAEn5xLjLRZ+/RIA+jTZxs9fG8BESccI8kPl0oYLby3JUlJtRC4VikIXuqC6Nayn+PrBk9TK4Xkm2t/aKGnV3SGWqih+E4fAXm+mXdpkDudNqy7jhSw/JxSeHcr8T8f5I3ZHsk0ffZgimpMaFKuJqL/7Kd3GDeZ4VT7fo1y3r9euUgLmsaosnFb6XNVRR0CW1Z/Ld/OEzEAbK++COLGxaijFS1dsP9r0z9HbucqJRRjdlmUn68mccGYnPk71XBxBDD91J+t23id8hrj47QBJz8TMrYKGaQHWYXfmiRy8kfiY94HKgtUdMl9d9ClmKoCH8iOJ+y5SSwi0YBe8O6qmmIlOR9hpGhR3e7Har4JorBEL2A03asPm05xSQfaBcDOKmj9BbcTnL0QlsS/962o2cXjIqV8Cd4HN2bnFQxHzQHbE49EH2d9iLa9pYwjuBl5BW+IyS+tm8+tXJMAZNHoNs9LYSxHYMpeRq3XB3ZWVsY2BkHoG6l/QIy3PtlO3BF8kqLC0pqgngnR5atogHplpOJnwpHk5eCBgySzu/hjIewVVncT97d0gKk82TO2rT0WNHUg82dmjFSutEKYodUYmoVnBOFXsDUdryW1aj1x0GnduAR1LviA0kQ2EPYysyc7eHAOlTjnedsrb1uvdm+iHfozXWmjKw11Fg7er0OKzx+Qoi+qqreQdXijMYoHcdNTsAS8HQnTZdpN2CDZdeOjZ2CFkjqc8seG0tp5ILkYJpSqTaT8LYZ886+1gI+7lGdebOMqjV5pN0lUG1M95NZV6zst1IOijnqS3k/OL1ZUimAtUSeor8/Wxbs9PzKpYqnMZ3FPoqSjkm1oLRH93IUXI6hM3mUUYwHl1BrDTdvu4wWH3xvmQ60OYI4BFIrrikrOEuA+g7iMdT3Pao57+I/5vpNdu0XrJ2RRfoxa1vxspBFXNZsgEetOQIJIL6j7ShWlfqJwAO9SqAfLdEtHEWuA9Xc49DsXUbviOuJpf3Un3WMiopnrtwSrUgyKAS2pXdOJ0q5FTcdG+Uc7FAUdbo9G7qpAXEw8dVhpDjYpfSd+VbbMbh28ik2+GSb13aYvd96V4mqucM7T1/gWoKiXJfGDgj29VDgy/VEOr4egc9fr0OUnbzPhzXOKF/gVvYwacM6Qa3L0MPclpAkR55QPVP6ifPw7KkyVXqhAazzfnlsPr97JXRavaoJNnYDJU33AV7oLJdj61cppN/4UtEocv/ZxVhFSVU
+*/

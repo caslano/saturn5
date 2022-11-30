@@ -2,7 +2,7 @@
 // detail/handler_type_requirements.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2022 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -65,7 +65,7 @@ template <typename Handler>
 auto zero_arg_copyable_handler_test(Handler h, void*)
   -> decltype(
     sizeof(Handler(static_cast<const Handler&>(h))),
-    ((h)()),
+    (BOOST_ASIO_MOVE_OR_LVALUE(Handler)(h)()),
     char(0));
 
 template <typename Handler>
@@ -75,7 +75,7 @@ template <typename Handler, typename Arg1>
 auto one_arg_handler_test(Handler h, Arg1* a1)
   -> decltype(
     sizeof(Handler(BOOST_ASIO_MOVE_CAST(Handler)(h))),
-    ((h)(*a1)),
+    (BOOST_ASIO_MOVE_OR_LVALUE(Handler)(h)(*a1)),
     char(0));
 
 template <typename Handler>
@@ -85,7 +85,7 @@ template <typename Handler, typename Arg1, typename Arg2>
 auto two_arg_handler_test(Handler h, Arg1* a1, Arg2* a2)
   -> decltype(
     sizeof(Handler(BOOST_ASIO_MOVE_CAST(Handler)(h))),
-    ((h)(*a1, *a2)),
+    (BOOST_ASIO_MOVE_OR_LVALUE(Handler)(h)(*a1, *a2)),
     char(0));
 
 template <typename Handler>
@@ -95,7 +95,8 @@ template <typename Handler, typename Arg1, typename Arg2>
 auto two_arg_move_handler_test(Handler h, Arg1* a1, Arg2* a2)
   -> decltype(
     sizeof(Handler(BOOST_ASIO_MOVE_CAST(Handler)(h))),
-    ((h)(*a1, BOOST_ASIO_MOVE_CAST(Arg2)(*a2))),
+    (BOOST_ASIO_MOVE_OR_LVALUE(Handler)(h)(
+      *a1, BOOST_ASIO_MOVE_CAST(Arg2)(*a2))),
     char(0));
 
 template <typename Handler>
@@ -117,9 +118,11 @@ template <typename T> const T& clvref(T);
 #if defined(BOOST_ASIO_HAS_MOVE)
 template <typename T> T rvref();
 template <typename T> T rvref(T);
+template <typename T> T rorlvref();
 #else // defined(BOOST_ASIO_HAS_MOVE)
 template <typename T> const T& rvref();
 template <typename T> const T& rvref(T);
+template <typename T> T& rorlvref();
 #endif // defined(BOOST_ASIO_HAS_MOVE)
 template <typename T> char argbyv(T);
 
@@ -146,7 +149,7 @@ struct handler_type_requirements
           boost::asio::detail::clvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()(), \
         char(0))> BOOST_ASIO_UNUSED_TYPEDEF
 
@@ -171,7 +174,7 @@ struct handler_type_requirements
           boost::asio::detail::rvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()( \
             boost::asio::detail::lvref<const boost::system::error_code>(), \
             boost::asio::detail::lvref<const std::size_t>()), \
@@ -198,7 +201,7 @@ struct handler_type_requirements
           boost::asio::detail::rvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()( \
             boost::asio::detail::lvref<const boost::system::error_code>(), \
             boost::asio::detail::lvref<const std::size_t>()), \
@@ -224,7 +227,7 @@ struct handler_type_requirements
           boost::asio::detail::rvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()( \
             boost::asio::detail::lvref<const boost::system::error_code>()), \
         char(0))> BOOST_ASIO_UNUSED_TYPEDEF
@@ -250,7 +253,7 @@ struct handler_type_requirements
           boost::asio::detail::rvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()( \
             boost::asio::detail::lvref<const boost::system::error_code>(), \
             boost::asio::detail::rvref<socket_type>()), \
@@ -276,7 +279,7 @@ struct handler_type_requirements
           boost::asio::detail::rvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()( \
             boost::asio::detail::lvref<const boost::system::error_code>()), \
         char(0))> BOOST_ASIO_UNUSED_TYPEDEF
@@ -302,7 +305,7 @@ struct handler_type_requirements
           boost::asio::detail::rvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()( \
             boost::asio::detail::lvref<const boost::system::error_code>(), \
             boost::asio::detail::lvref<const endpoint_type>()), \
@@ -329,7 +332,7 @@ struct handler_type_requirements
           boost::asio::detail::rvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()( \
             boost::asio::detail::lvref<const boost::system::error_code>(), \
             boost::asio::detail::lvref<const iter_type>()), \
@@ -356,7 +359,7 @@ struct handler_type_requirements
           boost::asio::detail::rvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()( \
             boost::asio::detail::lvref<const boost::system::error_code>(), \
             boost::asio::detail::lvref<const range_type>()), \
@@ -382,7 +385,7 @@ struct handler_type_requirements
           boost::asio::detail::rvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()( \
             boost::asio::detail::lvref<const boost::system::error_code>()), \
         char(0))> BOOST_ASIO_UNUSED_TYPEDEF
@@ -408,7 +411,7 @@ struct handler_type_requirements
           boost::asio::detail::rvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()( \
             boost::asio::detail::lvref<const boost::system::error_code>(), \
             boost::asio::detail::lvref<const int>()), \
@@ -434,7 +437,7 @@ struct handler_type_requirements
           boost::asio::detail::rvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()( \
             boost::asio::detail::lvref<const boost::system::error_code>()), \
         char(0))> BOOST_ASIO_UNUSED_TYPEDEF
@@ -460,7 +463,7 @@ struct handler_type_requirements
           boost::asio::detail::rvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()( \
           boost::asio::detail::lvref<const boost::system::error_code>(), \
           boost::asio::detail::lvref<const std::size_t>()), \
@@ -486,7 +489,7 @@ struct handler_type_requirements
           boost::asio::detail::rvref< \
             asio_true_handler_type>())) + \
       sizeof( \
-        boost::asio::detail::lvref< \
+        boost::asio::detail::rorlvref< \
           asio_true_handler_type>()( \
             boost::asio::detail::lvref<const boost::system::error_code>()), \
         char(0))> BOOST_ASIO_UNUSED_TYPEDEF
@@ -556,3 +559,7 @@ struct handler_type_requirements
 } // namespace boost
 
 #endif // BOOST_ASIO_DETAIL_HANDLER_TYPE_REQUIREMENTS_HPP
+
+/* handler_type_requirements.hpp
+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
+*/

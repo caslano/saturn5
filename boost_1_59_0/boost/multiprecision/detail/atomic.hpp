@@ -7,36 +7,35 @@
 #ifndef BOOST_MT_ATOMIC_DETAIL_HPP
 #define BOOST_MT_ATOMIC_DETAIL_HPP
 
-#include <boost/config.hpp>
+#include <boost/multiprecision/detail/standalone_config.hpp>
 
 #ifdef BOOST_HAS_THREADS
 
-#ifndef BOOST_NO_CXX11_HDR_ATOMIC
 #  include <atomic>
 #  define BOOST_MATH_ATOMIC_NS std
 namespace boost {
    namespace multiprecision {
       namespace detail {
 #if ATOMIC_INT_LOCK_FREE == 2
-         typedef std::atomic<int> atomic_counter_type;
-         typedef std::atomic<unsigned> atomic_unsigned_type;
-         typedef int atomic_integer_type;
-         typedef unsigned atomic_unsigned_integer_type;
+         using atomic_counter_type = std::atomic<int>;
+         using atomic_unsigned_type = std::atomic<unsigned>;
+         using atomic_integer_type = int;
+         using atomic_unsigned_integer_type = unsigned;
 #elif ATOMIC_SHORT_LOCK_FREE == 2
-         typedef std::atomic<short> atomic_counter_type;
-         typedef std::atomic<unsigned short> atomic_unsigned_type;
-         typedef short atomic_integer_type;
-         typedef unsigned short atomic_unsigned_integer_type;
+         using atomic_counter_type = std::atomic<short>;
+         using atomic_unsigned_type = std::atomic<unsigned short>;
+         using atomic_integer_type = short;
+         using atomic_unsigned_integer_type = unsigned short;
 #elif ATOMIC_LONG_LOCK_FREE == 2
-         typedef std::atomic<long> atomic_unsigned_integer_type;
-         typedef std::atomic<unsigned long> atomic_unsigned_type;
-         typedef unsigned long atomic_unsigned_integer_type;
-         typedef long atomic_integer_type;
+         using atomic_unsigned_integer_type = std::atomic<long>;
+         using atomic_unsigned_type = std::atomic<unsigned long>;
+         using atomic_unsigned_integer_type = unsigned long;
+         using atomic_integer_type = long;
 #elif ATOMIC_LLONG_LOCK_FREE == 2
-         typedef std::atomic<long long> atomic_unsigned_integer_type;
-         typedef std::atomic<unsigned long long> atomic_unsigned_type;
-         typedef long long atomic_integer_type;
-         typedef unsigned long long atomic_unsigned_integer_type;
+         using atomic_unsigned_integer_type = std::atomic<long long>;
+         using atomic_unsigned_type = std::atomic<unsigned long long>;
+         using atomic_integer_type = long long;
+         using atomic_unsigned_integer_type = unsigned long long;
 #else
 
 #define BOOST_MT_NO_ATOMIC_INT
@@ -44,48 +43,6 @@ namespace boost {
 #endif
       }
    }}
-#else // BOOST_NO_CXX11_HDR_ATOMIC
-//
-// We need Boost.Atomic, but on any platform that supports auto-linking we do
-// not need to link against a separate library:
-//
-#define BOOST_ATOMIC_NO_LIB
-#include <boost/atomic.hpp>
-#  define BOOST_MATH_ATOMIC_NS boost
-
-namespace boost{ namespace multiprecision{ namespace detail{
-
-//
-// We need a type to use as an atomic counter:
-//
-#if BOOST_ATOMIC_INT_LOCK_FREE == 2
-typedef boost::atomic<int> atomic_counter_type;
-typedef boost::atomic<unsigned> atomic_unsigned_type;
-typedef int atomic_integer_type;
-typedef unsigned atomic_unsigned_integer_type;
-#elif BOOST_ATOMIC_SHORT_LOCK_FREE == 2
-typedef boost::atomic<short> atomic_counter_type;
-typedef boost::atomic<unsigned short> atomic_unsigned_type;
-typedef short atomic_integer_type;
-typedef unsigned short atomic_unsigned_integer_type;
-#elif BOOST_ATOMIC_LONG_LOCK_FREE == 2
-typedef boost::atomic<long> atomic_counter_type;
-typedef boost::atomic<unsigned long> atomic_unsigned_type;
-typedef long atomic_integer_type;
-typedef unsigned long atomic_unsigned_integer_type;
-#elif BOOST_ATOMIC_LLONG_LOCK_FREE == 2
-typedef boost::atomic<long long> atomic_counter_type;
-typedef boost::atomic<unsigned long long> atomic_unsigned_type;
-typedef long long atomic_integer_type;
-typedef unsigned long long atomic_unsigned_integer_type;
-#else
-#  define BOOST_MT_NO_ATOMIC_INT
-#endif
-
-}}} // namespaces
-
-#endif  // BOOST_NO_CXX11_HDR_ATOMIC
-
 #else // BOOST_HAS_THREADS
 
 #define BOOST_MT_NO_ATOMIC_INT
@@ -95,11 +52,15 @@ typedef unsigned long long atomic_unsigned_integer_type;
 namespace boost { namespace multiprecision { namespace detail {
 
 #ifdef BOOST_MT_NO_ATOMIC_INT
-typedef unsigned precision_type;
+using precision_type = unsigned;
 #else
-typedef atomic_unsigned_type precision_type;
+using precision_type = atomic_unsigned_type;
 #endif
 
 } } }
 
 #endif // BOOST_MATH_ATOMIC_DETAIL_HPP
+
+/* atomic.hpp
+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
+*/

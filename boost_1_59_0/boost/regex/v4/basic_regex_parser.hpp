@@ -22,6 +22,9 @@
 #ifdef BOOST_MSVC
 #pragma warning(push)
 #pragma warning(disable: 4103)
+#if BOOST_MSVC >= 1800
+#pragma warning(disable: 26812)
+#endif
 #endif
 #ifdef BOOST_HAS_ABI_HEADERS
 #  include BOOST_ABI_PREFIX
@@ -124,7 +127,8 @@ private:
 
 template <class charT, class traits>
 basic_regex_parser<charT, traits>::basic_regex_parser(regex_data<charT, traits>* data)
-   : basic_regex_creator<charT, traits>(data), m_mark_count(0), m_mark_reset(-1), m_max_mark(0), m_paren_start(0), m_alt_insert_point(0), m_has_case_change(false), m_recursion_count(0)
+   : basic_regex_creator<charT, traits>(data), m_parser_proc(), m_base(0), m_end(0), m_position(0), 
+   m_mark_count(0), m_mark_reset(-1), m_max_mark(0), m_paren_start(0), m_alt_insert_point(0), m_has_case_change(false), m_recursion_count(0)
 {
 }
 
@@ -168,7 +172,7 @@ void basic_regex_parser<charT, traits>::parse(const charT* p1, const charT* p2, 
       m_parser_proc = &basic_regex_parser<charT, traits>::parse_literal;
       break;
    default:
-      // Ooops, someone has managed to set more than one of the main option flags, 
+      // Oops, someone has managed to set more than one of the main option flags, 
       // so this must be an error:
       fail(regex_constants::error_unknown, 0, "An invalid combination of regular expression syntax flags was used.");
       return;
@@ -193,7 +197,7 @@ void basic_regex_parser<charT, traits>::parse(const charT* p1, const charT* p2, 
    if(this->m_pdata->m_status)
       return;
    // fill in our sub-expression count:
-   this->m_pdata->m_mark_count = 1 + m_mark_count;
+   this->m_pdata->m_mark_count = 1u + (std::size_t)m_mark_count;
    this->finalize(p1, p2);
 }
 
@@ -321,6 +325,12 @@ bool basic_regex_parser<charT, traits>::parse_basic()
    return true;
 }
 
+#ifdef BOOST_MSVC
+#  pragma warning(push)
+#if BOOST_MSVC >= 1800
+#pragma warning(disable:26812)
+#endif
+#endif
 template <class charT, class traits>
 bool basic_regex_parser<charT, traits>::parse_extended()
 {
@@ -408,6 +418,9 @@ bool basic_regex_parser<charT, traits>::parse_extended()
    }
    return result;
 }
+#ifdef BOOST_MSVC
+#  pragma warning(pop)
+#endif
 #ifdef BOOST_MSVC
 #pragma warning(pop)
 #endif
@@ -545,8 +558,8 @@ bool basic_regex_parser<charT, traits>::parse_open_paren()
    //
    // allow backrefs to this mark:
    //
-   if((markid > 0) && (markid < sizeof(unsigned) * CHAR_BIT))
-      this->m_backrefs |= 1u << (markid - 1);
+   if(markid > 0)
+      this->m_backrefs.set(markid);
 
    return true;
 }
@@ -859,7 +872,7 @@ escape_type_class_jump:
       {
          bool have_brace = false;
          bool negative = false;
-         static const char* incomplete_message = "Incomplete \\g escape found.";
+         static const char incomplete_message[] = "Incomplete \\g escape found.";
          if(++m_position == m_end)
          {
             fail(regex_constants::error_escape, m_position - m_base, incomplete_message);
@@ -911,8 +924,8 @@ escape_type_class_jump:
             pc = m_position;
          }
          if(negative)
-            i = 1 + m_mark_count - i;
-         if(((i > 0) && (i < std::numeric_limits<unsigned>::digits) && (i - 1 < static_cast<boost::intmax_t>(sizeof(unsigned) * CHAR_BIT)) && (this->m_backrefs & (1u << (i-1)))) || ((i > 10000) && (this->m_pdata->get_id(i) > 0) && (this->m_pdata->get_id(i)-1 < static_cast<boost::intmax_t>(sizeof(unsigned) * CHAR_BIT)) && (this->m_backrefs & (1u << (this->m_pdata->get_id(i)-1)))))
+            i = 1 + (static_cast<boost::intmax_t>(m_mark_count) - i);
+         if(((i < hash_value_mask) && (i > 0) && (this->m_backrefs.test(i))) || ((i >= hash_value_mask) && (this->m_pdata->get_id(i) > 0) && (this->m_backrefs.test(this->m_pdata->get_id(i)))))
          {
             m_position = pc;
             re_brace* pb = static_cast<re_brace*>(this->append_state(syntax_element_backref, sizeof(re_brace)));
@@ -968,7 +981,7 @@ template <class charT, class traits>
 bool basic_regex_parser<charT, traits>::parse_repeat(std::size_t low, std::size_t high)
 {
    bool greedy = true;
-   bool pocessive = false;
+   bool possessive = false;
    std::size_t insert_point;
    // 
    // when we get to here we may have a non-greedy ? mark still to come:
@@ -992,12 +1005,12 @@ bool basic_regex_parser<charT, traits>::parse_repeat(std::size_t low, std::size_
          greedy = false;
          ++m_position;
       }
-      // for perl regexes only check for pocessive ++ repeats.
+      // for perl regexes only check for possessive ++ repeats.
       if((m_position != m_end)
          && (0 == (this->flags() & regbase::main_option_type)) 
          && (this->m_traits.syntax_type(*m_position) == regex_constants::syntax_plus))
       {
-         pocessive = true;
+         possessive = true;
          ++m_position;
       }
    }
@@ -1042,6 +1055,7 @@ bool basic_regex_parser<charT, traits>::parse_repeat(std::size_t low, std::size_
       case syntax_element_jump:
       case syntax_element_startmark:
       case syntax_element_backstep:
+      case syntax_element_toggle_case:
          // can't legally repeat any of the above:
          fail(regex_constants::error_badrepeat, m_position - m_base);
          return false;
@@ -1069,10 +1083,10 @@ bool basic_regex_parser<charT, traits>::parse_repeat(std::size_t low, std::size_
    rep = static_cast<re_repeat*>(this->getaddress(rep_off));
    rep->alt.i = this->m_pdata->m_data.size() - rep_off;
    //
-   // If the repeat is pocessive then bracket the repeat with a (?>...)
+   // If the repeat is possessive then bracket the repeat with a (?>...)
    // independent sub-expression construct:
    //
-   if(pocessive)
+   if(possessive)
    {
       if(m_position != m_end)
       {
@@ -1111,6 +1125,9 @@ bool basic_regex_parser<charT, traits>::parse_repeat(std::size_t low, std::size_
                   }
                   else
                      contin = false;
+                  break;
+               default:
+                  contin = false;
                }
             }
             else
@@ -1133,7 +1150,7 @@ bool basic_regex_parser<charT, traits>::parse_repeat(std::size_t low, std::size_
 template <class charT, class traits>
 bool basic_regex_parser<charT, traits>::parse_repeat_range(bool isbasic)
 {
-   static const char* incomplete_message = "Missing } in quantified repetition.";
+   static const char incomplete_message[] = "Missing } in quantified repetition.";
    //
    // parse a repeat-range:
    //
@@ -1339,7 +1356,7 @@ bool basic_regex_parser<charT, traits>::parse_alt()
 template <class charT, class traits>
 bool basic_regex_parser<charT, traits>::parse_set()
 {
-   static const char* incomplete_message = "Character set declaration starting with [ terminated prematurely - either no ] was found or the set had no content.";
+   static const char incomplete_message[] = "Character set declaration starting with [ terminated prematurely - either no ] was found or the set had no content.";
    ++m_position;
    if(m_position == m_end)
    {
@@ -1431,7 +1448,7 @@ bool basic_regex_parser<charT, traits>::parse_set()
 template <class charT, class traits>
 bool basic_regex_parser<charT, traits>::parse_inner_set(basic_char_set<charT, traits>& char_set)
 {
-   static const char* incomplete_message = "Character class declaration starting with [ terminated prematurely - either no ] was found or the set had no content.";
+   static const char incomplete_message[] = "Character class declaration starting with [ terminated prematurely - either no ] was found or the set had no content.";
    //
    // we have either a character class [:name:]
    // a collating element [.name.]
@@ -1529,7 +1546,7 @@ bool basic_regex_parser<charT, traits>::parse_inner_set(basic_char_set<charT, tr
          fail(regex_constants::error_ctype, name_first - m_base);
          return false;
       }
-      if(negated == false)
+      if(!negated)
          char_set.add_class(m);
       else
          char_set.add_negated_class(m);
@@ -1567,7 +1584,7 @@ bool basic_regex_parser<charT, traits>::parse_inner_set(basic_char_set<charT, tr
          return false;
       }
       string_type m = this->m_traits.lookup_collatename(name_first, name_last);
-      if((0 == m.size()) || (m.size() > 2))
+      if(m.empty() || (m.size() > 2))
       {
          fail(regex_constants::error_collate, name_first - m_base);
          return false;
@@ -1935,7 +1952,7 @@ charT basic_regex_parser<charT, traits>::unescape_character()
 template <class charT, class traits>
 bool basic_regex_parser<charT, traits>::parse_backref()
 {
-   BOOST_ASSERT(m_position != m_end);
+   BOOST_REGEX_ASSERT(m_position != m_end);
    const charT* pc = m_position;
    boost::intmax_t i = this->m_traits.toi(pc, pc + 1, 10);
    if((i == 0) || (((this->flags() & regbase::main_option_type) == regbase::perl_syntax_group) && (this->flags() & regbase::no_bk_refs)))
@@ -1944,7 +1961,7 @@ bool basic_regex_parser<charT, traits>::parse_backref()
       charT c = unescape_character();
       this->append_literal(c);
    }
-   else if((i > 0) && (this->m_backrefs & (1u << (i-1))))
+   else if((i > 0) && (this->m_backrefs.test(i)))
    {
       m_position = pc;
       re_brace* pb = static_cast<re_brace*>(this->append_state(syntax_element_backref, sizeof(re_brace)));
@@ -2132,7 +2149,7 @@ insert_recursion:
          // Oops not a relative recursion at all, but a (?-imsx) group:
          goto option_group_jump;
       }
-      v = m_mark_count + 1 - v;
+      v = static_cast<boost::intmax_t>(m_mark_count) + 1 - v;
       if(v <= 0)
       {
          // Rewind to start of (? sequence:
@@ -2596,7 +2613,7 @@ option_group_jump:
       this->fail(regex_constants::error_paren, ::boost::BOOST_REGEX_DETAIL_NS::distance(m_base, m_end));
       return false;
    }
-   BOOST_ASSERT(this->m_traits.syntax_type(*m_position) == regex_constants::syntax_close_mark);
+   BOOST_REGEX_ASSERT(this->m_traits.syntax_type(*m_position) == regex_constants::syntax_close_mark);
    ++m_position;
    //
    // restore the flags:
@@ -2710,7 +2727,7 @@ option_group_jump:
    {
 #ifndef BOOST_NO_STD_DISTANCE
       if(this->flags() & regbase::save_subexpression_location)
-         this->m_pdata->m_subs.at(markid - 1).second = std::distance(m_base, m_position) - 1;
+         this->m_pdata->m_subs.at((std::size_t)markid - 1).second = std::distance(m_base, m_position) - 1;
 #else
       if(this->flags() & regbase::save_subexpression_location)
          this->m_pdata->m_subs.at(markid - 1).second = (m_position - m_base) - 1;
@@ -2718,8 +2735,7 @@ option_group_jump:
       //
       // allow backrefs to this mark:
       //
-      if(markid < (int)(sizeof(unsigned) * CHAR_BIT))
-         this->m_backrefs |= 1u << (markid - 1);
+      this->m_backrefs.set(markid);
    }
    return true;
 }
@@ -2747,6 +2763,12 @@ bool basic_regex_parser<charT, traits>::match_verb(const char* verb)
    return true;
 }
 
+#ifdef BOOST_MSVC
+#  pragma warning(push)
+#if BOOST_MSVC >= 1800
+#pragma warning(disable:26812)
+#endif
+#endif
 template <class charT, class traits>
 bool basic_regex_parser<charT, traits>::parse_perl_verb()
 {
@@ -2915,6 +2937,9 @@ bool basic_regex_parser<charT, traits>::parse_perl_verb()
    fail(regex_constants::error_perl_extension, m_position - m_base);
    return false;
 }
+#ifdef BOOST_MSVC
+#  pragma warning(pop)
+#endif
 
 template <class charT, class traits>
 bool basic_regex_parser<charT, traits>::add_emacs_code(bool negate)
@@ -3091,7 +3116,7 @@ bool basic_regex_parser<charT, traits>::unwind_alts(std::ptrdiff_t last_paren_st
    // alternative then that's an error:
    //
    if((this->m_alt_insert_point == static_cast<std::ptrdiff_t>(this->m_pdata->m_data.size()))
-      && m_alt_jumps.size() && (m_alt_jumps.back() > last_paren_start)
+      && (!m_alt_jumps.empty()) && (m_alt_jumps.back() > last_paren_start)
       &&
       !(
          ((this->flags() & regbase::main_option_type) == regbase::perl_syntax_group)
@@ -3106,7 +3131,7 @@ bool basic_regex_parser<charT, traits>::unwind_alts(std::ptrdiff_t last_paren_st
    // 
    // Fix up our alternatives:
    //
-   while(m_alt_jumps.size() && (m_alt_jumps.back() > last_paren_start))
+   while((!m_alt_jumps.empty()) && (m_alt_jumps.back() > last_paren_start))
    {
       //
       // fix up the jump to point to the end of the states
@@ -3116,7 +3141,13 @@ bool basic_regex_parser<charT, traits>::unwind_alts(std::ptrdiff_t last_paren_st
       m_alt_jumps.pop_back();
       this->m_pdata->m_data.align();
       re_jump* jmp = static_cast<re_jump*>(this->getaddress(jump_offset));
-      BOOST_ASSERT(jmp->type == syntax_element_jump);
+      if (jmp->type != syntax_element_jump)
+      {
+         // Something really bad happened, this used to be an assert, 
+         // but we'll make it an error just in case we should ever get here.
+         fail(regex_constants::error_unknown, this->m_position - this->m_base, "Internal logic failed while compiling the expression, probably you added a repeat to something non-repeatable!");
+         return false;
+      }
       jmp->alt.i = this->m_pdata->m_data.size() - jump_offset;
    }
    return true;
@@ -3141,3 +3172,7 @@ bool basic_regex_parser<charT, traits>::unwind_alts(std::ptrdiff_t last_paren_st
 #endif
 
 #endif
+
+/* basic_regex_parser.hpp
+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
+*/

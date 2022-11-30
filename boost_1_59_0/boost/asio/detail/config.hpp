@@ -2,7 +2,7 @@
 // detail/config.hpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2022 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +12,7 @@
 #define BOOST_ASIO_DETAIL_CONFIG_HPP
 
 #if defined(BOOST_ASIO_STANDALONE)
+# define BOOST_ASIO_DISABLE_BOOST_ALIGN 1
 # define BOOST_ASIO_DISABLE_BOOST_ARRAY 1
 # define BOOST_ASIO_DISABLE_BOOST_ASSERT 1
 # define BOOST_ASIO_DISABLE_BOOST_BIND 1
@@ -23,6 +24,7 @@
 # define BOOST_ASIO_DISABLE_BOOST_THROW_EXCEPTION 1
 # define BOOST_ASIO_DISABLE_BOOST_WORKAROUND 1
 #else // defined(BOOST_ASIO_STANDALONE)
+// Boost.Config library is available.
 # include <boost/config.hpp>
 # include <boost/version.hpp>
 # define BOOST_ASIO_HAS_BOOST_CONFIG 1
@@ -61,6 +63,9 @@
 # define BOOST_ASIO_DECL
 #endif // !defined(BOOST_ASIO_DECL)
 
+// Helper macro for documentation.
+#define BOOST_ASIO_UNSPECIFIED(e) e
+
 // Microsoft Visual C++ detection.
 #if !defined(BOOST_ASIO_MSVC)
 # if defined(BOOST_ASIO_HAS_BOOST_CONFIG) && defined(BOOST_MSVC)
@@ -95,13 +100,12 @@
 #   if __has_feature(__cxx_rvalue_references__)
 #    define BOOST_ASIO_HAS_MOVE 1
 #   endif // __has_feature(__cxx_rvalue_references__)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_MOVE 1
 #    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
-#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(BOOST_ASIO_MSVC)
 #   if (_MSC_VER >= 1700)
@@ -130,6 +134,8 @@
 # define BOOST_ASIO_NONDEDUCED_MOVE_ARG(type) type&
 # define BOOST_ASIO_MOVE_CAST(type) static_cast<type&&>
 # define BOOST_ASIO_MOVE_CAST2(type1, type2) static_cast<type1, type2&&>
+# define BOOST_ASIO_MOVE_OR_LVALUE(type) static_cast<type&&>
+# define BOOST_ASIO_MOVE_OR_LVALUE_TYPE(type) type
 #endif // defined(BOOST_ASIO_HAS_MOVE) && !defined(BOOST_ASIO_MOVE_CAST)
 
 // If BOOST_ASIO_MOVE_CAST still isn't defined, default to a C++03-compatible
@@ -156,6 +162,8 @@
 # define BOOST_ASIO_NONDEDUCED_MOVE_ARG(type) const type&
 # define BOOST_ASIO_MOVE_CAST(type) static_cast<const type&>
 # define BOOST_ASIO_MOVE_CAST2(type1, type2) static_cast<const type1, type2&>
+# define BOOST_ASIO_MOVE_OR_LVALUE(type)
+# define BOOST_ASIO_MOVE_OR_LVALUE_TYPE(type) type&
 #endif // !defined(BOOST_ASIO_MOVE_CAST)
 
 // Support variadic templates on compilers known to allow it.
@@ -165,13 +173,12 @@
 #   if __has_feature(__cxx_variadic_templates__)
 #    define BOOST_ASIO_HAS_VARIADIC_TEMPLATES 1
 #   endif // __has_feature(__cxx_variadic_templates__)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_VARIADIC_TEMPLATES 1
 #    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
-#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(BOOST_ASIO_MSVC)
 #   if (_MSC_VER >= 1900)
@@ -180,21 +187,27 @@
 #  endif // defined(BOOST_ASIO_MSVC)
 # endif // !defined(BOOST_ASIO_DISABLE_VARIADIC_TEMPLATES)
 #endif // !defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+#if !defined(BOOST_ASIO_ELLIPSIS)
+# if defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+#  define BOOST_ASIO_ELLIPSIS ...
+# else // defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+#  define BOOST_ASIO_ELLIPSIS
+# endif // defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+#endif // !defined(BOOST_ASIO_ELLIPSIS)
 
 // Support deleted functions on compilers known to allow it.
 #if !defined(BOOST_ASIO_DELETED)
-# if defined(__GNUC__)
+# if defined(__clang__)
+#  if __has_feature(__cxx_deleted_functions__)
+#   define BOOST_ASIO_DELETED = delete
+#  endif // __has_feature(__cxx_deleted_functions__)
+# elif defined(__GNUC__)
 #  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #   if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #    define BOOST_ASIO_DELETED = delete
 #   endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 # endif // defined(__GNUC__)
-# if defined(__clang__)
-#  if __has_feature(__cxx_deleted_functions__)
-#   define BOOST_ASIO_DELETED = delete
-#  endif // __has_feature(__cxx_deleted_functions__)
-# endif // defined(__clang__)
 # if defined(BOOST_ASIO_MSVC)
 #  if (_MSC_VER >= 1900)
 #   define BOOST_ASIO_DELETED = delete
@@ -211,14 +224,13 @@
 #  if defined(__clang__)
 #   if __has_feature(__cxx_constexpr__)
 #    define BOOST_ASIO_HAS_CONSTEXPR 1
-#   endif // __has_feature(__cxx_constexr__)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
+#   endif // __has_feature(__cxx_constexpr__)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_CONSTEXPR 1
 #    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
-#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(BOOST_ASIO_MSVC)
 #   if (_MSC_VER >= 1900)
@@ -234,39 +246,109 @@
 #  define BOOST_ASIO_CONSTEXPR
 # endif // defined(BOOST_ASIO_HAS_CONSTEXPR)
 #endif // !defined(BOOST_ASIO_CONSTEXPR)
+#if !defined(BOOST_ASIO_STATIC_CONSTEXPR)
+# if defined(BOOST_ASIO_HAS_CONSTEXPR)
+#  define BOOST_ASIO_STATIC_CONSTEXPR(type, assignment) \
+    static constexpr type assignment
+# else // defined(BOOST_ASIO_HAS_CONSTEXPR)
+#  define BOOST_ASIO_STATIC_CONSTEXPR(type, assignment) \
+    static const type assignment
+# endif // defined(BOOST_ASIO_HAS_CONSTEXPR)
+#endif // !defined(BOOST_ASIO_STATIC_CONSTEXPR)
+#if !defined(BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT)
+# if defined(BOOST_ASIO_HAS_CONSTEXPR)
+#  if defined(__GNUC__)
+#   if (__GNUC__ >= 8)
+#    define BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(type, name) \
+      static constexpr const type name{}
+#   else // (__GNUC__ >= 8)
+#    define BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(type, name) \
+      static const type name
+#   endif // (__GNUC__ >= 8)
+#  elif defined(BOOST_ASIO_MSVC)
+#   define BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(type, name) \
+     static const type name
+#  else // defined(BOOST_ASIO_MSVC)
+#   define BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(type, name) \
+     static constexpr const type name{}
+#  endif // defined(BOOST_ASIO_MSVC)
+# else // defined(BOOST_ASIO_HAS_CONSTEXPR)
+#  define BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(type, name) \
+    static const type name
+# endif // defined(BOOST_ASIO_HAS_CONSTEXPR)
+#endif // !defined(BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT)
 
 // Support noexcept on compilers known to allow it.
-#if !defined(BOOST_ASIO_NOEXCEPT)
+#if !defined(BOOST_ASIO_HAS_NOEXCEPT)
 # if !defined(BOOST_ASIO_DISABLE_NOEXCEPT)
 #  if defined(BOOST_ASIO_HAS_BOOST_CONFIG) && (BOOST_VERSION >= 105300)
+#   if !defined(BOOST_NO_NOEXCEPT)
+#    define BOOST_ASIO_HAS_NOEXCEPT 1
+#   endif // !defined(BOOST_NO_NOEXCEPT)
 #   define BOOST_ASIO_NOEXCEPT BOOST_NOEXCEPT
 #   define BOOST_ASIO_NOEXCEPT_OR_NOTHROW BOOST_NOEXCEPT_OR_NOTHROW
+#   define BOOST_ASIO_NOEXCEPT_IF(c) BOOST_NOEXCEPT_IF(c)
 #  elif defined(__clang__)
 #   if __has_feature(__cxx_noexcept__)
-#    define BOOST_ASIO_NOEXCEPT noexcept(true)
-#    define BOOST_ASIO_NOEXCEPT_OR_NOTHROW noexcept(true)
+#    define BOOST_ASIO_HAS_NOEXCEPT 1
 #   endif // __has_feature(__cxx_noexcept__)
 #  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
-#      define BOOST_ASIO_NOEXCEPT noexcept(true)
-#      define BOOST_ASIO_NOEXCEPT_OR_NOTHROW noexcept(true)
+#      define BOOST_ASIO_HAS_NOEXCEPT 1
 #    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #  elif defined(BOOST_ASIO_MSVC)
 #   if (_MSC_VER >= 1900)
-#    define BOOST_ASIO_NOEXCEPT noexcept(true)
-#    define BOOST_ASIO_NOEXCEPT_OR_NOTHROW noexcept(true)
+#    define BOOST_ASIO_HAS_NOEXCEPT 1
 #   endif // (_MSC_VER >= 1900)
 #  endif // defined(BOOST_ASIO_MSVC)
 # endif // !defined(BOOST_ASIO_DISABLE_NOEXCEPT)
 # if !defined(BOOST_ASIO_NOEXCEPT)
-#  define BOOST_ASIO_NOEXCEPT
 # endif // !defined(BOOST_ASIO_NOEXCEPT)
 # if !defined(BOOST_ASIO_NOEXCEPT_OR_NOTHROW)
-#  define BOOST_ASIO_NOEXCEPT_OR_NOTHROW throw()
 # endif // !defined(BOOST_ASIO_NOEXCEPT_OR_NOTHROW)
+#endif // !defined(BOOST_ASIO_HAS_NOEXCEPT)
+#if !defined(BOOST_ASIO_NOEXCEPT)
+# if defined(BOOST_ASIO_HAS_NOEXCEPT)
+#  define BOOST_ASIO_NOEXCEPT noexcept(true)
+# else // defined(BOOST_ASIO_HAS_NOEXCEPT)
+#  define BOOST_ASIO_NOEXCEPT
+# endif // defined(BOOST_ASIO_HAS_NOEXCEPT)
 #endif // !defined(BOOST_ASIO_NOEXCEPT)
+#if !defined(BOOST_ASIO_NOEXCEPT_OR_NOTHROW)
+# if defined(BOOST_ASIO_HAS_NOEXCEPT)
+#  define BOOST_ASIO_NOEXCEPT_OR_NOTHROW noexcept(true)
+# else // defined(BOOST_ASIO_HAS_NOEXCEPT)
+#  define BOOST_ASIO_NOEXCEPT_OR_NOTHROW throw()
+# endif // defined(BOOST_ASIO_HAS_NOEXCEPT)
+#endif // !defined(BOOST_ASIO_NOEXCEPT_OR_NOTHROW)
+#if !defined(BOOST_ASIO_NOEXCEPT_IF)
+# if defined(BOOST_ASIO_HAS_NOEXCEPT)
+#  define BOOST_ASIO_NOEXCEPT_IF(c) noexcept(c)
+# else // defined(BOOST_ASIO_HAS_NOEXCEPT)
+#  define BOOST_ASIO_NOEXCEPT_IF(c)
+# endif // defined(BOOST_ASIO_HAS_NOEXCEPT)
+#endif // !defined(BOOST_ASIO_NOEXCEPT_IF)
+
+// Support noexcept on function types on compilers known to allow it.
+#if !defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+# if !defined(BOOST_ASIO_DISABLE_NOEXCEPT_FUNCTION_TYPE)
+#  if defined(__clang__)
+#   if (__cplusplus >= 202002)
+#    define BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE 1
+#   endif // (__cplusplus >= 202002)
+#  elif defined(__GNUC__)
+#   if (__cplusplus >= 202002)
+#    define BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE 1
+#   endif // (__cplusplus >= 202002)
+#  elif defined(BOOST_ASIO_MSVC)
+#   if (_MSC_VER >= 1900 && _MSVC_LANG >= 202002)
+#    define BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE 1
+#   endif // (_MSC_VER >= 1900 && _MSVC_LANG >= 202002)
+#  endif // defined(BOOST_ASIO_MSVC)
+# endif // !defined(BOOST_ASIO_DISABLE_NOEXCEPT_FUNCTION_TYPE)
+#endif // !defined(BOOST_ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 // Support automatic type deduction on compilers known to support it.
 #if !defined(BOOST_ASIO_HAS_DECLTYPE)
@@ -275,13 +357,12 @@
 #   if __has_feature(__cxx_decltype__)
 #    define BOOST_ASIO_HAS_DECLTYPE 1
 #   endif // __has_feature(__cxx_decltype__)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_DECLTYPE 1
 #    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
-#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(BOOST_ASIO_MSVC)
 #   if (_MSC_VER >= 1800)
@@ -298,8 +379,7 @@
 #   if __has_feature(__cxx_alias_templates__)
 #    define BOOST_ASIO_HAS_ALIAS_TEMPLATES 1
 #   endif // __has_feature(__cxx_alias_templates__)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_ALIAS_TEMPLATES 1
@@ -320,7 +400,7 @@
 #  if defined(__clang__)
 #   if __has_feature(__cxx_return_type_deduction__)
 #    define BOOST_ASIO_HAS_RETURN_TYPE_DEDUCTION 1
-#   endif // __has_feature(__cxx_alias_templates__)
+#   endif // __has_feature(__cxx_return_type_deduction__)
 #  elif (__cplusplus >= 201402)
 #   define BOOST_ASIO_HAS_RETURN_TYPE_DEDUCTION 1
 #  elif defined(__cpp_return_type_deduction)
@@ -336,9 +416,26 @@
 # if !defined(BOOST_ASIO_DISABLE_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS)
 #  if (__cplusplus >= 201103)
 #   define BOOST_ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS 1
-#  endif // (__cplusplus >= 201103)
+#  elif defined(BOOST_ASIO_MSVC)
+#   if (_MSC_VER >= 1900 && _MSVC_LANG >= 201103)
+#    define BOOST_ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS 1
+#   endif // (_MSC_VER >= 1900 && _MSVC_LANG >= 201103)
+#  endif // defined(BOOST_ASIO_MSVC)
 # endif // !defined(BOOST_ASIO_DISABLE_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS)
 #endif // !defined(BOOST_ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS)
+
+// Support enum classes on compilers known to allow them.
+#if !defined(BOOST_ASIO_HAS_ENUM_CLASS)
+# if !defined(BOOST_ASIO_DISABLE_ENUM_CLASS)
+#  if (__cplusplus >= 201103)
+#   define BOOST_ASIO_HAS_ENUM_CLASS 1
+#  elif defined(BOOST_ASIO_MSVC)
+#   if (_MSC_VER >= 1900 && _MSVC_LANG >= 201103)
+#    define BOOST_ASIO_HAS_ENUM_CLASS 1
+#   endif // (_MSC_VER >= 1900 && _MSVC_LANG >= 201103)
+#  endif // defined(BOOST_ASIO_MSVC)
+# endif // !defined(BOOST_ASIO_DISABLE_ENUM_CLASS)
+#endif // !defined(BOOST_ASIO_HAS_ENUM_CLASS)
 
 // Support concepts on compilers known to allow them.
 #if !defined(BOOST_ASIO_HAS_CONCEPTS)
@@ -354,6 +451,178 @@
 # endif // !defined(BOOST_ASIO_DISABLE_CONCEPTS)
 #endif // !defined(BOOST_ASIO_HAS_CONCEPTS)
 
+// Support template variables on compilers known to allow it.
+#if !defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+# if !defined(BOOST_ASIO_DISABLE_VARIABLE_TEMPLATES)
+#  if defined(__clang__)
+#   if (__cplusplus >= 201402)
+#    if __has_feature(__cxx_variable_templates__)
+#     define BOOST_ASIO_HAS_VARIABLE_TEMPLATES 1
+#    endif // __has_feature(__cxx_variable_templates__)
+#   endif // (__cplusplus >= 201402)
+#  elif defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#   if (__GNUC__ >= 6)
+#    if (__cplusplus >= 201402)
+#     define BOOST_ASIO_HAS_VARIABLE_TEMPLATES 1
+#    endif // (__cplusplus >= 201402)
+#   endif // (__GNUC__ >= 6)
+#  endif // defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#  if defined(BOOST_ASIO_MSVC)
+#   if (_MSC_VER >= 1901)
+#    define BOOST_ASIO_HAS_VARIABLE_TEMPLATES 1
+#   endif // (_MSC_VER >= 1901)
+#  endif // defined(BOOST_ASIO_MSVC)
+# endif // !defined(BOOST_ASIO_DISABLE_VARIABLE_TEMPLATES)
+#endif // !defined(BOOST_ASIO_HAS_VARIABLE_TEMPLATES)
+
+// Support SFINAEd template variables on compilers known to allow it.
+#if !defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+# if !defined(BOOST_ASIO_DISABLE_SFINAE_VARIABLE_TEMPLATES)
+#  if defined(__clang__)
+#   if (__cplusplus >= 201703)
+#    if __has_feature(__cxx_variable_templates__)
+#     define BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES 1
+#    endif // __has_feature(__cxx_variable_templates__)
+#   endif // (__cplusplus >= 201703)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 8) && (__GNUC_MINOR__ >= 4)) || (__GNUC__ > 8)
+#    if (__cplusplus >= 201402)
+#     define BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES 1
+#    endif // (__cplusplus >= 201402)
+#   endif // ((__GNUC__ == 8) && (__GNUC_MINOR__ >= 4)) || (__GNUC__ > 8)
+#  endif // defined(__GNUC__)
+#  if defined(BOOST_ASIO_MSVC)
+#   if (_MSC_VER >= 1901)
+#    define BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES 1
+#   endif // (_MSC_VER >= 1901)
+#  endif // defined(BOOST_ASIO_MSVC)
+# endif // !defined(BOOST_ASIO_DISABLE_SFINAE_VARIABLE_TEMPLATES)
+#endif // !defined(BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+
+// Support SFINAE use of constant expressions on compilers known to allow it.
+#if !defined(BOOST_ASIO_HAS_CONSTANT_EXPRESSION_SFINAE)
+# if !defined(BOOST_ASIO_DISABLE_CONSTANT_EXPRESSION_SFINAE)
+#  if defined(__clang__)
+#   if (__cplusplus >= 201402)
+#    define BOOST_ASIO_HAS_CONSTANT_EXPRESSION_SFINAE 1
+#   endif // (__cplusplus >= 201402)
+#  elif defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#   if (__GNUC__ >= 7)
+#    if (__cplusplus >= 201402)
+#     define BOOST_ASIO_HAS_CONSTANT_EXPRESSION_SFINAE 1
+#    endif // (__cplusplus >= 201402)
+#   endif // (__GNUC__ >= 7)
+#  endif // defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#  if defined(BOOST_ASIO_MSVC)
+#   if (_MSC_VER >= 1901)
+#    define BOOST_ASIO_HAS_CONSTANT_EXPRESSION_SFINAE 1
+#   endif // (_MSC_VER >= 1901)
+#  endif // defined(BOOST_ASIO_MSVC)
+# endif // !defined(BOOST_ASIO_DISABLE_CONSTANT_EXPRESSION_SFINAE)
+#endif // !defined(BOOST_ASIO_HAS_CONSTANT_EXPRESSION_SFINAE)
+
+// Enable workarounds for lack of working expression SFINAE.
+#if !defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+# if !defined(BOOST_ASIO_DISABLE_WORKING_EXPRESSION_SFINAE)
+#  if !defined(BOOST_ASIO_MSVC) && !defined(__INTEL_COMPILER)
+#   if (__cplusplus >= 201103)
+#    define BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE 1
+#   endif // (__cplusplus >= 201103)
+#  elif defined(BOOST_ASIO_MSVC) && (_MSC_VER >= 1929)
+#   if (_MSVC_LANG >= 202000)
+#    define BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE 1
+#   endif // (_MSVC_LANG >= 202000)
+#  endif // defined(BOOST_ASIO_MSVC) && (_MSC_VER >= 1929)
+# endif // !defined(BOOST_ASIO_DISABLE_WORKING_EXPRESSION_SFINAE)
+#endif // !defined(BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+
+// Support ref-qualified functions on compilers known to allow it.
+#if !defined(BOOST_ASIO_HAS_REF_QUALIFIED_FUNCTIONS)
+# if !defined(BOOST_ASIO_DISABLE_REF_QUALIFIED_FUNCTIONS)
+#  if defined(__clang__)
+#   if __has_feature(__cxx_reference_qualified_functions__)
+#    define BOOST_ASIO_HAS_REF_QUALIFIED_FUNCTIONS 1
+#   endif // __has_feature(__cxx_reference_qualified_functions__)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define BOOST_ASIO_HAS_REF_QUALIFIED_FUNCTIONS 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+#  if defined(BOOST_ASIO_MSVC)
+#   if (_MSC_VER >= 1900)
+#    define BOOST_ASIO_HAS_REF_QUALIFIED_FUNCTIONS 1
+#   endif // (_MSC_VER >= 1900)
+#  endif // defined(BOOST_ASIO_MSVC)
+# endif // !defined(BOOST_ASIO_DISABLE_REF_QUALIFIED_FUNCTIONS)
+#endif // !defined(BOOST_ASIO_HAS_REF_QUALIFIED_FUNCTIONS)
+#if defined(BOOST_ASIO_HAS_REF_QUALIFIED_FUNCTIONS)
+# if !defined(BOOST_ASIO_LVALUE_REF_QUAL)
+#  define BOOST_ASIO_LVALUE_REF_QUAL &
+# endif // !defined(BOOST_ASIO_LVALUE_REF_QUAL)
+# if !defined(BOOST_ASIO_RVALUE_REF_QUAL)
+#  define BOOST_ASIO_RVALUE_REF_QUAL &&
+# endif // !defined(BOOST_ASIO_RVALUE_REF_QUAL)
+#else // defined(BOOST_ASIO_HAS_REF_QUALIFIED_FUNCTIONS)
+# if !defined(BOOST_ASIO_LVALUE_REF_QUAL)
+#  define BOOST_ASIO_LVALUE_REF_QUAL
+# endif // !defined(BOOST_ASIO_LVALUE_REF_QUAL)
+# if !defined(BOOST_ASIO_RVALUE_REF_QUAL)
+#  define BOOST_ASIO_RVALUE_REF_QUAL
+# endif // !defined(BOOST_ASIO_RVALUE_REF_QUAL)
+#endif // defined(BOOST_ASIO_HAS_REF_QUALIFIED_FUNCTIONS)
+
+// Support for the alignof operator.
+#if !defined(BOOST_ASIO_HAS_ALIGNOF)
+# if !defined(BOOST_ASIO_DISABLE_ALIGNOF)
+#  if (__cplusplus >= 201103)
+#   define BOOST_ASIO_HAS_ALIGNOF 1
+#  endif // (__cplusplus >= 201103)
+# endif // !defined(BOOST_ASIO_DISABLE_ALIGNOF)
+#endif // !defined(BOOST_ASIO_HAS_ALIGNOF)
+
+#if defined(BOOST_ASIO_HAS_ALIGNOF)
+# define BOOST_ASIO_ALIGNOF(T) alignof(T)
+# if defined(__STDCPP_DEFAULT_NEW_ALIGNMENT__)
+#  define BOOST_ASIO_DEFAULT_ALIGN __STDCPP_DEFAULT_NEW_ALIGNMENT__
+# elif defined(__GNUC__)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
+#   define BOOST_ASIO_DEFAULT_ALIGN alignof(std::max_align_t)
+#  else // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
+#   define BOOST_ASIO_DEFAULT_ALIGN alignof(max_align_t)
+#  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
+# else // defined(__GNUC__)
+#  define BOOST_ASIO_DEFAULT_ALIGN alignof(std::max_align_t)
+# endif // defined(__GNUC__)
+#else // defined(BOOST_ASIO_HAS_ALIGNOF)
+# define BOOST_ASIO_ALIGNOF(T) 1
+# define BOOST_ASIO_DEFAULT_ALIGN 1
+#endif // defined(BOOST_ASIO_HAS_ALIGNOF)
+
+// Standard library support for aligned allocation.
+#if !defined(BOOST_ASIO_HAS_STD_ALIGNED_ALLOC)
+# if !defined(BOOST_ASIO_DISABLE_STD_ALIGNED_ALLOC)
+#  if (__cplusplus >= 201703)
+#   if defined(__clang__)
+#    if defined(BOOST_ASIO_HAS_CLANG_LIBCXX)
+#     if (_LIBCPP_STD_VER > 14) && defined(_LIBCPP_HAS_ALIGNED_ALLOC) \
+        && !defined(_LIBCPP_MSVCRT) && !defined(__MINGW32__)
+#      define BOOST_ASIO_HAS_STD_ALIGNED_ALLOC 1
+#     endif // (_LIBCPP_STD_VER > 14) && defined(_LIBCPP_HAS_ALIGNED_ALLOC)
+            //   && !defined(_LIBCPP_MSVCRT) && !defined(__MINGW32__)
+#    elif defined(_GLIBCXX_HAVE_ALIGNED_ALLOC)
+#     define BOOST_ASIO_HAS_STD_ALIGNED_ALLOC 1
+#    endif // defined(_GLIBCXX_HAVE_ALIGNED_ALLOC)
+#   elif defined(__GNUC__)
+#    if defined(_GLIBCXX_HAVE_ALIGNED_ALLOC)
+#     define BOOST_ASIO_HAS_STD_ALIGNED_ALLOC 1
+#    endif // defined(_GLIBCXX_HAVE_ALIGNED_ALLOC)
+#   endif // defined(__GNUC__)
+#  endif // (__cplusplus >= 201703)
+# endif // !defined(BOOST_ASIO_DISABLE_STD_ALIGNED_ALLOC)
+#endif // !defined(BOOST_ASIO_HAS_STD_ALIGNED_ALLOC)
+
 // Standard library support for system errors.
 # if !defined(BOOST_ASIO_DISABLE_STD_SYSTEM_ERROR)
 #  if defined(__clang__)
@@ -364,8 +633,7 @@
 #     define BOOST_ASIO_HAS_STD_SYSTEM_ERROR 1
 #    endif // __has_include(<system_error>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_SYSTEM_ERROR 1
@@ -414,8 +682,7 @@
 #     define BOOST_ASIO_HAS_STD_ARRAY 1
 #    endif // __has_include(<array>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_ARRAY 1
@@ -439,8 +706,7 @@
 #   elif (__cplusplus >= 201103)
 #    define BOOST_ASIO_HAS_STD_SHARED_PTR 1
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_SHARED_PTR 1
@@ -464,8 +730,7 @@
 #   elif (__cplusplus >= 201103)
 #    define BOOST_ASIO_HAS_STD_ALLOCATOR_ARG 1
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_ALLOCATOR_ARG 1
@@ -496,9 +761,8 @@
 #      define BOOST_ASIO_HAS_STD_ATOMIC 1
 #     endif // __has_include(<atomic>)
 #    endif // (__clang_major__ >= 10)
-#   endif /// defined(__apple_build_version__) && defined(_LIBCPP_VERSION)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#   endif // defined(__apple_build_version__) && defined(_LIBCPP_VERSION)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_ATOMIC 1
@@ -526,8 +790,7 @@
 #     define BOOST_ASIO_HAS_STD_CHRONO 1
 #    endif // __has_include(<chrono>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_CHRONO 1
@@ -579,8 +842,7 @@
 #   elif (__cplusplus >= 201103)
 #    define BOOST_ASIO_HAS_STD_ADDRESSOF 1
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_ADDRESSOF 1
@@ -604,8 +866,7 @@
 #   elif (__cplusplus >= 201103)
 #    define BOOST_ASIO_HAS_STD_FUNCTION 1
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_FUNCTION 1
@@ -620,6 +881,30 @@
 # endif // !defined(BOOST_ASIO_DISABLE_STD_FUNCTION)
 #endif // !defined(BOOST_ASIO_HAS_STD_FUNCTION)
 
+// Standard library support for the reference_wrapper class.
+#if !defined(BOOST_ASIO_HAS_STD_REFERENCE_WRAPPER)
+# if !defined(BOOST_ASIO_DISABLE_STD_REFERENCE_WRAPPER)
+#  if defined(__clang__)
+#   if defined(BOOST_ASIO_HAS_CLANG_LIBCXX)
+#    define BOOST_ASIO_HAS_STD_REFERENCE_WRAPPER 1
+#   elif (__cplusplus >= 201103)
+#    define BOOST_ASIO_HAS_STD_REFERENCE_WRAPPER 1
+#   endif // (__cplusplus >= 201103)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define BOOST_ASIO_HAS_STD_REFERENCE_WRAPPER 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+#  if defined(BOOST_ASIO_MSVC)
+#   if (_MSC_VER >= 1700)
+#    define BOOST_ASIO_HAS_STD_REFERENCE_WRAPPER 1
+#   endif // (_MSC_VER >= 1700)
+#  endif // defined(BOOST_ASIO_MSVC)
+# endif // !defined(BOOST_ASIO_DISABLE_STD_REFERENCE_WRAPPER)
+#endif // !defined(BOOST_ASIO_HAS_STD_REFERENCE_WRAPPER)
+
 // Standard library support for type traits.
 #if !defined(BOOST_ASIO_HAS_STD_TYPE_TRAITS)
 # if !defined(BOOST_ASIO_DISABLE_STD_TYPE_TRAITS)
@@ -631,13 +916,12 @@
 #     define BOOST_ASIO_HAS_STD_TYPE_TRAITS 1
 #    endif // __has_include(<type_traits>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_TYPE_TRAITS 1
 #    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
-#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(BOOST_ASIO_MSVC)
 #   if (_MSC_VER >= 1700)
@@ -653,7 +937,7 @@
 #  if defined(__clang__)
 #   if __has_feature(__cxx_nullptr__)
 #    define BOOST_ASIO_HAS_NULLPTR 1
-#   endif // __has_feature(__cxx_rvalue_references__)
+#   endif // __has_feature(__cxx_nullptr__)
 #  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
@@ -702,8 +986,7 @@
 #   elif (__cplusplus >= 201103)
 #    define BOOST_ASIO_HAS_CSTDINT 1
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_CSTDINT 1
@@ -729,8 +1012,7 @@
 #     define BOOST_ASIO_HAS_STD_THREAD 1
 #    endif // __has_include(<thread>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_THREAD 1
@@ -756,8 +1038,7 @@
 #     define BOOST_ASIO_HAS_STD_MUTEX_AND_CONDVAR 1
 #    endif // __has_include(<mutex>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_MUTEX_AND_CONDVAR 1
@@ -783,8 +1064,7 @@
 #     define BOOST_ASIO_HAS_STD_CALL_ONCE 1
 #    endif // __has_include(<mutex>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_CALL_ONCE 1
@@ -808,10 +1088,9 @@
 #   elif (__cplusplus >= 201103)
 #    if __has_include(<future>)
 #     define BOOST_ASIO_HAS_STD_FUTURE 1
-#    endif // __has_include(<mutex>)
+#    endif // __has_include(<future>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_FUTURE 1
@@ -876,8 +1155,7 @@
 #     endif // __has_include(<experimental/string_view>)
 #    endif // (__cplusplus >= 201402)
 #   endif // // defined(BOOST_ASIO_HAS_CLANG_LIBCXX)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
 #    if (__cplusplus >= 201402)
 #     define BOOST_ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
@@ -901,14 +1179,17 @@
 // Standard library support for iostream move construction and assignment.
 #if !defined(BOOST_ASIO_HAS_STD_IOSTREAM_MOVE)
 # if !defined(BOOST_ASIO_DISABLE_STD_IOSTREAM_MOVE)
-#  if defined(__GNUC__)
+#  if defined(__clang__)
+#   if (__cplusplus >= 201103)
+#    define BOOST_ASIO_HAS_STD_IOSTREAM_MOVE 1
+#   endif // (__cplusplus >= 201103)
+#  elif defined(__GNUC__)
 #   if (__GNUC__ > 4)
 #    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define BOOST_ASIO_HAS_STD_IOSTREAM_MOVE 1
 #    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // (__GNUC__ > 4)
-#  endif // defined(__GNUC__)
-#  if defined(BOOST_ASIO_MSVC)
+#  elif defined(BOOST_ASIO_MSVC)
 #   if (_MSC_VER >= 1700)
 #    define BOOST_ASIO_HAS_STD_IOSTREAM_MOVE 1
 #   endif // (_MSC_VER >= 1700)
@@ -924,8 +1205,118 @@
 #    define BOOST_ASIO_HAS_STD_INVOKE_RESULT 1
 #   endif // (_MSC_VER >= 1911 && _MSVC_LANG >= 201703)
 #  endif // defined(BOOST_ASIO_MSVC)
+#  if defined(BOOST_ASIO_HAS_CLANG_LIBCXX)
+#   if (_LIBCPP_VERSION >= 13000)
+#    if (__cplusplus >= 202002)
+#     define BOOST_ASIO_HAS_STD_INVOKE_RESULT 1
+#    endif // (__cplusplus >= 202002)
+#   endif // (_LIBCPP_VERSION >= 13000)
+#  endif // defined(BOOST_ASIO_HAS_CLANG_LIBCXX)
 # endif // !defined(BOOST_ASIO_DISABLE_STD_INVOKE_RESULT)
 #endif // !defined(BOOST_ASIO_HAS_STD_INVOKE_RESULT)
+
+// Standard library support for std::exception_ptr and std::current_exception.
+#if !defined(BOOST_ASIO_HAS_STD_EXCEPTION_PTR)
+# if !defined(BOOST_ASIO_DISABLE_STD_EXCEPTION_PTR)
+#  if defined(__clang__)
+#   if defined(BOOST_ASIO_HAS_CLANG_LIBCXX)
+#    define BOOST_ASIO_HAS_STD_EXCEPTION_PTR 1
+#   elif (__cplusplus >= 201103)
+#    define BOOST_ASIO_HAS_STD_EXCEPTION_PTR 1
+#   endif // (__cplusplus >= 201103)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define BOOST_ASIO_HAS_STD_EXCEPTION_PTR 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+#  if defined(BOOST_ASIO_MSVC)
+#   if (_MSC_VER >= 1800)
+#    define BOOST_ASIO_HAS_STD_EXCEPTION_PTR 1
+#   endif // (_MSC_VER >= 1800)
+#  endif // defined(BOOST_ASIO_MSVC)
+# endif // !defined(BOOST_ASIO_DISABLE_STD_EXCEPTION_PTR)
+#endif // !defined(BOOST_ASIO_HAS_STD_EXCEPTION_PTR)
+
+// Standard library support for std::nested_exception.
+#if !defined(BOOST_ASIO_HAS_STD_NESTED_EXCEPTION)
+# if !defined(BOOST_ASIO_DISABLE_STD_NESTED_EXCEPTION)
+#  if defined(__clang__)
+#   if defined(BOOST_ASIO_HAS_CLANG_LIBCXX)
+#    define BOOST_ASIO_HAS_STD_NESTED_EXCEPTION 1
+#   elif (__cplusplus >= 201103)
+#    define BOOST_ASIO_HAS_STD_NESTED_EXCEPTION 1
+#   endif // (__cplusplus >= 201103)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define BOOST_ASIO_HAS_STD_NESTED_EXCEPTION 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+#  if defined(BOOST_ASIO_MSVC)
+#   if (_MSC_VER >= 1900)
+#    define BOOST_ASIO_HAS_STD_NESTED_EXCEPTION 1
+#   endif // (_MSC_VER >= 1900)
+#  endif // defined(BOOST_ASIO_MSVC)
+# endif // !defined(BOOST_ASIO_DISABLE_STD_NESTED_EXCEPTION)
+#endif // !defined(BOOST_ASIO_HAS_STD_NESTED_EXCEPTION)
+
+// Standard library support for std::any.
+#if !defined(BOOST_ASIO_HAS_STD_ANY)
+# if !defined(BOOST_ASIO_DISABLE_STD_ANY)
+#  if defined(__clang__)
+#   if (__cplusplus >= 201703)
+#    if __has_include(<any>)
+#     define BOOST_ASIO_HAS_STD_ANY 1
+#    endif // __has_include(<any>)
+#   endif // (__cplusplus >= 201703)
+#  elif defined(__GNUC__)
+#   if (__GNUC__ >= 7)
+#    if (__cplusplus >= 201703)
+#     define BOOST_ASIO_HAS_STD_ANY 1
+#    endif // (__cplusplus >= 201703)
+#   endif // (__GNUC__ >= 7)
+#  endif // defined(__GNUC__)
+#  if defined(BOOST_ASIO_MSVC)
+#   if (_MSC_VER >= 1910) && (_MSVC_LANG >= 201703)
+#    define BOOST_ASIO_HAS_STD_ANY 1
+#   endif // (_MSC_VER >= 1910) && (_MSVC_LANG >= 201703)
+#  endif // defined(BOOST_ASIO_MSVC)
+# endif // !defined(BOOST_ASIO_DISABLE_STD_ANY)
+#endif // !defined(BOOST_ASIO_HAS_STD_ANY)
+
+// Standard library support for std::source_location.
+#if !defined(BOOST_ASIO_HAS_STD_SOURCE_LOCATION)
+# if !defined(BOOST_ASIO_DISABLE_STD_SOURCE_LOCATION)
+// ...
+# endif // !defined(BOOST_ASIO_DISABLE_STD_SOURCE_LOCATION)
+#endif // !defined(BOOST_ASIO_HAS_STD_SOURCE_LOCATION)
+
+// Standard library support for std::experimental::source_location.
+#if !defined(BOOST_ASIO_HAS_STD_EXPERIMENTAL_SOURCE_LOCATION)
+# if !defined(BOOST_ASIO_DISABLE_STD_EXPERIMENTAL_SOURCE_LOCATION)
+#  if defined(__GNUC__)
+#   if (__cplusplus >= 201709)
+#    if __has_include(<experimental/source_location>)
+#     define BOOST_ASIO_HAS_STD_EXPERIMENTAL_SOURCE_LOCATION 1
+#    endif // __has_include(<experimental/source_location>)
+#   endif // (__cplusplus >= 201709)
+#  endif // defined(__GNUC__)
+# endif // !defined(BOOST_ASIO_DISABLE_STD_EXPERIMENTAL_SOURCE_LOCATION)
+#endif // !defined(BOOST_ASIO_HAS_STD_EXPERIMENTAL_SOURCE_LOCATION)
+
+// Standard library has a source_location that we can use.
+#if !defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
+# if !defined(BOOST_ASIO_DISABLE_SOURCE_LOCATION)
+#  if defined(BOOST_ASIO_HAS_STD_SOURCE_LOCATION)
+#   define BOOST_ASIO_HAS_SOURCE_LOCATION 1
+#  elif defined(BOOST_ASIO_HAS_STD_EXPERIMENTAL_SOURCE_LOCATION)
+#   define BOOST_ASIO_HAS_SOURCE_LOCATION 1
+#  endif // defined(BOOST_ASIO_HAS_STD_EXPERIMENTAL_SOURCE_LOCATION)
+# endif // !defined(BOOST_ASIO_DISABLE_SOURCE_LOCATION)
+#endif // !defined(BOOST_ASIO_HAS_SOURCE_LOCATION)
 
 // Windows App target. Windows but with a limited API.
 #if !defined(BOOST_ASIO_WINDOWS_APP)
@@ -970,17 +1361,17 @@
 // Windows: target OS version.
 #if defined(BOOST_ASIO_WINDOWS) || defined(__CYGWIN__)
 # if !defined(_WIN32_WINNT) && !defined(_WIN32_WINDOWS)
-#  if defined(_MSC_VER) || defined(__BORLANDC__)
+#  if defined(_MSC_VER) || (defined(__BORLANDC__) && !defined(__clang__))
 #   pragma message( \
   "Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:\n"\
   "- add -D_WIN32_WINNT=0x0601 to the compiler command line; or\n"\
   "- add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.\n"\
   "Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).")
-#  else // defined(_MSC_VER) || defined(__BORLANDC__)
+#  else // defined(_MSC_VER) || (defined(__BORLANDC__) && !defined(__clang__))
 #   warning Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately.
 #   warning For example, add -D_WIN32_WINNT=0x0601 to the compiler command line.
 #   warning Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
-#  endif // defined(_MSC_VER) || defined(__BORLANDC__)
+#  endif // defined(_MSC_VER) || (defined(__BORLANDC__) && !defined(__clang__))
 #  define _WIN32_WINNT 0x0601
 # endif // !defined(_WIN32_WINNT) && !defined(_WIN32_WINDOWS)
 # if defined(_MSC_VER)
@@ -1088,6 +1479,13 @@
 # endif // !defined(BOOST_ASIO_HAS_TIMERFD)
 #endif // defined(__linux__)
 
+// Linux: io_uring is used instead of epoll.
+#if !defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+# if !defined(BOOST_ASIO_HAS_EPOLL) && defined(BOOST_ASIO_HAS_IO_URING)
+#  define BOOST_ASIO_HAS_IO_URING_AS_DEFAULT 1
+# endif // !defined(BOOST_ASIO_HAS_EPOLL) && defined(BOOST_ASIO_HAS_IO_URING)
+#endif // !defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+
 // Mac OS X, FreeBSD, NetBSD, OpenBSD: kqueue.
 #if (defined(__MACH__) && defined(__APPLE__)) \
   || defined(__FreeBSD__) \
@@ -1183,15 +1581,39 @@
 // UNIX domain sockets.
 #if !defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
 # if !defined(BOOST_ASIO_DISABLE_LOCAL_SOCKETS)
-#  if !defined(BOOST_ASIO_WINDOWS) \
-  && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+#  if !defined(BOOST_ASIO_WINDOWS_RUNTIME)
 #   define BOOST_ASIO_HAS_LOCAL_SOCKETS 1
-#  endif // !defined(BOOST_ASIO_WINDOWS)
-         //   && !defined(BOOST_ASIO_WINDOWS_RUNTIME)
-         //   && !defined(__CYGWIN__)
+#  endif // !defined(BOOST_ASIO_WINDOWS_RUNTIME)
 # endif // !defined(BOOST_ASIO_DISABLE_LOCAL_SOCKETS)
 #endif // !defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
+
+// Files.
+#if !defined(BOOST_ASIO_HAS_FILE)
+# if !defined(BOOST_ASIO_DISABLE_FILE)
+#  if defined(BOOST_ASIO_HAS_WINDOWS_RANDOM_ACCESS_HANDLE)
+#   define BOOST_ASIO_HAS_FILE 1
+#  elif defined(BOOST_ASIO_HAS_IO_URING)
+#   define BOOST_ASIO_HAS_FILE 1
+#  endif // defined(BOOST_ASIO_HAS_IO_URING)
+# endif // !defined(BOOST_ASIO_DISABLE_FILE)
+#endif // !defined(BOOST_ASIO_HAS_FILE)
+
+// Pipes.
+#if !defined(BOOST_ASIO_HAS_PIPE)
+# if defined(BOOST_ASIO_HAS_IOCP) \
+  || !defined(BOOST_ASIO_WINDOWS) \
+  && !defined(BOOST_ASIO_WINDOWS_RUNTIME) \
+  && !defined(__CYGWIN__)
+#  if !defined(__SYMBIAN32__)
+#   if !defined(BOOST_ASIO_DISABLE_PIPE)
+#    define BOOST_ASIO_HAS_PIPE 1
+#   endif // !defined(BOOST_ASIO_DISABLE_PIPE)
+#  endif // !defined(__SYMBIAN32__)
+# endif // defined(BOOST_ASIO_HAS_IOCP)
+        //   || !defined(BOOST_ASIO_WINDOWS)
+        //   && !defined(BOOST_ASIO_WINDOWS_RUNTIME)
+        //   && !defined(__CYGWIN__)
+#endif // !defined(BOOST_ASIO_HAS_PIPE)
 
 // Can use sigaction() instead of signal().
 #if !defined(BOOST_ASIO_HAS_SIGACTION)
@@ -1310,6 +1732,15 @@
 # endif // !defined(BOOST_ASIO_DISABLE_BOOST_STATIC_CONSTANT)
 #endif // !defined(BOOST_ASIO_STATIC_CONSTANT)
 
+// Boost align library.
+#if !defined(BOOST_ASIO_HAS_BOOST_ALIGN)
+# if !defined(BOOST_ASIO_DISABLE_BOOST_ALIGN)
+#  if defined(BOOST_ASIO_HAS_BOOST_CONFIG) && (BOOST_VERSION >= 105600)
+#   define BOOST_ASIO_HAS_BOOST_ALIGN 1
+#  endif // defined(BOOST_ASIO_HAS_BOOST_CONFIG) && (BOOST_VERSION >= 105600)
+# endif // !defined(BOOST_ASIO_DISABLE_BOOST_ALIGN)
+#endif // !defined(BOOST_ASIO_HAS_BOOST_ALIGN)
+
 // Boost array library.
 #if !defined(BOOST_ASIO_HAS_BOOST_ARRAY)
 # if !defined(BOOST_ASIO_DISABLE_BOOST_ARRAY)
@@ -1379,9 +1810,9 @@
 #   if (__GNUC__ >= 3)
 #    define BOOST_ASIO_HAS_HANDLER_HOOKS 1
 #   endif // (__GNUC__ >= 3)
-#  elif !defined(__BORLANDC__)
+#  elif !defined(__BORLANDC__) || defined(__clang__)
 #   define BOOST_ASIO_HAS_HANDLER_HOOKS 1
-#  endif // !defined(__BORLANDC__)
+#  endif // !defined(__BORLANDC__) || defined(__clang__)
 # endif // !defined(BOOST_ASIO_DISABLE_HANDLER_HOOKS)
 #endif // !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
 
@@ -1460,24 +1891,102 @@
 # define BOOST_ASIO_UNUSED_VARIABLE
 #endif // !defined(BOOST_ASIO_UNUSED_VARIABLE)
 
-// Support co_await on compilers known to allow it.
+// Support the co_await keyword on compilers known to allow it.
 #if !defined(BOOST_ASIO_HAS_CO_AWAIT)
 # if !defined(BOOST_ASIO_DISABLE_CO_AWAIT)
 #  if defined(BOOST_ASIO_MSVC)
-#   if (_MSC_FULL_VER >= 190023506)
+#   if (_MSC_VER >= 1928) && (_MSVC_LANG >= 201705) && !defined(__clang__)
+#    define BOOST_ASIO_HAS_CO_AWAIT 1
+#   elif (_MSC_FULL_VER >= 190023506)
 #    if defined(_RESUMABLE_FUNCTIONS_SUPPORTED)
 #     define BOOST_ASIO_HAS_CO_AWAIT 1
 #    endif // defined(_RESUMABLE_FUNCTIONS_SUPPORTED)
 #   endif // (_MSC_FULL_VER >= 190023506)
-#  endif // defined(BOOST_ASIO_MSVC)
+#  elif defined(__clang__)
+#   if (__cplusplus >= 201703) && (__cpp_coroutines >= 201703)
+#    if __has_include(<experimental/coroutine>)
+#     define BOOST_ASIO_HAS_CO_AWAIT 1
+#    endif // __has_include(<experimental/coroutine>)
+#   endif // (__cplusplus >= 201703) && (__cpp_coroutines >= 201703)
+#  elif defined(__GNUC__)
+#   if (__cplusplus >= 201709) && (__cpp_impl_coroutine >= 201902)
+#    if __has_include(<coroutine>)
+#     define BOOST_ASIO_HAS_CO_AWAIT 1
+#    endif // __has_include(<coroutine>)
+#   endif // (__cplusplus >= 201709) && (__cpp_impl_coroutine >= 201902)
+#  endif // defined(__GNUC__)
 # endif // !defined(BOOST_ASIO_DISABLE_CO_AWAIT)
-# if defined(__clang__)
-#  if (__cplusplus >= 201703) && (__cpp_coroutines >= 201703)
-#   if __has_include(<experimental/coroutine>)
-#    define BOOST_ASIO_HAS_CO_AWAIT 1
-#   endif // __has_include(<experimental/coroutine>)
-#  endif // (__cplusplus >= 201703) && (__cpp_coroutines >= 201703)
-# endif // defined(__clang__)
 #endif // !defined(BOOST_ASIO_HAS_CO_AWAIT)
 
+// Standard library support for coroutines.
+#if !defined(BOOST_ASIO_HAS_STD_COROUTINE)
+# if !defined(BOOST_ASIO_DISABLE_STD_COROUTINE)
+#  if defined(BOOST_ASIO_MSVC)
+#   if (_MSC_VER >= 1928) && (_MSVC_LANG >= 201705)
+#    define BOOST_ASIO_HAS_STD_COROUTINE 1
+#   endif // (_MSC_VER >= 1928) && (_MSVC_LANG >= 201705)
+#  endif // defined(BOOST_ASIO_MSVC)
+#  if defined(__GNUC__)
+#   if (__cplusplus >= 201709) && (__cpp_impl_coroutine >= 201902)
+#    if __has_include(<coroutine>)
+#     define BOOST_ASIO_HAS_STD_COROUTINE 1
+#    endif // __has_include(<coroutine>)
+#   endif // (__cplusplus >= 201709) && (__cpp_impl_coroutine >= 201902)
+#  endif // defined(__GNUC__)
+# endif // !defined(BOOST_ASIO_DISABLE_STD_COROUTINE)
+#endif // !defined(BOOST_ASIO_HAS_STD_COROUTINE)
+
+// Compiler support for the the [[nodiscard]] attribute.
+#if !defined(BOOST_ASIO_NODISCARD)
+# if defined(__has_cpp_attribute)
+#  if __has_cpp_attribute(nodiscard)
+#   if (__cplusplus >= 201703)
+#    define BOOST_ASIO_NODISCARD [[nodiscard]]
+#   endif // (__cplusplus >= 201703)
+#  endif // __has_cpp_attribute(nodiscard)
+# endif // defined(__has_cpp_attribute)
+#endif // !defined(BOOST_ASIO_NODISCARD)
+#if !defined(BOOST_ASIO_NODISCARD)
+# define BOOST_ASIO_NODISCARD
+#endif // !defined(BOOST_ASIO_NODISCARD)
+
+// Kernel support for MSG_NOSIGNAL.
+#if !defined(BOOST_ASIO_HAS_MSG_NOSIGNAL)
+# if defined(__linux__)
+#  define BOOST_ASIO_HAS_MSG_NOSIGNAL 1
+# elif defined(_POSIX_VERSION)
+#  if (_POSIX_VERSION >= 200809L)
+#   define BOOST_ASIO_HAS_MSG_NOSIGNAL 1
+#  endif // _POSIX_VERSION >= 200809L
+# endif // defined(_POSIX_VERSION)
+#endif // !defined(BOOST_ASIO_HAS_MSG_NOSIGNAL)
+
+// Standard library support for std::hash.
+#if !defined(BOOST_ASIO_HAS_STD_HASH)
+# if !defined(BOOST_ASIO_DISABLE_STD_HASH)
+#  if defined(__clang__)
+#   if defined(BOOST_ASIO_HAS_CLANG_LIBCXX)
+#    define BOOST_ASIO_HAS_STD_HASH 1
+#   elif (__cplusplus >= 201103)
+#    define BOOST_ASIO_HAS_STD_HASH 1
+#   endif // (__cplusplus >= 201103)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define BOOST_ASIO_HAS_STD_HASH 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+#  if defined(BOOST_ASIO_MSVC)
+#   if (_MSC_VER >= 1700)
+#    define BOOST_ASIO_HAS_STD_HASH 1
+#   endif // (_MSC_VER >= 1700)
+#  endif // defined(BOOST_ASIO_MSVC)
+# endif // !defined(BOOST_ASIO_DISABLE_STD_HASH)
+#endif // !defined(BOOST_ASIO_HAS_STD_HASH)
+
 #endif // BOOST_ASIO_DETAIL_CONFIG_HPP
+
+/* config.hpp
+rtzhDrmC5GjYm4KhuJl1grGz5k903tRpCnaBbggJ8UQ6+ep94be0TuKHKRCSOah+rvpg5AfXFqffXbFlfUP/gOTH0Ray0ku0enAb+IDyxOn/XqBXf3vxJtWH50eAf5fAduaF/U39A88TxA+py5e+XUCj0NAwUhQsOKBOxEvjLkig2GssytB5owwNqmLRSA0aOZSC8K11OscoTvlS9JKu4HUjx6IvOjrUauHWXa7r0FXipRj1YU1dLdl6NqjI4fTrilWqvGR6LytCZ7tT1wnOWudI3MLlu9XXtc8Cb8QeSK7Dc4dMxdg3e5zQGj4sSdvRugd9v+5vcKJsCF+SPSb5Hnff97jJy0W8M4jimcUrGtUvdv7CM0nn1Sw2XoRsj8grFlNlDrwPssNJZtosvYc2bizeKS1D/PkrQxw528TV7XTsIak5w47b5M7FXJ1ppkkfMYi3eBoGbJPJQnYEBVx2vsFBUH9/57c7eP/W99RZAIU3cwftQ2b/KDm8QGqmrErMU4PoBu0NfPbFxe1t1yrWWXgoXIsjXP+6uiAy+1u9hves7zIakkwu8G4jc+HaPqy8/ni+eHuUi3M59S2X63KGLxfqcs43l+JyASIX43LJawLX60RoAtrrFGUC0+vMcQLJ65x6gtDrgmviTVuXPinBrfUDWxwE3/2rM6ETO8qGsU6iGLmxQaLYkbFJokC2+zR/ucbzitvZXLyVwe9xx2MXK7GEPkQrEl7nRLfRuVgWQsgTeKyfkPfIoMOEciuw6aDj/bIF0WOeshXQ43jHojjPAt+Rh1K8CzMkB3xkfgsppN0T4zOWAkcOqcUSHCTknB8PazEKRw6Py5r64qVztw6zAl0AxjCxIjVNPzBbSyX+q1GYhvC70Pju/lxAzYELKgSithy80OAIqViW5U4Mp8WiZy42qx2FVMBMGamI0AUDeafgPcOrTiEIRgoyQQRGSjIhtAryHEE89fjxrNjZGGBW4mxsVdYHjhjHrHTrPo+xsVoTcIs9WxNSi31dE1SLgxYTZgsbvg/gWk1h+LSEqMixRXXXcZZZbdr9jlmdozE4Wb2MMRtCyfoklAH8bXJmb+XapMzC6rsXc0WbKZfJqoXa3GO4sjaapKh3bwtyX/tQt5I7d+tVJQ+h3XfxM+s/0Pm92lp3P+PRBNy1ZdKhS8WSYzAhcWpCGguRJDIRvlCCMs4Gar7YyIbjQukRZ1FC3MjBKIpd7LOVLFsSOhbcNyh1IZUxyHUhoey02BOXe4MyGZgGn5OPxYUoLkfkxB2R4bf5AlvI06TBph+TSxlpQMgJMyIflkubkBiZeKcvcOvrpk6DIAPxTn+wE4kmGJkNtCZcjg0mlz5Dokw/TYNW+Sss7IPIq01h45yqWB0TXgteSYZ34719FEzgpk7UEcLpOtBkVSgN+OLGyk5QEX1Jm9LYibb9qmYS1WSatm7MPLElhkFuZLPtVEdC5cGxC+E6MDm1yA3LQywXfYhmYy/i8IZDcUisDS6RSDm+wjIQWw9/waHkSO0cMtzEdE7ger8ET+aF34AofkXuxBNxWLSJhP2NpS+dqcM8tskgITmuaRge++DAoMZfxsqD4aT/wiPmxxDjavJZye3Vwys/2rZ4+03kC4lbtV6j1oGV1ZPT77dIrSH+A22Q3rdlu/3+mHxi9n5vsCl6wqSMilNIzMKUgPoqod3Zamnkchj1oTxd3I5tc4DGy9Bd+oyX8uE73YNGeP4wp03rImexNxo+DK0oK+GZXfbrjI6SZp/pDpwwfyhFxGmfyjnxNAgjhUkJphOPJu2ERUcO55sU51uapQ4Pz5h5T5q7Ae8/gLHYILGGpIhtKzjncs2kGcgBC1IpU6qHG8womq1rjSdDjScLjYdTjIe/GA+T91rB9er1R+Up4cvkcSdJO9MlHmvQdFZJ5hvHfsYPn+qrkowkCE840sh9FSVmta+RawZixxq5mCC2p5GrBmIgGzuIHWjkukXRW53MZSNF0e/vzmXj947c4PPEH8x9kItK3zuc+8AAYvtzH+xA7HjuAyGI7c190AOxo7kP/CB2oBHgFwW1e6IRwNsLfkOAYMCFSbyqEZBlDHZOgPDSjU6wqwqg2Av+woGuXRDEnOjagVFQ2IcaASRRUFQOdIJDVYBgUM6JTnCpCtAdBSXJiWlQaAz2jgvT4IsxmDhIygUxkFRjDNYDkkpB7OvcKMlGehXvV5xutHRF3n6chvj0WJ5unIZebjL3YhatAq4c10YWrWhn8YMX5jWEJxEzaGnj3JM4ZdVp41rrETPzI3NpGxHDSuY2SVzGzuUs7Dsg1srCPphe1dCOk4qQXqW5FjEsNjJX6tJjlsjCjsVjfCFqbqPm3WPmT3gTbXyB8cTtn9oGY+xcz8IuFOJgc31X0bttNi7Dy5CBOhqW3GX9YNu+2A3Dyd6GuRJG1F2xLu+okP85hs3dZrtjTmc3YljH3GYkuOr2FKU33/TdENi2QfXY6xSyIaBE7/Z41e2PXuN4JfEXGvqZgjMddI1hvEJ6Lmr1+jFEaZxh1XavWgwIoA44nmh3zzUf3L9kdP4IOpBuJSrHGqSFQ+vto/zqGurDrGN8XuRAzy2M2MbF9rA2dZqs3AlW8O4iHTeJiy1tfcrhozJE6Y/NySNUJNd3MvTuRSy6+3TJ3It5I45FzgQDmoqpAos1tzLcMKXDhMJdQo6hTJUIlXKQi8RoOIeBcirYs85H6STMHWHErmRCBUk2G6rYw6fkP17JvtGbK3mcJb5iKV3mdxpgWzdvnwvxph5qc1QLvX7/ltMaAl7+uG42aIQweL/Uoy1oerfF7UVQmWwZfr9bTtX4rj0PllvqYUuRXC6yZD1gA6qC03pe/ZvrD3NB3ROFzKYpLEtpPavkp2hr4xH1CZk30fB67gEvFxiCvy4Mmcqqfn2haXRNZIm8l+gTl6ayedj7NVMqJ9xnjEb/PMDjfswDVwF6ErESW36hyUGJA3sn6GbpGx3eAg+taxwfgZIg2wex3MOv7UBYOKhNP25ZZqLUnuON9FsNve6Dm71KudaXpdvsT6kJFJGJI2jD7Xo+ZH5vFL+B23ghRYyhbeZ+Lux8i4TAwzu5toXUH2Xu0ty6EU3wY8gydpKkgNPcZaSKa9IpapCLf6cmTZZrdLs5vZrMXH+EkSvEJ9I33eebz6OPZ2uWfYB9jH0l4zHPV/Utnk73vJOvOrGLdPWqdgVLdg2PTr2bcgN8JN/TlkqcTva7uPvTcd2tForECurSnbivDqeaJivlKNIHuKtH5tOdm+LKS0vm2ZqsL8rLmupOFvKsM8u/lgc2qrnoLl+lldM26c1dvS/ncG+pP3hXrt3IP3M1X17h5ttyAKPbtsteqC1U32FX3Ti8x16/2GGn6ktzR3c0uz9S5759bH4vcg9zRNQsUCfQ6v/4VPGdEnmIn3NzVR4GGX/fZ1fwPKB6ZY/MWsjRad7FTeCko/dMy485ohVBSMQeSv/GvSiWVU6LmgHNPpRIcA8xRktCIwerrzrBkQBWsiy7s5oAyZWcINldZ/GsAD9ukrs3mYXOHF/a1mzkPC3EKWPUk2MnJy3Tye8CRV85Rosx5uNWeKOSNkCpaap+JlZLJmFhdymsoffNFINr3gxk7ky+skTCQqlcXtSUzw/iWsfyKYajxroDbnUrxsCpZZgiRIc8tRlbMElbtUytGK0SHt/7vSekezLi2rePYvdo9yvL/qvtcDAwPEoXBFp2MvS31Ba7/AH17Qz4EGOTM4MiW9eqXhCFel23zquREBWw2Gwwy6THmSciQYfx11+pvnlDk+gH+J3YVtXPL7/yxjsZXrA+Zrve965tGdDDyX/VmnxEsTLnK3qdhuCA0c7l/fRwU84n06YLuOxcEV9rtBq1DDrUq/Sez6D31r+vGc0I/65XfV/+rcS9bNl1sBwBdt415PHhWK1JbokNTcmzCd4Nys11/sOcZrPz2MjuyNhI+0hzOp+728K8nflFukvvd57r4xur3h0e/qrMhbOHqDKejLkzJoXRoy++vRA8793Rj0OPdj/nTEYtERAINLmNbngTLlztLqk5p76nNIBdztKp0CnQSfWSv7X2dJgJ0bT/uALbsTO3kajFFNEGAzcMCOsGS+pcyGjH9WNJYAcTPqcf2J6atJII4J1WkpmuXWAQvkxyK19GJxF62oomnKJsdwW2o8ofG+3sb+5yPGxU78xnVXRNcW22PeWMjsk77O39ELsVYmCbxTYZ+qENJmdHsRPjfAtnwjbUsBMb3g+1Ke7E0YBYekfzcm9+Ez4lzJ8cK7akX1ra0GxZYqb99SPLbdiDsB3J9w6fR96G6KFXzn15uQnNrwf6EDYpPkc2C+tRVMQy9uucv/JMbxY6przo+77JfI40dGIff7tp/Tk5TR4zxulzDB0pRi4qbwCNE6nmCz0hxCKyWhM4TelWUsrY+H5mJ3iuyDRpwlcc8Sx9eyZcXPE+EHqPZC5sLR+ZB4pEoeblkcasd2svub34uCSRFD/QqFBIeUG0xJZ/4hivvTQrVkzHncqtH9Put99098JrSV8WOsl1H2/a4/ZCbkleljgpQB7zasywy8LrJzLh0RVjzErdDXwO+v3tdbUF2R3sN2G8SZuFIHYK777eGhxbOaK86HHMGoqWmJ+RwPd+RgK3FdOOh5Hkew6dbr5bXUNgK88zFnXJdcd7G/8gxk+SOYG/n9NQg+b7plVSP5txUn235JKtMdItX9dCfSGyVW4ly36ifnfxkuBzsFsBn4X8QriPOH/B4pbqOdR58LnYefc5xXneuen51jnGeeK56rnVrdUt7rhYq1pr1BLJL8E8K2Lt42YHOP4YzFMaITf4XPf82zn3LeGt3i3/rd8tWIPecyhPjoHUXHjL2Iesh5iHymZNP9FlUgEagVcCDAIk9omZCZlxmUmZsZmJmfGZyfox+gn6cfpJ+rH6ifrx9f0Vg/aSMLmBEyTU1KFZb+EYyEmC6NA/wcvudsSsJKzErSTVD54MnPSfDBL1EQ3wbKafS5wzeNY3SzxpPIk+qTy9ftJ5En5SeoLvueM41/slzOcdg290q7xAFtEEgbgyhbZlNqvqR+rhRExpmbzECS3LnF/CdkZJR60rOyXK/YwlBs6b8q2HcMN4A21DeYNlw3kDYUNmg/ZC/YLjwv0C+UL+gtG5zbOd14KQOV6TPNwMmFc9IbZX7KLcSMuXkCHNmFe/a1XDqkU9mMiSWJ1Qneic4Jx4kYAxIL3lY5ro9Mbpk1PsX0JrYngmH6qpxX9PLEm0TrD+6qWLrHYobhrpFP9ZrUGzQaxBtSHSR5CfnKeP4ZzwVrJBt0GkQblBpkFbs2Bp4zBl5eRwoUKdnQovUXYgUNw6J3J8xsK8hoMbmyASv9N8Ezc9YkQcK6dkfHjX7rJSPqYweKLfKhZXPXw6iFulWDWkqHMaZV/SNYFbiyAnSrW3aGMabl/UNY5bMz2bsEROtaBocnpjCmf/bB9u/7VrkkviH6OoAAYs+dP5k43+jPNl/Rzn6wZxELYQqwirJLkwuTi5KLlEvVC9WL2oZLpk2nrKevpg6mAabyr1s0dSAoWkRGP0k6B/Ls+e/KX5HcJj5JPcjyz/iTYL+8ZMwiyYPZIFGB/aDqobxzSp10wfqF+b4k5a6pu1r1OEsxlFarJbd3z8bFbKddSrVZlUIzBsXKZhPfOu1vRIw3vmjasJ12qOLuyTOOV+AebBa4hShIOBxqrjUpiDfq+qZfGxPg43bJ7I6IiTSN8e5J7ofYRS5IPBu6onuujbD93gdH3nmqHB01jTyXP9h+huNDyR6SMjBoPzHw7p3Nh5QtJLWodGjGmnfoleafun6JVuf4heGdKo/Cj5Le9Y7XvhX6NXrhR6T/8Su9L372NX2lDw6JuEv9r3uwqwoPlYBDMtkt1gQaL1Xs1KiQx3OsWCfsHizwEtfw0RnZ3TN/65RlzLmF77RrR8l5zbWrYmX4ulrGFG2LqodkLL2ramTounrGVG6KBwy4KfXv0g13UkrrZci6OsaUbkoOhqwsvaVxRrXPWg5Gryztrzo351TQDm1HltDOYMqZYKHnFj2PGCoG2MWwS7Bl42hgWwTIF2Yl2rKonJj9lv5p1V5+cEOjaZwYnqCDplvPLIMXGrnJrxBWzbUnY5vArZsVdW8TX9C+hHGrZWP6N+9WjOL7DaNrqlsYvw6PEIpRYNT0jXzC/gl6nQTm5bXdTcajWchdcJaheqWoTXSJdJa5emF6pas2mVqRXQG2JVhc9THCq54TSl6Rqe1FRN91QcWrkhNiXp9pabc1TizeO6xddN3QzffLvpvIn3tV4yXLJbslwyXbItZTkGHmOAbTBe8y32jm6aXzjfwvvxl2YzrKlz8phwdOCuXpMdx7R06RsL4NdJXLP9iDrZEPhMNC9/aH6NcJ/42ONn7h8aGvoerMe357EHosdvI8BxjNOEXLbjycS/6vEQwNOHVEVOmebUw5U8V6/D2WQD0U0M1EBvnwwekVusfJfOnrFxWDuMgSCaV4gp4+HueN52VHe2jHNvi2x6XH/Wum57pmfVG3nfnWxUMUfph9n2w3c08iRxsY8gqvmg58JUBmkARYMEEdq+TSHKWZUhCe1cwTOFV4eQJDpBoj9nC3iu4ZnGq5dBLJ9A2R+/RX1eda7i+ZGX4BjfvJSDPX+r09XOgYWCyBy5QiWDMRkP2exw1ZWVp4HHw9NsLIKTx8PROYVrv5Kg+XYbvLpjLnGauwTxMfQ4u2mP8A74KPpfBdtc1hidSd2VvTLzcr6jfnx9J3uneydyp3wns2Bvw/Kn2IF4v8YOrKyYmz3Eq5v1iCqlxJujueXCJUeOC+ljuXT+HGtDOoo7Gl/dp2wCRQRxMAJX+Q5XnjEbC4/xtN8HXiBJfgvtlvwxJoMV9jbRz1IhcLzyK2IYH3W6HCGLQSMbOtmihZEdiz7HCtOKCRY2UZx1v/umJQi3pyGRJI9h6woz5iRP0u4qff6QYWXhVKZDyWg6iheNrR0hEdkb0RtJGVHWE9+jfAh1Teod1jKkZ1jxeXaO/ZrbO7Clf9nIvlrXhmOxk98ss1J+3vzQ+RrqHrXmAnusJ8woLmXI+Uv0zrlcVryzaBEVBB8BbU/YWVYeSzedIvhHHqUI1Byh2QyM0bAdoRU9jIow26wmtmy1qTeY6mHd66LL6d9X+TwZx7aVu4rWWcc2L4Qy1QP49QF3vtAnw/cBavo99+d+zQKjG352ZwDkt0lPpH4YbW96/Ghb0VYCM8wC89lrPd9muCVgBZQzJNDe6D0httdnJQPHhkjHLvnWjc/gLOzlx9aOszpbxIRH4h+zJnWFMu/fYj7HFe8NzcimHN0heWL50c3vIK1EAnWvAGPcxYVx8AjB0UBuIjbt0jlkNcXZJDVpNqxdYzPdKLvodsTjMnS25ba/lGddf8zndb3/rcC+7cnTj/blEHIw2TgYBAwBi4ekUGkllV4aNrfNTWhsjng0Do/dQ1BY/Ct5Lrf9mr3eYc6noA/V0n2HXHmmzjvDjPqVlUaKptPraCXWVgdJdHyW8/0FaV4Le+Z0Ahel1aNc35sxaEf1Xb8GY+n69Ocl6/p1J6qXtd59tK4g41j6sp1fy7HidGBbv+K4o+te0RSy4r3yiDxVsVLpOBmI
+*/

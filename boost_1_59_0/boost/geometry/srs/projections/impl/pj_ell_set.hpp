@@ -3,8 +3,8 @@
 
 // Copyright (c) 2008-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
-// This file was modified by Oracle on 2017, 2018, 2019.
-// Modifications copyright (c) 2017-2019, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2017-2020.
+// Modifications copyright (c) 2017-2020, Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
@@ -42,8 +42,10 @@
 #define BOOST_GEOMETRY_PROJECTIONS_IMPL_PJ_ELL_SET_HPP
 
 #include <string>
+#include <type_traits>
 #include <vector>
 
+#include <boost/geometry/core/static_assert.hpp>
 #include <boost/geometry/formulas/eccentricity_sqr.hpp>
 #include <boost/geometry/util/math.hpp>
 
@@ -166,18 +168,18 @@ template
             Params,
             srs::spar::detail::is_param_tr<srs::spar::detail::ellps_traits>::pred
         >::value,
-    int N = boost::tuples::length<Params>::value
+    int N = geometry::tuples::size<Params>::value
 >
 struct pj_ell_init_ellps_static
 {
     template <typename T>
     static bool apply(Params const& params, T &a, T &b)
     {
-        typedef typename boost::tuples::element<I, Params>::type param_type;
+        typedef typename geometry::tuples::element<I, Params>::type param_type;
         typedef srs::spar::detail::ellps_traits<param_type> traits_type;
         typedef typename traits_type::template model_type<T>::type model_type;
 
-        param_type const& param = boost::tuples::get<I>(params);
+        param_type const& param = geometry::tuples::get<I>(params);
         model_type const& model = traits_type::template model<T>(param);
 
         a = geometry::get_radius<0>(model);
@@ -196,13 +198,13 @@ struct pj_ell_init_ellps_static<Params, N, N>
     }
 };
 
-template <typename T, BOOST_GEOMETRY_PROJECTIONS_DETAIL_TYPENAME_PX>
-inline bool pj_ell_init_ellps(srs::spar::parameters<BOOST_GEOMETRY_PROJECTIONS_DETAIL_PX> const& params,
+template <typename T, typename ...Ps>
+inline bool pj_ell_init_ellps(srs::spar::parameters<Ps...> const& params,
                               T &a, T &b)
 {
     return pj_ell_init_ellps_static
         <
-            srs::spar::parameters<BOOST_GEOMETRY_PROJECTIONS_DETAIL_PX>
+            srs::spar::parameters<Ps...>
         >::apply(params, a, b);
 }
 
@@ -361,7 +363,7 @@ inline void pj_ell_init(Params const& params, T &a, T &es)
 template <typename Params>
 struct static_srs_tag_check_nonexpanded
 {
-    typedef typename boost::mpl::if_c
+    typedef std::conditional_t
         <
             geometry::tuples::exists_if
                 <
@@ -398,7 +400,7 @@ struct static_srs_tag_check_nonexpanded
             srs_sphere_tag,
             // NOTE: The assumption here is that if the user defines either one of:
             // b, es, e, f, rf parameters then he wants to define spheroid, not sphere
-            typename boost::mpl::if_c
+            std::conditional_t
                 <
                     geometry::tuples::exists_if
                         <
@@ -422,8 +424,8 @@ struct static_srs_tag_check_nonexpanded
                         >::value,
                     srs_spheroid_tag,
                     void
-                >::type
-        >::type type;
+                >
+        > type;
 };
 
 template <typename Params>
@@ -504,7 +506,7 @@ struct static_srs_tag<Params, void, void, void>
 {
     // User didn't pass any parameter defining model
     // so use default or generate error
-    typedef typename boost::mpl::if_c
+    typedef std::conditional_t
         <
             geometry::tuples::exists_if
                 <
@@ -512,10 +514,12 @@ struct static_srs_tag<Params, void, void, void>
                 >::value,
             void,
             srs_spheroid_tag // WGS84
-        >::type type;
+        > type;
 
-    static const bool is_found = ! boost::is_same<type, void>::value;
-    BOOST_MPL_ASSERT_MSG((is_found), UNKNOWN_ELLP_PARAM, (Params));
+    static const bool is_found = ! std::is_void<type>::value;
+    BOOST_GEOMETRY_STATIC_ASSERT((is_found),
+        "Expected ellipsoid or sphere definition.",
+        Params);
 };
 
 
@@ -595,3 +599,7 @@ inline void pj_calc_ellipsoid_params(parameters<T> & p, T const& a, T const& es)
 }}} // namespace boost::geometry::projections
 
 #endif // BOOST_GEOMETRY_PROJECTIONS_IMPL_PJ_ELL_SET_HPP
+
+/* pj_ell_set.hpp
+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
+*/

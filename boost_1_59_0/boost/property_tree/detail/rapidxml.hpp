@@ -12,8 +12,9 @@
 
 //! \file rapidxml.hpp This file contains rapidxml parser and DOM implementation
 
+#include <boost/config.hpp>
 #include <boost/assert.hpp>
-#include <cstdlib>      // For std::size_t
+#include <cstddef>      // For std::size_t
 #include <new>          // For placement new
 
 // On MSVC, disable "conditional expression is constant" warning (level 4). 
@@ -58,7 +59,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
 
         //! Gets human readable description of error.
         //! \return Pointer to null terminated description of the error.
-        virtual const char *what() const throw()
+        const char *what() const throw() BOOST_OVERRIDE
         {
             return m_what;
         }
@@ -138,7 +139,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
 
     //! Parse flag instructing the parser to not use text of first data node as a value of parent element.
     //! Can be combined with other flags by use of | operator.
-    //! Note that child data nodes of element node take precendence over its value when printing. 
+    //! Note that child data nodes of element node take precedence over its value when printing.
     //! That is, if element has one or more child data nodes <em>and</em> a value, the value will be ignored.
     //! Use rapidxml::parse_no_data_nodes flag to prevent creation of data nodes if you want to manipulate data using values of elements.
     //! <br><br>
@@ -334,7 +335,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
     //! you are encouraged to use memory_pool of relevant xml_document to allocate the memory. 
     //! Not only is this faster than allocating them by using <code>new</code> operator, 
     //! but also their lifetime will be tied to the lifetime of document, 
-    //! possibly simplyfing memory management. 
+    //! possibly simplifying memory management.
     //! <br><br>
     //! Call allocate_node() or allocate_attribute() functions to obtain new nodes or attributes from the pool. 
     //! You can also call allocate_string() function to allocate strings.
@@ -391,7 +392,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
         }
 
         //! Allocates a new node from the pool, and optionally assigns name and value to it. 
-        //! If the allocation request cannot be accomodated, this function will throw <code>std::bad_alloc</code>.
+        //! If the allocation request cannot be accommodated, this function will throw <code>std::bad_alloc</code>.
         //! If exceptions are disabled by defining RAPIDXML_NO_EXCEPTIONS, this function
         //! will call rapidxml::parse_error_handler() function.
         //! \param type Type of node to create.
@@ -424,7 +425,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
         }
 
         //! Allocates a new attribute from the pool, and optionally assigns name and value to it.
-        //! If the allocation request cannot be accomodated, this function will throw <code>std::bad_alloc</code>.
+        //! If the allocation request cannot be accommodated, this function will throw <code>std::bad_alloc</code>.
         //! If exceptions are disabled by defining RAPIDXML_NO_EXCEPTIONS, this function
         //! will call rapidxml::parse_error_handler() function.
         //! \param name Name to assign to the attribute, or 0 to assign no name.
@@ -455,7 +456,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
         }
 
         //! Allocates a char array of given size from the pool, and optionally copies a given string to it.
-        //! If the allocation request cannot be accomodated, this function will throw <code>std::bad_alloc</code>.
+        //! If the allocation request cannot be accommodated, this function will throw <code>std::bad_alloc</code>.
         //! If exceptions are disabled by defining RAPIDXML_NO_EXCEPTIONS, this function
         //! will call rapidxml::parse_error_handler() function.
         //! \param source String to initialize the allocated memory with, or 0 to not initialize it.
@@ -694,7 +695,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
         //! <br><br>
         //! Note that node does not own its name or value, it only stores a pointer to it. 
         //! It will not delete or otherwise free the pointer on destruction.
-        //! It is reponsibility of the user to properly manage lifetime of the string.
+        //! It is responsibility of the user to properly manage lifetime of the string.
         //! The easiest way to achieve it is to use memory_pool of the document to allocate the string -
         //! on destruction of the document the string will be automatically freed.
         //! <br><br>
@@ -721,7 +722,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
         //! <br><br>
         //! Note that node does not own its name or value, it only stores a pointer to it. 
         //! It will not delete or otherwise free the pointer on destruction.
-        //! It is reponsibility of the user to properly manage lifetime of the string.
+        //! It is responsibility of the user to properly manage lifetime of the string.
         //! The easiest way to achieve it is to use memory_pool of the document to allocate the string -
         //! on destruction of the document the string will be automatically freed.
         //! <br><br>
@@ -730,7 +731,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
         //! <br><br>
         //! If an element has a child node of type node_data, it will take precedence over element value when printing.
         //! If you want to manipulate data of elements using values, use parser flag rapidxml::parse_no_data_nodes to prevent creation of data nodes by the parser.
-        //! \param val value of node to set. Does not have to be zero terminated.
+        //! \param val Value of node to set. Does not have to be zero terminated.
         //! \param size Size of value, in characters. This does not include zero terminator, if one is present.
         void value(const Ch *val, std::size_t size)
         {
@@ -740,7 +741,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
 
         //! Sets value of node to a zero-terminated string.
         //! See also \ref ownership_of_strings and xml_node::value(const Ch *, std::size_t).
-        //! \param val Vame of node to set. Must be zero terminated.
+        //! \param val Name of node to set. Must be zero terminated.
         void value(const Ch *val)
         {
             this->value(val, internal::measure(val));
@@ -1311,7 +1312,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
     
         // Note that some of the pointers below have UNDEFINED values if certain other pointers are 0.
         // This is required for maximum performance, as it allows the parser to omit initialization of 
-        // unneded/redundant values.
+        // unneeded/redundant values.
         //
         // The rules are as follows:
         // 1. first_node and first_attribute contain valid pointers, or 0 if node has no children/attributes respectively
@@ -1374,7 +1375,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
             parse_bom<Flags>(text);
             
             // Parse children
-            while (1)
+            while (true)
             {
                 // Skip whitespace before node
                 skip<whitespace_pred, Flags>(text);
@@ -1636,7 +1637,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
                             {
                                 unsigned long code = 0;
                                 src += 3;   // Skip &#x
-                                while (1)
+                                while (true)
                                 {
                                     unsigned char digit = internal::lookup_tables<0>::lookup_digits[static_cast<unsigned char>(*src)];
                                     if (digit == 0xFF)
@@ -1650,7 +1651,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
                             {
                                 unsigned long code = 0;
                                 src += 2;   // Skip &#
-                                while (1)
+                                while (true)
                                 {
                                     unsigned char digit = internal::lookup_tables<0>::lookup_digits[static_cast<unsigned char>(*src)];
                                     if (digit == 0xFF)
@@ -2165,7 +2166,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
         void parse_node_contents(Ch *&text, xml_node<Ch> *node)
         {
             // For all children and text
-            while (1)
+            while (true)
             {
                 // Skip whitespace between > and node contents
                 Ch *contents_start = text;      // Store start of node contents before whitespace is skipped
@@ -2395,7 +2396,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
              1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1   // F
         };
 
-        // Text (i.e. PCDATA) that does not require processing when ws normalizationis is enabled
+        // Text (i.e. PCDATA) that does not require processing when ws normalizations is enabled
         // (anything but < \0 & space \n \r \t)
         template<int Dummy>
         const unsigned char lookup_tables<Dummy>::lookup_text_pure_with_ws[256] = 
@@ -2593,3 +2594,7 @@ namespace boost { namespace property_tree { namespace detail {namespace rapidxml
 #endif
 
 #endif
+
+/* rapidxml.hpp
+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
+*/

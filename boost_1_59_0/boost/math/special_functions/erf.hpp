@@ -70,23 +70,23 @@ inline float erf_asymptotic_limit_N(const T&)
 {
    return (std::numeric_limits<float>::max)();
 }
-inline float erf_asymptotic_limit_N(const boost::integral_constant<int, 24>&)
+inline float erf_asymptotic_limit_N(const std::integral_constant<int, 24>&)
 {
    return 2.8F;
 }
-inline float erf_asymptotic_limit_N(const boost::integral_constant<int, 53>&)
+inline float erf_asymptotic_limit_N(const std::integral_constant<int, 53>&)
 {
    return 4.3F;
 }
-inline float erf_asymptotic_limit_N(const boost::integral_constant<int, 64>&)
+inline float erf_asymptotic_limit_N(const std::integral_constant<int, 64>&)
 {
    return 4.8F;
 }
-inline float erf_asymptotic_limit_N(const boost::integral_constant<int, 106>&)
+inline float erf_asymptotic_limit_N(const std::integral_constant<int, 106>&)
 {
    return 6.5F;
 }
-inline float erf_asymptotic_limit_N(const boost::integral_constant<int, 113>&)
+inline float erf_asymptotic_limit_N(const std::integral_constant<int, 113>&)
 {
    return 6.8F;
 }
@@ -95,7 +95,7 @@ template <class T, class Policy>
 inline T erf_asymptotic_limit()
 {
    typedef typename policies::precision<T, Policy>::type precision_type;
-   typedef boost::integral_constant<int,
+   typedef std::integral_constant<int,
       precision_type::value <= 0 ? 0 :
       precision_type::value <= 24 ? 24 :
       precision_type::value <= 53 ? 53 :
@@ -103,6 +103,37 @@ inline T erf_asymptotic_limit()
       precision_type::value <= 113 ? 113 : 0
    > tag_type;
    return erf_asymptotic_limit_N(tag_type());
+}
+
+template <class T>
+struct erf_series_near_zero
+{
+   typedef T result_type;
+   T         term;
+   T         zz;
+   int       k;
+   erf_series_near_zero(const T& z) : term(z), zz(-z * z), k(0) {}
+
+   T operator()()
+   {
+      T result = term / (2 * k + 1);
+      term *= zz / ++k;
+      return result;
+   }
+};
+
+template <class T, class Policy>
+T erf_series_near_zero_sum(const T& x, const Policy& pol)
+{
+   //
+   // We need Kahan summation here, otherwise the errors grow fairly quickly.
+   // This method is *much* faster than the alternatives even so.
+   //
+   erf_series_near_zero<T> sum(x);
+   std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
+   T result = constants::two_div_root_pi<T>() * tools::kahan_sum_series(sum, tools::digits<T>(), max_iter);
+   policies::check_series_iterations<T>("boost::math::erf<%1%>(%1%, %1%)", max_iter, pol);
+   return result;
 }
 
 template <class T, class Policy, class Tag>
@@ -125,27 +156,19 @@ T erf_imp(T z, bool invert, const Policy& pol, const Tag& t)
    if(!invert && (z > detail::erf_asymptotic_limit<T, Policy>()))
    {
       detail::erf_asympt_series_t<T> s(z);
-      boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
+      std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
       result = boost::math::tools::sum_series(s, policies::get_epsilon<T, Policy>(), max_iter, 1);
       policies::check_series_iterations<T>("boost::math::erf<%1%>(%1%, %1%)", max_iter, pol);
    }
    else
    {
       T x = z * z;
-      if(x < 0.6)
+      if(z < 1.3f)
       {
          // Compute P:
-         result = z * exp(-x);
-         result /= sqrt(boost::math::constants::pi<T>());
-         if(result != 0)
-            result *= 2 * detail::lower_gamma_series(T(0.5f), x, pol);
-      }
-      else if(x < 1.1f)
-      {
-         // Compute Q:
-         invert = !invert;
-         result = tgamma_small_upper_part(T(0.5f), x, pol);
-         result /= sqrt(boost::math::constants::pi<T>());
+         // This is actually good for z p to 2 or so, but the cutoff given seems
+         // to be the best compromise.  Performance wise, this is way quicker than anything else...
+         result = erf_series_near_zero_sum(z, pol);
       }
       else if(x > 1 / tools::epsilon<T>())
       {
@@ -168,7 +191,7 @@ T erf_imp(T z, bool invert, const Policy& pol, const Tag& t)
 }
 
 template <class T, class Policy>
-T erf_imp(T z, bool invert, const Policy& pol, const boost::integral_constant<int, 53>& t)
+T erf_imp(T z, bool invert, const Policy& pol, const std::integral_constant<int, 53>& t)
 {
    BOOST_MATH_STD_USING
 
@@ -237,7 +260,7 @@ T erf_imp(T z, bool invert, const Policy& pol, const boost::integral_constant<in
          result = z * (Y + tools::evaluate_polynomial(P, zz) / tools::evaluate_polynomial(Q, zz));
       }
    }
-   else if(invert ? (z < 28) : (z < 5.8f))
+   else if(invert ? (z < 28) : (z < 5.93f))
    {
       //
       // We'll be calculating erfc:
@@ -393,11 +416,11 @@ T erf_imp(T z, bool invert, const Policy& pol, const boost::integral_constant<in
    }
 
    return result;
-} // template <class T, class Lanczos>T erf_imp(T z, bool invert, const Lanczos& l, const boost::integral_constant<int, 53>& t)
+} // template <class T, class Lanczos>T erf_imp(T z, bool invert, const Lanczos& l, const std::integral_constant<int, 53>& t)
 
 
 template <class T, class Policy>
-T erf_imp(T z, bool invert, const Policy& pol, const boost::integral_constant<int, 64>& t)
+T erf_imp(T z, bool invert, const Policy& pol, const std::integral_constant<int, 64>& t)
 {
    BOOST_MATH_STD_USING
 
@@ -460,7 +483,7 @@ T erf_imp(T z, bool invert, const Policy& pol, const boost::integral_constant<in
          result = z * (Y + tools::evaluate_polynomial(P, T(z * z)) / tools::evaluate_polynomial(Q, T(z * z)));
       }
    }
-   else if(invert ? (z < 110) : (z < 6.4f))
+   else if(invert ? (z < 110) : (z < 6.6f))
    {
       //
       // We'll be calculating erfc:
@@ -627,11 +650,11 @@ T erf_imp(T z, bool invert, const Policy& pol, const boost::integral_constant<in
    }
 
    return result;
-} // template <class T, class Lanczos>T erf_imp(T z, bool invert, const Lanczos& l, const boost::integral_constant<int, 64>& t)
+} // template <class T, class Lanczos>T erf_imp(T z, bool invert, const Lanczos& l, const std::integral_constant<int, 64>& t)
 
 
 template <class T, class Policy>
-T erf_imp(T z, bool invert, const Policy& pol, const boost::integral_constant<int, 113>& t)
+T erf_imp(T z, bool invert, const Policy& pol, const std::integral_constant<int, 113>& t)
 {
    BOOST_MATH_STD_USING
 
@@ -1095,7 +1118,7 @@ T erf_imp(T z, bool invert, const Policy& pol, const boost::integral_constant<in
    }
 
    return result;
-} // template <class T, class Lanczos>T erf_imp(T z, bool invert, const Lanczos& l, const boost::integral_constant<int, 113>& t)
+} // template <class T, class Lanczos>T erf_imp(T z, bool invert, const Lanczos& l, const std::integral_constant<int, 113>& t)
 
 template <class T, class Policy, class tag>
 struct erf_initializer
@@ -1106,8 +1129,8 @@ struct erf_initializer
       {
          do_init(tag());
       }
-      static void do_init(const boost::integral_constant<int, 0>&){}
-      static void do_init(const boost::integral_constant<int, 53>&)
+      static void do_init(const std::integral_constant<int, 0>&){}
+      static void do_init(const std::integral_constant<int, 53>&)
       {
          boost::math::erf(static_cast<T>(1e-12), Policy());
          boost::math::erf(static_cast<T>(0.25), Policy());
@@ -1116,7 +1139,7 @@ struct erf_initializer
          boost::math::erf(static_cast<T>(4.25), Policy());
          boost::math::erf(static_cast<T>(5.25), Policy());
       }
-      static void do_init(const boost::integral_constant<int, 64>&)
+      static void do_init(const std::integral_constant<int, 64>&)
       {
          boost::math::erf(static_cast<T>(1e-12), Policy());
          boost::math::erf(static_cast<T>(0.25), Policy());
@@ -1125,7 +1148,7 @@ struct erf_initializer
          boost::math::erf(static_cast<T>(4.25), Policy());
          boost::math::erf(static_cast<T>(5.25), Policy());
       }
-      static void do_init(const boost::integral_constant<int, 113>&)
+      static void do_init(const std::integral_constant<int, 113>&)
       {
          boost::math::erf(static_cast<T>(1e-22), Policy());
          boost::math::erf(static_cast<T>(0.25), Policy());
@@ -1169,7 +1192,7 @@ inline typename tools::promote_args<T>::type erf(T z, const Policy& /* pol */)
    BOOST_MATH_INSTRUMENT_CODE("value_type = " << typeid(value_type).name());
    BOOST_MATH_INSTRUMENT_CODE("precision_type = " << typeid(precision_type).name());
 
-   typedef boost::integral_constant<int,
+   typedef std::integral_constant<int,
       precision_type::value <= 0 ? 0 :
       precision_type::value <= 53 ? 53 :
       precision_type::value <= 64 ? 64 :
@@ -1204,7 +1227,7 @@ inline typename tools::promote_args<T>::type erfc(T z, const Policy& /* pol */)
    BOOST_MATH_INSTRUMENT_CODE("value_type = " << typeid(value_type).name());
    BOOST_MATH_INSTRUMENT_CODE("precision_type = " << typeid(precision_type).name());
 
-   typedef boost::integral_constant<int,
+   typedef std::integral_constant<int,
       precision_type::value <= 0 ? 0 :
       precision_type::value <= 53 ? 53 :
       precision_type::value <= 64 ? 64 :
@@ -1244,3 +1267,7 @@ inline typename tools::promote_args<T>::type erfc(T z)
 
 
 
+
+/* erf.hpp
+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
+*/

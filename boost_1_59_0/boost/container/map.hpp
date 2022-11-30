@@ -121,7 +121,7 @@ class map
    typedef typename BOOST_CONTAINER_IMPDEF(base_t::const_iterator)                        const_iterator;
    typedef typename BOOST_CONTAINER_IMPDEF(base_t::reverse_iterator)                      reverse_iterator;
    typedef typename BOOST_CONTAINER_IMPDEF(base_t::const_reverse_iterator)                const_reverse_iterator;
-   typedef std::pair<key_type, mapped_type>                                               nonconst_value_type;
+   //typedef std::pair<key_type, mapped_type>                                               nonconst_value_type;
    typedef BOOST_CONTAINER_IMPDEF(movable_value_type_impl)                                movable_value_type;
    typedef BOOST_CONTAINER_IMPDEF(node_handle<
       typename base_t::stored_allocator_type
@@ -664,7 +664,7 @@ class map
    //! <b>Returns</b>: A reference to the element whose key is equivalent to x.
    //! Throws: An exception object of type out_of_range if no such element is present.
    //! <b>Complexity</b>: logarithmic.
-   const T& at(const key_type& k) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD const T& at(const key_type& k) const
    {
       const_iterator i = this->find(k);
       if(i == this->end()){
@@ -688,40 +688,7 @@ class map
    //!
    //! <b>Complexity</b>: Logarithmic.
    BOOST_CONTAINER_FORCEINLINE std::pair<iterator,bool> insert(const value_type& x)
-   { return this->base_t::insert_unique(x); }
-
-   //! <b>Effects</b>: Inserts a new value_type created from the pair if and only if
-   //! there is no element in the container  with key equivalent to the key of x.
-   //!
-   //! <b>Returns</b>: The bool component of the returned pair is true if and only
-   //!   if the insertion takes place, and the iterator component of the pair
-   //!   points to the element with key equivalent to the key of x.
-   //!
-   //! <b>Complexity</b>: Logarithmic.
-   BOOST_CONTAINER_FORCEINLINE std::pair<iterator,bool> insert(const nonconst_value_type& x)
-   { return this->try_emplace(x.first, x.second); }
-
-   //! <b>Effects</b>: Inserts a new value_type move constructed from the pair if and
-   //! only if there is no element in the container with key equivalent to the key of x.
-   //!
-   //! <b>Returns</b>: The bool component of the returned pair is true if and only
-   //!   if the insertion takes place, and the iterator component of the pair
-   //!   points to the element with key equivalent to the key of x.
-   //!
-   //! <b>Complexity</b>: Logarithmic.
-   BOOST_CONTAINER_FORCEINLINE std::pair<iterator,bool> insert(BOOST_RV_REF(nonconst_value_type) x)
-   { return this->try_emplace(boost::move(x.first), boost::move(x.second)); }
-
-   //! <b>Effects</b>: Inserts a new value_type move constructed from the pair if and
-   //! only if there is no element in the container with key equivalent to the key of x.
-   //!
-   //! <b>Returns</b>: The bool component of the returned pair is true if and only
-   //!   if the insertion takes place, and the iterator component of the pair
-   //!   points to the element with key equivalent to the key of x.
-   //!
-   //! <b>Complexity</b>: Logarithmic.
-   BOOST_CONTAINER_FORCEINLINE std::pair<iterator,bool> insert(BOOST_RV_REF(movable_value_type) x)
-   { return this->try_emplace(boost::move(x.first), boost::move(x.second)); }
+   { return this->base_t::insert_unique_convertible(x); }
 
    //! <b>Effects</b>: Move constructs a new value from x if and only if there is
    //!   no element in the container with key equivalent to the key of x.
@@ -732,7 +699,28 @@ class map
    //!
    //! <b>Complexity</b>: Logarithmic.
    BOOST_CONTAINER_FORCEINLINE std::pair<iterator,bool> insert(BOOST_RV_REF(value_type) x)
-   { return this->base_t::insert_unique(boost::move(x)); }
+   { return this->base_t::insert_unique_convertible(boost::move(x)); }
+
+   //! <b>Effects</b>: Inserts a new value_type created from the pair if and only if
+   //! there is no element in the container  with key equivalent to the key of x.
+   //!
+   //! <b>Returns</b>: The bool component of the returned pair is true if and only
+   //!   if the insertion takes place, and the iterator component of the pair
+   //!   points to the element with key equivalent to the key of x.
+   //!
+   //! <b>Complexity</b>: Logarithmic.
+   template <class Pair>
+   BOOST_CONTAINER_FORCEINLINE BOOST_CONTAINER_DOC1ST
+         ( std::pair<iterator BOOST_MOVE_I bool>
+         , typename dtl::enable_if_c<
+               dtl::is_convertible<Pair BOOST_MOVE_I value_type>::value ||
+               dtl::is_convertible<Pair BOOST_MOVE_I movable_value_type>::value
+            BOOST_MOVE_I std::pair<iterator BOOST_MOVE_I bool> >::type)
+      insert(BOOST_FWD_REF(Pair) x)
+   {  return this->base_t::emplace_unique(boost::forward<Pair>(x)); }
+
+   BOOST_CONTAINER_FORCEINLINE iterator insert(const_iterator p, const value_type& x)
+   { return this->base_t::insert_unique_hint_convertible(p, x); }
 
    //! <b>Effects</b>: Inserts a copy of x in the container if and only if there is
    //!   no element in the container with key equivalent to the key of x.
@@ -743,9 +731,30 @@ class map
    //!
    //! <b>Complexity</b>: Logarithmic in general, but amortized constant if t
    //!   is inserted right before p.
-   BOOST_CONTAINER_FORCEINLINE iterator insert(const_iterator p, const value_type& x)
-   { return this->base_t::insert_unique(p, x); }
+   BOOST_CONTAINER_FORCEINLINE iterator insert(const_iterator p, BOOST_RV_REF(value_type) x)
+   { return this->base_t::insert_unique_hint_convertible(p, boost::move(x)); }
 
+   //! <b>Effects</b>: Inserts a copy of x in the container if and only if there is
+   //!   no element in the container with key equivalent to the key of x.
+   //!   p is a hint pointing to where the insert should start to search.
+   //!
+   //! <b>Returns</b>: An iterator pointing to the element with key equivalent
+   //!   to the key of x.
+   //!
+   //! <b>Complexity</b>: Logarithmic in general, but amortized constant if t
+   //!   is inserted right before p.
+   template <class Pair>
+   BOOST_CONTAINER_FORCEINLINE BOOST_CONTAINER_DOC1ST
+         ( iterator
+         , typename dtl::enable_if_c<
+            dtl::is_convertible<Pair BOOST_MOVE_I value_type>::value  ||
+            dtl::is_convertible<Pair BOOST_MOVE_I movable_value_type>::value
+            BOOST_MOVE_I iterator >::type)
+      insert(const_iterator p, BOOST_FWD_REF(Pair) x)
+   {  return this->base_t::emplace_hint_unique(p, boost::forward<Pair>(x));  }
+
+
+/*
    //! <b>Effects</b>: Move constructs a new value from x if and only if there is
    //!   no element in the container with key equivalent to the key of x.
    //!   p is a hint pointing to where the insert should start to search.
@@ -776,18 +785,11 @@ class map
    //! <b>Returns</b>: An iterator pointing to the element with key equivalent to the key of x.
    //!
    //! <b>Complexity</b>: Logarithmic.
-   iterator insert(const_iterator p, const nonconst_value_type& x)
+   BOOST_CONTAINER_FORCEINLINE iterator insert(const_iterator p, const nonconst_value_type& x)
    { return this->try_emplace(p, x.first, x.second); }
 
-   //! <b>Effects</b>: Inserts an element move constructed from x in the container.
-   //!   p is a hint pointing to where the insert should start to search.
-   //!
-   //! <b>Returns</b>: An iterator pointing to the element with key equivalent to the key of x.
-   //!
-   //! <b>Complexity</b>: Logarithmic.
-   BOOST_CONTAINER_FORCEINLINE iterator insert(const_iterator p, BOOST_RV_REF(value_type) x)
-   { return this->base_t::insert_unique(p, boost::move(x)); }
 
+*/
    //! <b>Requires</b>: first, last are not iterators into *this.
    //!
    //! <b>Effects</b>: inserts each element from the range [first,last) if and only
@@ -796,7 +798,7 @@ class map
    //! <b>Complexity</b>: At most N log(size()+N) (N is the distance from first to last)
    template <class InputIterator>
    BOOST_CONTAINER_FORCEINLINE void insert(InputIterator first, InputIterator last)
-   {  this->base_t::insert_unique(first, last);  }
+   {  this->base_t::insert_unique_range(first, last);  }
 
 #if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
    //! <b>Effects</b>: inserts each element from the range [il.begin(), il.end()) if and only
@@ -804,7 +806,7 @@ class map
    //!
    //! <b>Complexity</b>: At most N log(size()+N) (N is the distance from il.begin() to il.end())
    BOOST_CONTAINER_FORCEINLINE void insert(std::initializer_list<value_type> il)
-   {  this->base_t::insert_unique(il.begin(), il.end()); }
+   {  this->base_t::insert_unique_range(il.begin(), il.end()); }
 #endif
 
    //! <b>Requires</b>: nh is empty or this->get_allocator() == nh.get_allocator().
@@ -962,6 +964,14 @@ class map
 
    #endif   // !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
 
+   //! <b>Effects</b>: If present, erases the element in the container with key equivalent to x.
+   //!
+   //! <b>Returns</b>: Returns the number of erased elements (0/1).
+   //!
+   //! <b>Complexity</b>: log(size()) + count(k)
+   BOOST_CONTAINER_FORCEINLINE size_type erase(const key_type& x)
+      { return this->base_t::erase_unique(x); }
+
    #if defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
 
    //! <b>Effects</b>: Erases the element pointed to by p.
@@ -973,13 +983,6 @@ class map
    //! <b>Complexity</b>: Amortized constant time
    iterator erase(const_iterator p) BOOST_NOEXCEPT_OR_NOTHROW;
 
-   //! <b>Effects</b>: Erases all elements in the container with key equivalent to x.
-   //!
-   //! <b>Returns</b>: Returns the number of erased elements.
-   //!
-   //! <b>Complexity</b>: log(size()) + count(k)
-   size_type erase(const key_type& x) BOOST_NOEXCEPT_OR_NOTHROW;
-
    //! <b>Effects</b>: Erases all the elements in the range [first, last).
    //!
    //! <b>Returns</b>: Returns last.
@@ -987,7 +990,9 @@ class map
    //! <b>Complexity</b>: log(size())+N where N is the distance from first to last.
    iterator erase(const_iterator first, const_iterator last) BOOST_NOEXCEPT_OR_NOTHROW;
 
-   #endif
+   #else
+   using base_t::erase;
+   #endif   //   #if defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
 
    //! <b>Effects</b>: Removes the first element in the container with key equivalent to k.
    //!
@@ -1062,7 +1067,7 @@ class map
    //! <b>Complexity</b>: Constant.
    void swap(map& x)
       BOOST_NOEXCEPT_IF(  allocator_traits_type::is_always_equal::value
-                                 && boost::container::dtl::is_nothrow_swappable<Compare>::value )
+                                 && boost::container::dtl::is_nothrow_swappable<Compare>::value );
 
    //! <b>Effects</b>: erase(begin(),end()).
    //!
@@ -1120,7 +1125,8 @@ class map
    //! <b>Returns</b>: The number of elements with key equivalent to x.
    //!
    //! <b>Complexity</b>: log(size())+count(k)
-   BOOST_CONTAINER_FORCEINLINE size_type count(const key_type& x) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      size_type count(const key_type& x) const
    {  return static_cast<size_type>(this->find(x) != this->cend());  }
 
    //! <b>Requires</b>: This overload is available only if
@@ -1130,7 +1136,8 @@ class map
    //!
    //! <b>Complexity</b>: log(size())+count(k)
    template<typename K>
-   BOOST_CONTAINER_FORCEINLINE size_type count(const K& x) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      size_type count(const K& x) const
    {  return static_cast<size_type>(this->find(x) != this->cend());  }
 
    #if defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
@@ -1281,7 +1288,9 @@ class map
    //! <b>Effects</b>: x.swap(y)
    //!
    //! <b>Complexity</b>: Constant.
-   friend void swap(map& x, map& y);
+   friend void swap(map& x, map& y)
+      BOOST_NOEXCEPT_IF(  allocator_traits_type::is_always_equal::value
+                                 && boost::container::dtl::is_nothrow_swappable<Compare>::value );
 
    #endif   //#if defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
 
@@ -1444,7 +1453,7 @@ class multimap
    typedef typename BOOST_CONTAINER_IMPDEF(base_t::const_iterator)                        const_iterator;
    typedef typename BOOST_CONTAINER_IMPDEF(base_t::reverse_iterator)                      reverse_iterator;
    typedef typename BOOST_CONTAINER_IMPDEF(base_t::const_reverse_iterator)                const_reverse_iterator;
-   typedef std::pair<key_type, mapped_type>                                               nonconst_value_type;
+   //typedef std::pair<key_type, mapped_type>                                               nonconst_value_type;
    typedef BOOST_CONTAINER_IMPDEF(movable_value_type_impl)                                movable_value_type;
    typedef BOOST_CONTAINER_IMPDEF(node_handle<
       typename base_t::stored_allocator_type
@@ -1834,28 +1843,28 @@ class multimap
    //!
    //! <b>Complexity</b>: Logarithmic.
    BOOST_CONTAINER_FORCEINLINE iterator insert(const value_type& x)
-   { return this->base_t::insert_equal(x); }
+   { return this->base_t::insert_equal_convertible(x); }
+
+   //! <b>Effects</b>: Inserts a new value move-constructed from x and returns
+   //!   the iterator pointing to the newly inserted element.
+   //!
+   //! <b>Complexity</b>: Logarithmic.
+   BOOST_CONTAINER_FORCEINLINE iterator insert(BOOST_RV_REF(value_type) x)
+   { return this->base_t::insert_equal_convertible(boost::move(x)); }
 
    //! <b>Effects</b>: Inserts a new value constructed from x and returns
    //!   the iterator pointing to the newly inserted element.
    //!
    //! <b>Complexity</b>: Logarithmic.
-   BOOST_CONTAINER_FORCEINLINE iterator insert(const nonconst_value_type& x)
-   { return this->base_t::emplace_equal(x); }
-
-   //! <b>Effects</b>: Inserts a new value move-constructed from x and returns
-   //!   the iterator pointing to the newly inserted element.
-   //!
-   //! <b>Complexity</b>: Logarithmic.
-   BOOST_CONTAINER_FORCEINLINE iterator insert(BOOST_RV_REF(nonconst_value_type) x)
-   { return this->base_t::emplace_equal(boost::move(x)); }
-
-   //! <b>Effects</b>: Inserts a new value move-constructed from x and returns
-   //!   the iterator pointing to the newly inserted element.
-   //!
-   //! <b>Complexity</b>: Logarithmic.
-   iterator insert(BOOST_RV_REF(movable_value_type) x)
-   { return this->base_t::emplace_equal(boost::move(x)); }
+   template<class Pair>
+   BOOST_CONTAINER_FORCEINLINE BOOST_CONTAINER_DOC1ST
+         ( iterator
+         , typename dtl::enable_if_c<
+            dtl::is_convertible<Pair BOOST_MOVE_I value_type>::value  ||
+            dtl::is_convertible<Pair BOOST_MOVE_I movable_value_type>::value
+            BOOST_MOVE_I iterator >::type)
+      insert(BOOST_FWD_REF(Pair) x)
+   { return this->base_t::emplace_equal(boost::forward<Pair>(x)); }
 
    //! <b>Effects</b>: Inserts a copy of x in the container.
    //!   p is a hint pointing to where the insert should start to search.
@@ -1866,29 +1875,7 @@ class multimap
    //! <b>Complexity</b>: Logarithmic in general, but amortized constant if t
    //!   is inserted right before p.
    BOOST_CONTAINER_FORCEINLINE iterator insert(const_iterator p, const value_type& x)
-   { return this->base_t::insert_equal(p, x); }
-
-   //! <b>Effects</b>: Inserts a new value constructed from x in the container.
-   //!   p is a hint pointing to where the insert should start to search.
-   //!
-   //! <b>Returns</b>: An iterator pointing to the element with key equivalent
-   //!   to the key of x.
-   //!
-   //! <b>Complexity</b>: Logarithmic in general, but amortized constant if t
-   //!   is inserted right before p.
-   BOOST_CONTAINER_FORCEINLINE iterator insert(const_iterator p, const nonconst_value_type& x)
-   { return this->base_t::emplace_hint_equal(p, x); }
-
-   //! <b>Effects</b>: Inserts a new value move constructed from x in the container.
-   //!   p is a hint pointing to where the insert should start to search.
-   //!
-   //! <b>Returns</b>: An iterator pointing to the element with key equivalent
-   //!   to the key of x.
-   //!
-   //! <b>Complexity</b>: Logarithmic in general, but amortized constant if t
-   //!   is inserted right before p.
-   BOOST_CONTAINER_FORCEINLINE iterator insert(const_iterator p, BOOST_RV_REF(nonconst_value_type) x)
-   { return this->base_t::emplace_hint_equal(p, boost::move(x)); }
+   { return this->base_t::insert_equal_hint_convertible(p, x); }
 
    //! <b>Effects</b>: Inserts a new value move constructed from x in the container.
    //!   p is a hint pointing to where the insert should start to search.
@@ -1899,7 +1886,25 @@ class multimap
    //! <b>Complexity</b>: Logarithmic in general, but amortized constant if t
    //!   is inserted right before p.
    BOOST_CONTAINER_FORCEINLINE iterator insert(const_iterator p, BOOST_RV_REF(movable_value_type) x)
-   { return this->base_t::emplace_hint_equal(p, boost::move(x)); }
+   { return this->base_t::insert_equal_hint_convertible(p, boost::move(x)); }
+
+   //! <b>Effects</b>: Inserts a new value constructed from x in the container.
+   //!   p is a hint pointing to where the insert should start to search.
+   //!
+   //! <b>Returns</b>: An iterator pointing to the element with key equivalent
+   //!   to the key of x.
+   //!
+   //! <b>Complexity</b>: Logarithmic in general, but amortized constant if t
+   //!   is inserted right before p.
+   template<class Pair>
+   BOOST_CONTAINER_FORCEINLINE BOOST_CONTAINER_DOC1ST
+         ( iterator
+         , typename dtl::enable_if_c<
+            dtl::is_convertible<Pair BOOST_MOVE_I value_type>::value  ||
+            dtl::is_convertible<Pair BOOST_MOVE_I movable_value_type>::value
+            BOOST_MOVE_I iterator>::type)
+      insert(const_iterator p, BOOST_FWD_REF(Pair) x)
+   { return this->base_t::emplace_hint_equal(p, boost::forward<Pair>(x)); }
 
    //! <b>Requires</b>: first, last are not iterators into *this.
    //!
@@ -1908,14 +1913,14 @@ class multimap
    //! <b>Complexity</b>: At most N log(size()+N) (N is the distance from first to last)
    template <class InputIterator>
    BOOST_CONTAINER_FORCEINLINE void insert(InputIterator first, InputIterator last)
-   {  this->base_t::insert_equal(first, last); }
+   {  this->base_t::insert_equal_range(first, last); }
 
 #if !defined(BOOST_NO_CXX11_HDR_INITIALIZER_LIST)
    //! <b>Effects</b>: inserts each element from the range [il.begin(), il.end().
    //!
    //! <b>Complexity</b>: At most N log(size()+N) (N is the distance from il.begin() to il.end())
    BOOST_CONTAINER_FORCEINLINE void insert(std::initializer_list<value_type> il)
-   {  this->base_t::insert_equal(il.begin(), il.end()); }
+   {  this->base_t::insert_equal_range(il.begin(), il.end()); }
 #endif
 
    //! <b>Requires</b>: nh is empty or this->get_allocator() == nh.get_allocator().
@@ -2216,7 +2221,9 @@ class multimap
    //! <b>Effects</b>: x.swap(y)
    //!
    //! <b>Complexity</b>: Constant.
-   friend void swap(multimap& x, multimap& y);
+   friend void swap(multimap& x, multimap& y)
+      BOOST_NOEXCEPT_IF(  allocator_traits_type::is_always_equal::value
+                                 && boost::container::dtl::is_nothrow_swappable<Compare>::value );
 
    #endif   //#if defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
 };
@@ -2307,3 +2314,7 @@ namespace container {
 
 #endif   // BOOST_CONTAINER_MAP_HPP
 
+
+/* map.hpp
+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
+*/

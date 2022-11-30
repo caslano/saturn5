@@ -12,19 +12,13 @@
 #define BOOST_MATH_UNCHECKED_BERNOULLI_HPP
 
 #include <limits>
+#include <type_traits>
+#include <array>
 #include <cmath>
+#include <cstdint>
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/math_fwd.hpp>
-#include <boost/mpl/int.hpp>
-#include <boost/type_traits/is_convertible.hpp>
-
-#ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
-#include <array>
-#else
-#include <boost/array.hpp>
-#endif
-
 
 namespace boost { namespace math { 
    
@@ -33,51 +27,51 @@ namespace detail {
 template <unsigned N>
 struct max_bernoulli_index
 {
-   BOOST_STATIC_CONSTANT(unsigned, value = 17);
+   static constexpr unsigned value = 17;
 };
 
 template <>
 struct max_bernoulli_index<1>
 {
-   BOOST_STATIC_CONSTANT(unsigned, value = 32);
+   static constexpr unsigned value = 32;
 };
 
 template <>
 struct max_bernoulli_index<2>
 {
-   BOOST_STATIC_CONSTANT(unsigned, value = 129);
+   static constexpr unsigned value = 129;
 };
 
 template <>
 struct max_bernoulli_index<3>
 {
-   BOOST_STATIC_CONSTANT(unsigned, value = 1156);
+   static constexpr unsigned value = 1156;
 };
 
 template <>
 struct max_bernoulli_index<4>
 {
-   BOOST_STATIC_CONSTANT(unsigned, value = 11);
+   static constexpr unsigned value = 11;
 };
 
 template <class T>
 struct bernoulli_imp_variant
 {
-   static const unsigned value = 
+   static constexpr unsigned value = 
       (std::numeric_limits<T>::max_exponent == 128)
       && (std::numeric_limits<T>::radix == 2)
       && (std::numeric_limits<T>::digits <= std::numeric_limits<float>::digits)
-      && (boost::is_convertible<float, T>::value) ? 1 :
+      && (std::is_convertible<float, T>::value) ? 1 :
       (
          (std::numeric_limits<T>::max_exponent == 1024)
          && (std::numeric_limits<T>::radix == 2)
          && (std::numeric_limits<T>::digits <= std::numeric_limits<double>::digits)
-         && (boost::is_convertible<double, T>::value) ? 2 :
+         && (std::is_convertible<double, T>::value) ? 2 :
          (
             (std::numeric_limits<T>::max_exponent == 16384)
             && (std::numeric_limits<T>::radix == 2)
             && (std::numeric_limits<T>::digits <= std::numeric_limits<long double>::digits)
-            && (boost::is_convertible<long double, T>::value) ? 3 : (!is_convertible<boost::int64_t, T>::value ? 4 : 0)
+            && (std::is_convertible<long double, T>::value) ? 3 : (!std::is_convertible<std::int64_t, T>::value ? 4 : 0)
          )
       );
 };
@@ -90,69 +84,69 @@ struct max_bernoulli_b2n : public detail::max_bernoulli_index<detail::bernoulli_
 namespace detail{
 
 template <class T>
-inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION T unchecked_bernoulli_imp(std::size_t n, const boost::integral_constant<int, 0>& )
+inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION T unchecked_bernoulli_imp(std::size_t n, const std::integral_constant<int, 0>& )
 {
 #ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
-   constexpr std::array<boost::int64_t, 1 + max_bernoulli_b2n<T>::value> numerators =
+   constexpr std::array<std::int64_t, 1 + max_bernoulli_b2n<T>::value> numerators =
 #else
-   static const boost::array<boost::int64_t, 1 + max_bernoulli_b2n<T>::value> numerators =
+   static const std::array<std::int64_t, 1 + max_bernoulli_b2n<T>::value> numerators =
 #endif
    {{
-      boost::int64_t(            +1LL),
-      boost::int64_t(            +1LL),
-      boost::int64_t(            -1LL),
-      boost::int64_t(            +1LL),
-      boost::int64_t(            -1LL),
-      boost::int64_t(            +5LL),
-      boost::int64_t(          -691LL),
-      boost::int64_t(            +7LL),
-      boost::int64_t(         -3617LL),
-      boost::int64_t(        +43867LL),
-      boost::int64_t(       -174611LL),
-      boost::int64_t(       +854513LL),
-      boost::int64_t(    -236364091LL),
-      boost::int64_t(      +8553103LL),
-      boost::int64_t(  -23749461029LL),
-      boost::int64_t(+8615841276005LL),
-      boost::int64_t(-7709321041217LL),
-      boost::int64_t(+2577687858367LL)
+      std::int64_t(            +1LL),
+      std::int64_t(            +1LL),
+      std::int64_t(            -1LL),
+      std::int64_t(            +1LL),
+      std::int64_t(            -1LL),
+      std::int64_t(            +5LL),
+      std::int64_t(          -691LL),
+      std::int64_t(            +7LL),
+      std::int64_t(         -3617LL),
+      std::int64_t(        +43867LL),
+      std::int64_t(       -174611LL),
+      std::int64_t(       +854513LL),
+      std::int64_t(    -236364091LL),
+      std::int64_t(      +8553103LL),
+      std::int64_t(  -23749461029LL),
+      std::int64_t(+8615841276005LL),
+      std::int64_t(-7709321041217LL),
+      std::int64_t(+2577687858367LL)
    }};
 
 #ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
-   constexpr std::array<boost::int64_t, 1 + max_bernoulli_b2n<T>::value> denominators =
+   constexpr std::array<std::int64_t, 1 + max_bernoulli_b2n<T>::value> denominators =
 #else
-   static const boost::array<boost::int64_t, 1 + max_bernoulli_b2n<T>::value> denominators =
+   static const std::array<std::int64_t, 1 + max_bernoulli_b2n<T>::value> denominators =
 #endif
    {{
-      boost::int64_t(      1LL),
-      boost::int64_t(      6LL),
-      boost::int64_t(     30LL),
-      boost::int64_t(     42LL),
-      boost::int64_t(     30LL),
-      boost::int64_t(     66LL),
-      boost::int64_t(   2730LL),
-      boost::int64_t(      6LL),
-      boost::int64_t(    510LL),
-      boost::int64_t(    798LL),
-      boost::int64_t(    330LL),
-      boost::int64_t(    138LL),
-      boost::int64_t(   2730LL),
-      boost::int64_t(      6LL),
-      boost::int64_t(    870LL),
-      boost::int64_t(  14322LL),
-      boost::int64_t(    510LL),
-      boost::int64_t(      6LL)
+      std::int64_t(      1LL),
+      std::int64_t(      6LL),
+      std::int64_t(     30LL),
+      std::int64_t(     42LL),
+      std::int64_t(     30LL),
+      std::int64_t(     66LL),
+      std::int64_t(   2730LL),
+      std::int64_t(      6LL),
+      std::int64_t(    510LL),
+      std::int64_t(    798LL),
+      std::int64_t(    330LL),
+      std::int64_t(    138LL),
+      std::int64_t(   2730LL),
+      std::int64_t(      6LL),
+      std::int64_t(    870LL),
+      std::int64_t(  14322LL),
+      std::int64_t(    510LL),
+      std::int64_t(      6LL)
    }};
    return T(numerators[n]) / denominators[n];
 }
 
 template <class T>
-inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION T unchecked_bernoulli_imp(std::size_t n, const boost::integral_constant<int, 1>& )
+inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION T unchecked_bernoulli_imp(std::size_t n, const std::integral_constant<int, 1>& )
 {
 #ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
    constexpr std::array<float, 1 + max_bernoulli_b2n<T>::value> bernoulli_data =
 #else
-   static const boost::array<float, 1 + max_bernoulli_b2n<T>::value> bernoulli_data =
+   static const std::array<float, 1 + max_bernoulli_b2n<T>::value> bernoulli_data =
 #endif
    {{
       +1.00000000000000000000000000000000000000000F,
@@ -195,12 +189,12 @@ inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION T unchecked_bernoulli_imp(std::size_t
 
 
 template <class T>
-inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION T unchecked_bernoulli_imp(std::size_t n, const boost::integral_constant<int, 2>& )
+inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION T unchecked_bernoulli_imp(std::size_t n, const std::integral_constant<int, 2>& )
 {
 #ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
    constexpr std::array<double, 1 + max_bernoulli_b2n<T>::value> bernoulli_data =
 #else
-   static const boost::array<double, 1 + max_bernoulli_b2n<T>::value> bernoulli_data =
+   static const std::array<double, 1 + max_bernoulli_b2n<T>::value> bernoulli_data =
 #endif
    {{
       +1.00000000000000000000000000000000000000000,
@@ -339,12 +333,12 @@ inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION T unchecked_bernoulli_imp(std::size_t
 }
 
 template <class T>
-inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION T unchecked_bernoulli_imp(std::size_t n, const boost::integral_constant<int, 3>& )
+inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION T unchecked_bernoulli_imp(std::size_t n, const std::integral_constant<int, 3>& )
 {
 #ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
    constexpr std::array<long double, 1 + max_bernoulli_b2n<T>::value> bernoulli_data =
 #else
-   static const boost::array<long double, 1 + max_bernoulli_b2n<T>::value> bernoulli_data =
+   static const std::array<long double, 1 + max_bernoulli_b2n<T>::value> bernoulli_data =
 #endif
    {{
       +1.00000000000000000000000000000000000000000L,
@@ -672,42 +666,42 @@ inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION T unchecked_bernoulli_imp(std::size_t
 }
 
 template <class T>
-inline T unchecked_bernoulli_imp(std::size_t n, const boost::integral_constant<int, 4>& )
+inline T unchecked_bernoulli_imp(std::size_t n, const std::integral_constant<int, 4>& )
 {
    //
    // Special case added for multiprecision types that have no conversion from long long,
    // there are very few such types, but mpfr_class is one.
    //
-   static const boost::array<boost::int32_t, 1 + max_bernoulli_b2n<T>::value> numerators =
+   static const std::array<std::int32_t, 1 + max_bernoulli_b2n<T>::value> numerators =
    {{
-      boost::int32_t(            +1LL),
-      boost::int32_t(            +1LL),
-      boost::int32_t(            -1LL),
-      boost::int32_t(            +1LL),
-      boost::int32_t(            -1LL),
-      boost::int32_t(            +5LL),
-      boost::int32_t(          -691LL),
-      boost::int32_t(            +7LL),
-      boost::int32_t(         -3617LL),
-      boost::int32_t(        +43867LL),
-      boost::int32_t(       -174611LL),
-      boost::int32_t(       +854513LL),
+      std::int32_t(            +1LL),
+      std::int32_t(            +1LL),
+      std::int32_t(            -1LL),
+      std::int32_t(            +1LL),
+      std::int32_t(            -1LL),
+      std::int32_t(            +5LL),
+      std::int32_t(          -691LL),
+      std::int32_t(            +7LL),
+      std::int32_t(         -3617LL),
+      std::int32_t(        +43867LL),
+      std::int32_t(       -174611LL),
+      std::int32_t(       +854513LL),
    }};
 
-   static const boost::array<boost::int32_t, 1 + max_bernoulli_b2n<T>::value> denominators =
+   static const std::array<std::int32_t, 1 + max_bernoulli_b2n<T>::value> denominators =
    {{
-      boost::int32_t(      1LL),
-      boost::int32_t(      6LL),
-      boost::int32_t(     30LL),
-      boost::int32_t(     42LL),
-      boost::int32_t(     30LL),
-      boost::int32_t(     66LL),
-      boost::int32_t(   2730LL),
-      boost::int32_t(      6LL),
-      boost::int32_t(    510LL),
-      boost::int32_t(    798LL),
-      boost::int32_t(    330LL),
-      boost::int32_t(    138LL),
+      std::int32_t(      1LL),
+      std::int32_t(      6LL),
+      std::int32_t(     30LL),
+      std::int32_t(     42LL),
+      std::int32_t(     30LL),
+      std::int32_t(     66LL),
+      std::int32_t(   2730LL),
+      std::int32_t(      6LL),
+      std::int32_t(    510LL),
+      std::int32_t(    798LL),
+      std::int32_t(    330LL),
+      std::int32_t(    138LL),
    }};
    return T(numerators[n]) / T(denominators[n]);
 }
@@ -717,7 +711,7 @@ inline T unchecked_bernoulli_imp(std::size_t n, const boost::integral_constant<i
 template<class T>
 inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION T unchecked_bernoulli_b2n(const std::size_t n)
 {
-   typedef boost::integral_constant<int, detail::bernoulli_imp_variant<T>::value> tag_type;
+   typedef std::integral_constant<int, detail::bernoulli_imp_variant<T>::value> tag_type;
 
    return detail::unchecked_bernoulli_imp<T>(n, tag_type());
 }
@@ -725,3 +719,7 @@ inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION T unchecked_bernoulli_b2n(const std::
 }} // namespaces
 
 #endif // BOOST_MATH_UNCHECKED_BERNOULLI_HPP
+
+/* unchecked_bernoulli.hpp
+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
+*/

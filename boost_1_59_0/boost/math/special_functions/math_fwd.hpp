@@ -24,12 +24,11 @@
 #endif
 
 #include <vector>
+#include <complex>
+#include <type_traits>
 #include <boost/math/special_functions/detail/round_fwd.hpp>
 #include <boost/math/tools/promotion.hpp> // for argument promotion.
 #include <boost/math/policies/policy.hpp>
-#include <boost/mpl/comparison.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/config/no_tr1/complex.hpp>
 
 #define BOOST_NO_MACRO_EXPAND /**/
 
@@ -193,22 +192,21 @@ namespace boost
    template <class T>
    inline std::vector<T> legendre_p_zeros(int l);
 
-#if !BOOST_WORKAROUND(BOOST_MSVC, <= 1310)
    template <class T, class Policy>
-   typename boost::enable_if_c<policies::is_policy<Policy>::value, typename tools::promote_args<T>::type>::type
+   typename std::enable_if<policies::is_policy<Policy>::value, typename tools::promote_args<T>::type>::type
          legendre_p(int l, T x, const Policy& pol);
    template <class T, class Policy>
-   inline typename boost::enable_if_c<policies::is_policy<Policy>::value, typename tools::promote_args<T>::type>::type
+   inline typename std::enable_if<policies::is_policy<Policy>::value, typename tools::promote_args<T>::type>::type
       legendre_p_prime(int l, T x, const Policy& pol);
-#endif
+
    template <class T>
    typename tools::promote_args<T>::type
          legendre_q(unsigned l, T x);
-#if !BOOST_WORKAROUND(BOOST_MSVC, <= 1310)
+
    template <class T, class Policy>
-   typename boost::enable_if_c<policies::is_policy<Policy>::value, typename tools::promote_args<T>::type>::type
+   typename std::enable_if<policies::is_policy<Policy>::value, typename tools::promote_args<T>::type>::type
          legendre_q(unsigned l, T x, const Policy& pol);
-#endif
+
    template <class T1, class T2, class T3>
    typename tools::promote_args<T1, T2, T3>::type
          legendre_next(unsigned l, unsigned m, T1 x, T2 Pl, T3 Plm1);
@@ -240,11 +238,11 @@ namespace boost
    template <class T1, class T2>
    struct laguerre_result
    {
-      typedef typename mpl::if_<
-         policies::is_policy<T2>,
+      using type = typename std::conditional<
+         policies::is_policy<T2>::value,
          typename tools::promote_args<T1>::type,
          typename tools::promote_args<T2>::type
-      >::type type;
+      >::type;
    };
 
    template <class T1, class T2>
@@ -396,11 +394,11 @@ namespace boost
    template <class T, class U, class V>
    struct ellint_3_result
    {
-      typedef typename mpl::if_<
-         policies::is_policy<V>,
+      using type = typename std::conditional<
+         policies::is_policy<V>::value,
          typename tools::promote_args<T, U>::type,
          typename tools::promote_args<T, U, V>::type
-      >::type type;
+      >::type;
    };
 
    } // namespace detail
@@ -639,43 +637,40 @@ namespace boost
 
    namespace detail{
 
-      typedef boost::integral_constant<int, 0> bessel_no_int_tag;      // No integer optimisation possible.
-      typedef boost::integral_constant<int, 1> bessel_maybe_int_tag;   // Maybe integer optimisation.
-      typedef boost::integral_constant<int, 2> bessel_int_tag;         // Definite integer optimisation.
+      typedef std::integral_constant<int, 0> bessel_no_int_tag;      // No integer optimisation possible.
+      typedef std::integral_constant<int, 1> bessel_maybe_int_tag;   // Maybe integer optimisation.
+      typedef std::integral_constant<int, 2> bessel_int_tag;         // Definite integer optimisation.
 
       template <class T1, class T2, class Policy>
       struct bessel_traits
       {
-         typedef typename mpl::if_<
-            is_integral<T1>,
+         using result_type = typename std::conditional<
+            std::is_integral<T1>::value,
             typename tools::promote_args<T2>::type,
             typename tools::promote_args<T1, T2>::type
-         >::type result_type;
+         >::type;
 
          typedef typename policies::precision<result_type, Policy>::type precision_type;
 
-         typedef typename mpl::if_<
-            mpl::or_<
-               mpl::less_equal<precision_type, boost::integral_constant<int, 0> >,
-               mpl::greater<precision_type, boost::integral_constant<int, 64> > >,
+         using optimisation_tag = typename std::conditional<
+            (precision_type::value <= 0 || precision_type::value > 64),
             bessel_no_int_tag,
-            typename mpl::if_<
-               is_integral<T1>,
+            typename std::conditional<
+               std::is_integral<T1>::value,
                bessel_int_tag,
                bessel_maybe_int_tag
             >::type
-         >::type optimisation_tag;
-         typedef typename mpl::if_<
-            mpl::or_<
-               mpl::less_equal<precision_type, boost::integral_constant<int, 0> >,
-               mpl::greater<precision_type, boost::integral_constant<int, 113> > >,
+         >::type;
+
+         using optimisation_tag128 = typename std::conditional<
+            (precision_type::value <= 0 || precision_type::value > 113),
             bessel_no_int_tag,
-            typename mpl::if_<
-               is_integral<T1>,
+            typename std::conditional<
+               std::is_integral<T1>::value,
                bessel_int_tag,
                bessel_maybe_int_tag
             >::type
-         >::type optimisation_tag128;
+         >::type;
       };
    } // detail
 
@@ -905,8 +900,8 @@ namespace boost
    template <class T, class U>
    struct expint_result
    {
-      typedef typename mpl::if_<
-         policies::is_policy<U>,
+      typedef typename std::conditional<
+         policies::is_policy<U>::value,
          typename tools::promote_args<T>::type,
          typename tools::promote_args<U>::type
       >::type type;
@@ -1013,16 +1008,89 @@ namespace boost
    template <class T, class U>
    typename tools::promote_args<T, U>::type jacobi_cs(T k, U theta);
 
+   // Jacobi Theta Functions:
+   template <class T, class U, class Policy>
+   typename tools::promote_args<T, U>::type jacobi_theta1(T z, U q, const Policy& pol);
+
+   template <class T, class U>
+   typename tools::promote_args<T, U>::type jacobi_theta1(T z, U q);
+
+   template <class T, class U, class Policy>
+   typename tools::promote_args<T, U>::type jacobi_theta2(T z, U q, const Policy& pol);
+
+   template <class T, class U>
+   typename tools::promote_args<T, U>::type jacobi_theta2(T z, U q);
+
+   template <class T, class U, class Policy>
+   typename tools::promote_args<T, U>::type jacobi_theta3(T z, U q, const Policy& pol);
+
+   template <class T, class U>
+   typename tools::promote_args<T, U>::type jacobi_theta3(T z, U q);
+
+   template <class T, class U, class Policy>
+   typename tools::promote_args<T, U>::type jacobi_theta4(T z, U q, const Policy& pol);
+
+   template <class T, class U>
+   typename tools::promote_args<T, U>::type jacobi_theta4(T z, U q);
+
+   template <class T, class U, class Policy>
+   typename tools::promote_args<T, U>::type jacobi_theta1tau(T z, U tau, const Policy& pol);
+
+   template <class T, class U>
+   typename tools::promote_args<T, U>::type jacobi_theta1tau(T z, U tau);
+
+   template <class T, class U, class Policy>
+   typename tools::promote_args<T, U>::type jacobi_theta2tau(T z, U tau, const Policy& pol);
+
+   template <class T, class U>
+   typename tools::promote_args<T, U>::type jacobi_theta2tau(T z, U tau);
+
+   template <class T, class U, class Policy>
+   typename tools::promote_args<T, U>::type jacobi_theta3tau(T z, U tau, const Policy& pol);
+
+   template <class T, class U>
+   typename tools::promote_args<T, U>::type jacobi_theta3tau(T z, U tau);
+
+   template <class T, class U, class Policy>
+   typename tools::promote_args<T, U>::type jacobi_theta4tau(T z, U tau, const Policy& pol);
+
+   template <class T, class U>
+   typename tools::promote_args<T, U>::type jacobi_theta4tau(T z, U tau);
+
+   template <class T, class U, class Policy>
+   typename tools::promote_args<T, U>::type jacobi_theta3m1(T z, U q, const Policy& pol);
+
+   template <class T, class U>
+   typename tools::promote_args<T, U>::type jacobi_theta3m1(T z, U q);
+
+   template <class T, class U, class Policy>
+   typename tools::promote_args<T, U>::type jacobi_theta4m1(T z, U q, const Policy& pol);
+
+   template <class T, class U>
+   typename tools::promote_args<T, U>::type jacobi_theta4m1(T z, U q);
+
+   template <class T, class U, class Policy>
+   typename tools::promote_args<T, U>::type jacobi_theta3m1tau(T z, U tau, const Policy& pol);
+
+   template <class T, class U>
+   typename tools::promote_args<T, U>::type jacobi_theta3m1tau(T z, U tau);
+
+   template <class T, class U, class Policy>
+   typename tools::promote_args<T, U>::type jacobi_theta4m1tau(T z, U tau, const Policy& pol);
+
+   template <class T, class U>
+   typename tools::promote_args<T, U>::type jacobi_theta4m1tau(T z, U tau);
+
 
    template <class T>
    typename tools::promote_args<T>::type zeta(T s);
 
    // pow:
    template <int N, typename T, class Policy>
-   typename tools::promote_args<T>::type pow(T base, const Policy& policy);
+   BOOST_CXX14_CONSTEXPR typename tools::promote_args<T>::type pow(T base, const Policy& policy);
 
    template <int N, typename T>
-   typename tools::promote_args<T>::type pow(T base);
+   BOOST_CXX14_CONSTEXPR typename tools::promote_args<T>::type pow(T base);
 
    // next:
    template <class T, class U, class Policy>
@@ -1120,31 +1188,21 @@ namespace boost
     } // namespace math
 } // namespace boost
 
-#ifdef BOOST_HAS_LONG_LONG
 #define BOOST_MATH_DETAIL_LL_FUNC(Policy)\
    \
    template <class T>\
-   inline T modf(const T& v, boost::long_long_type* ipart){ using boost::math::modf; return modf(v, ipart, Policy()); }\
+   inline T modf(const T& v, long long* ipart){ using boost::math::modf; return modf(v, ipart, Policy()); }\
    \
    template <class T>\
-   inline boost::long_long_type lltrunc(const T& v){ using boost::math::lltrunc; return lltrunc(v, Policy()); }\
+   inline long long lltrunc(const T& v){ using boost::math::lltrunc; return lltrunc(v, Policy()); }\
    \
    template <class T>\
-   inline boost::long_long_type llround(const T& v){ using boost::math::llround; return llround(v, Policy()); }\
+   inline long long llround(const T& v){ using boost::math::llround; return llround(v, Policy()); }\
 
-#else
-#define BOOST_MATH_DETAIL_LL_FUNC(Policy)
-#endif
-
-#if !defined(BOOST_NO_CXX11_DECLTYPE) && !defined(BOOST_NO_CXX11_AUTO_DECLARATIONS) && !defined(BOOST_NO_CXX11_HDR_ARRAY)
 #  define BOOST_MATH_DETAIL_11_FUNC(Policy)\
    template <class T, class U, class V>\
    inline typename boost::math::tools::promote_args<T, U>::type hypergeometric_1F1(const T& a, const U& b, const V& z)\
    { return boost::math::hypergeometric_1F1(a, b, z, Policy()); }\
-
-#else
-#  define BOOST_MATH_DETAIL_11_FUNC(Policy)
-#endif
 
 #define BOOST_MATH_DECLARE_SPECIAL_FUNCTIONS(Policy)\
    \
@@ -1510,10 +1568,10 @@ template <class OutputIterator, class T>\
    { boost::math::cyl_neumann_zero(v, start_index, number_of_zeros, out_it, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type sin_pi(T x){ return boost::math::sin_pi(x); }\
+   inline typename boost::math::tools::promote_args<T>::type sin_pi(T x){ return boost::math::sin_pi(x, Policy()); }\
 \
    template <class T>\
-   inline typename boost::math::tools::promote_args<T>::type cos_pi(T x){ return boost::math::cos_pi(x); }\
+   inline typename boost::math::tools::promote_args<T>::type cos_pi(T x){ return boost::math::cos_pi(x, Policy()); }\
 \
    using boost::math::fpclassify;\
    using boost::math::isfinite;\
@@ -1642,6 +1700,54 @@ template <class OutputIterator, class T>\
    inline typename boost::math::tools::promote_args<T, U>::type jacobi_cs(T k, U theta)\
    { return boost::math::jacobi_cs(k, theta, Policy()); }\
    \
+   template <class T, class U>\
+   inline typename boost::math::tools::promote_args<T, U>::type jacobi_theta1(T z, U q)\
+   { return boost::math::jacobi_theta1(z, q, Policy()); }\
+   \
+   template <class T, class U>\
+   inline typename boost::math::tools::promote_args<T, U>::type jacobi_theta2(T z, U q)\
+   { return boost::math::jacobi_theta2(z, q, Policy()); }\
+   \
+   template <class T, class U>\
+   inline typename boost::math::tools::promote_args<T, U>::type jacobi_theta3(T z, U q)\
+   { return boost::math::jacobi_theta3(z, q, Policy()); }\
+   \
+   template <class T, class U>\
+   inline typename boost::math::tools::promote_args<T, U>::type jacobi_theta4(T z, U q)\
+   { return boost::math::jacobi_theta4(z, q, Policy()); }\
+   \
+   template <class T, class U>\
+   inline typename boost::math::tools::promote_args<T, U>::type jacobi_theta1tau(T z, U q)\
+   { return boost::math::jacobi_theta1tau(z, q, Policy()); }\
+   \
+   template <class T, class U>\
+   inline typename boost::math::tools::promote_args<T, U>::type jacobi_theta2tau(T z, U q)\
+   { return boost::math::jacobi_theta2tau(z, q, Policy()); }\
+   \
+   template <class T, class U>\
+   inline typename boost::math::tools::promote_args<T, U>::type jacobi_theta3tau(T z, U q)\
+   { return boost::math::jacobi_theta3tau(z, q, Policy()); }\
+   \
+   template <class T, class U>\
+   inline typename boost::math::tools::promote_args<T, U>::type jacobi_theta4tau(T z, U q)\
+   { return boost::math::jacobi_theta4tau(z, q, Policy()); }\
+   \
+   template <class T, class U>\
+   inline typename boost::math::tools::promote_args<T, U>::type jacobi_theta3m1(T z, U q)\
+   { return boost::math::jacobi_theta3m1(z, q, Policy()); }\
+   \
+   template <class T, class U>\
+   inline typename boost::math::tools::promote_args<T, U>::type jacobi_theta4m1(T z, U q)\
+   { return boost::math::jacobi_theta4m1(z, q, Policy()); }\
+   \
+   template <class T, class U>\
+   inline typename boost::math::tools::promote_args<T, U>::type jacobi_theta3m1tau(T z, U q)\
+   { return boost::math::jacobi_theta3m1tau(z, q, Policy()); }\
+   \
+   template <class T, class U>\
+   inline typename boost::math::tools::promote_args<T, U>::type jacobi_theta4m1tau(T z, U q)\
+   { return boost::math::jacobi_theta4m1tau(z, q, Policy()); }\
+   \
    template <class T>\
    inline typename boost::math::tools::promote_args<T>::type airy_ai(T x)\
    {  return boost::math::airy_ai(x, Policy());  }\
@@ -1710,3 +1816,7 @@ template <class OutputIterator, class T>\
 
 
 #endif // BOOST_MATH_SPECIAL_MATH_FWD_HPP
+
+/* math_fwd.hpp
+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
+*/

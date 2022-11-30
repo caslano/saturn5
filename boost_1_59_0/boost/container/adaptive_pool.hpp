@@ -31,6 +31,8 @@
 #include <boost/container/detail/singleton.hpp>
 #include <boost/container/detail/placement_new.hpp>
 
+#include <boost/move/detail/force_ptr.hpp>
+
 #include <boost/assert.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/move/utility_core.hpp>
@@ -132,6 +134,10 @@ class adaptive_pool
    adaptive_pool(const adaptive_pool &) BOOST_NOEXCEPT_OR_NOTHROW
    {}
 
+   //!Copy assignment from other adaptive_pool.
+   adaptive_pool & operator=(const adaptive_pool &) BOOST_NOEXCEPT_OR_NOTHROW
+   {  return *this;  }
+
    //!Copy constructor from related adaptive_pool.
    template<class T2>
    adaptive_pool
@@ -149,7 +155,7 @@ class adaptive_pool
    {  return size_type(-1)/(2u*sizeof(T));   }
 
    //!Allocate memory for an array of count elements.
-   //!Throws std::bad_alloc if there is no enough memory
+   //!Throws bad_alloc if there is no enough memory
    pointer allocate(size_type count, const void * = 0)
    {
       if(BOOST_UNLIKELY(count > size_type(-1)/(2u*sizeof(T))))
@@ -251,7 +257,7 @@ class adaptive_pool
       BOOST_STATIC_ASSERT(( Version > 1 ));/*
       dlmalloc_memchain ch;
       BOOST_CONTAINER_MEMCHAIN_INIT(&ch);
-      if(BOOST_UNLIKELY(!dlmalloc_multialloc_nodes(n_elements, elem_size*sizeof(T), DL_MULTIALLOC_DEFAULT_CONTIGUOUS, &ch))){
+      if(BOOST_UNLIKELY(!dlmalloc_multialloc_nodes(n_elements, elem_size*sizeof(T), BOOST_CONTAINER_DL_MULTIALLOC_DEFAULT_CONTIGUOUS, &ch))){
          boost::container::throw_bad_alloc();
       }
       chain.incorporate_after(chain.before_begin()
@@ -259,7 +265,8 @@ class adaptive_pool
                              ,(T*)BOOST_CONTAINER_MEMCHAIN_LASTMEM(&ch)
                              ,BOOST_CONTAINER_MEMCHAIN_SIZE(&ch) );*/
       if(BOOST_UNLIKELY(!dlmalloc_multialloc_nodes
-            (n_elements, elem_size*sizeof(T), DL_MULTIALLOC_DEFAULT_CONTIGUOUS, reinterpret_cast<dlmalloc_memchain *>(&chain)))){
+            ( n_elements, elem_size*sizeof(T), BOOST_CONTAINER_DL_MULTIALLOC_DEFAULT_CONTIGUOUS
+            , move_detail::force_ptr<dlmalloc_memchain *>(&chain)))){
          boost::container::throw_bad_alloc();
       }
    }
@@ -271,7 +278,7 @@ class adaptive_pool
       BOOST_STATIC_ASSERT(( Version > 1 ));/*
       dlmalloc_memchain ch;
       BOOST_CONTAINER_MEMCHAIN_INIT(&ch);
-      if(BOOST_UNLIKELY(!dlmalloc_multialloc_arrays(n_elements, elem_sizes, sizeof(T), DL_MULTIALLOC_DEFAULT_CONTIGUOUS, &ch))){
+      if(BOOST_UNLIKELY(!dlmalloc_multialloc_arrays(n_elements, elem_sizes, sizeof(T), BOOST_CONTAINER_DL_MULTIALLOC_DEFAULT_CONTIGUOUS, &ch))){
          boost::container::throw_bad_alloc();
       }
       chain.incorporate_after(chain.before_begin()
@@ -279,7 +286,8 @@ class adaptive_pool
                              ,(T*)BOOST_CONTAINER_MEMCHAIN_LASTMEM(&ch)
                              ,BOOST_CONTAINER_MEMCHAIN_SIZE(&ch) );*/
       if(BOOST_UNLIKELY(!dlmalloc_multialloc_arrays
-         (n_elements, elem_sizes, sizeof(T), DL_MULTIALLOC_DEFAULT_CONTIGUOUS, reinterpret_cast<dlmalloc_memchain *>(&chain)))){
+         ( n_elements, elem_sizes, sizeof(T), BOOST_CONTAINER_DL_MULTIALLOC_DEFAULT_CONTIGUOUS
+         , move_detail::force_ptr<dlmalloc_memchain *>(&chain)))){
          boost::container::throw_bad_alloc();
       }
    }
@@ -291,7 +299,7 @@ class adaptive_pool
       size_t size(chain.size());
       BOOST_CONTAINER_MEMCHAIN_INIT_FROM(&ch, beg, last, size);
       dlmalloc_multidealloc(&ch);*/
-      dlmalloc_multidealloc(reinterpret_cast<dlmalloc_memchain *>(&chain));
+      dlmalloc_multidealloc(move_detail::force_ptr<dlmalloc_memchain *>(&chain));
    }
 
    //!Deallocates all free blocks of the pool
@@ -442,6 +450,10 @@ class private_adaptive_pool
    private_adaptive_pool(const private_adaptive_pool &) BOOST_NOEXCEPT_OR_NOTHROW
    {}
 
+   //!Copy assignment from other adaptive_pool.
+   private_adaptive_pool & operator=(const private_adaptive_pool &) BOOST_NOEXCEPT_OR_NOTHROW
+   {  return *this;  }
+
    //!Copy constructor from related private_adaptive_pool.
    template<class T2>
    private_adaptive_pool
@@ -459,7 +471,7 @@ class private_adaptive_pool
    {  return size_type(-1)/(2u*sizeof(T));   }
 
    //!Allocate memory for an array of count elements.
-   //!Throws std::bad_alloc if there is no enough memory
+   //!Throws bad_alloc if there is no enough memory
    pointer allocate(size_type count, const void * = 0)
    {
       if(BOOST_UNLIKELY(count > size_type(-1)/(2u*sizeof(T))))
@@ -536,7 +548,8 @@ class private_adaptive_pool
    {
       BOOST_STATIC_ASSERT(( Version > 1 ));
       if(BOOST_UNLIKELY(!dlmalloc_multialloc_nodes
-            (n_elements, elem_size*sizeof(T), DL_MULTIALLOC_DEFAULT_CONTIGUOUS, reinterpret_cast<dlmalloc_memchain *>(&chain)))){
+            ( n_elements, elem_size*sizeof(T), BOOST_CONTAINER_DL_MULTIALLOC_DEFAULT_CONTIGUOUS
+            , move_detail::force_ptr<dlmalloc_memchain *>(&chain)))){
          boost::container::throw_bad_alloc();
       }
    }
@@ -547,14 +560,15 @@ class private_adaptive_pool
    {
       BOOST_STATIC_ASSERT(( Version > 1 ));
       if(BOOST_UNLIKELY(!dlmalloc_multialloc_arrays
-         (n_elements, elem_sizes, sizeof(T), DL_MULTIALLOC_DEFAULT_CONTIGUOUS, reinterpret_cast<dlmalloc_memchain *>(&chain)))){
+         (n_elements, elem_sizes, sizeof(T), BOOST_CONTAINER_DL_MULTIALLOC_DEFAULT_CONTIGUOUS
+         , move_detail::force_ptr<dlmalloc_memchain *>(&chain)))){
          boost::container::throw_bad_alloc();
       }
    }
 
    void deallocate_many(multiallocation_chain &chain) BOOST_NOEXCEPT_OR_NOTHROW
    {
-      dlmalloc_multidealloc(reinterpret_cast<dlmalloc_memchain *>(&chain));
+      dlmalloc_multidealloc(move_detail::force_ptr<dlmalloc_memchain *>(&chain));
    }
 
    //!Deallocates all free blocks of the pool
@@ -607,3 +621,7 @@ class private_adaptive_pool
 #include <boost/container/detail/config_end.hpp>
 
 #endif   //#ifndef BOOST_CONTAINER_ADAPTIVE_POOL_HPP
+
+/* adaptive_pool.hpp
+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
+*/

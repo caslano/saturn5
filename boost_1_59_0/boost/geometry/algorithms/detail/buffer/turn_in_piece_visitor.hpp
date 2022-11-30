@@ -1,813 +1,38 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2012-2014 Barend Gehrels, Amsterdam, the Netherlands.
+// Copyright (c) 2012-2020 Barend Gehrels, Amsterdam, the Netherlands.
 // Copyright (c) 2017 Adam Wulkiewicz, Lodz, Poland.
 
-// This file was modified by Oracle on 2016, 2018.
-// Modifications copyright (c) 2016-2018 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2016-2022.
+// Modifications copyright (c) 2016-2022 Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_GEOMETRY_ALGORITHMS_DETAIL_BUFFER_TURN_IN_PIECE_VISITOR
-#define BOOST_GEOMETRY_ALGORITHMS_DETAIL_BUFFER_TURN_IN_PIECE_VISITOR
-
-
-#include <boost/core/ignore_unused.hpp>
-
-#include <boost/range.hpp>
+#ifndef BOOST_GEOMETRY_ALGORITHMS_DETAIL_BUFFER_TURN_IN_PIECE_VISITOR_HPP
+#define BOOST_GEOMETRY_ALGORITHMS_DETAIL_BUFFER_TURN_IN_PIECE_VISITOR_HPP
 
 #include <boost/geometry/core/assert.hpp>
 #include <boost/geometry/core/config.hpp>
 
-#include <boost/geometry/arithmetic/dot_product.hpp>
-#include <boost/geometry/algorithms/assign.hpp>
 #include <boost/geometry/algorithms/comparable_distance.hpp>
-#include <boost/geometry/algorithms/equals.hpp>
-#include <boost/geometry/algorithms/expand.hpp>
+#include <boost/geometry/algorithms/covered_by.hpp>
 #include <boost/geometry/algorithms/detail/disjoint/point_box.hpp>
 #include <boost/geometry/algorithms/detail/disjoint/box_box.hpp>
-#include <boost/geometry/algorithms/detail/overlay/segment_identifier.hpp>
-#include <boost/geometry/algorithms/detail/overlay/get_turn_info.hpp>
-#include <boost/geometry/policies/compare.hpp>
-#include <boost/geometry/strategies/buffer.hpp>
+#include <boost/geometry/algorithms/detail/dummy_geometries.hpp>
 #include <boost/geometry/algorithms/detail/buffer/buffer_policies.hpp>
-
-#include <boost/geometry/strategies/cartesian/side_of_intersection.hpp>
+#include <boost/geometry/geometries/box.hpp>
 
 
 namespace boost { namespace geometry
 {
 
-
 #ifndef DOXYGEN_NO_DETAIL
+
 namespace detail { namespace buffer
 {
-
-struct piece_get_box
-{
-    template <typename Box, typename Piece>
-    static inline void apply(Box& total, Piece const& piece)
-    {
-        geometry::expand(total, piece.robust_envelope);
-    }
-};
-
-template <typename DisjointBoxBoxStrategy>
-struct piece_ovelaps_box
-{
-    template <typename Box, typename Piece>
-    static inline bool apply(Box const& box, Piece const& piece)
-    {
-        if (piece.type == strategy::buffer::buffered_flat_end
-            || piece.type == strategy::buffer::buffered_concave)
-        {
-            // Turns cannot be inside a flat end (though they can be on border)
-            // Neither we need to check if they are inside concave helper pieces
-
-            // Skip all pieces not used as soon as possible
-            return false;
-        }
-
-        return ! geometry::detail::disjoint::disjoint_box_box(box, piece.robust_envelope,
-                                                              DisjointBoxBoxStrategy());
-    }
-};
-
-struct turn_get_box
-{
-    template <typename Box, typename Turn>
-    static inline void apply(Box& total, Turn const& turn)
-    {
-        geometry::expand(total, turn.robust_point);
-    }
-};
-
-template <typename DisjointPointBoxStrategy>
-struct turn_ovelaps_box
-{
-    template <typename Box, typename Turn>
-    static inline bool apply(Box const& box, Turn const& turn)
-    {
-        return ! geometry::detail::disjoint::disjoint_point_box(turn.robust_point, box,
-                                                                DisjointPointBoxStrategy());
-    }
-};
-
-
-enum analyse_result
-{
-    analyse_unknown,
-    analyse_continue,
-    analyse_disjoint,
-    analyse_within,
-    analyse_on_original_boundary,
-    analyse_on_offsetted,
-    analyse_near_offsetted
-};
-
-template <typename Point>
-inline bool in_box(Point const& previous,
-        Point const& current, Point const& point)
-{
-    // Get its box (TODO: this can be prepared-on-demand later)
-    typedef geometry::model::box<Point> box_type;
-    box_type box;
-    geometry::assign_inverse(box);
-    geometry::expand(box, previous);
-    geometry::expand(box, current);
-
-    return geometry::covered_by(point, box);
-}
-
-template <typename NumericType>
-inline bool is_one_sided(NumericType const& left, NumericType const& right)
-{
-    static NumericType const zero = 0;
-    return geometry::math::equals(left, zero)
-        || geometry::math::equals(right, zero);
-}
-
-template <typename Point, typename DistanceStrategy>
-inline bool has_zero_distance_at(Point const& point,
-                                 DistanceStrategy const& distance_strategy)
-{
-    return is_one_sided(distance_strategy.apply(point, point,
-            strategy::buffer::buffer_side_left),
-        distance_strategy.apply(point, point,
-            strategy::buffer::buffer_side_right));
-}
-
-// meta-programming-structure defining if to use side-of-intersection
-// (only for cartesian / only necessary with rescaling)
-template <typename Tag>
-struct use_side_of_intersection {};
-
-#if defined(BOOST_GEOMETRY_USE_RESCALING)
-// With rescaling, let Cartesian use side-of-intersection
-template <>
-struct use_side_of_intersection<cartesian_tag> { static bool const value = true; };
-#else
-template <>
-struct use_side_of_intersection<cartesian_tag> { static bool const value = false; };
-#endif
-
-template <>
-struct use_side_of_intersection<spherical_tag> { static bool const value = false; };
-
-template <>
-struct use_side_of_intersection<geographic_tag> { static bool const value = false; };
-
-
-template <bool UseSideOfIntersection>
-struct check_segment {};
-
-// Implementation using side-of-intersection
-template <>
-struct check_segment<true>
-{
-    template <typename Point, typename Turn, typename SideStrategy>
-    static inline analyse_result apply(Point const& previous,
-            Point const& current, Turn const& turn,
-            bool from_monotonic,
-            SideStrategy const& )
-    {
-        typedef geometry::model::referring_segment<Point const> segment_type;
-        segment_type const p(turn.rob_pi, turn.rob_pj);
-        segment_type const q(turn.rob_qi, turn.rob_qj);
-        segment_type const r(previous, current);
-        int const side = strategy::side::side_of_intersection::apply(p, q, r,
-                    turn.robust_point);
-
-        if (side == 0)
-        {
-            return analyse_on_offsetted;
-        }
-        if (side == -1 && from_monotonic)
-        {
-            return analyse_within;
-        }
-        if (side == 1 && from_monotonic)
-        {
-            return analyse_disjoint;
-        }
-        return analyse_continue;
-    }
-};
-
-template <>
-struct check_segment<false>
-{
-    template <typename Point, typename Turn, typename SideStrategy>
-    static inline analyse_result apply(Point const& previous,
-            Point const& current, Turn const& turn,
-            bool from_monotonic,
-            SideStrategy const& side_strategy)
-    {
-        int const side = side_strategy.apply(previous, current, turn.robust_point);
-
-        if (side == 0)
-        {
-            // Collinear, only on segment if it is covered by its bbox
-            if (in_box(previous, current, turn.robust_point))
-            {
-                return analyse_on_offsetted;
-            }
-        }
-        else if (side == -1)
-        {
-            // It is in the triangle right-of the segment where the
-            // segment is the hypothenusa. Check if it is close
-            // (within rounding-area)
-            if (in_box(previous, current, turn.robust_point))
-            {
-                return analyse_near_offsetted;
-            }
-            else if (from_monotonic)
-            {
-                return analyse_within;
-            }
-        }
-        else if (from_monotonic)
-        {
-            // Left of segment
-            return analyse_disjoint;
-        }
-
-        // Not monotonic, on left or right side: continue analysing
-        return analyse_continue;
-    }
-};
-
-template <bool UseSideOfIntersection>
-class analyse_turn_wrt_point_piece {};
-
-template <>
-class analyse_turn_wrt_point_piece<true>
-{
-public :
-    template <typename Turn, typename Piece, typename PointInGeometryStrategy, typename SideStrategy>
-    static inline analyse_result apply(Turn const& turn, Piece const& piece,
-                                       PointInGeometryStrategy const& ,
-                                       SideStrategy const& )
-    {
-        typedef typename Piece::section_type section_type;
-        typedef typename Turn::robust_point_type point_type;
-        typedef typename geometry::coordinate_type<point_type>::type coordinate_type;
-
-        typedef geometry::model::referring_segment<point_type const> segment_type;
-        segment_type const p(turn.rob_pi, turn.rob_pj);
-        segment_type const q(turn.rob_qi, turn.rob_qj);
-
-        BOOST_GEOMETRY_ASSERT(! piece.sections.empty());
-
-        coordinate_type const point_x = geometry::get<0>(turn.robust_point);
-
-        for (std::size_t s = 0; s < piece.sections.size(); s++)
-        {
-            section_type const& section = piece.sections[s];
-            // If point within horizontal range of monotonic section:
-            if (! section.duplicate
-                && section.begin_index < section.end_index
-                && point_x >= geometry::get<min_corner, 0>(section.bounding_box) - 1
-                && point_x <= geometry::get<max_corner, 0>(section.bounding_box) + 1)
-            {
-                for (signed_size_type i = section.begin_index + 1; i <= section.end_index; i++)
-                {
-                    point_type const& previous = piece.robust_ring[i - 1];
-                    point_type const& current = piece.robust_ring[i];
-
-
-                    // First check if it is in range - if it is not, the
-                    // expensive side_of_intersection does not need to be
-                    // applied
-                    coordinate_type x1 = geometry::get<0>(previous);
-                    coordinate_type x2 = geometry::get<0>(current);
-
-                    if (x1 > x2)
-                    {
-                        std::swap(x1, x2);
-                    }
-
-                    if (point_x >= x1 - 1 && point_x <= x2 + 1)
-                    {
-                        segment_type const r(previous, current);
-                        int const side = strategy::side::side_of_intersection::apply(p, q, r,
-                                    turn.robust_point);
-
-                        // Sections are monotonic in x-dimension
-                        if (side == 1)
-                        {
-                            // Left on segment
-                            return analyse_disjoint;
-                        }
-                        else if (side == 0)
-                        {
-                            // Collinear - TODO: check if really on segment
-                            return analyse_on_offsetted;
-                        }
-                    }
-                }
-            }
-        }
-
-        // It is nowhere outside, and not on segment, so it is within
-        return analyse_within;
-    }
-
-};
-
-template <>
-class analyse_turn_wrt_point_piece<false>
-{
-public :
-    template <typename Turn, typename Piece, typename PointInGeometryStrategy, typename SideStrategy>
-    static inline analyse_result apply(Turn const& turn, Piece const& piece,
-                                       PointInGeometryStrategy const& point_in_geometry_strategy,
-                                       SideStrategy const& side_strategy)
-    {
-        typedef typename Piece::section_type section_type;
-        typedef typename Turn::robust_point_type point_type;
-        typedef typename geometry::coordinate_type<point_type>::type coordinate_type;
-
-        typename PointInGeometryStrategy::state_type state;
-
-        BOOST_GEOMETRY_ASSERT(! piece.sections.empty());
-
-        coordinate_type const point_x = geometry::get<0>(turn.robust_point);
-
-        for (std::size_t s = 0; s < piece.sections.size(); s++)
-        {
-            section_type const& section = piece.sections[s];
-            // If point within horizontal range of monotonic section:
-            if (! section.duplicate
-                && section.begin_index < section.end_index
-                && point_x >= geometry::get<min_corner, 0>(section.bounding_box) - 1
-                && point_x <= geometry::get<max_corner, 0>(section.bounding_box) + 1)
-            {
-                for (signed_size_type i = section.begin_index + 1; i <= section.end_index; i++)
-                {
-                    point_type const& previous = piece.robust_ring[i - 1];
-                    point_type const& current = piece.robust_ring[i];
-
-                    analyse_result code = check_segment<false>::apply(previous, current, turn, false, side_strategy);
-                    if (code != analyse_continue)
-                    {
-                        return code;
-                    }
-
-                    // Get the state (to determine it is within), we don't have
-                    // to cover the on-segment case (covered above)
-                    point_in_geometry_strategy.apply(turn.robust_point, previous, current, state);
-                }
-            }
-        }
-
-        int const code = point_in_geometry_strategy.result(state);
-        if (code == 1)
-        {
-            return analyse_within;
-        }
-        else if (code == -1)
-        {
-            return analyse_disjoint;
-        }
-
-        // Should normally not occur - on-segment is covered
-        return analyse_unknown;
-    }
-
-};
-
-template <bool UseSideOfIntersection>
-struct check_helper_segment {};
-
-template <>
-struct check_helper_segment<true>
-{
-    template <typename Point, typename Turn,  typename SideStrategy>
-    static inline analyse_result apply(Point const& s1,
-                Point const& s2, Turn const& turn,
-                bool is_original,
-                analyse_result result_for_original,
-                Point const& offsetted,
-                SideStrategy const& )
-    {
-        boost::ignore_unused(offsetted, is_original);
-
-        typedef geometry::model::referring_segment<Point const> segment_type;
-        segment_type const p(turn.rob_pi, turn.rob_pj);
-        segment_type const q(turn.rob_qi, turn.rob_qj);
-        segment_type const r(s1, s2);
-        int const side = strategy::side::side_of_intersection::apply(p, q, r,
-                    turn.robust_point);
-
-        if (side == 1)
-        {
-            // left of segment
-            return analyse_disjoint;
-        }
-        else if (side == 0)
-        {
-            // If is collinear, either on segment or before/after
-            typedef geometry::model::box<Point> box_type;
-
-            box_type box;
-            geometry::assign_inverse(box);
-            geometry::expand(box, s1);
-            geometry::expand(box, s2);
-
-            if (geometry::covered_by(turn.robust_point, box))
-            {
-                return result_for_original;
-            }
-
-            // It is collinear but not on the segment. Because these
-            // segments are convex, it is outside
-            // Unless the offsetted ring is collinear or concave w.r.t.
-            // helper-segment but that scenario is not yet supported
-            return analyse_disjoint;
-        }
-
-        // right of segment
-        return analyse_continue;
-    }
-
-};
-
-template <>
-struct check_helper_segment<false>
-{
-    template <typename Point, typename Turn, typename SideStrategy>
-    static inline analyse_result apply(Point const& s1,
-                Point const& s2, Turn const& turn,
-                bool is_original,
-                analyse_result result_for_original,
-                Point const& offsetted,
-                SideStrategy const& side_strategy)
-    {
-        switch(side_strategy.apply(s1, s2, turn.robust_point))
-        {
-            case 1 :
-                return analyse_disjoint; // left of segment
-            case 0 :
-                {
-                    // If is collinear, either on segment or before/after
-                    typedef geometry::model::box<Point> box_type;
-
-                    box_type box;
-                    geometry::assign_inverse(box);
-                    geometry::expand(box, s1);
-                    geometry::expand(box, s2);
-
-                    if (geometry::covered_by(turn.robust_point, box))
-                    {
-                        // It is on the segment
-                        if (! is_original
-                            && geometry::comparable_distance(turn.robust_point, offsetted) <= 1)
-                        {
-                            // It is within, and close to the offsetted-boundary,
-                            // take any rounding-issues into account
-                            return analyse_near_offsetted;
-                        }
-
-                        // Points on helper-segments are considered as within
-                        // Points on original boundary are processed differently
-                        return result_for_original;
-                    }
-
-                    // It is collinear but not on the segment. Because these
-                    // segments are convex, it is outside
-                    // Unless the offsetted ring is collinear or concave w.r.t.
-                    // helper-segment but that scenario is not yet supported
-                    return analyse_disjoint;
-                }
-                break;
-        }
-
-        // right of segment
-        return analyse_continue;
-    }
-};
-
-template <bool UseSideOfIntersection>
-class analyse_turn_wrt_piece
-{
-    template
-    <
-        typename Turn,
-        typename Piece,
-        typename DistanceStrategy,
-        typename SideStrategy
-    >
-    static inline analyse_result
-    check_helper_segments(Turn const& turn, Piece const& piece,
-                          DistanceStrategy const& distance_strategy,
-                          SideStrategy const& side_strategy)
-    {
-        typedef typename Turn::robust_point_type point_type;
-        geometry::equal_to<point_type> comparator;
-
-        point_type points[4];
-
-        signed_size_type helper_count = static_cast<signed_size_type>(piece.robust_ring.size())
-                                            - piece.offsetted_count;
-        if (helper_count == 4)
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                points[i] = piece.robust_ring[piece.offsetted_count + i];
-            }
-
-            //      3--offsetted outline--0
-            //      |                     |
-            // left |                     | right
-            //      |                     |
-            //      2===>==original===>===1
-
-        }
-        else if (helper_count == 3)
-        {
-            // Triangular piece, assign points but assign second twice
-            for (int i = 0; i < 4; i++)
-            {
-                int index = i < 2 ? i : i - 1;
-                points[i] = piece.robust_ring[piece.offsetted_count + index];
-            }
-        }
-        else
-        {
-            // Some pieces (e.g. around points) do not have helper segments.
-            // Others should have 3 (join) or 4 (side)
-            return analyse_continue;
-        }
-
-        // If a turn is located on the original, it is considered as within,
-        // unless it is at a flat start or end, or the buffer (at that point)
-        // is one-sided (zero-distance)
-        bool const one_sided = has_zero_distance_at(turn.point, distance_strategy);
-
-        analyse_result const result_for_original
-                = one_sided || piece.is_flat_end || piece.is_flat_start
-                ? analyse_on_original_boundary
-                : analyse_within;
-
-        // First check point-equality
-        point_type const& point = turn.robust_point;
-        if (comparator(point, points[0]) || comparator(point, points[3]))
-        {
-            return analyse_on_offsetted;
-        }
-        if (comparator(point, points[1]))
-        {
-            // On original, with right corner of piece
-            return result_for_original;
-        }
-        if (comparator(point, points[2]))
-        {
-            // On original, with left corner of piece
-            return result_for_original;
-        }
-
-        // Right side of the piece (never an original)
-        analyse_result result
-            = check_helper_segment<UseSideOfIntersection>::apply(points[0], points[1], turn,
-                    false, analyse_within, points[0], side_strategy);
-        if (result != analyse_continue)
-        {
-            return result;
-        }
-
-        // Left side of the piece (never an original)
-        result = check_helper_segment<UseSideOfIntersection>::apply(points[2], points[3], turn,
-                    false, analyse_within, points[3], side_strategy);
-        if (result != analyse_continue)
-        {
-            return result;
-        }
-
-        // Side of the piece at side of original geometry
-        // (here flat start/end will result in within)
-        if (! comparator(points[1], points[2]))
-        {
-            result = check_helper_segment<UseSideOfIntersection>::apply(points[1],
-                    points[2], turn, true,
-                    one_sided ? analyse_on_original_boundary : analyse_within,
-                    point, side_strategy);
-            if (result != analyse_continue)
-            {
-                return result;
-            }
-        }
-
-        // We are within the \/ or |_| shaped piece, where the top is the
-        // offsetted ring.
-        if (! geometry::covered_by(point, piece.robust_offsetted_envelope))
-        {
-            // Not in offsetted-area. This makes a cheap check possible
-            switch(side_strategy.apply(points[3], points[0], point))
-            {
-                case 1 : return analyse_disjoint;
-                case -1 : return analyse_within;
-                case 0 : return analyse_disjoint;
-            }
-        }
-
-        return analyse_continue;
-    }
-
-    template <typename Turn, typename Piece, typename Compare,  typename SideStrategy>
-    static inline analyse_result check_monotonic(Turn const& turn, Piece const& piece, Compare const& compare, SideStrategy const& side_strategy)
-    {
-        typedef typename Piece::piece_robust_ring_type ring_type;
-        typedef typename ring_type::const_iterator it_type;
-        it_type end = piece.robust_ring.begin() + piece.offsetted_count;
-        it_type it = std::lower_bound(piece.robust_ring.begin(),
-                    end,
-                    turn.robust_point,
-                    compare);
-
-        if (it != end
-            && it != piece.robust_ring.begin())
-        {
-            // iterator points to point larger than point
-            // w.r.t. specified direction, and prev points to a point smaller
-            // We now know if it is inside/outside
-            it_type prev = it - 1;
-            return check_segment<UseSideOfIntersection>::apply(*prev, *it, turn, true, side_strategy);
-        }
-        return analyse_continue;
-    }
-
-public :
-    template
-    <
-        typename Turn,
-        typename Piece,
-        typename DistanceStrategy,
-        typename SideStrategy
-    >
-    static inline analyse_result apply(Turn const& turn, Piece const& piece,
-                                       DistanceStrategy const& distance_strategy,
-                                       SideStrategy const& side_strategy)
-    {
-        typedef typename Turn::robust_point_type point_type;
-        analyse_result code = check_helper_segments(turn, piece, distance_strategy, side_strategy);
-        if (code != analyse_continue)
-        {
-            return code;
-        }
-
-        geometry::equal_to<point_type> comparator;
-
-        if (piece.offsetted_count > 8)
-        {
-            // If the offset contains some points and is monotonic, we try
-            // to avoid walking all points linearly.
-            // We try it only once.
-            if (piece.is_monotonic_increasing[0])
-            {
-                code = check_monotonic(turn, piece, geometry::less<point_type, 0>(), side_strategy);
-                if (code != analyse_continue) return code;
-            }
-            else if (piece.is_monotonic_increasing[1])
-            {
-                code = check_monotonic(turn, piece, geometry::less<point_type, 1>(), side_strategy);
-                if (code != analyse_continue) return code;
-            }
-            else if (piece.is_monotonic_decreasing[0])
-            {
-                code = check_monotonic(turn, piece, geometry::greater<point_type, 0>(), side_strategy);
-                if (code != analyse_continue) return code;
-            }
-            else if (piece.is_monotonic_decreasing[1])
-            {
-                code = check_monotonic(turn, piece, geometry::greater<point_type, 1>(), side_strategy);
-                if (code != analyse_continue) return code;
-            }
-        }
-
-        // It is small or not monotonic, walk linearly through offset
-        // TODO: this will be combined with winding strategy
-
-        for (signed_size_type i = 1; i < piece.offsetted_count; i++)
-        {
-            point_type const& previous = piece.robust_ring[i - 1];
-            point_type const& current = piece.robust_ring[i];
-
-            // The robust ring can contain duplicates
-            // (on which any side or side-value would return 0)
-            if (! comparator(previous, current))
-            {
-                code = check_segment<UseSideOfIntersection>::apply(previous, current, turn, false, side_strategy);
-                if (code != analyse_continue)
-                {
-                    return code;
-                }
-            }
-        }
-
-        return analyse_unknown;
-    }
-
-};
-
-// Helper Structure, of which the apply method returns a side value in {-1, 0, 1}
-template <bool UseSideOfIntersection>
-struct turn_in_piece {};
-
-template <>
-struct turn_in_piece<true>
-{
-
-private :
-    template <typename Turn, typename Piece>
-    static inline int in_convex_piece(Turn const& turn, Piece const& piece)
-    {
-        typedef typename Turn::robust_point_type point_type;
-        typedef typename Piece::piece_robust_ring_type ring_type;
-        typedef geometry::model::referring_segment<point_type const> segment;
-
-        segment const p(turn.rob_pi, turn.rob_pj);
-        segment const q(turn.rob_qi, turn.rob_qj);
-
-        typedef typename boost::range_iterator<ring_type const>::type iterator_type;
-        iterator_type it = boost::begin(piece.robust_ring);
-        iterator_type end = boost::end(piece.robust_ring);
-
-        // A robust ring is always closed, and always clockwise
-        for (iterator_type previous = it++; it != end; ++previous, ++it)
-        {
-            geometry::equal_to<point_type> comparator;
-            if (comparator(*previous, *it))
-            {
-                // Points are the same
-                continue;
-            }
-
-            segment r(*previous, *it);
-
-            int const side = strategy::side::side_of_intersection::apply(p, q, r,
-                        turn.robust_point);
-
-            if (side == 1)
-            {
-                // IP is left of segment, so it is outside
-                return -1; // outside
-            }
-            else if (side == 0)
-            {
-                // IP is collinear with segment. TODO: we should analyze this further
-                // For now we use the fallback point
-                if (in_box(*previous, *it, turn.robust_point))
-                {
-                    return 0;
-                }
-                else
-                {
-                    return -1; // outside
-                }
-            }
-        }
-        return 1; // inside
-    }
-
-public :
-
-    template <typename Turn, typename Piece, typename Strategy>
-    static inline int apply(Turn const& turn, Piece const& piece,
-            Strategy const& strategy)
-    {
-        if (piece.is_convex)
-        {
-            return in_convex_piece(turn, piece);
-        }
-        else
-        {
-            // side-of-intersection only supported for convex pieces
-            // Call point_in_geometry, a performance-bottleneck
-            // TODO: might be replaced by extending analysing piece
-            return detail::within::point_in_geometry(turn.robust_point,
-                piece.robust_ring, strategy);
-        }
-    }
-};
-
-template <>
-struct turn_in_piece<false>
-{
-public :
-
-    template <typename Turn, typename Piece, typename Strategy>
-    static inline int apply(Turn const& turn, Piece const& piece,
-            Strategy const& strategy)
-    {
-        return detail::within::point_in_geometry(turn.robust_point,
-            piece.robust_ring, strategy);
-    }
-};
 
 template
 <
@@ -815,17 +40,15 @@ template
     typename Turns,
     typename Pieces,
     typename DistanceStrategy,
-    typename PointInGeometryStrategy,
-    typename SideStrategy
+    typename UmbrellaStrategy
 
 >
 class turn_in_piece_visitor
 {
     Turns& m_turns; // because partition is currently operating on const input only
     Pieces const& m_pieces; // to check for piece-type
-    DistanceStrategy const& m_distance_strategy; // to check if point is on original
-    PointInGeometryStrategy const& m_point_in_geometry_strategy;
-    SideStrategy const& m_side_strategy;
+    DistanceStrategy const& m_distance_strategy; // to check if point is on original or one_sided
+    UmbrellaStrategy const& m_umbrella_strategy;
 
     template <typename Operation, typename Piece>
     inline bool skip(Operation const& op, Piece const& piece) const
@@ -854,28 +77,40 @@ class turn_in_piece_visitor
         return false;
     }
 
+    template <typename NumericType>
+    inline bool is_one_sided(NumericType const& left, NumericType const& right) const
+    {
+        static NumericType const zero = 0;
+        return geometry::math::equals(left, zero)
+            || geometry::math::equals(right, zero);
+    }
+
+    template <typename Point>
+    inline bool has_zero_distance_at(Point const& point) const
+    {
+        return is_one_sided(m_distance_strategy.apply(point, point,
+                strategy::buffer::buffer_side_left),
+            m_distance_strategy.apply(point, point,
+                strategy::buffer::buffer_side_right));
+    }
 
 public:
 
     inline turn_in_piece_visitor(Turns& turns, Pieces const& pieces,
                                  DistanceStrategy const& distance_strategy,
-                                 PointInGeometryStrategy const& strategy,
-                                 SideStrategy const& side_strategy)
+                                 UmbrellaStrategy const& umbrella_strategy)
         : m_turns(turns)
         , m_pieces(pieces)
         , m_distance_strategy(distance_strategy)
-        , m_point_in_geometry_strategy(strategy)
-        , m_side_strategy(side_strategy)
+        , m_umbrella_strategy(umbrella_strategy)        
     {}
 
     template <typename Turn, typename Piece>
-    inline bool apply(Turn const& turn, Piece const& piece, bool first = true)
+    inline bool apply(Turn const& turn, Piece const& piece)
     {
-        boost::ignore_unused(first);
-
-        if (turn.count_within > 0)
+        if (! turn.is_turn_traversable)
         {
-            // Already inside - no need to check again
+            // Already handled
             return true;
         }
 
@@ -886,74 +121,77 @@ public:
             return true;
         }
 
-        if (! geometry::covered_by(turn.robust_point, piece.robust_envelope))
-        {
-            // Easy check: if the turn is not in the envelope, we can safely return
-            return true;
-        }
-
         if (skip(turn.operations[0], piece) || skip(turn.operations[1], piece))
         {
             return true;
         }
 
-        // TODO: mutable_piece to make some on-demand preparations in analyse
-        Turn& mutable_turn = m_turns[turn.turn_index];
+        return apply(turn, piece, piece.m_piece_border);
+    }
+
+    template <typename Turn, typename Piece, typename Border>
+    inline bool apply(Turn const& turn, Piece const& piece, Border const& border)
+    {
+        if (! geometry::covered_by(turn.point, border.m_envelope, m_umbrella_strategy))
+        {
+            // Easy check: if turn is not in the (expanded) envelope
+            return true;
+        }
 
         if (piece.type == geometry::strategy::buffer::buffered_point)
         {
-            // Optimization for buffer around points: if distance from center
-            // is not between min/max radius, the result is clear
-            typedef typename default_comparable_distance_result
-                <
-                    typename Turn::robust_point_type
-                >::type distance_type;
+            // Optimization for a buffer around points: if distance from center
+            // is not between min/max radius, it is either inside or outside,
+            // and more expensive checks are not necessary.
+            auto const d = geometry::comparable_distance(piece.m_center, turn.point,
+                                                         m_umbrella_strategy);
 
-            distance_type const cd
-                = geometry::comparable_distance(piece.robust_center,
-                        turn.robust_point);
-
-            if (cd < piece.robust_min_comparable_radius)
+            if (d < border.m_min_comparable_radius)
             {
-                mutable_turn.count_within++;
+                Turn& mutable_turn = m_turns[turn.turn_index];
+                mutable_turn.is_turn_traversable = false;
                 return true;
             }
-            if (cd > piece.robust_max_comparable_radius)
+            if (d > border.m_max_comparable_radius)
             {
                 return true;
             }
         }
 
-        static const bool use_soi = use_side_of_intersection<CsTag>::value;
-        boost::ignore_unused(use_soi);
+        // Check if buffer is one-sided (at this point), because then a point
+        // on the original is not considered as within.
+        bool const one_sided = has_zero_distance_at(turn.point);
 
-        analyse_result const analyse_code =
-            piece.type == geometry::strategy::buffer::buffered_point
-                ? analyse_turn_wrt_point_piece<use_soi>::apply(turn, piece, m_point_in_geometry_strategy, m_side_strategy)
-                : analyse_turn_wrt_piece<use_soi>::apply(turn, piece, m_distance_strategy, m_side_strategy);
-
-        switch(analyse_code)
+        typename Border::state_type state;
+        if (! border.point_on_piece(turn.point, m_umbrella_strategy, one_sided,
+                                    turn.is_linear_end_point, state))
         {
-            case analyse_disjoint :
-            case analyse_on_offsetted :
-            case analyse_on_original_boundary :
-                return true;
-            case analyse_within :
-                mutable_turn.count_within++;
-                return true;
-            case analyse_near_offsetted :
-                mutable_turn.count_within_near_offsetted++;
-                return true;
-            default :
-                break;
+            return true;
         }
 
-        int const geometry_code = turn_in_piece<use_soi>::apply(turn, piece,
-                m_point_in_geometry_strategy);
-
-        if (geometry_code == 1)
+        if (state.code() == 1)
         {
-            mutable_turn.count_within++;
+            // It is WITHIN a piece, or on the piece border, but not
+            // on the offsetted part of it.
+
+            // TODO - at further removing rescaling, this threshold can be
+            // adapted, or ideally, go.
+            // This threshold is minimized to the point where fragile
+            // unit tests of hard cases start to fail (5 in multi_polygon)
+            // But it is acknowlegded that such a threshold depends on the
+            // scale of the input.
+            if (state.m_min_distance > 1.0e-4 || ! state.m_close_to_offset)
+            {
+                Turn& mutable_turn = m_turns[turn.turn_index];
+                mutable_turn.is_turn_traversable = false;
+
+                // Keep track of the information if this turn was close
+                // to an offset (without threshold). Because if it was,
+                // it might have been classified incorrectly and in the
+                // pretraversal step, it can in hindsight be classified
+                // as "outside".
+                mutable_turn.close_to_offset = state.m_close_to_offset;
+            }
         }
 
         return true;
@@ -967,4 +205,8 @@ public:
 
 }} // namespace boost::geometry
 
-#endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_BUFFER_TURN_IN_PIECE_VISITOR
+#endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_BUFFER_TURN_IN_PIECE_VISITOR_HPP
+
+/* turn_in_piece_visitor.hpp
+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
+*/

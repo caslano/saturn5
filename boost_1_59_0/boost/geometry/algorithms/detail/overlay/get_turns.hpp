@@ -3,8 +3,8 @@
 // Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 // Copyright (c) 2014-2017 Adam Wulkiewicz, Lodz, Poland.
 
-// This file was modified by Oracle on 2014, 2016, 2017, 2018.
-// Modifications copyright (c) 2014-2018 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2014-2021.
+// Modifications copyright (c) 2014-2021 Oracle and/or its affiliates.
 
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
@@ -22,9 +22,24 @@
 #include <boost/array.hpp>
 #include <boost/concept_check.hpp>
 #include <boost/core/ignore_unused.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/vector_c.hpp>
-#include <boost/range.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
+#include <boost/range/size.hpp>
+#include <boost/range/value_type.hpp>
+
+#include <boost/geometry/algorithms/detail/disjoint/box_box.hpp>
+#include <boost/geometry/algorithms/detail/disjoint/point_point.hpp>
+#include <boost/geometry/algorithms/detail/interior_iterator.hpp>
+#include <boost/geometry/algorithms/detail/overlay/get_turn_info.hpp>
+#include <boost/geometry/algorithms/detail/overlay/get_turn_info_ll.hpp>
+#include <boost/geometry/algorithms/detail/overlay/get_turn_info_la.hpp>
+#include <boost/geometry/algorithms/detail/overlay/segment_identifier.hpp>
+#include <boost/geometry/algorithms/detail/partition.hpp>
+#include <boost/geometry/algorithms/detail/recalculate.hpp>
+#include <boost/geometry/algorithms/detail/sections/range_by_section.hpp>
+#include <boost/geometry/algorithms/detail/sections/section_box_policies.hpp>
+#include <boost/geometry/algorithms/detail/sections/section_functions.hpp>
+#include <boost/geometry/algorithms/detail/sections/sectionalize.hpp>
 
 #include <boost/geometry/core/access.hpp>
 #include <boost/geometry/core/assert.hpp>
@@ -35,14 +50,8 @@
 #include <boost/geometry/core/ring_type.hpp>
 #include <boost/geometry/core/tags.hpp>
 
-#include <boost/geometry/geometries/concepts/check.hpp>
-
-#include <boost/geometry/util/math.hpp>
-#include <boost/geometry/views/closeable_view.hpp>
-#include <boost/geometry/views/reversible_view.hpp>
-#include <boost/geometry/views/detail/range_type.hpp>
-
 #include <boost/geometry/geometries/box.hpp>
+#include <boost/geometry/geometries/concepts/check.hpp>
 #include <boost/geometry/geometries/segment.hpp>
 
 #include <boost/geometry/iterators/ever_circling_iterator.hpp>
@@ -50,22 +59,11 @@
 #include <boost/geometry/strategies/intersection_strategies.hpp>
 #include <boost/geometry/strategies/intersection_result.hpp>
 
-#include <boost/geometry/algorithms/detail/disjoint/box_box.hpp>
-#include <boost/geometry/algorithms/detail/disjoint/point_point.hpp>
+#include <boost/geometry/util/math.hpp>
+#include <boost/geometry/util/type_traits.hpp>
 
-#include <boost/geometry/algorithms/detail/interior_iterator.hpp>
-#include <boost/geometry/algorithms/detail/partition.hpp>
-#include <boost/geometry/algorithms/detail/recalculate.hpp>
-#include <boost/geometry/algorithms/detail/sections/section_box_policies.hpp>
+#include <boost/geometry/views/detail/closed_clockwise_view.hpp>
 
-#include <boost/geometry/algorithms/detail/overlay/get_turn_info.hpp>
-#include <boost/geometry/algorithms/detail/overlay/get_turn_info_ll.hpp>
-#include <boost/geometry/algorithms/detail/overlay/get_turn_info_la.hpp>
-#include <boost/geometry/algorithms/detail/overlay/segment_identifier.hpp>
-
-#include <boost/geometry/algorithms/detail/sections/range_by_section.hpp>
-#include <boost/geometry/algorithms/detail/sections/sectionalize.hpp>
-#include <boost/geometry/algorithms/detail/sections/section_functions.hpp>
 
 #ifdef BOOST_GEOMETRY_DEBUG_INTERSECTION
 #  include <sstream>
@@ -108,7 +106,7 @@ template
     typename Section,
     typename Point,
     typename CircularIterator,
-    typename IntersectionStrategy,
+    typename Strategy,
     typename RobustPolicy
 >
 struct unique_sub_range_from_section
@@ -118,16 +116,17 @@ struct unique_sub_range_from_section
     unique_sub_range_from_section(Section const& section, signed_size_type index,
                           CircularIterator circular_iterator,
                           Point const& previous, Point const& current,
+                          Strategy const& strategy,
                           RobustPolicy const& robust_policy)
-      : m_section(section)
-      , m_index(index)
-      , m_previous_point(previous)
-      , m_current_point(current)
-      , m_circular_iterator(circular_iterator)
-      , m_point_retrieved(false)
-      , m_robust_policy(robust_policy)
-    {
-    }
+        : m_section(section)
+        , m_index(index)
+        , m_previous_point(previous)
+        , m_current_point(current)
+        , m_circular_iterator(circular_iterator)
+        , m_point_retrieved(false)
+        , m_strategy(strategy)
+        , m_robust_policy(robust_policy)
+    {}
 
     inline bool is_first_segment() const
     {
@@ -170,7 +169,6 @@ private :
 
     inline void advance_to_non_duplicate_next(Point const& current, CircularIterator& circular_iterator) const
     {
-        typedef typename IntersectionStrategy::point_in_point_strategy_type disjoint_strategy_type;
         typedef typename robust_point_type<Point, RobustPolicy>::type robust_point_type;
         robust_point_type current_robust_point;
         robust_point_type next_robust_point;
@@ -187,12 +185,9 @@ private :
         // So advance to the "non duplicate next"
         // (the check is defensive, to avoid endless loops)
         std::size_t check = 0;
-        while(! detail::disjoint::disjoint_point_point
-                (
-                    current_robust_point, next_robust_point,
-                    disjoint_strategy_type()
-                )
-            && check++ < m_section.range_count)
+        while (! detail::disjoint::disjoint_point_point(
+                    current_robust_point, next_robust_point, m_strategy)
+               && check++ < m_section.range_count)
         {
             circular_iterator++;
             geometry::recalculate(next_robust_point, *circular_iterator, m_robust_policy);
@@ -206,6 +201,7 @@ private :
     mutable CircularIterator m_circular_iterator;
     mutable Point m_point;
     mutable bool m_point_retrieved;
+    Strategy m_strategy;
     RobustPolicy m_robust_policy;
 };
 
@@ -218,40 +214,24 @@ template
 >
 class get_turns_in_sections
 {
-    typedef typename closeable_view
+    using range1_view = detail::closed_clockwise_view
         <
-            typename range_type<Geometry1>::type const,
-            closure<Geometry1>::value
-        >::type cview_type1;
-    typedef typename closeable_view
+            typename ring_type<Geometry1>::type const,
+            geometry::closure<Geometry1>::value,
+            Reverse1 ? counterclockwise : clockwise
+        >;
+    using range2_view = detail::closed_clockwise_view
         <
-            typename range_type<Geometry2>::type const,
-            closure<Geometry2>::value
-        >::type cview_type2;
+            typename ring_type<Geometry2>::type const,
+            geometry::closure<Geometry2>::value,
+            Reverse2 ? counterclockwise : clockwise
+        >;
 
-    typedef typename reversible_view
-        <
-            cview_type1 const,
-            Reverse1 ? iterate_reverse : iterate_forward
-        >::type view_type1;
-    typedef typename reversible_view
-        <
-            cview_type2 const,
-            Reverse2 ? iterate_reverse : iterate_forward
-        >::type view_type2;
+    using range1_iterator = typename boost::range_iterator<range1_view const>::type;
+    using range2_iterator = typename boost::range_iterator<range2_view const>::type;
 
-    typedef typename boost::range_iterator
-        <
-            view_type1 const
-        >::type range1_iterator;
-
-    typedef typename boost::range_iterator
-        <
-            view_type2 const
-        >::type range2_iterator;
-
-    typedef ever_circling_iterator<range1_iterator> circular1_iterator;
-    typedef ever_circling_iterator<range2_iterator> circular2_iterator;
+    using circular1_iterator = ever_circling_iterator<range1_iterator>;
+    using circular2_iterator = ever_circling_iterator<range2_iterator>;
 
     template <typename Geometry, typename Section>
     static inline bool adjacent(Section const& section,
@@ -267,15 +247,7 @@ class get_turns_in_sections
 
         boost::ignore_unused(n, index1, index2);
 
-        return boost::is_same
-                    <
-                        typename tag_cast
-                            <
-                                typename geometry::tag<Geometry>::type,
-                                areal_tag
-                            >::type,
-                        areal_tag
-                    >::value
+        return util::is_areal<Geometry>::value
                && index1 == 0
                && index2 >= n - 2
                 ;
@@ -284,29 +256,20 @@ class get_turns_in_sections
 
 public :
     // Returns true if terminated, false if interrupted
-    template <typename IntersectionStrategy, typename RobustPolicy, typename Turns, typename InterruptPolicy>
+    template <typename Strategy, typename RobustPolicy, typename Turns, typename InterruptPolicy>
     static inline bool apply(
             int source_id1, Geometry1 const& geometry1, Section1 const& sec1,
             int source_id2, Geometry2 const& geometry2, Section2 const& sec2,
             bool skip_larger, bool skip_adjacent,
-            IntersectionStrategy const& intersection_strategy,
+            Strategy const& strategy,
             RobustPolicy const& robust_policy,
             Turns& turns,
             InterruptPolicy& interrupt_policy)
     {
         boost::ignore_unused(interrupt_policy);
 
-        static bool const areal1 = boost::is_same
-            <
-                typename tag_cast<typename tag<Geometry1>::type, areal_tag>::type,
-                areal_tag
-            >::type::value;
-        static bool const areal2 = boost::is_same
-            <
-                typename tag_cast<typename tag<Geometry2>::type, areal_tag>::type,
-                areal_tag
-            >::type::value;
-
+        static bool const areal1 = util::is_areal<Geometry1>::value;
+        static bool const areal2 = util::is_areal<Geometry2>::value;
 
         if ((sec1.duplicate && (sec1.count + 1) < sec1.range_count)
            || (sec2.duplicate && (sec2.count + 1) < sec2.range_count))
@@ -318,10 +281,8 @@ public :
             return true;
         }
 
-        cview_type1 cview1(range_by_section(geometry1, sec1));
-        cview_type2 cview2(range_by_section(geometry2, sec2));
-        view_type1 view1(cview1);
-        view_type2 view2(cview2);
+        range1_view const view1(range_by_section(geometry1, sec1));
+        range2_view const view2(range_by_section(geometry2, sec2));
 
         range1_iterator begin_range_1 = boost::begin(view1);
         range1_iterator end_range_1 = boost::end(view1);
@@ -341,7 +302,7 @@ public :
 
         // We need a circular iterator because it might run through the closing point.
         // One circle is actually enough but this one is just convenient.
-        ever_circling_iterator<range1_iterator> next1(begin_range_1, end_range_1, it1, true);
+        circular1_iterator next1(begin_range_1, end_range_1, it1, true);
         next1++;
 
         // Walk through section and stop if we exceed the other box
@@ -354,11 +315,11 @@ public :
             unique_sub_range_from_section
                 <
                     areal1, Section1, point1_type, circular1_iterator,
-                    IntersectionStrategy, RobustPolicy
+                    Strategy, RobustPolicy
                 > unique_sub_range1(sec1, index1,
                                     circular1_iterator(begin_range_1, end_range_1, next1, true),
                                     *prev1, *it1,
-                                    robust_policy);
+                                    strategy, robust_policy);
 
             signed_size_type index2 = sec2.begin_index;
             signed_size_type ndi2 = sec2.non_duplicate_index;
@@ -367,7 +328,7 @@ public :
 
             get_start_point_iterator(sec2, view2, prev2, it2, end2,
                         index2, ndi2, dir2, sec1.bounding_box, robust_policy);
-            ever_circling_iterator<range2_iterator> next2(begin_range_2, end_range_2, it2, true);
+            circular2_iterator next2(begin_range_2, end_range_2, it2, true);
             next2++;
 
             for (prev2 = it2++, next2++;
@@ -407,11 +368,11 @@ public :
                     unique_sub_range_from_section
                         <
                             areal2, Section2, point2_type, circular2_iterator,
-                            IntersectionStrategy, RobustPolicy
+                            Strategy, RobustPolicy
                         > unique_sub_range2(sec2, index2,
                                             circular2_iterator(begin_range_2, end_range_2, next2),
                                             *prev2, *it2,
-                                            robust_policy);
+                                            strategy, robust_policy);
 
                     typedef typename boost::range_value<Turns>::type turn_info;
 
@@ -426,7 +387,7 @@ public :
                     std::size_t const size_before = boost::size(turns);
 
                     TurnPolicy::apply(unique_sub_range1, unique_sub_range2,
-                                      ti, intersection_strategy, robust_policy,
+                                      ti, strategy, robust_policy,
                                       std::back_inserter(turns));
 
                     if (InterruptPolicy::enabled)
@@ -448,8 +409,6 @@ public :
 private :
     typedef typename geometry::point_type<Geometry1>::type point1_type;
     typedef typename geometry::point_type<Geometry2>::type point2_type;
-    typedef typename model::referring_segment<point1_type const> segment1_type;
-    typedef typename model::referring_segment<point2_type const> segment2_type;
 
     // It is NOT possible to have section-iterators here
     // because of the logistics of "index" (the section-iterator automatically
@@ -483,7 +442,7 @@ template
     typename Geometry1, typename Geometry2,
     bool Reverse1, bool Reverse2,
     typename TurnPolicy,
-    typename IntersectionStrategy,
+    typename Strategy,
     typename RobustPolicy,
     typename Turns,
     typename InterruptPolicy
@@ -494,20 +453,20 @@ struct section_visitor
     Geometry1 const& m_geometry1;
     int m_source_id2;
     Geometry2 const& m_geometry2;
-    IntersectionStrategy const& m_intersection_strategy;
+    Strategy const& m_strategy;
     RobustPolicy const& m_rescale_policy;
     Turns& m_turns;
     InterruptPolicy& m_interrupt_policy;
 
     section_visitor(int id1, Geometry1 const& g1,
                     int id2, Geometry2 const& g2,
-                    IntersectionStrategy const& intersection_strategy,
+                    Strategy const& strategy,
                     RobustPolicy const& robust_policy,
                     Turns& turns,
                     InterruptPolicy& ip)
         : m_source_id1(id1), m_geometry1(g1)
         , m_source_id2(id2), m_geometry2(g2)
-        , m_intersection_strategy(intersection_strategy)
+        , m_strategy(strategy)
         , m_rescale_policy(robust_policy)
         , m_turns(turns)
         , m_interrupt_policy(ip)
@@ -518,7 +477,7 @@ struct section_visitor
     {
         if (! detail::disjoint::disjoint_box_box(sec1.bounding_box,
                                                  sec2.bounding_box,
-                                                 m_intersection_strategy.get_disjoint_box_box_strategy()))
+                                                 m_strategy) )
         {
             // false if interrupted
             return get_turns_in_sections
@@ -531,7 +490,7 @@ struct section_visitor
                     >::apply(m_source_id1, m_geometry1, sec1,
                              m_source_id2, m_geometry2, sec2,
                              false, false,
-                             m_intersection_strategy,
+                             m_strategy,
                              m_rescale_policy,
                              m_turns, m_interrupt_policy);
         }
@@ -550,11 +509,11 @@ class get_turns_generic
 {
 
 public:
-    template <typename IntersectionStrategy, typename RobustPolicy, typename Turns, typename InterruptPolicy>
+    template <typename Strategy, typename RobustPolicy, typename Turns, typename InterruptPolicy>
     static inline void apply(
             int source_id1, Geometry1 const& geometry1,
             int source_id2, Geometry2 const& geometry2,
-            IntersectionStrategy const& intersection_strategy,
+            Strategy const& strategy,
             RobustPolicy const& robust_policy,
             Turns& turns,
             InterruptPolicy& interrupt_policy)
@@ -573,17 +532,12 @@ public:
         typedef geometry::sections<box_type, 2> sections_type;
 
         sections_type sec1, sec2;
-        typedef boost::mpl::vector_c<std::size_t, 0, 1> dimensions;
-
-        typename IntersectionStrategy::envelope_strategy_type const
-            envelope_strategy = intersection_strategy.get_envelope_strategy();
-        typename IntersectionStrategy::expand_strategy_type const
-            expand_strategy = intersection_strategy.get_expand_strategy();
+        typedef std::integer_sequence<std::size_t, 0, 1> dimensions;
 
         geometry::sectionalize<Reverse1, dimensions>(geometry1, robust_policy,
-                sec1, envelope_strategy, expand_strategy, 0);
+                                                     sec1, strategy, 0);
         geometry::sectionalize<Reverse2, dimensions>(geometry2, robust_policy,
-                sec2, envelope_strategy, expand_strategy, 1);
+                                                     sec2, strategy, 1);
 
         // ... and then partition them, intersecting overlapping sections in visitor method
         section_visitor
@@ -591,27 +545,17 @@ public:
                 Geometry1, Geometry2,
                 Reverse1, Reverse2,
                 TurnPolicy,
-                IntersectionStrategy, RobustPolicy,
+                Strategy, RobustPolicy,
                 Turns, InterruptPolicy
             > visitor(source_id1, geometry1, source_id2, geometry2,
-                      intersection_strategy, robust_policy,
-                      turns, interrupt_policy);
-
-        typedef detail::section::get_section_box
-            <
-                typename IntersectionStrategy::expand_box_strategy_type
-            > get_section_box_type;
-        typedef detail::section::overlaps_section_box
-            <
-                typename IntersectionStrategy::disjoint_box_box_strategy_type
-            > overlaps_section_box_type;
+                      strategy, robust_policy, turns, interrupt_policy);
 
         geometry::partition
             <
                 box_type
             >::apply(sec1, sec2, visitor,
-                     get_section_box_type(),
-                     overlaps_section_box_type());
+                     detail::section::get_section_box<Strategy>(strategy),
+                     detail::section::overlaps_section_box<Strategy>(strategy));
     }
 };
 
@@ -629,22 +573,14 @@ struct get_turns_cs
     typedef typename geometry::point_type<Box>::type box_point_type;
     typedef boost::array<box_point_type, 4> box_array;
 
-    typedef typename closeable_view
+    using view_type = detail::closed_clockwise_view
         <
             Range const,
-            closure<Range>::value
-        >::type cview_type;
+            geometry::closure<Range>::value,
+            ReverseRange ? counterclockwise : clockwise
+        >;
 
-    typedef typename reversible_view
-        <
-            cview_type const,
-            ReverseRange ? iterate_reverse : iterate_forward
-        >::type view_type;
-
-    typedef typename boost::range_iterator
-        <
-            view_type const
-        >::type iterator_type;
+    using iterator_type = typename boost::range_iterator<view_type const>::type;
 
     struct unique_sub_range_from_box_policy
     {
@@ -730,8 +666,7 @@ struct get_turns_cs
         box_array box_points;
         assign_box_corners_oriented<ReverseBox>(box, box_points);
 
-        cview_type cview(range);
-        view_type view(cview);
+        view_type const view(range);
 
         // TODO: in this code, possible duplicate points are not yet taken
         // into account (not in the iterator, nor in the retrieve policy)
@@ -1113,10 +1048,10 @@ template
 >
 struct get_turns_reversed
 {
-    template <typename IntersectionStrategy, typename RobustPolicy, typename Turns, typename InterruptPolicy>
+    template <typename Strategy, typename RobustPolicy, typename Turns, typename InterruptPolicy>
     static inline void apply(int source_id1, Geometry1 const& g1,
                              int source_id2, Geometry2 const& g2,
-                             IntersectionStrategy const& intersection_strategy,
+                             Strategy const& strategy,
                              RobustPolicy const& robust_policy,
                              Turns& turns,
                              InterruptPolicy& interrupt_policy)
@@ -1128,7 +1063,7 @@ struct get_turns_reversed
                 Reverse2, Reverse1,
                 TurnPolicy
             >::apply(source_id2, g2, source_id1, g1,
-                     intersection_strategy, robust_policy,
+                     strategy, robust_policy,
                      turns, interrupt_policy);
     }
 };
@@ -1159,14 +1094,14 @@ template
     typename AssignPolicy,
     typename Geometry1,
     typename Geometry2,
-    typename IntersectionStrategy,
+    typename Strategy,
     typename RobustPolicy,
     typename Turns,
     typename InterruptPolicy
 >
 inline void get_turns(Geometry1 const& geometry1,
                       Geometry2 const& geometry2,
-                      IntersectionStrategy const& intersection_strategy,
+                      Strategy const& strategy,
                       RobustPolicy const& robust_policy,
                       Turns& turns,
                       InterruptPolicy& interrupt_policy)
@@ -1176,7 +1111,7 @@ inline void get_turns(Geometry1 const& geometry1,
     typedef detail::overlay::get_turn_info<AssignPolicy> TurnPolicy;
     //typedef detail::get_turns::get_turn_info_type<Geometry1, Geometry2, AssignPolicy> TurnPolicy;
 
-    boost::mpl::if_c
+    std::conditional_t
         <
             reverse_dispatch<Geometry1, Geometry2>::type::value,
             dispatch::get_turns_reversed
@@ -1195,11 +1130,11 @@ inline void get_turns(Geometry1 const& geometry1,
                 Reverse1, Reverse2,
                 TurnPolicy
             >
-        >::type::apply(0, geometry1,
-                       1, geometry2,
-                       intersection_strategy,
-                       robust_policy,
-                       turns, interrupt_policy);
+        >::apply(0, geometry1,
+                 1, geometry2,
+                 strategy,
+                 robust_policy,
+                 turns, interrupt_policy);
 }
 
 #if defined(_MSC_VER)
@@ -1209,3 +1144,7 @@ inline void get_turns(Geometry1 const& geometry1,
 }} // namespace boost::geometry
 
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_GET_TURNS_HPP
+
+/* get_turns.hpp
+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
+*/

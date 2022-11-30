@@ -9,27 +9,15 @@
 #ifdef _MSC_VER
 #pragma once
 #endif
-#include <boost/math/tools/complex.hpp> // test for multiprecision types.
+#include <boost/math/tools/complex.hpp> // test for multiprecision types in complex Newton
 
-#include <iostream>
 #include <utility>
-#include <boost/config/no_tr1/cmath.hpp>
-#include <stdexcept>
+#include <cmath>
+#include <tuple>
+#include <cstdint>
 
 #include <boost/math/tools/config.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/assert.hpp>
-#include <boost/throw_exception.hpp>
 #include <boost/math/tools/cxx03_warn.hpp>
-
-#ifdef BOOST_MSVC
-#pragma warning(push)
-#pragma warning(disable: 4512)
-#endif
-#include <boost/math/tools/tuple.hpp>
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
 
 #include <boost/math/special_functions/sign.hpp>
 #include <boost/math/special_functions/next.hpp>
@@ -94,7 +82,7 @@ void handle_zero_derivative(F f,
    T& result,
    T& guess,
    const T& min,
-   const T& max) BOOST_NOEXCEPT_IF(BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+   const T& max) noexcept(BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
 {
    if (last_f0 == 0)
    {
@@ -140,7 +128,7 @@ void handle_zero_derivative(F f,
 } // namespace
 
 template <class F, class T, class Tol, class Policy>
-std::pair<T, T> bisect(F f, T min, T max, Tol tol, boost::uintmax_t& max_iter, const Policy& pol) BOOST_NOEXCEPT_IF(policies::is_noexcept_error_policy<Policy>::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+std::pair<T, T> bisect(F f, T min, T max, Tol tol, std::uintmax_t& max_iter, const Policy& pol) noexcept(policies::is_noexcept_error_policy<Policy>::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
 {
    T fmin = f(min);
    T fmax = f(max);
@@ -173,7 +161,7 @@ std::pair<T, T> bisect(F f, T min, T max, Tol tol, boost::uintmax_t& max_iter, c
    //
    // Three function invocations so far:
    //
-   boost::uintmax_t count = max_iter;
+   std::uintmax_t count = max_iter;
    if (count < 3)
       count = 0;
    else
@@ -205,40 +193,33 @@ std::pair<T, T> bisect(F f, T min, T max, Tol tol, boost::uintmax_t& max_iter, c
    max_iter -= count;
 
 #ifdef BOOST_MATH_INSTRUMENT
-   std::cout << "Bisection iteration, final count = " << max_iter << std::endl;
-
-   static boost::uintmax_t max_count = 0;
-   if (max_iter > max_count)
-   {
-      max_count = max_iter;
-      std::cout << "Maximum iterations: " << max_iter << std::endl;
-   }
+   std::cout << "Bisection required " << max_iter << " iterations.\n";
 #endif
 
    return std::make_pair(min, max);
 }
 
 template <class F, class T, class Tol>
-inline std::pair<T, T> bisect(F f, T min, T max, Tol tol, boost::uintmax_t& max_iter)  BOOST_NOEXCEPT_IF(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+inline std::pair<T, T> bisect(F f, T min, T max, Tol tol, std::uintmax_t& max_iter)  noexcept(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
 {
    return bisect(f, min, max, tol, max_iter, policies::policy<>());
 }
 
 template <class F, class T, class Tol>
-inline std::pair<T, T> bisect(F f, T min, T max, Tol tol) BOOST_NOEXCEPT_IF(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+inline std::pair<T, T> bisect(F f, T min, T max, Tol tol) noexcept(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
 {
-   boost::uintmax_t m = (std::numeric_limits<boost::uintmax_t>::max)();
+   std::uintmax_t m = (std::numeric_limits<std::uintmax_t>::max)();
    return bisect(f, min, max, tol, m, policies::policy<>());
 }
 
 
 template <class F, class T>
-T newton_raphson_iterate(F f, T guess, T min, T max, int digits, boost::uintmax_t& max_iter) BOOST_NOEXCEPT_IF(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+T newton_raphson_iterate(F f, T guess, T min, T max, int digits, std::uintmax_t& max_iter) noexcept(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
 {
    BOOST_MATH_STD_USING
 
    static const char* function = "boost::math::tools::newton_raphson_iterate<%1%>";
-   if (min >= max)
+   if (min > max)
    {
       return policies::raise_evaluation_error(function, "Range arguments in wrong order in boost::math::tools::newton_raphson_iterate(first arg=%1%)", min, boost::math::policies::policy<>());
    }
@@ -264,11 +245,11 @@ T newton_raphson_iterate(F f, T guess, T min, T max, int digits, boost::uintmax_
    T max_range_f = 0;
    T min_range_f = 0;
 
-   boost::uintmax_t count(max_iter);
+   std::uintmax_t count(max_iter);
 
 #ifdef BOOST_MATH_INSTRUMENT
    std::cout << "Newton_raphson_iterate, guess = " << guess << ", min = " << min << ", max = " << max
-      << ", digits = " << digits << ", max_iter = " << max_iter << std::endl;
+      << ", digits = " << digits << ", max_iter = " << max_iter << "\n";
 #endif
 
    do {
@@ -282,9 +263,6 @@ T newton_raphson_iterate(F f, T guess, T min, T max, int digits, boost::uintmax_
       if (f1 == 0)
       {
          // Oops zero derivative!!!
-#ifdef BOOST_MATH_INSTRUMENT
-         std::cout << "Newton iteration, zero derivative found!" << std::endl;
-#endif
          detail::handle_zero_derivative(f, last_f0, f0, delta, result, guess, min, max);
       }
       else
@@ -292,7 +270,7 @@ T newton_raphson_iterate(F f, T guess, T min, T max, int digits, boost::uintmax_
          delta = f0 / f1;
       }
 #ifdef BOOST_MATH_INSTRUMENT
-      std::cout << "Newton iteration " << max_iter - count << ", delta = " << delta << std::endl;
+      std::cout << "Newton iteration " << max_iter - count << ", delta = " << delta << ", residual = " << f0 << "\n";
 #endif
       if (fabs(delta * 2) > fabs(delta2))
       {
@@ -348,24 +326,16 @@ T newton_raphson_iterate(F f, T guess, T min, T max, int digits, boost::uintmax_
    max_iter -= count;
 
 #ifdef BOOST_MATH_INSTRUMENT
-   std::cout << "Newton Raphson final iteration count = " << max_iter << std::endl;
-
-   static boost::uintmax_t max_count = 0;
-   if (max_iter > max_count)
-   {
-      max_count = max_iter;
-      // std::cout << "Maximum iterations: " << max_iter << std::endl;
-      // Puzzled what this tells us, so commented out for now?
-   }
+   std::cout << "Newton Raphson required " << max_iter << " iterations\n";
 #endif
 
    return result;
 }
 
 template <class F, class T>
-inline T newton_raphson_iterate(F f, T guess, T min, T max, int digits) BOOST_NOEXCEPT_IF(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+inline T newton_raphson_iterate(F f, T guess, T min, T max, int digits) noexcept(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
 {
-   boost::uintmax_t m = (std::numeric_limits<boost::uintmax_t>::max)();
+   std::uintmax_t m = (std::numeric_limits<std::uintmax_t>::max)();
    return newton_raphson_iterate(f, guess, min, max, digits, m);
 }
 
@@ -374,7 +344,7 @@ namespace detail {
    struct halley_step
    {
       template <class T>
-      static T step(const T& /*x*/, const T& f0, const T& f1, const T& f2) BOOST_NOEXCEPT_IF(BOOST_MATH_IS_FLOAT(T))
+      static T step(const T& /*x*/, const T& f0, const T& f1, const T& f2) noexcept(BOOST_MATH_IS_FLOAT(T))
       {
          using std::fabs;
          T denom = 2 * f0;
@@ -396,10 +366,10 @@ namespace detail {
    };
 
    template <class F, class T>
-   T bracket_root_towards_min(F f, T guess, const T& f0, T& min, T& max, boost::uintmax_t& count) BOOST_NOEXCEPT_IF(BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())));
+   T bracket_root_towards_min(F f, T guess, const T& f0, T& min, T& max, std::uintmax_t& count) noexcept(BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())));
 
    template <class F, class T>
-   T bracket_root_towards_max(F f, T guess, const T& f0, T& min, T& max, boost::uintmax_t& count) BOOST_NOEXCEPT_IF(BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+   T bracket_root_towards_max(F f, T guess, const T& f0, T& min, T& max, std::uintmax_t& count) noexcept(BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
    {
       using std::fabs;
       //
@@ -454,7 +424,7 @@ namespace detail {
    }
 
    template <class F, class T>
-   T bracket_root_towards_min(F f, T guess, const T& f0, T& min, T& max, boost::uintmax_t& count) BOOST_NOEXCEPT_IF(BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+   T bracket_root_towards_min(F f, T guess, const T& f0, T& min, T& max, std::uintmax_t& count) noexcept(BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
    {
       using std::fabs;
       //
@@ -510,13 +480,13 @@ namespace detail {
    }
 
    template <class Stepper, class F, class T>
-   T second_order_root_finder(F f, T guess, T min, T max, int digits, boost::uintmax_t& max_iter) BOOST_NOEXCEPT_IF(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+   T second_order_root_finder(F f, T guess, T min, T max, int digits, std::uintmax_t& max_iter) noexcept(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
    {
       BOOST_MATH_STD_USING
 
 #ifdef BOOST_MATH_INSTRUMENT
         std::cout << "Second order root iteration, guess = " << guess << ", min = " << min << ", max = " << max
-        << ", digits = " << digits << ", max_iter = " << max_iter << std::endl;
+        << ", digits = " << digits << ", max_iter = " << max_iter << "\n";
 #endif
       static const char* function = "boost::math::tools::halley_iterate<%1%>";
       if (min >= max)
@@ -535,7 +505,7 @@ namespace detail {
       bool out_of_bounds_sentry = false;
 
    #ifdef BOOST_MATH_INSTRUMENT
-      std::cout << "Second order root iteration, limit = " << factor << std::endl;
+      std::cout << "Second order root iteration, limit = " << factor << "\n";
    #endif
 
       //
@@ -551,7 +521,7 @@ namespace detail {
       T max_range_f = 0;
       T min_range_f = 0;
 
-      boost::uintmax_t count(max_iter);
+      std::uintmax_t count(max_iter);
 
       do {
          last_f0 = f0;
@@ -569,9 +539,6 @@ namespace detail {
          if (f1 == 0)
          {
             // Oops zero derivative!!!
-   #ifdef BOOST_MATH_INSTRUMENT
-            std::cout << "Second order root iteration, zero derivative found!" << std::endl;
-   #endif
             detail::handle_zero_derivative(f, last_f0, f0, delta, result, guess, min, max);
          }
          else
@@ -599,7 +566,7 @@ namespace detail {
                delta = f0 / f1;
          }
    #ifdef BOOST_MATH_INSTRUMENT
-         std::cout << "Second order root iteration, delta = " << delta << std::endl;
+         std::cout << "Second order root iteration, delta = " << delta << ", residual = " << f0 << "\n";
    #endif
          T convergence = fabs(delta / delta2);
          if ((convergence > 0.8) && (convergence < 2))
@@ -697,7 +664,7 @@ namespace detail {
       max_iter -= count;
 
    #ifdef BOOST_MATH_INSTRUMENT
-      std::cout << "Second order root finder, final iteration count = " << max_iter << std::endl;
+      std::cout << "Second order root finder required " << max_iter << " iterations.\n";
    #endif
 
       return result;
@@ -705,15 +672,15 @@ namespace detail {
 } // T second_order_root_finder
 
 template <class F, class T>
-T halley_iterate(F f, T guess, T min, T max, int digits, boost::uintmax_t& max_iter) BOOST_NOEXCEPT_IF(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+T halley_iterate(F f, T guess, T min, T max, int digits, std::uintmax_t& max_iter) noexcept(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
 {
    return detail::second_order_root_finder<detail::halley_step>(f, guess, min, max, digits, max_iter);
 }
 
 template <class F, class T>
-inline T halley_iterate(F f, T guess, T min, T max, int digits) BOOST_NOEXCEPT_IF(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+inline T halley_iterate(F f, T guess, T min, T max, int digits) noexcept(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
 {
-   boost::uintmax_t m = (std::numeric_limits<boost::uintmax_t>::max)();
+   std::uintmax_t m = (std::numeric_limits<std::uintmax_t>::max)();
    return halley_iterate(f, guess, min, max, digits, m);
 }
 
@@ -722,7 +689,7 @@ namespace detail {
    struct schroder_stepper
    {
       template <class T>
-      static T step(const T& x, const T& f0, const T& f1, const T& f2) BOOST_NOEXCEPT_IF(BOOST_MATH_IS_FLOAT(T))
+      static T step(const T& x, const T& f0, const T& f1, const T& f2) noexcept(BOOST_MATH_IS_FLOAT(T))
       {
          using std::fabs;
          T ratio = f0 / f1;
@@ -743,30 +710,30 @@ namespace detail {
 }
 
 template <class F, class T>
-T schroder_iterate(F f, T guess, T min, T max, int digits, boost::uintmax_t& max_iter) BOOST_NOEXCEPT_IF(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+T schroder_iterate(F f, T guess, T min, T max, int digits, std::uintmax_t& max_iter) noexcept(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
 {
    return detail::second_order_root_finder<detail::schroder_stepper>(f, guess, min, max, digits, max_iter);
 }
 
 template <class F, class T>
-inline T schroder_iterate(F f, T guess, T min, T max, int digits) BOOST_NOEXCEPT_IF(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+inline T schroder_iterate(F f, T guess, T min, T max, int digits) noexcept(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
 {
-   boost::uintmax_t m = (std::numeric_limits<boost::uintmax_t>::max)();
+   std::uintmax_t m = (std::numeric_limits<std::uintmax_t>::max)();
    return schroder_iterate(f, guess, min, max, digits, m);
 }
 //
 // These two are the old spelling of this function, retained for backwards compatibility just in case:
 //
 template <class F, class T>
-T schroeder_iterate(F f, T guess, T min, T max, int digits, boost::uintmax_t& max_iter) BOOST_NOEXCEPT_IF(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+T schroeder_iterate(F f, T guess, T min, T max, int digits, std::uintmax_t& max_iter) noexcept(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
 {
    return detail::second_order_root_finder<detail::schroder_stepper>(f, guess, min, max, digits, max_iter);
 }
 
 template <class F, class T>
-inline T schroeder_iterate(F f, T guess, T min, T max, int digits) BOOST_NOEXCEPT_IF(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
+inline T schroeder_iterate(F f, T guess, T min, T max, int digits) noexcept(policies::is_noexcept_error_policy<policies::policy<> >::value&& BOOST_MATH_IS_FLOAT(T) && noexcept(std::declval<F>()(std::declval<T>())))
 {
-   boost::uintmax_t m = (std::numeric_limits<boost::uintmax_t>::max)();
+   std::uintmax_t m = (std::numeric_limits<std::uintmax_t>::max)();
    return schroder_iterate(f, guess, min, max, digits, m);
 }
 
@@ -1013,3 +980,7 @@ inline std::pair<typename tools::promote_args<T1, T2, T3>::type, typename tools:
 } // namespace boost
 
 #endif // BOOST_MATH_TOOLS_NEWTON_SOLVER_HPP
+
+/* roots.hpp
+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
+*/

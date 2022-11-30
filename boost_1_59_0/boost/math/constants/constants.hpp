@@ -12,21 +12,15 @@
 #include <boost/math/policies/policy.hpp>
 #include <boost/math/tools/precision.hpp>
 #include <boost/math/tools/convert_from_string.hpp>
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4127 4701)
 #endif
-#ifndef BOOST_MATH_NO_LEXICAL_CAST
-#include <boost/lexical_cast.hpp>
-#endif
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 #pragma warning(pop)
 #endif
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/and.hpp>
-#include <boost/mpl/int.hpp>
-#include <boost/type_traits/is_convertible.hpp>
-#include <boost/utility/declval.hpp>
+#include <utility>
+#include <type_traits>
 
 #if defined(__GNUC__) && defined(BOOST_MATH_USE_FLOAT128)
 //
@@ -77,27 +71,27 @@ namespace boost{ namespace math
    //
    // Max number of binary digits in the string representations of our constants:
    //
-   BOOST_STATIC_CONSTANT(int, max_string_digits = (101 * 1000L) / 301L);
+   static constexpr int max_string_digits = (101 * 1000L) / 301L;
 
-   template <class Real, class Policy>
+   template <typename Real, typename Policy>
    struct construction_traits
    {
    private:
-      typedef typename policies::precision<Real, Policy>::type real_precision;
-      typedef typename policies::precision<float, Policy>::type float_precision;
-      typedef typename policies::precision<double, Policy>::type double_precision;
-      typedef typename policies::precision<long double, Policy>::type long_double_precision;
+      using real_precision = typename policies::precision<Real, Policy>::type;
+      using float_precision = typename policies::precision<float, Policy>::type;
+      using double_precision = typename policies::precision<double, Policy>::type;
+      using long_double_precision = typename policies::precision<long double, Policy>::type;
    public:
-      typedef boost::integral_constant<int,
+      using type = std::integral_constant<int,
          (0 == real_precision::value) ? 0 :
-         boost::is_convertible<float, Real>::value && (real_precision::value <= float_precision::value)? construct_from_float :
-         boost::is_convertible<double, Real>::value && (real_precision::value <= double_precision::value)? construct_from_double :
-         boost::is_convertible<long double, Real>::value && (real_precision::value <= long_double_precision::value)? construct_from_long_double :
+         std::is_convertible<float, Real>::value && (real_precision::value <= float_precision::value)? construct_from_float :
+         std::is_convertible<double, Real>::value && (real_precision::value <= double_precision::value)? construct_from_double :
+         std::is_convertible<long double, Real>::value && (real_precision::value <= long_double_precision::value)? construct_from_long_double :
 #ifdef BOOST_MATH_USE_FLOAT128
-         boost::is_convertible<BOOST_MATH_FLOAT128_TYPE, Real>::value && (real_precision::value <= 113) ? construct_from_float128 :
+         std::is_convertible<BOOST_MATH_FLOAT128_TYPE, Real>::value && (real_precision::value <= 113) ? construct_from_float128 :
 #endif
          (real_precision::value <= max_string_digits) ? construct_from_string : real_precision::value
-      > type;
+      >;
    };
 
 #ifdef BOOST_HAS_THREADS
@@ -113,13 +107,13 @@ namespace boost{ namespace math
       template <class Real, class Policy = boost::math::policies::policy<> >
       struct constant_return
       {
-         typedef typename construction_traits<Real, Policy>::type construct_type;
-         typedef typename mpl::if_c<
+         using construct_type = typename construction_traits<Real, Policy>::type;
+         using type = typename std::conditional<
             (construct_type::value == construct_from_string) || (construct_type::value > construct_max),
-            const Real&, Real>::type type;
+            const Real&, Real>::type;
       };
 
-      template <class T, const T& (*F)()>
+      template <typename T, const T& (*F)()>
       struct constant_initializer
       {
          static void force_instantiate()
@@ -138,10 +132,10 @@ namespace boost{ namespace math
          static const initializer init;
       };
 
-      template <class T, const T& (*F)()>
+      template <typename T, const T& (*F)()>
       typename constant_initializer<T, F>::initializer const constant_initializer<T, F>::init;
 
-      template <class T, int N, const T& (*F)(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC((boost::integral_constant<int, N>)) BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(T))>
+      template <typename T, int N, const T& (*F)(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC((std::integral_constant<int, N>)) BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(T))>
       struct constant_initializer2
       {
          static void force_instantiate()
@@ -160,14 +154,14 @@ namespace boost{ namespace math
          static const initializer init;
       };
 
-      template <class T, int N, const T& (*F)(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC((boost::integral_constant<int, N>)) BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(T))>
+      template <typename T, int N, const T& (*F)(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC((std::integral_constant<int, N>)) BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(T))>
       typename constant_initializer2<T, N, F>::initializer const constant_initializer2<T, N, F>::init;
 
    }
 
 #ifdef BOOST_MATH_USE_FLOAT128
 #  define BOOST_MATH_FLOAT128_CONSTANT_OVERLOAD(x) \
-   static inline BOOST_CONSTEXPR T get(const boost::integral_constant<int, construct_from_float128>&) BOOST_NOEXCEPT\
+   static inline constexpr T get(const std::integral_constant<int, construct_from_float128>&) noexcept\
    { return BOOST_JOIN(x, Q); }
 #else
 #  define BOOST_MATH_FLOAT128_CONSTANT_OVERLOAD(x)
@@ -181,7 +175,7 @@ namespace boost{ namespace math
 
 #define BOOST_DEFINE_MATH_CONSTANT(name, x, y)\
    namespace detail{\
-   template <class T> struct BOOST_JOIN(constant_, name){\
+   template <typename T> struct BOOST_JOIN(constant_, name){\
    private:\
    /* The default implementations come next: */ \
    static inline const T& get_from_string()\
@@ -190,8 +184,8 @@ namespace boost{ namespace math
       return result;\
    }\
    /* This one is for very high precision that is none the less known at compile time: */ \
-   template <int N> static T compute(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC((boost::integral_constant<int, N>)));\
-   template <int N> static inline const T& get_from_compute(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC((boost::integral_constant<int, N>)))\
+   template <int N> static T compute(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC((std::integral_constant<int, N>)));\
+   template <int N> static inline const T& get_from_compute(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC((std::integral_constant<int, N>)))\
    {\
       static const T result = compute<N>();\
       return result;\
@@ -210,25 +204,25 @@ namespace boost{ namespace math
    }\
    /* public getters come next */\
    public:\
-   static inline const T& get(const boost::integral_constant<int, construct_from_string>&)\
+   static inline const T& get(const std::integral_constant<int, construct_from_string>&)\
    {\
       constant_initializer<T, & BOOST_JOIN(constant_, name)<T>::get_from_string >::force_instantiate();\
       return get_from_string();\
    }\
-   static inline BOOST_CONSTEXPR T get(const boost::integral_constant<int, construct_from_float>) BOOST_NOEXCEPT\
+   static inline constexpr T get(const std::integral_constant<int, construct_from_float>) noexcept\
    { return BOOST_JOIN(x, F); }\
-   static inline BOOST_CONSTEXPR T get(const boost::integral_constant<int, construct_from_double>&) BOOST_NOEXCEPT\
+   static inline constexpr T get(const std::integral_constant<int, construct_from_double>&) noexcept\
    { return x; }\
-   static inline BOOST_CONSTEXPR T get(const boost::integral_constant<int, construct_from_long_double>&) BOOST_NOEXCEPT\
+   static inline constexpr T get(const std::integral_constant<int, construct_from_long_double>&) noexcept\
    { return BOOST_JOIN(x, L); }\
    BOOST_MATH_FLOAT128_CONSTANT_OVERLOAD(x) \
-   template <int N> static inline const T& get(const boost::integral_constant<int, N>&)\
+   template <int N> static inline const T& get(const std::integral_constant<int, N>&)\
    {\
       constant_initializer2<T, N, & BOOST_JOIN(constant_, name)<T>::template get_from_compute<N> >::force_instantiate();\
       return get_from_compute<N>(); \
    }\
    /* This one is for true arbitrary precision, which may well vary at runtime: */ \
-   static inline T get(const boost::integral_constant<int, 0>&)\
+   static inline T get(const std::integral_constant<int, 0>&)\
    {\
       BOOST_MATH_PRECOMPUTE_IF_NOT_LOCAL(constant_, name)\
       return get_from_variable_precision(); }\
@@ -237,16 +231,16 @@ namespace boost{ namespace math
    \
    \
    /* The actual forwarding function: */ \
-   template <class T, class Policy> inline BOOST_CONSTEXPR typename detail::constant_return<T, Policy>::type name(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC(T) BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(Policy)) BOOST_MATH_NOEXCEPT(T)\
+   template <typename T, typename Policy> inline constexpr typename detail::constant_return<T, Policy>::type name(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC(T) BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(Policy)) BOOST_MATH_NOEXCEPT(T)\
    { return detail:: BOOST_JOIN(constant_, name)<T>::get(typename construction_traits<T, Policy>::type()); }\
-   template <class T> inline BOOST_CONSTEXPR typename detail::constant_return<T>::type name(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC(T)) BOOST_MATH_NOEXCEPT(T)\
+   template <typename T> inline constexpr typename detail::constant_return<T>::type name(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC(T)) BOOST_MATH_NOEXCEPT(T)\
    { return name<T, boost::math::policies::policy<> >(); }\
    \
    \
    /* Now the namespace specific versions: */ \
-   } namespace float_constants{ BOOST_STATIC_CONSTEXPR float name = BOOST_JOIN(x, F); }\
-   namespace double_constants{ BOOST_STATIC_CONSTEXPR double name = x; } \
-   namespace long_double_constants{ BOOST_STATIC_CONSTEXPR long double name = BOOST_JOIN(x, L); }\
+   } namespace float_constants{ static constexpr float name = BOOST_JOIN(x, F); }\
+   namespace double_constants{ static constexpr double name = x; } \
+   namespace long_double_constants{ static constexpr long double name = BOOST_JOIN(x, L); }\
    namespace constants{
 
   BOOST_DEFINE_MATH_CONSTANT(half, 5.000000000000000000000000000000000000e-01, "5.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e-01")
@@ -324,6 +318,17 @@ namespace boost{ namespace math
   BOOST_DEFINE_MATH_CONSTANT(one_div_pi, 0.3183098861837906715377675267450287240689192, "0.31830988618379067153776752674502872406891929148091289749533468811779359526845307018022760553250617191214568545351")
   BOOST_DEFINE_MATH_CONSTANT(two_div_root_pi, 1.12837916709551257389615890312154517168810125, "1.12837916709551257389615890312154517168810125865799771368817144342128493688298682897348732040421472688605669581272")
 
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1900)
+  BOOST_DEFINE_MATH_CONSTANT(first_feigenbaum, 4.66920160910299067185320382046620161725818557747576863274,  "4.6692016091029906718532038204662016172581855774757686327456513430041343302113147371386897440239480138171")
+  BOOST_DEFINE_MATH_CONSTANT(plastic, 1.324717957244746025960908854478097340734404056901733364534, "1.32471795724474602596090885447809734073440405690173336453401505030282785124554759405469934798178728032991")
+  BOOST_DEFINE_MATH_CONSTANT(gauss, 0.834626841674073186281429732799046808993993013490347002449, "0.83462684167407318628142973279904680899399301349034700244982737010368199270952641186969116035127532412906785")
+  BOOST_DEFINE_MATH_CONSTANT(dottie, 0.739085133215160641655312087673873404013411758900757464965, "0.739085133215160641655312087673873404013411758900757464965680635773284654883547594599376106931766531849801246")
+  BOOST_DEFINE_MATH_CONSTANT(reciprocal_fibonacci, 3.35988566624317755317201130291892717968890513, "3.35988566624317755317201130291892717968890513373196848649555381532513031899668338361541621645679008729704")
+  BOOST_DEFINE_MATH_CONSTANT(laplace_limit, 0.662743419349181580974742097109252907056233549115022417, "0.66274341934918158097474209710925290705623354911502241752039253499097185308651127724965480259895818168")
+#endif
+
+template <typename T>
+inline constexpr T tau() {  return two_pi<T>(); }
 
 } // namespace constants
 } // namespace math
@@ -338,3 +343,7 @@ namespace boost{ namespace math
 #endif // BOOST_MATH_CONSTANTS_CONSTANTS_INCLUDED
 
 
+
+/* constants.hpp
+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
+*/

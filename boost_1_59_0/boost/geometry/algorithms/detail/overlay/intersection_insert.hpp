@@ -2,9 +2,10 @@
 
 // Copyright (c) 2007-2015 Barend Gehrels, Amsterdam, the Netherlands.
 
-// This file was modified by Oracle on 2014, 2015, 2017, 2019, 2020.
-// Modifications copyright (c) 2014-2020 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2014-2021.
+// Modifications copyright (c) 2014-2021 Oracle and/or its affiliates.
 
+// Contributed and/or modified by Vissarion Fysikopoulos, on behalf of Oracle
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
@@ -17,38 +18,43 @@
 
 
 #include <cstddef>
+#include <deque>
+#include <type_traits>
 
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/assert.hpp>
-#include <boost/range/metafunctions.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
+#include <boost/range/size.hpp>
 
-
-#include <boost/geometry/core/is_areal.hpp>
-#include <boost/geometry/core/point_order.hpp>
-#include <boost/geometry/core/reverse_dispatch.hpp>
-#include <boost/geometry/geometries/concepts/check.hpp>
 #include <boost/geometry/algorithms/convert.hpp>
 #include <boost/geometry/algorithms/detail/point_on_border.hpp>
 #include <boost/geometry/algorithms/detail/overlay/clip_linestring.hpp>
 #include <boost/geometry/algorithms/detail/overlay/follow.hpp>
 #include <boost/geometry/algorithms/detail/overlay/get_intersection_points.hpp>
+#include <boost/geometry/algorithms/detail/overlay/linear_linear.hpp>
 #include <boost/geometry/algorithms/detail/overlay/overlay.hpp>
 #include <boost/geometry/algorithms/detail/overlay/overlay_type.hpp>
+#include <boost/geometry/algorithms/detail/overlay/pointlike_areal.hpp>
+#include <boost/geometry/algorithms/detail/overlay/pointlike_linear.hpp>
+#include <boost/geometry/algorithms/detail/overlay/pointlike_pointlike.hpp>
 #include <boost/geometry/algorithms/detail/overlay/range_in_geometry.hpp>
 #include <boost/geometry/algorithms/detail/overlay/segment_as_subrange.hpp>
+
+#include <boost/geometry/core/point_order.hpp>
+#include <boost/geometry/core/reverse_dispatch.hpp>
+#include <boost/geometry/core/static_assert.hpp>
+
+#include <boost/geometry/geometries/concepts/check.hpp>
 
 #include <boost/geometry/policies/robustness/rescale_policy_tags.hpp>
 #include <boost/geometry/policies/robustness/segment_ratio_type.hpp>
 #include <boost/geometry/policies/robustness/get_rescale_policy.hpp>
 
+#include <boost/geometry/strategies/default_strategy.hpp>
+#include <boost/geometry/strategies/detail.hpp>
+#include <boost/geometry/strategies/relate/services.hpp>
+
 #include <boost/geometry/views/segment_view.hpp>
 #include <boost/geometry/views/detail/boundary_view.hpp>
-
-#include <boost/geometry/algorithms/detail/check_iterator_range.hpp>
-#include <boost/geometry/algorithms/detail/overlay/linear_linear.hpp>
-#include <boost/geometry/algorithms/detail/overlay/pointlike_areal.hpp>
-#include <boost/geometry/algorithms/detail/overlay/pointlike_linear.hpp>
-#include <boost/geometry/algorithms/detail/overlay/pointlike_pointlike.hpp>
 
 #if defined(BOOST_GEOMETRY_DEBUG_FOLLOW)
 #include <boost/geometry/algorithms/detail/overlay/debug_turn_info.hpp>
@@ -78,7 +84,7 @@ struct intersection_segment_segment_point
             Strategy const& strategy)
     {
         // Make sure this is only called with no rescaling
-        BOOST_STATIC_ASSERT((boost::is_same
+        BOOST_STATIC_ASSERT((std::is_same
            <
                no_rescale_policy_tag,
                typename rescale_policy_type<RobustPolicy>::type
@@ -98,7 +104,7 @@ struct intersection_segment_segment_point
         detail::segment_as_subrange<Segment2> sub_range2(segment2);
 
         intersection_return_type
-            is = strategy.apply(sub_range1, sub_range2, policy_type());
+            is = strategy.relate().apply(sub_range1, sub_range2, policy_type());
 
         for (std::size_t i = 0; i < is.count; i++)
         {
@@ -127,7 +133,7 @@ struct intersection_linestring_linestring_point
             Strategy const& strategy)
     {
         // Make sure this is only called with no rescaling
-        BOOST_STATIC_ASSERT((boost::is_same
+        BOOST_STATIC_ASSERT((std::is_same
            <
                no_rescale_policy_tag,
                typename rescale_policy_type<RobustPolicy>::type
@@ -285,7 +291,7 @@ struct intersection_of_linestring_with_areal
             Strategy const& strategy)
     {
         // Make sure this is only called with no rescaling
-        BOOST_STATIC_ASSERT((boost::is_same
+        BOOST_STATIC_ASSERT((std::is_same
            <
                no_rescale_policy_tag,
                typename rescale_policy_type<RobustPolicy>::type
@@ -456,7 +462,7 @@ struct intersection_linear_areal_point
                                        Strategy const& strategy)
     {
         // Make sure this is only called with no rescaling
-        BOOST_STATIC_ASSERT((boost::is_same
+        BOOST_STATIC_ASSERT((std::is_same
            <
                no_rescale_policy_tag,
                typename rescale_policy_type<RobustPolicy>::type
@@ -525,73 +531,6 @@ struct intersection_areal_linear_point
 };
 
 
-struct tupled_output_tag {};
-
-
-template
-<
-    typename GeometryOut,
-    bool IsTupled = geometry::detail::is_tupled_range_values<GeometryOut>::value
->
-struct tag
-    : geometry::tag<GeometryOut>
-{};
-
-template <typename GeometryOut>
-struct tag<GeometryOut, true>
-{
-    typedef tupled_output_tag type;
-};
-
-
-template <typename Geometry1, typename Geometry2, typename TupledOut>
-struct expect_output_p
-{
-    static const bool is_point_found = geometry::tuples::exists_if
-        <
-            TupledOut, geometry::detail::is_tag_same_as_pred<point_tag>::template pred
-        >::value;
-
-    BOOST_MPL_ASSERT_MSG
-        (
-            is_point_found, POINTLIKE_GEOMETRY_EXPECTED_IN_TUPLED_OUTPUT,
-            (types<Geometry1, Geometry2, TupledOut>)
-        );
-};
-
-template <typename Geometry1, typename Geometry2, typename TupledOut>
-struct expect_output_pl
-    : expect_output_p<Geometry1, Geometry2, TupledOut>
-{
-    static const bool is_linestring_found = geometry::tuples::exists_if
-        <
-            TupledOut, geometry::detail::is_tag_same_as_pred<linestring_tag>::template pred
-        >::value;
-
-    BOOST_MPL_ASSERT_MSG
-        (
-            is_linestring_found, LINEAR_GEOMETRY_EXPECTED_IN_TUPLED_OUTPUT,
-            (types<Geometry1, Geometry2, TupledOut>)
-        );
-};
-
-template <typename Geometry1, typename Geometry2, typename TupledOut>
-struct expect_output_pla
-    : expect_output_pl<Geometry1, Geometry2, TupledOut>
-{
-    static const bool is_polygon_found = geometry::tuples::exists_if
-        <
-            TupledOut, geometry::detail::is_tag_same_as_pred<polygon_tag>::template pred
-        >::value;
-
-    BOOST_MPL_ASSERT_MSG
-    (
-        is_polygon_found, AREAL_GEOMETRY_EXPECTED_IN_TUPLED_OUTPUT,
-        (types<Geometry1, Geometry2, TupledOut>)
-    );
-};
-
-
 }} // namespace detail::intersection
 #endif // DOXYGEN_NO_DETAIL
 
@@ -614,7 +553,7 @@ template
     // tag dispatching:
     typename TagIn1 = typename geometry::tag<Geometry1>::type,
     typename TagIn2 = typename geometry::tag<Geometry2>::type,
-    typename TagOut = typename detail::intersection::tag<GeometryOut>::type,
+    typename TagOut = typename detail::setop_insert_output_tag<GeometryOut>::type,
     // metafunction finetuning helpers:
     typename CastedTagIn1 = typename geometry::tag_cast<TagIn1, areal_tag, linear_tag, pointlike_tag>::type,
     typename CastedTagIn2 = typename geometry::tag_cast<TagIn2, areal_tag, linear_tag, pointlike_tag>::type,
@@ -622,11 +561,10 @@ template
 >
 struct intersection_insert
 {
-    BOOST_MPL_ASSERT_MSG
-        (
-            false, NOT_OR_NOT_YET_IMPLEMENTED_FOR_THIS_GEOMETRY_TYPES_OR_ORIENTATIONS
-            , (types<Geometry1, Geometry2, GeometryOut>)
-        );
+    BOOST_GEOMETRY_STATIC_ASSERT_FALSE(
+        "Not or not yet implemented for these Geometry types or their order.",
+        Geometry1, Geometry2, GeometryOut,
+        std::integral_constant<overlay_type, OverlayType>);
 };
 
 
@@ -996,13 +934,21 @@ struct intersection_insert
     <
         Linear1, Linear2, TupledOut, OverlayType,
         Reverse1, Reverse2,
-        TagIn1, TagIn2, detail::intersection::tupled_output_tag,
-        linear_tag, linear_tag, detail::intersection::tupled_output_tag
+        TagIn1, TagIn2, detail::tupled_output_tag,
+        linear_tag, linear_tag, detail::tupled_output_tag
     >
-    // NOTE: This is not fully correct because points can be the result only in
-    // case of intersection but intersection_insert is called also by difference.
-    // So this requirement could be relaxed in the future.
-    : detail::intersection::expect_output_pl<Linear1, Linear2, TupledOut>
+    : detail::expect_output
+        <
+            Linear1, Linear2, TupledOut,
+            // NOTE: points can be the result only in case of intersection.
+            std::conditional_t
+                <
+                    (OverlayType == overlay_intersection),
+                    point_tag,
+                    void
+                >,
+            linestring_tag
+        >
 {
     // NOTE: The order of geometries in TupledOut tuple/pair must correspond to the order
     // iterators in OutputIterators tuple/pair.
@@ -1113,10 +1059,10 @@ struct intersection_insert
     <
         PointLike1, PointLike2, TupledOut, OverlayType,
         Reverse1, Reverse2,
-        TagIn1, TagIn2, detail::intersection::tupled_output_tag,
-        pointlike_tag, pointlike_tag, detail::intersection::tupled_output_tag
+        TagIn1, TagIn2, detail::tupled_output_tag,
+        pointlike_tag, pointlike_tag, detail::tupled_output_tag
     >
-    : detail::intersection::expect_output_p<PointLike1, PointLike2, TupledOut>
+    : detail::expect_output<PointLike1, PointLike2, TupledOut, point_tag>
 {
     // NOTE: The order of geometries in TupledOut tuple/pair must correspond to the order
     // of iterators in OutputIterators tuple/pair.
@@ -1240,16 +1186,16 @@ struct intersection_insert
     <
         PointLike, Linear, TupledOut, OverlayType,
         Reverse1, Reverse2,
-        TagIn1, TagIn2, detail::intersection::tupled_output_tag,
-        pointlike_tag, linear_tag, detail::intersection::tupled_output_tag
+        TagIn1, TagIn2, detail::tupled_output_tag,
+        pointlike_tag, linear_tag, detail::tupled_output_tag
     >
     // Reuse the implementation for PointLike/PointLike.
     : intersection_insert
         <
             PointLike, Linear, TupledOut, OverlayType,
             Reverse1, Reverse2,
-            TagIn1, TagIn2, detail::intersection::tupled_output_tag,
-            pointlike_tag, pointlike_tag, detail::intersection::tupled_output_tag
+            TagIn1, TagIn2, detail::tupled_output_tag,
+            pointlike_tag, pointlike_tag, detail::tupled_output_tag
         >
 {};
 
@@ -1265,8 +1211,8 @@ struct intersection_insert
     <
         Linestring, MultiPoint, TupledOut, overlay_intersection,
         Reverse1, Reverse2,
-        linestring_tag, multi_point_tag, detail::intersection::tupled_output_tag,
-        linear_tag, pointlike_tag, detail::intersection::tupled_output_tag
+        linestring_tag, multi_point_tag, detail::tupled_output_tag,
+        linear_tag, pointlike_tag, detail::tupled_output_tag
     >
 {
     template <typename RobustPolicy, typename OutputIterators, typename Strategy>
@@ -1368,16 +1314,16 @@ struct intersection_insert
     <
         PointLike, Areal, TupledOut, OverlayType,
         Reverse1, Reverse2,
-        TagIn1, TagIn2, detail::intersection::tupled_output_tag,
-        pointlike_tag, areal_tag, detail::intersection::tupled_output_tag
+        TagIn1, TagIn2, detail::tupled_output_tag,
+        pointlike_tag, areal_tag, detail::tupled_output_tag
     >
     // Reuse the implementation for PointLike/PointLike.
     : intersection_insert
         <
             PointLike, Areal, TupledOut, OverlayType,
             Reverse1, Reverse2,
-            TagIn1, TagIn2, detail::intersection::tupled_output_tag,
-            pointlike_tag, pointlike_tag, detail::intersection::tupled_output_tag
+            TagIn1, TagIn2, detail::tupled_output_tag,
+            pointlike_tag, pointlike_tag, detail::tupled_output_tag
         >
 {};
 
@@ -1394,8 +1340,8 @@ struct intersection_insert
     <
         Areal, MultiPoint, TupledOut, overlay_intersection,
         Reverse1, Reverse2,
-        TagIn1, multi_point_tag, detail::intersection::tupled_output_tag,
-        areal_tag, pointlike_tag, detail::intersection::tupled_output_tag
+        TagIn1, multi_point_tag, detail::tupled_output_tag,
+        areal_tag, pointlike_tag, detail::tupled_output_tag
     >
 {
     template <typename RobustPolicy, typename OutputIterators, typename Strategy>
@@ -1426,8 +1372,8 @@ struct intersection_insert
         TupledOut,
         OverlayType,
         ReverseLinestring, ReversePolygon,
-        linestring_tag, polygon_tag, detail::intersection::tupled_output_tag,
-        linear_tag, areal_tag, detail::intersection::tupled_output_tag
+        linestring_tag, polygon_tag, detail::tupled_output_tag,
+        linear_tag, areal_tag, detail::tupled_output_tag
     > : detail::intersection::intersection_of_linestring_with_areal
             <
                 ReversePolygon,
@@ -1450,8 +1396,8 @@ struct intersection_insert
         TupledOut,
         OverlayType,
         ReverseLinestring, ReverseRing,
-        linestring_tag, ring_tag, detail::intersection::tupled_output_tag,
-        linear_tag, areal_tag, detail::intersection::tupled_output_tag
+        linestring_tag, ring_tag, detail::tupled_output_tag,
+        linear_tag, areal_tag, detail::tupled_output_tag
     > : detail::intersection::intersection_of_linestring_with_areal
             <
                 ReverseRing,
@@ -1487,26 +1433,26 @@ inline OutputIterator insert(Geometry1 const& geometry1,
             OutputIterator out,
             Strategy const& strategy)
 {
-    return boost::mpl::if_c
-    <
-        geometry::reverse_dispatch<Geometry1, Geometry2>::type::value,
-        geometry::dispatch::intersection_insert_reversed
+    return std::conditional_t
         <
-            Geometry1, Geometry2,
-            GeometryOut,
-            OverlayType,
-            overlay::do_reverse<geometry::point_order<Geometry1>::value>::value,
-            overlay::do_reverse<geometry::point_order<Geometry2>::value, ReverseSecond>::value
-        >,
-        geometry::dispatch::intersection_insert
-        <
-            Geometry1, Geometry2,
-            GeometryOut,
-            OverlayType,
-            geometry::detail::overlay::do_reverse<geometry::point_order<Geometry1>::value>::value,
-            geometry::detail::overlay::do_reverse<geometry::point_order<Geometry2>::value, ReverseSecond>::value
-        >
-    >::type::apply(geometry1, geometry2, robust_policy, out, strategy);
+            geometry::reverse_dispatch<Geometry1, Geometry2>::type::value,
+            geometry::dispatch::intersection_insert_reversed
+            <
+                Geometry1, Geometry2,
+                GeometryOut,
+                OverlayType,
+                overlay::do_reverse<geometry::point_order<Geometry1>::value>::value,
+                overlay::do_reverse<geometry::point_order<Geometry2>::value, ReverseSecond>::value
+            >,
+            geometry::dispatch::intersection_insert
+            <
+                Geometry1, Geometry2,
+                GeometryOut,
+                OverlayType,
+                geometry::detail::overlay::do_reverse<geometry::point_order<Geometry1>::value>::value,
+                geometry::detail::overlay::do_reverse<geometry::point_order<Geometry2>::value, ReverseSecond>::value
+            >
+        >::apply(geometry1, geometry2, robust_policy, out, strategy);
 }
 
 
@@ -1593,9 +1539,9 @@ inline OutputIterator intersection_insert(Geometry1 const& geometry1,
     concepts::check<Geometry1 const>();
     concepts::check<Geometry2 const>();
 
-    typedef typename strategy::intersection::services::default_strategy
+    typedef typename strategies::relate::services::default_strategy
         <
-            typename cs_tag<GeometryOut>::type
+            Geometry1, Geometry2
         >::type strategy_type;
     
     return intersection_insert<GeometryOut>(geometry1, geometry2, out,
@@ -1611,3 +1557,7 @@ inline OutputIterator intersection_insert(Geometry1 const& geometry1,
 
 
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_INTERSECTION_INSERT_HPP
+
+/* intersection_insert.hpp
+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
+*/

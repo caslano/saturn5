@@ -1,5 +1,5 @@
 /* Proposed SG14 status_code
-(C) 2018-2020 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018-2022 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Jun 2018
 
 
@@ -31,7 +31,7 @@ DEALINGS IN THE SOFTWARE.
 #ifndef BOOST_OUTCOME_SYSTEM_ERROR2_ERRORED_STATUS_CODE_HPP
 #define BOOST_OUTCOME_SYSTEM_ERROR2_ERRORED_STATUS_CODE_HPP
 
-#include "generic_code.hpp"
+#include "quick_status_code_from_enum.hpp"
 #include "status_code_ptr.hpp"
 
 BOOST_OUTCOME_SYSTEM_ERROR2_NAMESPACE_BEGIN
@@ -92,28 +92,37 @@ public:
 
   /***** KEEP THESE IN SYNC WITH STATUS_CODE *****/
   //! Implicit construction from any type where an ADL discovered `make_status_code(T, Args ...)` returns a `status_code`.
-  template <class T, class... Args,                                                                              //
-            class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type,    // Safe ADL lookup of make_status_code(), returns void if not found
-            typename std::enable_if<!std::is_same<typename std::decay<T>::type, errored_status_code>::value      // not copy/move of self
-                                    && !std::is_same<typename std::decay<T>::type, in_place_t>::value            // not in_place_t
-                                    && is_status_code<MakeStatusCodeResult>::value                               // ADL makes a status code
-                                    && std::is_constructible<errored_status_code, MakeStatusCodeResult>::value,  // ADLed status code is compatible
-                                    bool>::type = true>
-  errored_status_code(T &&v, Args &&... args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...)))  // NOLINT
-  : errored_status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class T, class... Args,                                                                               //
+                         class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type)     // Safe ADL lookup of make_status_code(), returns void if not found
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(!std::is_same<typename std::decay<T>::type, errored_status_code>::value          // not copy/move of self
+                                              && !std::is_same<typename std::decay<T>::type, in_place_t>::value                // not in_place_t
+                                              && is_status_code<MakeStatusCodeResult>::value                                   // ADL makes a status code
+                                              && std::is_constructible<errored_status_code, MakeStatusCodeResult>::value))     // ADLed status code is compatible
+  errored_status_code(T &&v, Args &&...args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...)))  // NOLINT
+      : errored_status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
+  {
+    _check();
+  }
+
+  //! Implicit construction from any `quick_status_code_from_enum<Enum>` enumerated type.
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class Enum,                                                                                      //
+                         class QuickStatusCodeType = typename quick_status_code_from_enum<Enum>::code_type)               // Enumeration has been activated
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(std::is_constructible<errored_status_code, QuickStatusCodeType>::value))    // Its status code is compatible
+  errored_status_code(Enum &&v) noexcept(std::is_nothrow_constructible<errored_status_code, QuickStatusCodeType>::value)  // NOLINT
+      : errored_status_code(QuickStatusCodeType(static_cast<Enum &&>(v)))
   {
     _check();
   }
   //! Explicit in-place construction.
   template <class... Args>
-  explicit errored_status_code(in_place_t _, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, Args &&...>::value)
+  explicit errored_status_code(in_place_t _, Args &&...args) noexcept(std::is_nothrow_constructible<value_type, Args &&...>::value)
       : _base(_, static_cast<Args &&>(args)...)
   {
     _check();
   }
   //! Explicit in-place construction from initialiser list.
   template <class T, class... Args>
-  explicit errored_status_code(in_place_t _, std::initializer_list<T> il, Args &&... args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<T>, Args &&...>::value)
+  explicit errored_status_code(in_place_t _, std::initializer_list<T> il, Args &&...args) noexcept(std::is_nothrow_constructible<value_type, std::initializer_list<T>, Args &&...>::value)
       : _base(_, il, static_cast<Args &&>(args)...)
   {
     _check();
@@ -134,8 +143,8 @@ public:
   `value_type` is trivially destructible and `sizeof(status_code) <= sizeof(status_code<erased<>>)`.
   Does not check if domains are equal.
   */
-  template <class ErasedType,  //
-            typename std::enable_if<detail::type_erasure_is_safe<ErasedType, value_type>::value, bool>::type = true>
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class ErasedType)  //
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(detail::type_erasure_is_safe<ErasedType, value_type>::value))
   explicit errored_status_code(const status_code<erased<ErasedType>> &v) noexcept(std::is_nothrow_copy_constructible<value_type>::value)
       : errored_status_code(detail::erasure_cast<value_type>(v.value()))  // NOLINT
   {
@@ -143,6 +152,8 @@ public:
     _check();
   }
 
+  //! Always false (including at compile time), as errored status codes are never successful.
+  constexpr bool success() const noexcept { return false; }
   //! Return a const reference to the `value_type`.
   constexpr const value_type &value() const &noexcept { return this->_value; }
 };
@@ -199,36 +210,63 @@ public:
 
   /***** KEEP THESE IN SYNC WITH STATUS_CODE *****/
   //! Implicit copy construction from any other status code if its value type is trivially copyable and it would fit into our storage
-  template <class DomainType,                                                                              //
-            typename std::enable_if<!detail::is_erased_status_code<status_code<DomainType>>::value         //
-                                    && std::is_trivially_copyable<typename DomainType::value_type>::value  //
-                                    && detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
-                                    bool>::type = true>
-  errored_status_code(const status_code<DomainType> &v) noexcept : _base(v)  // NOLINT
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class DomainType)                                                                        //
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(std::is_trivially_copyable<typename DomainType::value_type>::value  //
+                                              &&detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value))
+  errored_status_code(const status_code<DomainType> &v) noexcept
+      : _base(v)  // NOLINT
+  {
+    _check();
+  }
+  //! Implicit copy construction from any other status code if its value type is trivially copyable and it would fit into our storage
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class DomainType)                                                                        //
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(std::is_trivially_copyable<typename DomainType::value_type>::value  //
+                                              &&detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value))
+  errored_status_code(const errored_status_code<DomainType> &v) noexcept
+      : _base(static_cast<const status_code<DomainType> &>(v))  // NOLINT
   {
     _check();
   }
   //! Implicit move construction from any other status code if its value type is trivially copyable or move bitcopying and it would fit into our storage
-  template <class DomainType,  //
-            typename std::enable_if<detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value,
-                                    bool>::type = true>
-  errored_status_code(status_code<DomainType> &&v) noexcept : _base(static_cast<status_code<DomainType> &&>(v))  // NOLINT
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class DomainType)  //
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value))
+  errored_status_code(status_code<DomainType> &&v) noexcept
+      : _base(static_cast<status_code<DomainType> &&>(v))  // NOLINT
+  {
+    _check();
+  }
+  //! Implicit move construction from any other status code if its value type is trivially copyable or move bitcopying and it would fit into our storage
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class DomainType)  //
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(detail::type_erasure_is_safe<value_type, typename DomainType::value_type>::value))
+  errored_status_code(errored_status_code<DomainType> &&v) noexcept
+      : _base(static_cast<status_code<DomainType> &&>(v))  // NOLINT
   {
     _check();
   }
   //! Implicit construction from any type where an ADL discovered `make_status_code(T, Args ...)` returns a `status_code`.
-  template <class T, class... Args,                                                                              //
-            class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type,    // Safe ADL lookup of make_status_code(), returns void if not found
-            typename std::enable_if<!std::is_same<typename std::decay<T>::type, errored_status_code>::value      // not copy/move of self
-                                    && !std::is_same<typename std::decay<T>::type, value_type>::value            // not copy/move of value type
-                                    && is_status_code<MakeStatusCodeResult>::value                               // ADL makes a status code
-                                    && std::is_constructible<errored_status_code, MakeStatusCodeResult>::value,  // ADLed status code is compatible
-                                    bool>::type = true>
-  errored_status_code(T &&v, Args &&... args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...)))  // NOLINT
-  : errored_status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class T, class... Args,                                                                               //
+                         class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<T, Args...>::type)     // Safe ADL lookup of make_status_code(), returns void if not found
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(!std::is_same<typename std::decay<T>::type, errored_status_code>::value          // not copy/move of self
+                                              && !std::is_same<typename std::decay<T>::type, value_type>::value                // not copy/move of value type
+                                              && is_status_code<MakeStatusCodeResult>::value                                   // ADL makes a status code
+                                              && std::is_constructible<errored_status_code, MakeStatusCodeResult>::value))     // ADLed status code is compatible
+  errored_status_code(T &&v, Args &&...args) noexcept(noexcept(make_status_code(std::declval<T>(), std::declval<Args>()...)))  // NOLINT
+      : errored_status_code(make_status_code(static_cast<T &&>(v), static_cast<Args &&>(args)...))
   {
     _check();
   }
+  //! Implicit construction from any `quick_status_code_from_enum<Enum>` enumerated type.
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class Enum,                                                                                      //
+                         class QuickStatusCodeType = typename quick_status_code_from_enum<Enum>::code_type)               // Enumeration has been activated
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(std::is_constructible<errored_status_code, QuickStatusCodeType>::value))    // Its status code is compatible
+  errored_status_code(Enum &&v) noexcept(std::is_nothrow_constructible<errored_status_code, QuickStatusCodeType>::value)  // NOLINT
+      : errored_status_code(QuickStatusCodeType(static_cast<Enum &&>(v)))
+  {
+    _check();
+  }
+
+  //! Always false (including at compile time), as errored status codes are never successful.
+  constexpr bool success() const noexcept { return false; }
   //! Return the erased `value_type` by value.
   constexpr value_type value() const noexcept { return this->_value; }
 };
@@ -273,40 +311,68 @@ template <class DomainType1, class DomainType2> inline bool operator!=(const err
   return !static_cast<const status_code<DomainType1> &>(a).equivalent(b);
 }
 //! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class DomainType1, class T,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool
-operator==(const errored_status_code<DomainType1> &a, const T &b)
+BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class DomainType1, class T,                                                                       //
+                       class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type)  // Safe ADL lookup of make_status_code(), returns void if not found
+BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(is_status_code<MakeStatusCodeResult>::value))                                // ADL makes a status code
+inline bool operator==(const errored_status_code<DomainType1> &a, const T &b)
 {
   return a.equivalent(make_status_code(b));
 }
 //! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class T, class DomainType1,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool
-operator==(const T &a, const errored_status_code<DomainType1> &b)
+BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class T, class DomainType1,                                                                       //
+                       class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type)  // Safe ADL lookup of make_status_code(), returns void if not found
+BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(is_status_code<MakeStatusCodeResult>::value))                                // ADL makes a status code
+inline bool operator==(const T &a, const errored_status_code<DomainType1> &b)
 {
   return b.equivalent(make_status_code(a));
 }
 //! True if the status code's are not semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class DomainType1, class T,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool
-operator!=(const errored_status_code<DomainType1> &a, const T &b)
+BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class DomainType1, class T,                                                                       //
+                       class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type)  // Safe ADL lookup of make_status_code(), returns void if not found
+BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(is_status_code<MakeStatusCodeResult>::value))                                // ADL makes a status code
+inline bool operator!=(const errored_status_code<DomainType1> &a, const T &b)
 {
   return !a.equivalent(make_status_code(b));
 }
 //! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class T, class DomainType1,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool
-operator!=(const T &a, const errored_status_code<DomainType1> &b)
+BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class T, class DomainType1,                                                                       //
+                       class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type)  // Safe ADL lookup of make_status_code(), returns void if not found
+BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(is_status_code<MakeStatusCodeResult>::value))                                // ADL makes a status code
+inline bool operator!=(const T &a, const errored_status_code<DomainType1> &b)
 {
   return !b.equivalent(make_status_code(a));
+}
+//! True if the status code's are semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(b)`.
+template <class DomainType1, class T,                                                     //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type  // Enumeration has been activated
+          >
+inline bool operator==(const errored_status_code<DomainType1> &a, const T &b)
+{
+  return a.equivalent(QuickStatusCodeType(b));
+}
+//! True if the status code's are semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(a)`.
+template <class T, class DomainType1,                                                     //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type  // Enumeration has been activated
+          >
+inline bool operator==(const T &a, const errored_status_code<DomainType1> &b)
+{
+  return b.equivalent(QuickStatusCodeType(a));
+}
+//! True if the status code's are not semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(b)`.
+template <class DomainType1, class T,                                                     //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type  // Enumeration has been activated
+          >
+inline bool operator!=(const errored_status_code<DomainType1> &a, const T &b)
+{
+  return !a.equivalent(QuickStatusCodeType(b));
+}
+//! True if the status code's are not semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(a)`.
+template <class T, class DomainType1,                                                     //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type  // Enumeration has been activated
+          >
+inline bool operator!=(const T &a, const errored_status_code<DomainType1> &b)
+{
+  return !b.equivalent(QuickStatusCodeType(a));
 }
 
 
@@ -340,3 +406,7 @@ template <class T> struct is_errored_status_code
 BOOST_OUTCOME_SYSTEM_ERROR2_NAMESPACE_END
 
 #endif
+
+/* errored_status_code.hpp
+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
+*/

@@ -113,9 +113,9 @@ struct type_at {
 
 template <typename RealType, size_t Order, size_t Depth>
 struct type_at<fvar<RealType, Order>, Depth> {
-  using type = typename conditional<Depth == 0,
-                                    fvar<RealType, Order>,
-                                    typename type_at<RealType, Depth - 1>::type>::type;
+  using type = typename std::conditional<Depth == 0,
+                                         fvar<RealType, Order>,
+                                         typename type_at<RealType, Depth - 1>::type>::type;
 };
 
 template <typename RealType, size_t Depth>
@@ -125,6 +125,7 @@ using get_type_at = typename type_at<RealType, Depth>::type;
 // https://www.boost.org/libs/math/doc/html/math_toolkit/real_concepts.html
 template <typename RealType, size_t Order>
 class fvar {
+ protected:
   std::array<RealType, Order + 1> v;
 
  public:
@@ -449,13 +450,6 @@ class fvar {
 #endif
 };
 
-// C++11 compatibility
-#ifdef BOOST_NO_CXX17_IF_CONSTEXPR
-#define BOOST_AUTODIFF_IF_CONSTEXPR
-#else
-#define BOOST_AUTODIFF_IF_CONSTEXPR constexpr
-#endif
-
 // Standard Library Support Requirements
 
 // fabs(cr1) | RealType
@@ -676,7 +670,7 @@ template <typename RealType2, size_t Order2>
 fvar<RealType, Order>::fvar(fvar<RealType2, Order2> const& cr) {
   for (size_t i = 0; i <= (std::min)(Order, Order2); ++i)
     v[i] = static_cast<RealType>(cr.v[i]);
-  if BOOST_AUTODIFF_IF_CONSTEXPR (Order2 < Order)
+  BOOST_IF_CONSTEXPR (Order2 < Order)
     std::fill(v.begin() + (Order2 + 1), v.end(), static_cast<RealType>(0));
 }
 
@@ -732,7 +726,7 @@ template <typename RealType2, size_t Order2>
 fvar<RealType, Order>& fvar<RealType, Order>::operator*=(fvar<RealType2, Order2> const& cr) {
   using diff_t = typename std::array<RealType, Order + 1>::difference_type;
   promote<RealType, RealType2> const zero(0);
-  if BOOST_AUTODIFF_IF_CONSTEXPR (Order <= Order2)
+  BOOST_IF_CONSTEXPR (Order <= Order2)
     for (size_t i = 0, j = Order; i <= Order; ++i, --j)
       v[j] = std::inner_product(v.cbegin(), v.cend() - diff_t(i), cr.v.crbegin() + diff_t(i), zero);
   else {
@@ -755,11 +749,11 @@ fvar<RealType, Order>& fvar<RealType, Order>::operator/=(fvar<RealType2, Order2>
   using diff_t = typename std::array<RealType, Order + 1>::difference_type;
   RealType const zero(0);
   v.front() /= cr.v.front();
-  if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
+  BOOST_IF_CONSTEXPR (Order < Order2)
     for (size_t i = 1, j = Order2 - 1, k = Order; i <= Order; ++i, --j, --k)
       (v[i] -= std::inner_product(
            cr.v.cbegin() + 1, cr.v.cend() - diff_t(j), v.crbegin() + diff_t(k), zero)) /= cr.v.front();
-  else if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order2)
+  else BOOST_IF_CONSTEXPR (0 < Order2)
     for (size_t i = 1, j = Order2 - 1, k = Order; i <= Order; ++i, j && --j, --k)
       (v[i] -= std::inner_product(
            cr.v.cbegin() + 1, cr.v.cend() - diff_t(j), v.crbegin() + diff_t(k), zero)) /= cr.v.front();
@@ -794,10 +788,10 @@ promote<fvar<RealType, Order>, fvar<RealType2, Order2>> fvar<RealType, Order>::o
   promote<fvar<RealType, Order>, fvar<RealType2, Order2>> retval;
   for (size_t i = 0; i <= (std::min)(Order, Order2); ++i)
     retval.v[i] = v[i] + cr.v[i];
-  if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
+  BOOST_IF_CONSTEXPR (Order < Order2)
     for (size_t i = Order + 1; i <= Order2; ++i)
       retval.v[i] = cr.v[i];
-  else if BOOST_AUTODIFF_IF_CONSTEXPR (Order2 < Order)
+  else BOOST_IF_CONSTEXPR (Order2 < Order)
     for (size_t i = Order2 + 1; i <= Order; ++i)
       retval.v[i] = v[i];
   return retval;
@@ -823,10 +817,10 @@ promote<fvar<RealType, Order>, fvar<RealType2, Order2>> fvar<RealType, Order>::o
   promote<fvar<RealType, Order>, fvar<RealType2, Order2>> retval;
   for (size_t i = 0; i <= (std::min)(Order, Order2); ++i)
     retval.v[i] = v[i] - cr.v[i];
-  if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
+  BOOST_IF_CONSTEXPR (Order < Order2)
     for (auto i = Order + 1; i <= Order2; ++i)
       retval.v[i] = -cr.v[i];
-  else if BOOST_AUTODIFF_IF_CONSTEXPR (Order2 < Order)
+  else BOOST_IF_CONSTEXPR (Order2 < Order)
     for (auto i = Order2 + 1; i <= Order; ++i)
       retval.v[i] = v[i];
   return retval;
@@ -854,7 +848,7 @@ promote<fvar<RealType, Order>, fvar<RealType2, Order2>> fvar<RealType, Order>::o
   using diff_t = typename std::array<RealType, Order + 1>::difference_type;
   promote<RealType, RealType2> const zero(0);
   promote<fvar<RealType, Order>, fvar<RealType2, Order2>> retval;
-  if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2)
+  BOOST_IF_CONSTEXPR (Order < Order2)
     for (size_t i = 0, j = Order, k = Order2; i <= Order2; ++i, j && --j, --k)
       retval.v[i] = std::inner_product(v.cbegin(), v.cend() - diff_t(j), cr.v.crbegin() + diff_t(k), zero);
   else
@@ -884,7 +878,7 @@ promote<fvar<RealType, Order>, fvar<RealType2, Order2>> fvar<RealType, Order>::o
   promote<RealType, RealType2> const zero(0);
   promote<fvar<RealType, Order>, fvar<RealType2, Order2>> retval;
   retval.v.front() = v.front() / cr.v.front();
-  if BOOST_AUTODIFF_IF_CONSTEXPR (Order < Order2) {
+  BOOST_IF_CONSTEXPR (Order < Order2) {
     for (size_t i = 1, j = Order2 - 1; i <= Order; ++i, --j)
       retval.v[i] =
           (v[i] - std::inner_product(
@@ -895,7 +889,7 @@ promote<fvar<RealType, Order>, fvar<RealType2, Order2>> fvar<RealType, Order>::o
           -std::inner_product(
               cr.v.cbegin() + 1, cr.v.cend() - diff_t(j), retval.v.crbegin() + diff_t(j + 1), zero) /
           cr.v.front();
-  } else if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order2)
+  } else BOOST_IF_CONSTEXPR (0 < Order2)
     for (size_t i = 1, j = Order2 - 1, k = Order; i <= Order; ++i, j && --j, --k)
       retval.v[i] =
           (v[i] - std::inner_product(
@@ -920,7 +914,7 @@ fvar<RealType, Order> operator/(typename fvar<RealType, Order>::root_type const&
   using diff_t = typename std::array<RealType, Order + 1>::difference_type;
   fvar<RealType, Order> retval;
   retval.v.front() = ca / cr.v.front();
-  if BOOST_AUTODIFF_IF_CONSTEXPR (0 < Order) {
+  BOOST_IF_CONSTEXPR (0 < Order) {
     RealType const zero(0);
     for (size_t i = 1, j = Order - 1; i <= Order; ++i, --j)
       retval.v[i] =
@@ -1413,14 +1407,23 @@ fvar<RealType, Order> exp(fvar<RealType, Order> const& cr) {
 template <typename RealType, size_t Order>
 fvar<RealType, Order> pow(fvar<RealType, Order> const& x,
                           typename fvar<RealType, Order>::root_type const& y) {
-  using std::pow;
+  BOOST_MATH_STD_USING
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const x0 = static_cast<root_type>(x);
   root_type derivatives[order + 1]{pow(x0, y)};
-  for (size_t i = 0; i < order && y - i != 0; ++i)
-    derivatives[i + 1] = (y - i) * derivatives[i] / x0;
-  return x.apply_derivatives(order, [&derivatives](size_t i) { return derivatives[i]; });
+  if (fabs(x0) < std::numeric_limits<root_type>::epsilon()) {
+    root_type coef = 1;
+    for (size_t i = 0; i < order && y - i != 0; ++i) {
+      coef *= y - i;
+      derivatives[i + 1] = coef * pow(x0, y - (i + 1));
+    }
+    return x.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });
+  } else {
+    for (size_t i = 0; i < order && y - i != 0; ++i)
+      derivatives[i + 1] = (y - i) * derivatives[i] / x0;
+    return x.apply_derivatives(order, [&derivatives](size_t i) { return derivatives[i]; });
+  }
 }
 
 template <typename RealType, size_t Order>
@@ -1448,7 +1451,7 @@ promote<fvar<RealType1, Order1>, fvar<RealType2, Order2>> pow(fvar<RealType1, Or
   root_type const x0 = static_cast<root_type>(x);
   root_type const y0 = static_cast<root_type>(y);
   root_type dxydx[order + 1]{pow(x0, y0)};
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return return_type(*dxydx);
   else {
     for (size_t i = 0; i < order && y0 - i != 0; ++i)
@@ -1457,7 +1460,7 @@ promote<fvar<RealType1, Order1>, fvar<RealType2, Order2>> pow(fvar<RealType1, Or
     lognx.front() = fvar<root_type, order>(1);
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
     lognx[1] = log(make_fvar<root_type, order>(x0));
-#else  // for compilers that compile this branch when order=0.
+#else  // for compilers that compile this branch when order == 0.
     lognx[(std::min)(size_t(1), order)] = log(make_fvar<root_type, order>(x0));
 #endif
     for (size_t i = 1; i < order; ++i)
@@ -1485,14 +1488,14 @@ fvar<RealType, Order> sqrt(fvar<RealType, Order> const& cr) {
   root_type derivatives[order + 1];
   root_type const x = static_cast<root_type>(cr);
   *derivatives = sqrt(x);
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(*derivatives);
   else {
     root_type numerator = 0.5;
     root_type powers = 1;
 #ifndef BOOST_NO_CXX17_IF_CONSTEXPR
     derivatives[1] = numerator / *derivatives;
-#else  // for compilers that compile this branch when order=0.
+#else  // for compilers that compile this branch when order == 0.
     derivatives[(std::min)(size_t(1), order)] = numerator / *derivatives;
 #endif
     using diff_t = typename std::array<RealType, Order + 1>::difference_type;
@@ -1515,10 +1518,10 @@ fvar<RealType, Order> log(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = log(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
-    auto const d1 = make_fvar<root_type, order - 1>(static_cast<root_type>(cr)).inverse();  // log'(x) = 1 / x
+    auto const d1 = make_fvar<root_type, bool(order) ? order - 1 : 0>(static_cast<root_type>(cr)).inverse();  // log'(x) = 1 / x
     return cr.apply_coefficients_nonhorner(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
 }
@@ -1545,7 +1548,7 @@ fvar<RealType, Order> cos(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = cos(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
     root_type const d1 = -sin(static_cast<root_type>(cr));
@@ -1560,7 +1563,7 @@ fvar<RealType, Order> sin(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = sin(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
     root_type const d1 = cos(static_cast<root_type>(cr));
@@ -1575,10 +1578,10 @@ fvar<RealType, Order> asin(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = asin(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
-    auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
+    auto x = make_fvar<root_type, bool(order) ? order - 1 : 0>(static_cast<root_type>(cr));
     auto const d1 = sqrt((x *= x).negate() += 1).inverse();  // asin'(x) = 1 / sqrt(1-x*x).
     return cr.apply_coefficients_nonhorner(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
@@ -1590,10 +1593,10 @@ fvar<RealType, Order> tan(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = tan(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
-    auto c = cos(make_fvar<root_type, order - 1>(static_cast<root_type>(cr)));
+    auto c = cos(make_fvar<root_type, bool(order) ? order - 1 : 0>(static_cast<root_type>(cr)));
     auto const d1 = (c *= c).inverse();  // tan'(x) = 1 / cos(x)^2
     return cr.apply_coefficients_nonhorner(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
@@ -1605,10 +1608,10 @@ fvar<RealType, Order> atan(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = atan(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
-    auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
+    auto x = make_fvar<root_type, bool(order) ? order - 1 : 0>(static_cast<root_type>(cr));
     auto const d1 = ((x *= x) += 1).inverse();  // atan'(x) = 1 / (x*x+1).
     return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
@@ -1621,10 +1624,10 @@ fvar<RealType, Order> atan2(fvar<RealType, Order> const& cr,
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = atan2(static_cast<root_type>(cr), ca);
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
-    auto y = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
+    auto y = make_fvar<root_type, bool(order) ? order - 1 : 0>(static_cast<root_type>(cr));
     auto const d1 = ca / ((y *= y) += (ca * ca));  // (d/dy)atan2(y,x) = x / (y*y+x*x)
     return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
@@ -1637,10 +1640,10 @@ fvar<RealType, Order> atan2(typename fvar<RealType, Order>::root_type const& ca,
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = atan2(ca, static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
-    auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
+    auto x = make_fvar<root_type, bool(order) ? order - 1 : 0>(static_cast<root_type>(cr));
     auto const d1 = -ca / ((x *= x) += (ca * ca));  // (d/dx)atan2(y,x) = -y / (x*x+y*y)
     return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
@@ -1656,7 +1659,7 @@ promote<fvar<RealType1, Order1>, fvar<RealType2, Order2>> atan2(fvar<RealType1, 
   root_type const y = static_cast<root_type>(cr1);
   root_type const x = static_cast<root_type>(cr2);
   root_type const d00 = atan2(y, x);
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return return_type(d00);
   else {
     constexpr size_t order1 = fvar<RealType1, Order1>::order_sum;
@@ -1746,10 +1749,10 @@ fvar<RealType, Order> acos(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = acos(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
-    auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
+    auto x = make_fvar<root_type, bool(order) ? order - 1 : 0>(static_cast<root_type>(cr));
     auto const d1 = sqrt((x *= x).negate() += 1).inverse().negate();  // acos'(x) = -1 / sqrt(1-x*x).
     return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
@@ -1761,10 +1764,10 @@ fvar<RealType, Order> acosh(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = acosh(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
-    auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
+    auto x = make_fvar<root_type, bool(order) ? order - 1 : 0>(static_cast<root_type>(cr));
     auto const d1 = sqrt((x *= x) -= 1).inverse();  // acosh'(x) = 1 / sqrt(x*x-1).
     return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
@@ -1776,10 +1779,10 @@ fvar<RealType, Order> asinh(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = asinh(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
-    auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
+    auto x = make_fvar<root_type, bool(order) ? order - 1 : 0>(static_cast<root_type>(cr));
     auto const d1 = sqrt((x *= x) += 1).inverse();  // asinh'(x) = 1 / sqrt(x*x+1).
     return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
@@ -1791,10 +1794,10 @@ fvar<RealType, Order> atanh(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = atanh(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
-    auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));
+    auto x = make_fvar<root_type, bool(order) ? order - 1 : 0>(static_cast<root_type>(cr));
     auto const d1 = ((x *= x).negate() += 1).inverse();  // atanh'(x) = 1 / (1-x*x)
     return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
@@ -1806,7 +1809,7 @@ fvar<RealType, Order> cosh(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = cosh(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
     root_type const derivatives[2]{d0, sinh(static_cast<root_type>(cr))};
@@ -1821,7 +1824,7 @@ fvar<RealType, Order> digamma(fvar<RealType, Order> const& cr) {
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const x = static_cast<root_type>(cr);
   root_type const d0 = digamma(x);
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
     static_assert(order <= static_cast<size_t>((std::numeric_limits<int>::max)()),
@@ -1837,10 +1840,10 @@ fvar<RealType, Order> erf(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = erf(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
-    auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));  // d1 = 2/sqrt(pi)*exp(-x*x)
+    auto x = make_fvar<root_type, bool(order) ? order - 1 : 0>(static_cast<root_type>(cr));  // d1 = 2/sqrt(pi)*exp(-x*x)
     auto const d1 = 2 * constants::one_div_root_pi<root_type>() * exp((x *= x).negate());
     return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
@@ -1852,10 +1855,10 @@ fvar<RealType, Order> erfc(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = erfc(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
-    auto x = make_fvar<root_type, order - 1>(static_cast<root_type>(cr));  // erfc'(x) = -erf'(x)
+    auto x = make_fvar<root_type, bool(order) ? order - 1 : 0>(static_cast<root_type>(cr));  // erfc'(x) = -erf'(x)
     auto const d1 = -2 * constants::one_div_root_pi<root_type>() * exp((x *= x).negate());
     return cr.apply_coefficients(order, [&d0, &d1](size_t i) { return i ? d1[i - 1] / i : d0; });
   }
@@ -1869,12 +1872,12 @@ fvar<RealType, Order> lambert_w0(fvar<RealType, Order> const& cr) {
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type derivatives[order + 1];
   *derivatives = lambert_w0(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(*derivatives);
   else {
     root_type const expw = exp(*derivatives);
     derivatives[1] = 1 / (static_cast<root_type>(cr) + expw);
-    if BOOST_AUTODIFF_IF_CONSTEXPR (order == 1)
+    BOOST_IF_CONSTEXPR (order == 1)
       return cr.apply_derivatives_nonhorner(order, [&derivatives](size_t i) { return derivatives[i]; });
     else {
       using diff_t = typename std::array<RealType, Order + 1>::difference_type;
@@ -1906,7 +1909,7 @@ fvar<RealType, Order> lgamma(fvar<RealType, Order> const& cr) {
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const x = static_cast<root_type>(cr);
   root_type const d0 = lgamma(x);
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(d0);
   else {
     static_assert(order <= static_cast<size_t>((std::numeric_limits<int>::max)()) + 1,
@@ -1923,7 +1926,7 @@ fvar<RealType, Order> sinc(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type taylor[order + 1]{1};  // sinc(0) = 1
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(*taylor);
   else {
     for (size_t n = 2; n <= order; n += 2)
@@ -1938,7 +1941,7 @@ fvar<RealType, Order> sinh(fvar<RealType, Order> const& cr) {
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
   root_type const d0 = sinh(static_cast<root_type>(cr));
-  if BOOST_AUTODIFF_IF_CONSTEXPR (fvar<RealType, Order>::order_sum == 0)
+  BOOST_IF_CONSTEXPR (fvar<RealType, Order>::order_sum == 0)
     return fvar<RealType, Order>(d0);
   else {
     root_type const derivatives[2]{d0, cosh(static_cast<root_type>(cr))};
@@ -1959,7 +1962,7 @@ fvar<RealType, Order> tgamma(fvar<RealType, Order> const& cr) {
   using std::tgamma;
   using root_type = typename fvar<RealType, Order>::root_type;
   constexpr size_t order = fvar<RealType, Order>::order_sum;
-  if BOOST_AUTODIFF_IF_CONSTEXPR (order == 0)
+  BOOST_IF_CONSTEXPR (order == 0)
     return fvar<RealType, Order>(tgamma(static_cast<root_type>(cr)));
   else {
     if (cr < 0)
@@ -2025,8 +2028,8 @@ struct promote_args_2<RealType0, detail::autodiff_fvar_type<RealType1, Order1>> 
 };
 
 template <typename destination_t, typename RealType, std::size_t Order>
-inline BOOST_MATH_CONSTEXPR destination_t real_cast(detail::autodiff_fvar_type<RealType, Order> const& from_v)
-    BOOST_NOEXCEPT_IF(BOOST_MATH_IS_FLOAT(destination_t) && BOOST_MATH_IS_FLOAT(RealType)) {
+inline constexpr destination_t real_cast(detail::autodiff_fvar_type<RealType, Order> const& from_v)
+    noexcept(BOOST_MATH_IS_FLOAT(destination_t) && BOOST_MATH_IS_FLOAT(RealType)) {
   return real_cast<destination_t>(static_cast<detail::autodiff_root_type<RealType, Order>>(from_v));
 }
 
@@ -2038,13 +2041,13 @@ template <class Policy, std::size_t Order>
 using fvar_t = differentiation::detail::fvar<Policy, Order>;
 template <class Policy, std::size_t Order>
 struct evaluation<fvar_t<float, Order>, Policy> {
-  using type = fvar_t<typename conditional<Policy::promote_float_type::value, double, float>::type, Order>;
+  using type = fvar_t<typename std::conditional<Policy::promote_float_type::value, double, float>::type, Order>;
 };
 
 template <class Policy, std::size_t Order>
 struct evaluation<fvar_t<double, Order>, Policy> {
   using type =
-      fvar_t<typename conditional<Policy::promote_double_type::value, long double, double>::type, Order>;
+      fvar_t<typename std::conditional<Policy::promote_double_type::value, long double, double>::type, Order>;
 };
 
 }  // namespace policies
@@ -2056,3 +2059,7 @@ struct evaluation<fvar_t<double, Order>, Policy> {
 #endif
 
 #endif  // BOOST_MATH_DIFFERENTIATION_AUTODIFF_HPP
+
+/* autodiff.hpp
+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
+*/

@@ -1,7 +1,11 @@
 // Boost.Container varray
 //
-// Copyright (c) 2012-2015 Adam Wulkiewicz, Lodz, Poland.
 // Copyright (c) 2011-2013 Andrew Hundt.
+// Copyright (c) 2012-2015 Adam Wulkiewicz, Lodz, Poland.
+//
+// This file was modified by Oracle on 2020.
+// Modifications copyright (c) 2020, Oracle and/or its affiliates.
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 //
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,16 +22,11 @@
 #include <boost/move/detail/fwd_macros.hpp>
 #endif
 
+#include <boost/concept_check.hpp>
 #include <boost/config.hpp>
 #include <boost/core/ignore_unused.hpp>
 #include <boost/swap.hpp>
 #include <boost/integer.hpp>
-
-#include <boost/mpl/assert.hpp>
-
-#include <boost/type_traits/is_unsigned.hpp>
-#include <boost/type_traits/alignment_of.hpp>
-#include <boost/type_traits/aligned_storage.hpp>
 
 // TODO - use std::reverse_iterator and std::iterator_traits
 // instead Boost.Iterator to remove dependency?
@@ -35,12 +34,15 @@
 #include <boost/iterator/reverse_iterator.hpp>
 #include <boost/iterator/iterator_concepts.hpp>
 
+#include <boost/type_traits/alignment_of.hpp>
+#include <boost/type_traits/aligned_storage.hpp>
+
+#include <boost/geometry/core/static_assert.hpp>
+
 #include <boost/geometry/index/detail/assert.hpp>
 #include <boost/geometry/index/detail/exception.hpp>
 
 #include <boost/geometry/index/detail/varray_detail.hpp>
-
-#include <boost/concept_check.hpp>
 
 /*!
 \defgroup varray_non_member varray non-member functions
@@ -61,9 +63,9 @@ struct varray_traits
     typedef Value & reference;
     typedef const Value & const_reference;
 
-    typedef boost::false_type use_memop_in_swap_and_move;
-    typedef boost::false_type use_optimized_swap;
-    typedef boost::false_type disable_trivial_init;
+    typedef std::false_type use_memop_in_swap_and_move;
+    typedef std::false_type use_optimized_swap;
+    typedef std::false_type disable_trivial_init;
 };
 
 template <typename Varray>
@@ -155,11 +157,11 @@ class varray
     typedef varray_detail::varray_traits<Value, Capacity> vt;
     typedef varray_detail::checker<varray> errh;
 
-    BOOST_MPL_ASSERT_MSG(
-        ( boost::is_unsigned<typename vt::size_type>::value &&
+    BOOST_GEOMETRY_STATIC_ASSERT(
+        ( std::is_unsigned<typename vt::size_type>::value &&
           sizeof(typename boost::uint_value_t<Capacity>::least) <= sizeof(typename vt::size_type) ),
-        SIZE_TYPE_IS_TOO_SMALL_FOR_SPECIFIED_CAPACITY,
-        (varray)
+        "Size type is too small for specified capacity.",
+        typename vt::size_type, std::integral_constant<std::size_t, Capacity>
     );
 
     typedef boost::aligned_storage<
@@ -1498,7 +1500,7 @@ private:
     // @par Complexity
     //   Linear O(N).
     template <std::size_t C>
-    void move_ctor_dispatch(varray<value_type, C> & other, boost::true_type /*use_memop*/)
+    void move_ctor_dispatch(varray<value_type, C> & other, std::true_type /*use_memop*/)
     {
         ::memcpy(this->data(), other.data(), sizeof(Value) * other.m_size);
         m_size = other.m_size;
@@ -1510,7 +1512,7 @@ private:
     // @par Complexity
     //   Linear O(N).
     template <std::size_t C>
-    void move_ctor_dispatch(varray<value_type, C> & other, boost::false_type /*use_memop*/)
+    void move_ctor_dispatch(varray<value_type, C> & other, std::false_type /*use_memop*/)
     {
         namespace sv = varray_detail;
         sv::uninitialized_move_if_noexcept(other.begin(), other.end(), this->begin());                  // may throw
@@ -1522,7 +1524,7 @@ private:
     // @par Complexity
     //   Linear O(N).
     template <std::size_t C>
-    void move_assign_dispatch(varray<value_type, C> & other, boost::true_type /*use_memop*/)
+    void move_assign_dispatch(varray<value_type, C> & other, std::true_type /*use_memop*/)
     {
         this->clear();
 
@@ -1536,7 +1538,7 @@ private:
     // @par Complexity
     //   Linear O(N).
     template <std::size_t C>
-    void move_assign_dispatch(varray<value_type, C> & other, boost::false_type /*use_memop*/)
+    void move_assign_dispatch(varray<value_type, C> & other, std::false_type /*use_memop*/)
     {
         namespace sv = varray_detail;
         if ( m_size <= static_cast<size_type>(other.size()) )
@@ -1558,15 +1560,14 @@ private:
     // @par Complexity
     //   Linear O(N).
     template <std::size_t C>
-    void swap_dispatch(varray<value_type, C> & other, boost::true_type const& /*use_optimized_swap*/)
+    void swap_dispatch(varray<value_type, C> & other, std::true_type /*use_optimized_swap*/)
     {
-        typedef typename
-        boost::mpl::if_c<
-            Capacity < C,
-            aligned_storage_type,
-            typename varray<value_type, C>::aligned_storage_type
-        >::type
-        storage_type;
+        typedef std::conditional_t
+            <
+                (Capacity < C),
+                aligned_storage_type,
+                typename varray<value_type, C>::aligned_storage_type
+            > storage_type;
         
         storage_type temp;
         Value * temp_ptr = reinterpret_cast<Value*>(temp.address());
@@ -1584,7 +1585,7 @@ private:
     // @par Complexity
     //   Linear O(N).
     template <std::size_t C>
-    void swap_dispatch(varray<value_type, C> & other, boost::false_type const& /*use_optimized_swap*/)
+    void swap_dispatch(varray<value_type, C> & other, std::false_type /*use_optimized_swap*/)
     {
         namespace sv = varray_detail;
 
@@ -1602,7 +1603,7 @@ private:
     //   Nothing.
     // @par Complexity
     //   Linear O(N).
-    void swap_dispatch_impl(iterator first_sm, iterator last_sm, iterator first_la, iterator last_la, boost::true_type const& /*use_memop*/)
+    void swap_dispatch_impl(iterator first_sm, iterator last_sm, iterator first_la, iterator last_la, std::true_type /*use_memop*/)
     {
         //BOOST_GEOMETRY_INDEX_ASSERT(std::distance(first_sm, last_sm) <= std::distance(first_la, last_la),
         //                            "incompatible ranges");
@@ -1628,7 +1629,7 @@ private:
     //   If Value's move constructor or move assignment throws.
     // @par Complexity
     //   Linear O(N).
-    void swap_dispatch_impl(iterator first_sm, iterator last_sm, iterator first_la, iterator last_la, boost::false_type const& /*use_memop*/)
+    void swap_dispatch_impl(iterator first_sm, iterator last_sm, iterator first_la, iterator last_la, std::false_type /*use_memop*/)
     {
         //BOOST_GEOMETRY_INDEX_ASSERT(std::distance(first_sm, last_sm) <= std::distance(first_la, last_la),
         //                            "incompatible ranges");
@@ -1937,7 +1938,7 @@ public:
     template <typename Iterator>
     void insert(iterator, Iterator first, Iterator last)
     {
-        // TODO - add MPL_ASSERT, check if Iterator is really an iterator
+        // TODO - add BOOST_GEOMETRY_STATIC_ASSERT, check if Iterator is really an iterator
         errh::check_capacity(*this, std::distance(first, last));                    // may throw
     }
 
@@ -1960,7 +1961,7 @@ public:
     template <typename Iterator>
     void assign(Iterator first, Iterator last)
     {
-        // TODO - add MPL_ASSERT, check if Iterator is really an iterator
+        // TODO - add BOOST_GEOMETRY_STATIC_ASSERT, check if Iterator is really an iterator
         errh::check_capacity(*this, std::distance(first, last));                    // may throw
     }
 
@@ -2193,3 +2194,7 @@ inline void swap(varray<V, C1> & x, varray<V, C2> & y)
 #include <boost/container/detail/config_end.hpp>
 
 #endif // BOOST_GEOMETRY_INDEX_DETAIL_VARRAY_HPP
+
+/* varray.hpp
+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
+*/

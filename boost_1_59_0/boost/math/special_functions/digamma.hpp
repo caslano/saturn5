@@ -18,7 +18,6 @@
 #include <boost/math/tools/promotion.hpp>
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/math/constants/constants.hpp>
-#include <boost/mpl/comparison.hpp>
 #include <boost/math/tools/big_constant.hpp>
 
 #if defined(__GNUC__) && defined(BOOST_MATH_USE_FLOAT128)
@@ -38,9 +37,9 @@ namespace detail{
 // Begin by defining the smallest value for which it is safe to
 // use the asymptotic expansion for digamma:
 //
-inline unsigned digamma_large_lim(const boost::integral_constant<int, 0>*)
+inline unsigned digamma_large_lim(const std::integral_constant<int, 0>*)
 {  return 20;  }
-inline unsigned digamma_large_lim(const boost::integral_constant<int, 113>*)
+inline unsigned digamma_large_lim(const std::integral_constant<int, 113>*)
 {  return 20;  }
 inline unsigned digamma_large_lim(const void*)
 {  return 10;  }
@@ -55,7 +54,7 @@ inline unsigned digamma_large_lim(const void*)
 // This first one gives 34-digit precision for x >= 20:
 //
 template <class T>
-inline T digamma_imp_large(T x, const boost::integral_constant<int, 113>*)
+inline T digamma_imp_large(T x, const std::integral_constant<int, 113>*)
 {
    BOOST_MATH_STD_USING // ADL of std functions.
    static const T P[] = {
@@ -88,7 +87,7 @@ inline T digamma_imp_large(T x, const boost::integral_constant<int, 113>*)
 // 19-digit precision for x >= 10:
 //
 template <class T>
-inline T digamma_imp_large(T x, const boost::integral_constant<int, 64>*)
+inline T digamma_imp_large(T x, const std::integral_constant<int, 64>*)
 {
    BOOST_MATH_STD_USING // ADL of std functions.
    static const T P[] = {
@@ -115,7 +114,7 @@ inline T digamma_imp_large(T x, const boost::integral_constant<int, 64>*)
 // 17-digit precision for x >= 10:
 //
 template <class T>
-inline T digamma_imp_large(T x, const boost::integral_constant<int, 53>*)
+inline T digamma_imp_large(T x, const std::integral_constant<int, 53>*)
 {
    BOOST_MATH_STD_USING // ADL of std functions.
    static const T P[] = {
@@ -139,7 +138,7 @@ inline T digamma_imp_large(T x, const boost::integral_constant<int, 53>*)
 // 9-digit precision for x >= 10:
 //
 template <class T>
-inline T digamma_imp_large(T x, const boost::integral_constant<int, 24>*)
+inline T digamma_imp_large(T x, const std::integral_constant<int, 24>*)
 {
    BOOST_MATH_STD_USING // ADL of std functions.
    static const T P[] = {
@@ -178,12 +177,12 @@ public:
 };
 
 template <class T, class Policy>
-inline T digamma_imp_large(T x, const Policy& pol, const boost::integral_constant<int, 0>*)
+inline T digamma_imp_large(T x, const Policy& pol, const std::integral_constant<int, 0>*)
 {
    BOOST_MATH_STD_USING
    digamma_series_func<T> s(x);
    T result = log(x) - 1 / (2 * x);
-   boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
+   std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
    result = boost::math::tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter, -result);
    result = -result;
    policies::check_series_iterations<T>("boost::math::digamma<%1%>(%1%)", max_iter, pol);
@@ -195,7 +194,7 @@ inline T digamma_imp_large(T x, const Policy& pol, const boost::integral_constan
 // 35-digit precision:
 //
 template <class T>
-T digamma_imp_1_2(T x, const boost::integral_constant<int, 113>*)
+T digamma_imp_1_2(T x, const std::integral_constant<int, 113>*)
 {
    //
    // Now the approximation, we use the form:
@@ -257,7 +256,7 @@ T digamma_imp_1_2(T x, const boost::integral_constant<int, 113>*)
 // 19-digit precision:
 //
 template <class T>
-T digamma_imp_1_2(T x, const boost::integral_constant<int, 64>*)
+T digamma_imp_1_2(T x, const std::integral_constant<int, 64>*)
 {
    //
    // Now the approximation, we use the form:
@@ -307,7 +306,7 @@ T digamma_imp_1_2(T x, const boost::integral_constant<int, 64>*)
 // 18-digit precision:
 //
 template <class T>
-T digamma_imp_1_2(T x, const boost::integral_constant<int, 53>*)
+T digamma_imp_1_2(T x, const std::integral_constant<int, 53>*)
 {
    //
    // Now the approximation, we use the form:
@@ -356,7 +355,7 @@ T digamma_imp_1_2(T x, const boost::integral_constant<int, 53>*)
 // 9-digit precision:
 //
 template <class T>
-inline T digamma_imp_1_2(T x, const boost::integral_constant<int, 24>*)
+inline T digamma_imp_1_2(T x, const std::integral_constant<int, 24>*)
 {
    //
    // Now the approximation, we use the form:
@@ -460,7 +459,7 @@ T digamma_imp(T x, const Tag* t, const Policy& pol)
 }
 
 template <class T, class Policy>
-T digamma_imp(T x, const boost::integral_constant<int, 0>* t, const Policy& pol)
+T digamma_imp(T x, const std::integral_constant<int, 0>* t, const Policy& pol)
 {
    //
    // This handles reflection of negative arguments, and all our
@@ -562,14 +561,14 @@ struct digamma_initializer
       init()
       {
          typedef typename policies::precision<T, Policy>::type precision_type;
-         do_init(boost::integral_constant<bool, precision_type::value && (precision_type::value <= 113)>());
+         do_init(std::integral_constant<bool, precision_type::value && (precision_type::value <= 113)>());
       }
-      void do_init(const boost::true_type&)
+      void do_init(const std::true_type&)
       {
          boost::math::digamma(T(1.5), Policy());
          boost::math::digamma(T(500), Policy());
       }
-      void do_init(const false_type&){}
+      void do_init(const std::false_type&){}
       void force_instantiate()const{}
    };
    static const init initializer;
@@ -591,7 +590,7 @@ inline typename tools::promote_args<T>::type
    typedef typename tools::promote_args<T>::type result_type;
    typedef typename policies::evaluation<result_type, Policy>::type value_type;
    typedef typename policies::precision<T, Policy>::type precision_type;
-   typedef boost::integral_constant<int,
+   typedef std::integral_constant<int,
       (precision_type::value <= 0) || (precision_type::value > 113) ? 0 :
       precision_type::value <= 24 ? 24 :
       precision_type::value <= 53 ? 53 :
@@ -628,3 +627,7 @@ inline typename tools::promote_args<T>::type
 
 #endif
 
+
+/* digamma.hpp
+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
+*/

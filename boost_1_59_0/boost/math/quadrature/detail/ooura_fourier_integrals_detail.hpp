@@ -6,14 +6,18 @@
 #ifndef BOOST_MATH_QUADRATURE_DETAIL_OOURA_FOURIER_INTEGRALS_DETAIL_HPP
 #define BOOST_MATH_QUADRATURE_DETAIL_OOURA_FOURIER_INTEGRALS_DETAIL_HPP
 #include <utility> // for std::pair.
-#include <mutex>
-#include <atomic>
 #include <vector>
 #include <iostream>
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/sin_pi.hpp>
 #include <boost/math/special_functions/cos_pi.hpp>
 #include <boost/math/constants/constants.hpp>
+#include <boost/math/tools/config.hpp>
+
+#ifdef BOOST_HAS_THREADS
+#include <mutex>
+#include <atomic>
+#endif
 
 namespace boost { namespace math { namespace quadrature { namespace detail {
 
@@ -378,8 +382,10 @@ private:
         lnode_row.shrink_to_fit();
         lweight_row.shrink_to_fit();
 
+        #ifdef BOOST_HAS_THREADS
         // std::scoped_lock once C++17 is more common?
         std::lock_guard<std::mutex> lock(node_weight_mutex_);
+        #endif 
         // Another thread might have already finished this calculation and appended it to the nodes/weights:
         if (current_num_levels == big_nodes_.size()) {
             big_nodes_.push_back(bnode_row);
@@ -413,7 +419,9 @@ private:
         return I0;
     }
 
+    #ifdef BOOST_HAS_THREADS
     std::mutex node_weight_mutex_;
+    #endif
     // Nodes for n >= 0, giving t_n = pi*phi(nh)/h. Generally t_n >> 1.
     std::vector<std::vector<Real>> big_nodes_;
     // The term bweights_ will indicate that these are weights corresponding
@@ -424,7 +432,12 @@ private:
     std::vector<std::vector<Real>> little_nodes_;
     std::vector<std::vector<Real>> lweights_;
     Real rel_err_goal_;
+
+    #ifdef BOOST_HAS_THREADS
     std::atomic<long> starting_level_;
+    #else
+    long starting_level_;
+    #endif
     size_t requested_levels_;
 };
 
@@ -606,7 +619,10 @@ private:
         lnode_row.shrink_to_fit();
         lweight_row.shrink_to_fit();
 
+        #ifdef BOOST_HAS_THREADS
         std::lock_guard<std::mutex> lock(node_weight_mutex_);
+        #endif
+
         // Another thread might have already finished this calculation and appended it to the nodes/weights:
         if (current_num_levels == big_nodes_.size()) {
             big_nodes_.push_back(bnode_row);
@@ -635,17 +651,30 @@ private:
         return I0;
     }
 
+    #ifdef BOOST_HAS_THREADS
     std::mutex node_weight_mutex_;
+    #endif 
+
     std::vector<std::vector<Real>> big_nodes_;
     std::vector<std::vector<Real>> bweights_;
 
     std::vector<std::vector<Real>> little_nodes_;
     std::vector<std::vector<Real>> lweights_;
     Real rel_err_goal_;
+
+    #ifdef BOOST_HAS_THREADS
     std::atomic<long> starting_level_;
+    #else
+    long starting_level_;
+    #endif
+
     size_t requested_levels_;
 };
 
 
 }}}}
 #endif
+
+/* ooura_fourier_integrals_detail.hpp
+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
+*/

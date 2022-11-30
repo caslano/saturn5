@@ -3,8 +3,8 @@
 // Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 // Copyright (c) 2013-2017 Adam Wulkiewicz, Lodz, Poland.
 
-// This file was modified by Oracle on 2013, 2014, 2016, 2017, 2018, 2019.
-// Modifications copyright (c) 2013-2019 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2013-2021.
+// Modifications copyright (c) 2013-2021 Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
@@ -26,6 +26,8 @@
 #include <boost/geometry/util/math.hpp>
 #include <boost/geometry/util/select_calculation_type.hpp>
 #include <boost/geometry/util/normalize_spheroidal_coordinates.hpp>
+
+#include <boost/geometry/strategy/spherical/expand_point.hpp>
 
 #include <boost/geometry/strategies/cartesian/point_in_box.hpp>
 #include <boost/geometry/strategies/covered_by.hpp>
@@ -121,45 +123,7 @@ class spherical_winding_base
 public:
     typedef typename SideStrategy::cs_tag cs_tag;
 
-    typedef SideStrategy side_strategy_type;
-
-    inline side_strategy_type get_side_strategy() const
-    {
-        return m_side_strategy;
-    }
-
-    typedef expand::spherical_point expand_point_strategy_type;
-
-    typedef typename SideStrategy::envelope_strategy_type envelope_strategy_type;
-
-    inline envelope_strategy_type get_envelope_strategy() const
-    {
-        return m_side_strategy.get_envelope_strategy();
-    }
-
-    typedef typename SideStrategy::disjoint_strategy_type disjoint_strategy_type;
-
-    inline disjoint_strategy_type get_disjoint_strategy() const
-    {
-        return m_side_strategy.get_disjoint_strategy();
-    }
-
-    typedef typename SideStrategy::equals_point_point_strategy_type equals_point_point_strategy_type;
-    inline equals_point_point_strategy_type get_equals_point_point_strategy() const
-    {
-        return m_side_strategy.get_equals_point_point_strategy();
-    }
-
-    typedef disjoint::spherical_box_box disjoint_box_box_strategy_type;
-    static inline disjoint_box_box_strategy_type get_disjoint_box_box_strategy()
-    {
-        return disjoint_box_box_strategy_type();
-    }
-
-    typedef covered_by::spherical_point_box disjoint_point_box_strategy_type;
-
-    spherical_winding_base()
-    {}
+    spherical_winding_base() = default;
 
     template <typename Model>
     explicit spherical_winding_base(Model const& model)
@@ -555,27 +519,13 @@ namespace services
 template <typename PointLike, typename Geometry, typename AnyTag1, typename AnyTag2>
 struct default_strategy<PointLike, Geometry, AnyTag1, AnyTag2, pointlike_tag, polygonal_tag, spherical_tag, spherical_tag>
 {
-    typedef within::detail::spherical_winding_base
-        <
-            typename strategy::side::services::default_strategy
-                <
-                    typename cs_tag<PointLike>::type
-                >::type,
-            void
-        > type;
+    typedef within::spherical_winding<> type;
 };
 
 template <typename PointLike, typename Geometry, typename AnyTag1, typename AnyTag2>
 struct default_strategy<PointLike, Geometry, AnyTag1, AnyTag2, pointlike_tag, linear_tag, spherical_tag, spherical_tag>
 {
-    typedef within::detail::spherical_winding_base
-        <
-            typename strategy::side::services::default_strategy
-                <
-                    typename cs_tag<PointLike>::type
-                >::type,
-            void
-        > type;
+    typedef within::spherical_winding<> type;
 };
 
 } // namespace services
@@ -593,27 +543,13 @@ namespace strategy { namespace covered_by { namespace services
 template <typename PointLike, typename Geometry, typename AnyTag1, typename AnyTag2>
 struct default_strategy<PointLike, Geometry, AnyTag1, AnyTag2, pointlike_tag, polygonal_tag, spherical_tag, spherical_tag>
 {
-    typedef within::detail::spherical_winding_base
-        <
-            typename strategy::side::services::default_strategy
-                <
-                    typename cs_tag<PointLike>::type
-                >::type,
-            void
-        > type;
+    typedef within::spherical_winding<> type;
 };
 
 template <typename PointLike, typename Geometry, typename AnyTag1, typename AnyTag2>
 struct default_strategy<PointLike, Geometry, AnyTag1, AnyTag2, pointlike_tag, linear_tag, spherical_tag, spherical_tag>
 {
-    typedef within::detail::spherical_winding_base
-        <
-            typename strategy::side::services::default_strategy
-                <
-                    typename cs_tag<PointLike>::type
-                >::type,
-            void
-        > type;
+    typedef within::spherical_winding<> type;
 };
 
 }}} // namespace strategy::covered_by::services
@@ -624,3 +560,7 @@ struct default_strategy<PointLike, Geometry, AnyTag1, AnyTag2, pointlike_tag, li
 
 
 #endif // BOOST_GEOMETRY_STRATEGY_SPHERICAL_POINT_IN_POLY_WINDING_HPP
+
+/* point_in_poly_winding.hpp
+G9/4eWIf4vWcpLmYiccVZXkBuKXmyt3VWteCJziA4JVy2uI7uReEiQheQt6IuRScgMaFng3fxQr0g+9L39u5mPEv5J5ePeeefFjEDI1sAvo3QB5+2Dab0azuHBOUTZVItfvahyKpLuWL2vOqThyra3T7MtvrK1lfszz9CexdCg52fFqyopYsduiL5uJj6ZvHHZ+KFG0dUrw8ymYkoWHeSniV31pyn8PVIDErtb//CjJFcSqbulJ14HrDjdUTpbpCnkP27HNBMGjc0at2ghO2GRI8FUXseuetwmkHszNyL7KxdiJa0ZTvVeqb6/krmpWYJid0N9QZfmFdIMBj1WL01TfEnhNczIUN2Gvv3y8COSUNX6JLQs0emUnAkjZ6Je89IXQy2Khh6PpJsTedCqnYAW5Z2lMMamWmBNEyt97mffRCyb6Tp5L6Qydr8wmlhXt81CpmLNtWf0SKP33dr49t3WBeN9A4a+1TxJj8tAmxi07jPWdnx1eTguEm7p9KFK+ebalC4MYkFyK47W3oC7yTBX+PXdRXx4FzTTpvbAHwHH79d7eOHLbV625l6q3zVyWh7wuYphplU8jSLQaPuXH8KpzKcfYbmarzP5V8moEoMHfKXyWLPUjtefNzxTwQHUvo9ti2VXmpvcCi8syXvWWuY8ZjeV0pLmVwsudiyQLpuBm0vsRhWT2B9IhEGH+NS5Z8krezKSGkNR7bFz1KTpPJzpKnc/mLOL9tWE7tLkHalAk35AKObmFKegaXMqW94e5mobkv8qF4lg1GIuNWKBt0ipt1bC+wpBMc4oZh1hskKRHDO+NZL4XQxN08VM2QGswQFu9hGTLTb6dAxZpr97yeTbB7zSpvUzpTgXfr02D9b8cTe9kslduvvCxgLlfC9zqcX2qfqfStDlbxjaIQtfT1RRFLgRgfuntELzE+xCyHI+++sGFsdO0bVvlN8Wlr+UE/CiveXVhskW60s9ZyOrA3lIakVRzKyBymorBlP5LxL8Kxg5lPyLEH9uGYc+n0XCU9VnlkR6/0xR9RoKNDqPLeY5r+gyDQ5xv2PEpF2kdXg7C2G/BzYVeBGGZ8/mYwQr+UQpf7HaHIJ5ZBn2MfpciPRe2cdh15mLMHaqyV0d8KSAMCljhQI3EahwCuOFU7/mCpscdDwwSyegzt6CXPkVWd0yb7hgC+sEi8LTNldwKxZsnhN7d+wDGuoNpKfiNfUTvr6FuMNjkAQ395NfoFm9FwWPCFB9No6osiorMyA878z6PeLekqM0w3tEdBsIfDQl304IwdSpoeMXBKKMoH933LywPyu/m6BNDfrdOFGQXeijT09dK1LCKmKa9iV15ZKbj22rym5r/FqEIgZZx/1LeFaKEsdeneexotTKP3RtfYPULzKj+t1P6vi8R/n7T4w0GDiZdSBQCEfu4CsHL4HlhFyhwpdCCLpPOlXSHRsbbPUSnb3HVuLKzSrKSZan8eJwdroHToCmmUKmFOOP0OUzDY0gayYe48TD80KEqzbGE714IB7aBf95br5JXsHgMp4tfidAUyJYsAs8ZdAvj0eNXzePRsTvMUO1SQP+PCEbKHCXZMxX62/0dv4PGJrpDVmatKiQDtm9SLMfOh4nUA594Tj6lEASgGDJRrNWPhbOY82vTZpMlTckyB/g3fN1Iezy2yvbLYl1EPMFN3+S3jc2DJjsGFtQRz4PYbbIVwz387aWGliB7EZc/Nn2nGDqR9QkX+jh8khLPAuUsFAZ5agHwzRML+b3J9Su15d3kUpnpVKOCTCz6oASCrdk9ZmPD2OsWIRfJa3tDdU4f0goUyKPU8/JeXfPbZTBYzfI40g+inbx9wKWtTbBvwEYY4/y78+5Cz2OrqAtWsotfu6P2NbfWs1F7XfyBVWvopPbnuQdHCpdf08u/Tm/1JayCAxD8Ru+rIdbnVn9BRplAzQ9Z44cKls6LiI8lMFwb5y0Obf240En6eAghuin2sw3zPVStUcjrCPzL3Fx6HOLuMSI1WGHb/0fMKZlFYwUPEZd6laki/BbXIUS+nfZmD4WRKIYc9Q+y4ruyscM/BNYGleD3irkVy323/7HaAvXB47i3zYDQZjT4g5ZiTcqyQ5tDCAcu1uzO9Ky4fPRLWqXTBaOCNYmPd1im64Od4gjoS/jtaivPzKO9I7fetnjOLIb6Giw45Z5CLVYECjh3grLQUxFLT5NxVOfzlHJO9UoQ/Hwi5Uy+jNPf9AmEYVK8WwqGm5zAcbTQQp84cImpyfKnWRNMcpfTI1mKKh2VmCyMyNbZ5BPsONC821BKTKWRoCmuz1vAxA7bSWXZ3sQx4cVC101N7eFO2RLL1zehDYDG+qCWdS2/rJtumaX8xL1iBgO5kt/dXaH8k+K6MYUzJas0OZmS3NWnFoOTljoNvWpIzC+2FpQp0FEybvvT/B5AO7xgP7VjLftjGfhjEfljEXrioQT9aiH4C9Qs1aLIihlgbsF89V3DBQ+TQ0IpwfqV93FLfrnJThlr0ujzxD42fq1wTyjUZuWJbynTmuZrt/jhFYgbpF+fThme7+cQIUhdCdWhwIj5HQhGFaCkxTEwm66bPkKwaNDHpRIy8J8lUlwTB0wyNsOcKkroXtpM5S00Bwn1Nq2dkNgypCrvEbOXTYBySRBjWCL6iF2RtZBurk+qQhAs/3tZ/weOFvkWg97yiJoaVKg2ineCydipeGhUqZNnbRN2U6kVXtYeZdJmPa+jO9p1PeQPMomMNNmiWDhOdkrCSzKEAEssSRA2ifjklVe+3C/Fh4VVcpyPNW+4wbPqIBLW4gJDZwMoqgTdjBgqIxWGFo1mvOYnX+NCCTDc0C9WJ4nGS28DS+RNLKWwjq+Te/SrEAsESK21mxSKjs7OnoWo/5bl5GMOxy5svaDgPnbcpR8h14a4f2qnAnKFnpuz79/c3YBYAIPBP0J/gPyF/Qv+E/Qn/E/En8k/Un+g/MX9i/8T9if+T8CfxT9Kf5D8pf1L/pP1J/5PxJ/NP1p/sPzl/cv/k/cn/U/Cn8E/Rn+I/JX9K/5T9Kf9T8afyT9Wf6j81f2r/1P2p/9Pwp/FP05/mPy1/Wv+0/Wn/0/Gn80/Xn+4/PX96//T96f8z8Gfwz9Cf4T8jf0b/jP0Z/zPxZ/LP1J/pPzN/Zv/M/Zn/s/Bn8c/Sn+U/K39W/6z9Wf+z8Wfzz9af7T87f3b/7P3Z/3Pw5/DP0Z/jPyd/Tv+c/Tn/c/Hn8s/Vn+s/N39u/9z9uf/z8Ofxz9Of5z8vf17/vP15//Px5/PP15/vPz9/AOb+4r/Zg1AkWhxfYJawLxtXXvzoY+h2Put4552Iv5QcaDnGWbBkMHqo8FBvC8HudphFZn0Ko4krqm2PcItqn5fYqSVUUH3/98z+ACGrJz1B2ZEbdhwqGTLdja/FcBAvdYjbKyk1xVpozUb6XBkXV8/f2RW6z6WKMfMJ1AZvDZjrQ++9DnRyasa2wO7KvIV6LrbBwcJ5fAaj2S7gabMVDG+8+594UsTgCGpL9qUrRkD0idjD8IpqW4GK8ZzvGvblkg35FbrujKdxTjfEO1APOQQw7fBSQGtlhnFMyPO2PdH1s9JEdJPoGT2iaRtOusQQ3BBgfFMmSpgulF631IqH9sSYGwQnGN1/5GO4qZDoQcgZAFQRYbtsF4wtenCERWnmWjAObu16EjaLjnw6H8nw6bivzPL/SqEM/C6C2Pq9S+cn1cGS32+cVxKto4QViAaJ9FawGx1iySXVzZVDMEkcoV4zQydKVGb4vA/tFDA812awZN+8Pe6eqdcyqdT664z30HJfKJCHPGIhQ1ynFhoEETDUik14hDtzNCA2UJwOpvjri/MQw+LuTVVYqA3htdHmMw/t6NYi4hl1Du4bVa4e/8M7ozpO7ovOSwDmS8e1KnTsTTS05qogDV7NbC5I9CcipUPx/0h3O9I/XgDCrOwB7wzGS79m1c/w5Qpy6XBhpNZrZUEV5RsUBRdEyJgv/saXv4IV7miqt+hYH4gAkOq03G4t00azqRmHj25aL/+m66106Ivud3DEGXcXtNv7J4k4iaboK7HmTQiO6hISm+JQQW5gyumoR47CHk9KD9vmYGTV9rVME1k4Px+u0BGVHLHbnMj+doZQOGD4MIW3DwLcVtnlnV4N1Nq86OOGGaU5UTa4cyEECq0ODXLfeH3PXXbw6fLce8whO1XKwRlcGHtLI47nk9vCwWRUTq4DZeP3SDTfxMcY+xiBQG3JqRmHCaRobb4b23qRMO455N8aBdJ1POprZMaPu+lGjwlg+5BJB98ZGR71k67zDRzVCa3oBrgriTrhORGOLND9klwYxg1bNgCgvAswqrbYuUmKdzv3WpGC0kJ6e9zSdd5kzJ1k2iwjEKKppKgnXZeo4vXD6MkUsITeC46aapDF7BI8lTr77c+70cvgcyMuOK0bDRw05g5pw0+0BkPMobMknRpV1nRG7H9hgg1FqpuS8SF/Ofee1qoNvbfF33S6tD8AbNLUH8UU2rrsNtVg4plvA7XkC1eZtyitdWRBR+3PRpx81+nvMXhNxW08ZhNYytgEbnIUhMEuHgqhmCA4AZ1NhTq91G5gD5WU0NmEFRUsTNPtRwAxuC5wR3ef4Jl3UP4cftZj1+Q4vxfUMwpLjV8GFm/YhLAr9ZJ8WeqkDjIv0yE6KuuKJNQY6iOSkcvtvNF2miZJZToOfy0hY0h1KAM2+RZz/583lwGXBN6vj0HN474bMASE8eeAcfYy7kfGf5ZQyTiaTFpw4N6iaruK39ryLnRfsxsVuNNAhA7WDkoCvDQ9J5qt71NWiDXTZVIvhQkv21aJN6JF8kTUHuTwv2CH75sC84b+b15jTtw7pQnXVS8RN/+F3ZD/txlf8d+XzXXIkBArQ1yh3kOshdt0g2EaVVo23Yz/h6BfU3k97FJvJJ7x9LYgNs2mKreckObAp6Vohf22cLXFLycPBnvKB3oS33C6SX0uLmnv7RbqJiThJ+SO8OlgtFLXiu4QyLeJvcnDwBLneE9xl1++HcNNPLiFEhHwpJTfQ8+4OsyxwBS6JfDyQ2Ei/2wOeEtH+Ybgc4gFZhNl0KgZG1IEdu1zXyO1x0LRrrpJPe2W2qc2pmHhva+ZUk0RqV090n8uAkKc0lt5Dj4Urv7umXjHNpNMb55vekIh75keLLd4miWxC+S0y/FHiBObVRZDJ/yqz3ATp7qqEcO0UJrWYmY10YHnisbq7ZjZidepjcezGvLp+XnIwPhHvGCwnPC3xVUB21OXOs8dO7PivSca587NeMHcB9UWabnfJkZwREWvgPvJEVvm5592M9f2M+zBx/nOtjTqV3tG4izJPb78oTOtHOeoMQO1P+KtH35ZQa8WgtPzXs2aWPgqDvQgKmlUrwr0PBpvQbzIGfOoaqCmrMGzAV+PgOFa8YF9KXY2CiZZposVmFbn1rAOlrVaBRf1sM2vJkt7/DG8/ssfvDQx+vrnu6wWZYIEK1oLQOeAfv1A+vFhmD/wetiiwkln0btmd5jROh10hf285WbqThGtyj/XIiG+hA/rw5fw79AVGR4vsxFf2CnhA6Ac57k2epnDT+ghb3n/YUI9aB3XXHkyMnvokNYzY+Mk7/CMjWgdR3LLRB8NgaTWxx/hP04AR4PQI+qfH289pVZqXR23YPFzMhhdnbJgR2moLBLaFqeMCWI1asMyZYi17s5ggYwI5bhHT1AWwzjLUzK2VBCdu2BNsGfF1u4DwSc0dR0TG/GB+21SP8O5dQqO+zv8EMd8kniQpzlYEXIXwhy4ylFd0GGsCFLJwJN8KVgNV1BbRZe/1zk8IpBcWX770MNazum8/9pYHbev+FgJ9pew05vAxb8FK3tIcbWupRzXqQxuPtMPfY2lAO/lJIWDI9mxxycHHJzTu0/yNmi7YmarR36oF2ru4CE3OXAqty0cUSUs22/BD6diE3VIe4vR14UfyyWWSl426PIYkMn3HzbBdxAsLbm8DLyqF8bOgyX0Fp1sddFQp1nX5m5g+R6cgLP82P4gYeWKbfAg5sIOHM4ZrjSti60hOfseDj4f9uMEwxyaDyKWsjdTiNb0ZhOlXgPSwGOjThk+4inEF6GHI5tbRlzZU56J2pYZcN1qqCS4/VvxM+CNzsMZkXxm/rdXsX+Y8sM5EUoD02+vuW1b+UY0GuWpYTbeVc3WCnbdByCNwIs9J0QsKvQ4NSbC2JGOfjj1VhP8XpHHMZW5DBcssTmWVjl9jnK+KscpGsJC196jFHa6HiVpqNti7yBcYDVqBPbBzHAhaF1VPCzjOx5ScE/wrP2fc9jtQ/q8iZiAHBzmK8j51II3QY1iri1VgeCHTl+eWJTGslpCmA1VPsS/DSnAqQmNN8F7YA+OCCvftilVzgUkd07s+1WtCb23/oIqf9hf7CioeWjKhtpzE1hpgcCjERti/6L0/x6pmipKpsvWB/Vn4Ci2V8OSdoPDrigTBnUKqTMPKzpsHrWoIuIvAamF/4EyG42iDIb1V4kJucJLEvt+IBWwd5st94QKGXZp+UQ2FzyLC7nwzS7WssNwtQmuzAC63f3XFyiKc7d32UqONjEGK8nbg4IkTpsSavIGbC+kTsFs+naM/K/bL5NkYq4k4k1iohz5QCl0xk+mNVizCbIusZmkyZXLboj9niqZeo1UYy7p4Vs3VcHxS4kN23yxu2k3kecjZCW0opRVAMH3ecbIpgLnoBsdgY1cc39lEUo/RwO9EvQRThbGm8HdtH1rYFZy1hM74s3CVkxIgw40WHrLDc7+YbSd2mz8sDwi1rlXXWSSFHuyaifdQrQqK2eigWbJDpmI7YVg1NIlNOsef37dvNYl8DOrz6D7p+DLEmgy156d0OP1aM69Uhv/IUwI9YiEFl6R0Z6ZuVGpxlY1qPxj1MC2q9lFzCAAJfH7RQO1UvCmznvHP09ah6tcIOcj0qMgegAjn33/So1FKtx2l1iR/peXejqzM3Qlob+v70e5bz89uJTobLgP8gePof3egWvjO97JrhRVrhf/vLnWyAn06c3/g82QlabEVJbAzgM6FABImwukaOgX0cJP0EGYE6qArCSYaNTJlo2iOX9ptcI/79cz/EexsgoFHIjPqMUmOrUNZUUCGIahQCvFW8iT2I0M2ESNhkPVeDS0JyLlV05bglbRoDMofBUgR5EYPeVEES9zvqYfB8XgtTxWnBAEaiVAB/Wz2Sf/QGqaMsL/nAa0BGvUBWD0hWgmXTcLToQ8MUw7As8uZ76E6uX8W3DYXcPkLciHP7m24Xe670H5Xc69dgL760EF1k5HQE76sJ4rNWVULmZ+Cq3tnYTrly69+Mb/0CmVwoh9WlbfA6MDN84l+1CLFeVzjepACeEcMRID3wd/PTa4xocKHN5wNXQoD5Q7vUvkxwhoPAPsqQe2dsAafc2esXoO35mUtXt7ItlclXVp2n5MS2EWYPLag5ZDgGvEpnLCmCfU88Efbrlk4TOkC/u09Qeub+lZVUm+A5nzqypT8IVWeO7qzlFi80dw7KeJxaUHipMhkJmVp6QgH9jiG2I8m434hn+B1t2O8wwj6xDSGlWcqtzkBC08Jdlj7T6DaNxXJHU8NpOQS+9e5Vrmk5lajf3KnoUi1itqcBqZ/irGyJqNoDPPXl9ZrifM
+*/

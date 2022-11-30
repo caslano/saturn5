@@ -50,15 +50,15 @@ struct zeta_series_cache_size
    //
    typedef typename boost::math::policies::precision<T,Policy>::type precision_type;
    typedef typename mpl::if_<
-      mpl::less_equal<precision_type, boost::integral_constant<int, 0> >,
-      boost::integral_constant<int, 5000>,
+      mpl::less_equal<precision_type, std::integral_constant<int, 0> >,
+      std::integral_constant<int, 5000>,
       typename mpl::if_<
-         mpl::less_equal<precision_type, boost::integral_constant<int, 64> >,
-         boost::integral_constant<int, 70>,
+         mpl::less_equal<precision_type, std::integral_constant<int, 64> >,
+         std::integral_constant<int, 70>,
          typename mpl::if_<
-            mpl::less_equal<precision_type, boost::integral_constant<int, 113> >,
-            boost::integral_constant<int, 100>,
-            boost::integral_constant<int, 5000>
+            mpl::less_equal<precision_type, std::integral_constant<int, 113> >,
+            std::integral_constant<int, 100>,
+            std::integral_constant<int, 5000>
          >::type
       >::type
    >::type type;
@@ -129,7 +129,7 @@ private:
 template <class T, class Policy>
 inline T zeta_series2_imp(T s, const Policy& pol)
 {
-   boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();;
+   std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();;
    zeta_series2<T> f(s);
    T result = tools::sum_series(
       f, 
@@ -174,7 +174,7 @@ T zeta_polynomial_series(T s, T sc, Policy const &)
 }
 
 template <class T, class Policy>
-T zeta_imp_prec(T s, T sc, const Policy& pol, const boost::integral_constant<int, 0>&)
+T zeta_imp_prec(T s, T sc, const Policy& pol, const std::integral_constant<int, 0>&)
 {
    BOOST_MATH_STD_USING
    T result;
@@ -199,7 +199,7 @@ T zeta_imp_prec(T s, T sc, const Policy& pol, const boost::integral_constant<int
 }
 
 template <class T, class Policy>
-inline T zeta_imp_prec(T s, T sc, const Policy&, const boost::integral_constant<int, 53>&)
+inline T zeta_imp_prec(T s, T sc, const Policy&, const std::integral_constant<int, 53>&)
 {
    BOOST_MATH_STD_USING
    T result;
@@ -373,7 +373,7 @@ inline T zeta_imp_prec(T s, T sc, const Policy&, const boost::integral_constant<
 }
 
 template <class T, class Policy>
-T zeta_imp_prec(T s, T sc, const Policy&, const boost::integral_constant<int, 64>&)
+T zeta_imp_prec(T s, T sc, const Policy&, const std::integral_constant<int, 64>&)
 {
    BOOST_MATH_STD_USING
    T result;
@@ -556,7 +556,7 @@ T zeta_imp_prec(T s, T sc, const Policy&, const boost::integral_constant<int, 64
 }
 
 template <class T, class Policy>
-T zeta_imp_prec(T s, T sc, const Policy&, const boost::integral_constant<int, 113>&)
+T zeta_imp_prec(T s, T sc, const Policy&, const std::integral_constant<int, 113>&)
 {
    BOOST_MATH_STD_USING
    T result;
@@ -877,7 +877,7 @@ T zeta_imp_prec(T s, T sc, const Policy&, const boost::integral_constant<int, 11
 }
 
 template <class T, class Policy>
-T zeta_imp_odd_integer(int s, const T&, const Policy&, const true_type&)
+T zeta_imp_odd_integer(int s, const T&, const Policy&, const std::true_type&)
 {
    static const T results[] = {
       BOOST_MATH_BIG_CONSTANT(T, 113, 1.2020569031595942853997381615114500), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0369277551433699263313654864570342), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0083492773819228268397975498497968), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0020083928260822144178527692324121), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0004941886041194645587022825264699), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0001227133475784891467518365263574), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000305882363070204935517285106451), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000076371976378997622736002935630), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000019082127165539389256569577951), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000004769329867878064631167196044), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000001192199259653110730677887189), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000298035035146522801860637051), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000074507117898354294919810042), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000018626597235130490064039099), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000004656629065033784072989233), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000001164155017270051977592974), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000291038504449709968692943), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000072759598350574810145209), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000018189896503070659475848), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000004547473783042154026799), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000001136868407680227849349), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000284217097688930185546), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000071054273952108527129), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000017763568435791203275), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000004440892103143813364), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000001110223025141066134), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000277555756213612417), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000069388939045441537), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000017347234760475766), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000004336808690020650), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000001084202172494241), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000271050543122347), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000067762635780452), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000016940658945098), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000004235164736273), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000001058791184068), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000264697796017), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000066174449004), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000016543612251), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000004135903063), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000001033975766), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000258493941), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000064623485), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000016155871), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000004038968), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000001009742), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000000252435), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000000063109), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000000015777), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000000003944), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000000000986), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000000000247), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000000000062), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000000000015), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000000000004), BOOST_MATH_BIG_CONSTANT(T, 113, 1.0000000000000000000000000000000001),
@@ -886,8 +886,11 @@ T zeta_imp_odd_integer(int s, const T&, const Policy&, const true_type&)
 }
 
 template <class T, class Policy>
-T zeta_imp_odd_integer(int s, const T& sc, const Policy& pol, const false_type&)
+T zeta_imp_odd_integer(int s, const T& sc, const Policy& pol, const std::false_type&)
 {
+#ifdef BOOST_MATH_NO_THREAD_LOCAL_WITH_NON_TRIVIAL_TYPES
+   static_assert(std::is_trivially_destructible<T>::value, "Your platform does not support thread_local with non-trivial types, last checked with Mingw-x64-8.1, Jan 2021.  Please try a Mingw build with the POSIX threading model, see https://sourceforge.net/p/mingw-w64/bugs/527/");
+#endif
    static BOOST_MATH_THREAD_LOCAL bool is_init = false;
    static BOOST_MATH_THREAD_LOCAL T results[50] = {};
    static BOOST_MATH_THREAD_LOCAL int digits = tools::digits<T>();
@@ -956,10 +959,10 @@ T zeta_imp(T s, T sc, const Policy& pol, const Tag& tag)
                   return T(((v / 2 - 1) & 1) ? -1 : 1) * ldexp(T(1), v - 1) * pow(constants::pi<T, Policy>(), v) *
                      boost::math::unchecked_bernoulli_b2n<T>(v / 2) / boost::math::unchecked_factorial<T>(v);
                return T(((v / 2 - 1) & 1) ? -1 : 1) * ldexp(T(1), v - 1) * pow(constants::pi<T, Policy>(), v) *
-                  boost::math::bernoulli_b2n<T>(v / 2) / boost::math::factorial<T>(v);
+                  boost::math::bernoulli_b2n<T>(v / 2) / boost::math::factorial<T>(v, pol);
             }
             else
-               return zeta_imp_odd_integer(v, sc, pol, boost::integral_constant<bool, (Tag::value <= 113) && Tag::value>());
+               return zeta_imp_odd_integer(v, sc, pol, std::integral_constant<bool, (Tag::value <= 113) && Tag::value>());
          }
 #ifndef BOOST_NO_EXCEPTIONS
       }
@@ -1016,9 +1019,9 @@ struct zeta_initializer
       {
          do_init(tag());
       }
-      static void do_init(const boost::integral_constant<int, 0>&){ boost::math::zeta(static_cast<T>(5), Policy()); }
-      static void do_init(const boost::integral_constant<int, 53>&){ boost::math::zeta(static_cast<T>(5), Policy()); }
-      static void do_init(const boost::integral_constant<int, 64>&)
+      static void do_init(const std::integral_constant<int, 0>&){ boost::math::zeta(static_cast<T>(5), Policy()); }
+      static void do_init(const std::integral_constant<int, 53>&){ boost::math::zeta(static_cast<T>(5), Policy()); }
+      static void do_init(const std::integral_constant<int, 64>&)
       {
          boost::math::zeta(static_cast<T>(0.5), Policy());
          boost::math::zeta(static_cast<T>(1.5), Policy());
@@ -1029,7 +1032,7 @@ struct zeta_initializer
 
          boost::math::zeta(static_cast<T>(5), Policy());
       }
-      static void do_init(const boost::integral_constant<int, 113>&)
+      static void do_init(const std::integral_constant<int, 113>&)
       {
          boost::math::zeta(static_cast<T>(0.5), Policy());
          boost::math::zeta(static_cast<T>(1.5), Policy());
@@ -1068,7 +1071,7 @@ inline typename tools::promote_args<T>::type zeta(T s, const Policy&)
       policies::promote_double<false>, 
       policies::discrete_quantile<>,
       policies::assert_undefined<> >::type forwarding_policy;
-   typedef boost::integral_constant<int,
+   typedef std::integral_constant<int,
       precision_type::value <= 0 ? 0 :
       precision_type::value <= 53 ? 53 :
       precision_type::value <= 64 ? 64 :
@@ -1096,3 +1099,7 @@ inline typename tools::promote_args<T>::type zeta(T s)
 
 
 
+
+/* zeta.hpp
+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
+*/

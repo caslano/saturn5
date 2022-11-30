@@ -19,147 +19,15 @@
 #ifndef BOOST_REGEX_OBJECT_CACHE_HPP
 #define BOOST_REGEX_OBJECT_CACHE_HPP
 
-#include <boost/config.hpp>
-#include <boost/shared_ptr.hpp>
-#include <map>
-#include <list>
-#include <stdexcept>
-#include <string>
-#ifdef BOOST_HAS_THREADS
-#include <boost/regex/pending/static_mutex.hpp>
-#endif
-
-namespace boost{
-
-template <class Key, class Object>
-class object_cache
-{
-public:
-   typedef std::pair< ::boost::shared_ptr<Object const>, Key const*> value_type;
-   typedef std::list<value_type> list_type;
-   typedef typename list_type::iterator list_iterator;
-   typedef std::map<Key, list_iterator> map_type;
-   typedef typename map_type::iterator map_iterator;
-   typedef typename list_type::size_type size_type;
-   static boost::shared_ptr<Object const> get(const Key& k, size_type l_max_cache_size);
-
-private:
-   static boost::shared_ptr<Object const> do_get(const Key& k, size_type l_max_cache_size);
-
-   struct data
-   {
-      list_type   cont;
-      map_type    index;
-   };
-
-   // Needed by compilers not implementing the resolution to DR45. For reference,
-   // see http://www.open-std.org/JTC1/SC22/WG21/docs/cwg_defects.html#45.
-   friend struct data;
-};
-
-template <class Key, class Object>
-boost::shared_ptr<Object const> object_cache<Key, Object>::get(const Key& k, size_type l_max_cache_size)
-{
-#ifdef BOOST_HAS_THREADS
-   static boost::static_mutex mut = BOOST_STATIC_MUTEX_INIT;
-
-   boost::static_mutex::scoped_lock l(mut);
-   if(l)
-   {
-      return do_get(k, l_max_cache_size);
-   }
-   //
-   // what do we do if the lock fails?
-   // for now just throw, but we should never really get here...
-   //
-   ::boost::throw_exception(std::runtime_error("Error in thread safety code: could not acquire a lock"));
-#if defined(BOOST_NO_UNREACHABLE_RETURN_DETECTION) || defined(BOOST_NO_EXCEPTIONS)
-   return boost::shared_ptr<Object>();
-#endif
+#include <boost/regex/config.hpp>
+#ifdef BOOST_REGEX_CXX03
+#include <boost/regex/v4/object_cache.hpp>
 #else
-   return do_get(k, l_max_cache_size);
+#include <boost/regex/v5/object_cache.hpp>
 #endif
-}
-
-template <class Key, class Object>
-boost::shared_ptr<Object const> object_cache<Key, Object>::do_get(const Key& k, size_type l_max_cache_size)
-{
-   typedef typename object_cache<Key, Object>::data object_data;
-   typedef typename map_type::size_type map_size_type;
-   static object_data s_data;
-
-   //
-   // see if the object is already in the cache:
-   //
-   map_iterator mpos = s_data.index.find(k);
-   if(mpos != s_data.index.end())
-   {
-      //
-      // Eureka! 
-      // We have a cached item, bump it up the list and return it:
-      //
-      if(--(s_data.cont.end()) != mpos->second)
-      {
-         // splice out the item we want to move:
-         list_type temp;
-         temp.splice(temp.end(), s_data.cont, mpos->second);
-         // and now place it at the end of the list:
-         s_data.cont.splice(s_data.cont.end(), temp, temp.begin());
-         BOOST_ASSERT(*(s_data.cont.back().second) == k);
-         // update index with new position:
-         mpos->second = --(s_data.cont.end());
-         BOOST_ASSERT(&(mpos->first) == mpos->second->second);
-         BOOST_ASSERT(&(mpos->first) == s_data.cont.back().second);
-      }
-      return s_data.cont.back().first;
-   }
-   //
-   // if we get here then the item is not in the cache,
-   // so create it:
-   //
-   boost::shared_ptr<Object const> result(new Object(k));
-   //
-   // Add it to the list, and index it:
-   //
-   s_data.cont.push_back(value_type(result, static_cast<Key const*>(0)));
-   s_data.index.insert(std::make_pair(k, --(s_data.cont.end())));
-   s_data.cont.back().second = &(s_data.index.find(k)->first);
-   map_size_type s = s_data.index.size();
-   BOOST_ASSERT(s_data.index[k]->first.get() == result.get());
-   BOOST_ASSERT(&(s_data.index.find(k)->first) == s_data.cont.back().second);
-   BOOST_ASSERT(s_data.index.find(k)->first == k);
-   if(s > l_max_cache_size)
-   {
-      //
-      // We have too many items in the list, so we need to start
-      // popping them off the back of the list, but only if they're
-      // being held uniquely by us:
-      //
-      list_iterator pos = s_data.cont.begin();
-      list_iterator last = s_data.cont.end();
-      while((pos != last) && (s > l_max_cache_size))
-      {
-         if(pos->first.unique())
-         {
-            list_iterator condemmed(pos);
-            ++pos;
-            // now remove the items from our containers, 
-            // then order has to be as follows:
-            BOOST_ASSERT(s_data.index.find(*(condemmed->second)) != s_data.index.end());
-            s_data.index.erase(*(condemmed->second));
-            s_data.cont.erase(condemmed); 
-            --s;
-         }
-         else
-            ++pos;
-      }
-      BOOST_ASSERT(s_data.index[k]->first.get() == result.get());
-      BOOST_ASSERT(&(s_data.index.find(k)->first) == s_data.cont.back().second);
-      BOOST_ASSERT(s_data.index.find(k)->first == k);
-   }
-   return result;
-}
-
-}
 
 #endif
+
+/* object_cache.hpp
++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
+*/

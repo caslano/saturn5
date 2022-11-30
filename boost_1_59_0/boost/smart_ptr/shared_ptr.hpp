@@ -14,23 +14,16 @@
 //  See http://www.boost.org/libs/smart_ptr/ for documentation.
 //
 
-#include <boost/config.hpp>   // for broken compiler workarounds
-
-// In order to avoid circular dependencies with Boost.TR1
-// we make sure that our include of <memory> doesn't try to
-// pull in the TR1 headers: that's why we use this header 
-// rather than including <memory> directly:
-#include <boost/config/no_tr1/memory.hpp>  // std::auto_ptr
-
-#include <boost/assert.hpp>
-#include <boost/checked_delete.hpp>
-#include <boost/throw_exception.hpp>
 #include <boost/smart_ptr/detail/shared_count.hpp>
-#include <boost/config/workaround.hpp>
 #include <boost/smart_ptr/detail/sp_convertible.hpp>
 #include <boost/smart_ptr/detail/sp_nullptr_t.hpp>
 #include <boost/smart_ptr/detail/sp_disable_deprecated.hpp>
 #include <boost/smart_ptr/detail/sp_noexcept.hpp>
+#include <boost/checked_delete.hpp>
+#include <boost/throw_exception.hpp>
+#include <boost/assert.hpp>
+#include <boost/config.hpp>
+#include <boost/config/workaround.hpp>
 
 #if !defined(BOOST_SP_NO_ATOMIC_ACCESS)
 #include <boost/smart_ptr/detail/spinlock_pool.hpp>
@@ -40,6 +33,7 @@
 #include <functional>           // for std::less
 #include <typeinfo>             // for std::bad_cast
 #include <cstddef>              // for std::size_t
+#include <memory>               // for std::auto_ptr
 
 #if !defined(BOOST_NO_IOSTREAM)
 #if !defined(BOOST_NO_IOSFWD)
@@ -86,7 +80,7 @@ template< class T > struct sp_element< T[] >
     typedef T type;
 };
 
-#if !defined( __BORLANDC__ ) || !BOOST_WORKAROUND( __BORLANDC__, < 0x600 )
+#if !defined( BOOST_BORLANDC ) || !BOOST_WORKAROUND( BOOST_BORLANDC, < 0x600 )
 
 template< class T, std::size_t N > struct sp_element< T[N] >
 {
@@ -135,7 +129,7 @@ template< class T > struct sp_dereference< T[] >
     typedef void type;
 };
 
-#if !defined( __BORLANDC__ ) || !BOOST_WORKAROUND( __BORLANDC__, < 0x600 )
+#if !defined( BOOST_BORLANDC ) || !BOOST_WORKAROUND( BOOST_BORLANDC, < 0x600 )
 
 template< class T, std::size_t N > struct sp_dereference< T[N] >
 {
@@ -160,7 +154,7 @@ template< class T > struct sp_member_access< T[] >
     typedef void type;
 };
 
-#if !defined( __BORLANDC__ ) || !BOOST_WORKAROUND( __BORLANDC__, < 0x600 )
+#if !defined( BOOST_BORLANDC ) || !BOOST_WORKAROUND( BOOST_BORLANDC, < 0x600 )
 
 template< class T, std::size_t N > struct sp_member_access< T[N] >
 {
@@ -185,7 +179,7 @@ template< class T > struct sp_array_access< T[] >
     typedef T & type;
 };
 
-#if !defined( __BORLANDC__ ) || !BOOST_WORKAROUND( __BORLANDC__, < 0x600 )
+#if !defined( BOOST_BORLANDC ) || !BOOST_WORKAROUND( BOOST_BORLANDC, < 0x600 )
 
 template< class T, std::size_t N > struct sp_array_access< T[N] >
 {
@@ -380,17 +374,36 @@ public:
     }
 
     //
-    // Requirements: D's copy constructor must not throw
+    // Requirements: D's copy/move constructors must not throw
     //
     // shared_ptr will release p by calling d(p)
     //
+
+#if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
+
+    template<class Y, class D> shared_ptr( Y * p, D d ): px( p ), pn( p, static_cast< D&& >( d ) )
+    {
+        boost::detail::sp_deleter_construct( this, p );
+    }
+
+#else
 
     template<class Y, class D> shared_ptr( Y * p, D d ): px( p ), pn( p, d )
     {
         boost::detail::sp_deleter_construct( this, p );
     }
 
+#endif
+
 #if !defined( BOOST_NO_CXX11_NULLPTR )
+
+#if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
+
+    template<class D> shared_ptr( boost::detail::sp_nullptr_t p, D d ): px( p ), pn( p, static_cast< D&& >( d ) )
+    {
+    }
+
+#else
 
     template<class D> shared_ptr( boost::detail::sp_nullptr_t p, D d ): px( p ), pn( p, d )
     {
@@ -398,18 +411,41 @@ public:
 
 #endif
 
+#endif
+
     // As above, but with allocator. A's copy constructor shall not throw.
+
+#if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
+
+    template<class Y, class D, class A> shared_ptr( Y * p, D d, A a ): px( p ), pn( p, static_cast< D&& >( d ), a )
+    {
+        boost::detail::sp_deleter_construct( this, p );
+    }
+
+#else
 
     template<class Y, class D, class A> shared_ptr( Y * p, D d, A a ): px( p ), pn( p, d, a )
     {
         boost::detail::sp_deleter_construct( this, p );
     }
 
+#endif
+
 #if !defined( BOOST_NO_CXX11_NULLPTR )
+
+#if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
+
+    template<class D, class A> shared_ptr( boost::detail::sp_nullptr_t p, D d, A a ): px( p ), pn( p, static_cast< D&& >( d ), a )
+    {
+    }
+
+#else
 
     template<class D, class A> shared_ptr( boost::detail::sp_nullptr_t p, D d, A a ): px( p ), pn( p, d, a )
     {
     }
+
+#endif
 
 #endif
 
@@ -699,6 +735,20 @@ public:
         this_type( p ).swap( *this );
     }
 
+#if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
+
+    template<class Y, class D> void reset( Y * p, D d )
+    {
+        this_type( p, static_cast< D&& >( d ) ).swap( *this );
+    }
+
+    template<class Y, class D, class A> void reset( Y * p, D d, A a )
+    {
+        this_type( p, static_cast< D&& >( d ), a ).swap( *this );
+    }
+
+#else
+
     template<class Y, class D> void reset( Y * p, D d )
     {
         this_type( p, d ).swap( *this );
@@ -708,6 +758,8 @@ public:
     {
         this_type( p, d, a ).swap( *this );
     }
+
+#endif
 
     template<class Y> void reset( shared_ptr<Y> const & r, element_type * p ) BOOST_SP_NOEXCEPT
     {
@@ -775,6 +827,21 @@ public:
     template<class Y> bool owner_before( weak_ptr<Y> const & rhs ) const BOOST_SP_NOEXCEPT
     {
         return pn < rhs.pn;
+    }
+
+    template<class Y> bool owner_equals( shared_ptr<Y> const & rhs ) const BOOST_SP_NOEXCEPT
+    {
+        return pn == rhs.pn;
+    }
+
+    template<class Y> bool owner_equals( weak_ptr<Y> const & rhs ) const BOOST_SP_NOEXCEPT
+    {
+        return pn == rhs.pn;
+    }
+
+    std::size_t owner_hash_value() const BOOST_SP_NOEXCEPT
+    {
+        return pn.hash_value();
     }
 
     void * _internal_get_deleter( boost::detail::sp_typeinfo_ const & ti ) const BOOST_SP_NOEXCEPT
@@ -1155,6 +1222,25 @@ template< class T > std::size_t hash_value( boost::shared_ptr<T> const & p ) BOO
 
 } // namespace boost
 
+// std::hash
+
+#if !defined(BOOST_NO_CXX11_HDR_FUNCTIONAL)
+
+namespace std
+{
+
+template<class T> struct hash< ::boost::shared_ptr<T> >
+{
+    std::size_t operator()( ::boost::shared_ptr<T> const & p ) const BOOST_SP_NOEXCEPT
+    {
+        return std::hash< typename ::boost::shared_ptr<T>::element_type* >()( p.get() );
+    }
+};
+
+} // namespace std
+
+#endif // #if !defined(BOOST_NO_CXX11_HDR_FUNCTIONAL)
+
 #include <boost/smart_ptr/detail/local_sp_deleter.hpp>
 
 namespace boost
@@ -1189,3 +1275,7 @@ template<class T, class D> shared_ptr( std::unique_ptr<T, D> ) -> shared_ptr<T>;
 #endif
 
 #endif  // #ifndef BOOST_SMART_PTR_SHARED_PTR_HPP_INCLUDED
+
+/* shared_ptr.hpp
+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
+*/

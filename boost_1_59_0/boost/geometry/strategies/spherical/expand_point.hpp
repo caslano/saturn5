@@ -1,233 +1,25 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Boost.Geometry
 
-// Copyright (c) 2007-2015 Barend Gehrels, Amsterdam, the Netherlands.
-// Copyright (c) 2008-2015 Bruno Lalande, Paris, France.
-// Copyright (c) 2009-2015 Mateusz Loskot, London, UK.
-// Copyright (c) 2014-2015 Samuel Debionne, Grenoble, France.
+// Copyright (c) 2020, Oracle and/or its affiliates.
 
-// This file was modified by Oracle on 2015-2018.
-// Modifications copyright (c) 2015-2018, Oracle and/or its affiliates.
-
-// Contributed and/or modified by Vissarion Fysikopoulos, on behalf of Oracle
-// Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
-// Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
-// (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
-
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
+// Licensed under the Boost Software License version 1.0.
+// http://www.boost.org/users/license.html
 
 #ifndef BOOST_GEOMETRY_STRATEGIES_SPHERICAL_EXPAND_POINT_HPP
 #define BOOST_GEOMETRY_STRATEGIES_SPHERICAL_EXPAND_POINT_HPP
 
-#include <cstddef>
-#include <algorithm>
-#include <functional>
 
-#include <boost/mpl/assert.hpp>
-#include <boost/type_traits/is_same.hpp>
-
-#include <boost/geometry/core/access.hpp>
-#include <boost/geometry/core/coordinate_dimension.hpp>
-#include <boost/geometry/core/coordinate_system.hpp>
-#include <boost/geometry/core/coordinate_type.hpp>
-#include <boost/geometry/core/tags.hpp>
-
-#include <boost/geometry/util/is_inverse_spheroidal_coordinates.hpp>
-#include <boost/geometry/util/math.hpp>
-#include <boost/geometry/util/select_coordinate_type.hpp>
-
-#include <boost/geometry/algorithms/detail/normalize.hpp>
-#include <boost/geometry/algorithms/detail/envelope/transform_units.hpp>
-
-#include <boost/geometry/strategies/expand.hpp>
-#include <boost/geometry/strategies/cartesian/expand_point.hpp>
+#include <boost/config/pragma_message.hpp>
+BOOST_PRAGMA_MESSAGE("This include file is deprecated and will be removed in the future.")
 
 
-namespace boost { namespace geometry
-{
+#include <boost/geometry/strategy/spherical/expand_point.hpp>
 
-namespace strategy { namespace expand
-{
-
-#ifndef DOXYGEN_NO_DETAIL
-namespace detail
-{
-
-// implementation for the spherical and geographic coordinate systems
-template <std::size_t DimensionCount, bool IsEquatorial>
-struct point_loop_on_spheroid
-{
-    template <typename Box, typename Point>
-    static inline void apply(Box& box, Point const& point)
-    {
-        typedef typename point_type<Box>::type box_point_type;
-        typedef typename coordinate_type<Box>::type box_coordinate_type;
-        typedef typename geometry::detail::cs_angular_units<Box>::type units_type;
-
-        typedef math::detail::constants_on_spheroid
-            <
-                box_coordinate_type,
-                units_type
-            > constants;
-
-        // normalize input point and input box
-        Point p_normalized;
-        strategy::normalize::spherical_point::apply(point, p_normalized);
-
-        // transform input point to be of the same type as the box point
-        box_point_type box_point;
-        geometry::detail::envelope::transform_units(p_normalized, box_point);
-
-        if (is_inverse_spheroidal_coordinates(box))
-        {
-            geometry::set_from_radian<min_corner, 0>(box, geometry::get_as_radian<0>(p_normalized));
-            geometry::set_from_radian<min_corner, 1>(box, geometry::get_as_radian<1>(p_normalized));
-            geometry::set_from_radian<max_corner, 0>(box, geometry::get_as_radian<0>(p_normalized));
-            geometry::set_from_radian<max_corner, 1>(box, geometry::get_as_radian<1>(p_normalized));
-
-        } else {
-
-            strategy::normalize::spherical_box::apply(box, box);
-
-            box_coordinate_type p_lon = geometry::get<0>(box_point);
-            box_coordinate_type p_lat = geometry::get<1>(box_point);
-
-            typename coordinate_type<Box>::type
-                    b_lon_min = geometry::get<min_corner, 0>(box),
-                    b_lat_min = geometry::get<min_corner, 1>(box),
-                    b_lon_max = geometry::get<max_corner, 0>(box),
-                    b_lat_max = geometry::get<max_corner, 1>(box);
-
-            if (math::is_latitude_pole<units_type, IsEquatorial>(p_lat))
-            {
-                // the point of expansion is the either the north or the
-                // south pole; the only important coordinate here is the
-                // pole's latitude, as the longitude can be anything;
-                // we, thus, take into account the point's latitude only and return
-                geometry::set<min_corner, 1>(box, (std::min)(p_lat, b_lat_min));
-                geometry::set<max_corner, 1>(box, (std::max)(p_lat, b_lat_max));
-                return;
-            }
-
-            if (math::equals(b_lat_min, b_lat_max)
-                    && math::is_latitude_pole<units_type, IsEquatorial>(b_lat_min))
-            {
-                // the box degenerates to either the north or the south pole;
-                // the only important coordinate here is the pole's latitude,
-                // as the longitude can be anything;
-                // we thus take into account the box's latitude only and return
-                geometry::set<min_corner, 0>(box, p_lon);
-                geometry::set<min_corner, 1>(box, (std::min)(p_lat, b_lat_min));
-                geometry::set<max_corner, 0>(box, p_lon);
-                geometry::set<max_corner, 1>(box, (std::max)(p_lat, b_lat_max));
-                return;
-            }
-
-            // update latitudes
-            b_lat_min = (std::min)(b_lat_min, p_lat);
-            b_lat_max = (std::max)(b_lat_max, p_lat);
-
-            // update longitudes
-            if (math::smaller(p_lon, b_lon_min))
-            {
-                box_coordinate_type p_lon_shifted = p_lon + constants::period();
-
-                if (math::larger(p_lon_shifted, b_lon_max))
-                {
-                    // here we could check using: ! math::larger(.., ..)
-                    if (math::smaller(b_lon_min - p_lon, p_lon_shifted - b_lon_max))
-                    {
-                        b_lon_min = p_lon;
-                    }
-                    else
-                    {
-                        b_lon_max = p_lon_shifted;
-                    }
-                }
-            }
-            else if (math::larger(p_lon, b_lon_max))
-            {
-                // in this case, and since p_lon is normalized in the range
-                // (-180, 180], we must have that b_lon_max <= 180
-                if (b_lon_min < 0
-                        && math::larger(p_lon - b_lon_max,
-                                        constants::period() - p_lon + b_lon_min))
-                {
-                    b_lon_min = p_lon;
-                    b_lon_max += constants::period();
-                }
-                else
-                {
-                    b_lon_max = p_lon;
-                }
-            }
-
-            geometry::set<min_corner, 0>(box, b_lon_min);
-            geometry::set<min_corner, 1>(box, b_lat_min);
-            geometry::set<max_corner, 0>(box, b_lon_max);
-            geometry::set<max_corner, 1>(box, b_lat_max);
-        }
-
-        point_loop
-            <
-                2, DimensionCount
-            >::apply(box, point);
-    }
-};
-
-
-} // namespace detail
-#endif // DOXYGEN_NO_DETAIL
-
-
-struct spherical_point
-{
-    template <typename Box, typename Point>
-    static void apply(Box & box, Point const& point)
-    {
-        expand::detail::point_loop_on_spheroid
-            <
-                dimension<Point>::value,
-                ! boost::is_same<typename cs_tag<Point>::type, spherical_polar_tag>::value
-            >::apply(box, point);
-    }
-};
-
-
-#ifndef DOXYGEN_NO_STRATEGY_SPECIALIZATIONS
-
-namespace services
-{
-
-template <typename CalculationType>
-struct default_strategy<point_tag, spherical_equatorial_tag, CalculationType>
-{
-    typedef spherical_point type;
-};
-
-template <typename CalculationType>
-struct default_strategy<point_tag, spherical_polar_tag, CalculationType>
-{
-    typedef spherical_point type;
-};
-
-template <typename CalculationType>
-struct default_strategy<point_tag, geographic_tag, CalculationType>
-{
-    typedef spherical_point type;
-};
-
-
-} // namespace services
-
-#endif // DOXYGEN_NO_STRATEGY_SPECIALIZATIONS
-
-
-}} // namespace strategy::expand
-
-}} // namespace boost::geometry
 
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_EXPAND_POINT_HPP
+
+/* expand_point.hpp
+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
+*/

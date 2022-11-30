@@ -1,5 +1,5 @@
 /* Proposed SG14 status_code
-(C) 2018 - 2019 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018 - 2020 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -303,7 +303,10 @@ public:
 
 public:
   //! Default constructor
-  constexpr explicit _generic_code_domain(typename _base::unique_id_type id = 0x746d6354f4f733e9) noexcept : _base(id) {}
+  constexpr explicit _generic_code_domain(typename _base::unique_id_type id = 0x746d6354f4f733e9) noexcept
+      : _base(id)
+  {
+  }
   _generic_code_domain(const _generic_code_domain &) = default;
   _generic_code_domain(_generic_code_domain &&) = default;
   _generic_code_domain &operator=(const _generic_code_domain &) = default;
@@ -369,7 +372,7 @@ BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 inline generic_code make_status_code(err
 /*************************************************************************************************************/
 
 
-template <class T> inline bool status_code<void>::equivalent(const status_code<T> &o) const noexcept
+template <class T> inline BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 bool status_code<void>::equivalent(const status_code<T> &o) const noexcept
 {
   if(_domain && o._domain)
   {
@@ -396,48 +399,85 @@ template <class T> inline bool status_code<void>::equivalent(const status_code<T
   return (!_domain && !o._domain);
 }
 //! True if the status code's are semantically equal via `equivalent()`.
-template <class DomainType1, class DomainType2> inline bool operator==(const status_code<DomainType1> &a, const status_code<DomainType2> &b) noexcept
+template <class DomainType1, class DomainType2> BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 inline bool operator==(const status_code<DomainType1> &a, const status_code<DomainType2> &b) noexcept
 {
   return a.equivalent(b);
 }
 //! True if the status code's are not semantically equal via `equivalent()`.
-template <class DomainType1, class DomainType2> inline bool operator!=(const status_code<DomainType1> &a, const status_code<DomainType2> &b) noexcept
+template <class DomainType1, class DomainType2> BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 inline bool operator!=(const status_code<DomainType1> &a, const status_code<DomainType2> &b) noexcept
 {
   return !a.equivalent(b);
 }
 //! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class DomainType1, class T,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool operator==(const status_code<DomainType1> &a, const T &b)
+BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class DomainType1, class T,                                                                       //
+                       class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type)  // Safe ADL lookup of make_status_code(), returns void if not found
+BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(is_status_code<MakeStatusCodeResult>::value))                                // ADL makes a status code
+BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 inline bool operator==(const status_code<DomainType1> &a, const T &b)
 {
   return a.equivalent(make_status_code(b));
 }
 //! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class T, class DomainType1,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool operator==(const T &a, const status_code<DomainType1> &b)
+BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class T, class DomainType1,                                                                       //
+                       class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type)  // Safe ADL lookup of make_status_code(), returns void if not found
+BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(is_status_code<MakeStatusCodeResult>::value))                                // ADL makes a status code
+BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 inline bool operator==(const T &a, const status_code<DomainType1> &b)
 {
   return b.equivalent(make_status_code(a));
 }
 //! True if the status code's are not semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class DomainType1, class T,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool operator!=(const status_code<DomainType1> &a, const T &b)
+BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class DomainType1, class T,                                                                       //
+                       class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type)  // Safe ADL lookup of make_status_code(), returns void if not found
+BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(is_status_code<MakeStatusCodeResult>::value))                                // ADL makes a status code
+BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 inline bool operator!=(const status_code<DomainType1> &a, const T &b)
 {
   return !a.equivalent(make_status_code(b));
 }
 //! True if the status code's are semantically equal via `equivalent()` to `make_status_code(T)`.
-template <class T, class DomainType1,                                                                       //
-          class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-          typename std::enable_if<is_status_code<MakeStatusCodeResult>::value, bool>::type = true>          // ADL makes a status code
-inline bool operator!=(const T &a, const status_code<DomainType1> &b)
+BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class T, class DomainType1,                                                                       //
+                       class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<const T &>::type)  // Safe ADL lookup of make_status_code(), returns void if not found
+BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(is_status_code<MakeStatusCodeResult>::value))                                // ADL makes a status code
+BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 inline bool operator!=(const T &a, const status_code<DomainType1> &b)
 {
   return !b.equivalent(make_status_code(a));
 }
+//! True if the status code's are semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(b)`.
+template <class DomainType1, class T,                                                     //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type  // Enumeration has been activated
+          >
+BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 inline bool operator==(const status_code<DomainType1> &a, const T &b)
+{
+  return a.equivalent(QuickStatusCodeType(b));
+}
+//! True if the status code's are semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(a)`.
+template <class T, class DomainType1,                                                     //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type  // Enumeration has been activated
+          >
+BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 inline bool operator==(const T &a, const status_code<DomainType1> &b)
+{
+  return b.equivalent(QuickStatusCodeType(a));
+}
+//! True if the status code's are not semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(b)`.
+template <class DomainType1, class T,                                                     //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type  // Enumeration has been activated
+          >
+BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 inline bool operator!=(const status_code<DomainType1> &a, const T &b)
+{
+  return !a.equivalent(QuickStatusCodeType(b));
+}
+//! True if the status code's are not semantically equal via `equivalent()` to `quick_status_code_from_enum<T>::code_type(a)`.
+template <class T, class DomainType1,                                                     //
+          class QuickStatusCodeType = typename quick_status_code_from_enum<T>::code_type  // Enumeration has been activated
+          >
+BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 inline bool operator!=(const T &a, const status_code<DomainType1> &b)
+{
+  return !b.equivalent(QuickStatusCodeType(a));
+}
+
 
 BOOST_OUTCOME_SYSTEM_ERROR2_NAMESPACE_END
 
 #endif
+
+/* generic_code.hpp
+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
+*/

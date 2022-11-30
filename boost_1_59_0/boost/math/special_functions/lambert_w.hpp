@@ -58,23 +58,27 @@ BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES_ITERATIONS  // Show evaluation of
 #include <boost/math/tools/series.hpp> // series functor.
 //#include <boost/math/tools/polynomial.hpp>  // polynomial.
 #include <boost/math/tools/rational.hpp>  // evaluate_polynomial.
-#include <boost/mpl/int.hpp>
-#include <boost/type_traits/is_integral.hpp>
 #include <boost/math/tools/precision.hpp> // boost::math::tools::max_value().
 #include <boost/math/tools/big_constant.hpp>
 #include <boost/math/tools/cxx03_warn.hpp>
+
+#ifndef BOOST_MATH_STANDALONE
+#include <boost/lexical_cast.hpp>
+#endif
 
 #include <limits>
 #include <cmath>
 #include <limits>
 #include <exception>
+#include <type_traits>
+#include <cstdint>
 
 // Needed for testing and diagnostics only.
 #include <iostream>
 #include <typeinfo>
 #include <boost/math/special_functions/next.hpp>  // For float_distance.
 
-typedef double lookup_t; // Type for lookup table (double or float, or even long double?)
+using lookup_t = double; // Type for lookup table (double or float, or even long double?)
 
 //#include "J:\Cpp\Misc\lambert_w_lookup_table_generator\lambert_w_lookup_table.ipp"
 // #include "lambert_w_lookup_table.ipp" // Boost.Math version.
@@ -104,14 +108,14 @@ namespace lambert_w_detail {
 //! \param z Argument z for Lambert_w function.
 //! \returns New estimate of Lambert W, hopefully improved.
 //!
-template <class T>
+template <typename T>
 inline T lambert_w_halley_step(T w_est, const T z)
 {
   BOOST_MATH_STD_USING
   T e = exp(w_est);
   w_est -= 2 * (w_est + 1) * (e * w_est - z) / (z * (w_est + 2) + e * (w_est * (w_est + 2) + 2));
   return w_est;
-} // template <class T> lambert_w_halley_step(T w_est, T z)
+} // template <typename T> lambert_w_halley_step(T w_est, T z)
 
 //! \brief Halley iterate to refine Lambert_w estimate,
 //! taking at least one Halley_step.
@@ -121,9 +125,8 @@ inline T lambert_w_halley_step(T w_est, const T z)
 //! \tparam T floating-point (or fixed-point) type.
 //! \param z Argument z for Lambert_w function.
 //! \param w_est Lambert w estimate.
-template <class T>
-inline
-  T lambert_w_halley_iterate(T w_est, const T z)
+template <typename T>
+inline T lambert_w_halley_iterate(T w_est, const T z)
 {
   BOOST_MATH_STD_USING
   static const T max_diff = boost::math::tools::root_epsilon<T>() * fabs(w_est);
@@ -137,21 +140,19 @@ inline
     diff = fabs(w_est - w_new);
   }
   return w_new;
-} // template <class T> lambert_w_halley_iterate(T w_est, T z)
+} // template <typename T> lambert_w_halley_iterate(T w_est, T z)
 
 // Two Halley function versions that either
-// single step (if boost::false_type) or iterate (if boost::true_type).
+// single step (if std::false_type) or iterate (if std::true_type).
 // Selected at compile-time using parameter 3.
-template <class T>
-inline
-T lambert_w_maybe_halley_iterate(T z, T w, boost::false_type const&)
+template <typename T>
+inline T lambert_w_maybe_halley_iterate(T z, T w, std::false_type const&)
 {
    return lambert_w_halley_step(z, w); // Single step.
 }
 
-template <class T>
-inline
-T lambert_w_maybe_halley_iterate(T z, T w, boost::true_type const&)
+template <typename T>
+inline T lambert_w_maybe_halley_iterate(T z, T w, std::true_type const&)
 {
    return lambert_w_halley_iterate(z, w); // Iterate steps.
 }
@@ -161,32 +162,33 @@ T lambert_w_maybe_halley_iterate(T z, T w, boost::true_type const&)
 //! reduce argument z to double precision (if true_type).
 //! Version is selected at compile-time using parameter 2.
 
-template <class T>
-inline
-double maybe_reduce_to_double(const T& z, const boost::true_type&)
+template <typename T>
+inline double maybe_reduce_to_double(const T& z, const std::true_type&)
 {
   return static_cast<double>(z); // Reduce to double precision.
 }
 
-template <class T>
-inline
-T maybe_reduce_to_double(const T& z, const boost::false_type&)
+template <typename T>
+inline T maybe_reduce_to_double(const T& z, const std::false_type&)
 { // Don't reduce to double.
   return z;
 }
 
-template <class T>
-inline
-double must_reduce_to_double(const T& z, const boost::true_type&)
+template <typename T>
+inline double must_reduce_to_double(const T& z, const std::true_type&)
 {
    return static_cast<double>(z); // Reduce to double precision.
 }
 
-template <class T>
-inline
-double must_reduce_to_double(const T& z, const boost::false_type&)
+template <typename T>
+inline double must_reduce_to_double(const T& z, const std::false_type&)
 { // try a lexical_cast and hope for the best:
+#ifndef BOOST_MATH_STANDALONE
    return boost::lexical_cast<double>(z);
+#else
+   static_assert(sizeof(T) == 0, "Unsupported in standalone mode: don't know how to cast your number type to a double.");
+   return 0.0;
+#endif
 }
 
 //! \brief Schroeder method, fifth-order update formula,
@@ -201,8 +203,7 @@ double must_reduce_to_double(const T& z, const boost::false_type&)
 
 // Schroeder refinement, called unless NOT required by precision policy.
 template<typename T>
-inline
-T schroeder_update(const T w, const T y)
+inline T schroeder_update(const T w, const T y)
 {
   // Compute derivatives using 5th order Schroeder refinement.
   // Since this is the final step, it will always use the highest precision type T.
@@ -496,28 +497,28 @@ T lambert_w_singularity_series(const T p)
   //! but for the tag_type selection to work, they all must include Policy in their signature.
 
   // Forward declaration of variants of lambert_w0_small_z.
-template <class T, class Policy>
-T lambert_w0_small_z(T x, const Policy&, boost::integral_constant<int, 0> const&);   //  for float (32-bit) type.
+template <typename T, typename Policy>
+T lambert_w0_small_z(T x, const Policy&, std::integral_constant<int, 0> const&);   //  for float (32-bit) type.
 
-template <class T, class Policy>
-T lambert_w0_small_z(T x, const Policy&, boost::integral_constant<int, 1> const&);   //  for double (64-bit) type.
+template <typename T, typename Policy>
+T lambert_w0_small_z(T x, const Policy&, std::integral_constant<int, 1> const&);   //  for double (64-bit) type.
 
-template <class T, class Policy>
-T lambert_w0_small_z(T x, const Policy&, boost::integral_constant<int, 2> const&);   //  for long double (double extended 80-bit) type.
+template <typename T, typename Policy>
+T lambert_w0_small_z(T x, const Policy&, std::integral_constant<int, 2> const&);   //  for long double (double extended 80-bit) type.
 
-template <class T, class Policy>
-T lambert_w0_small_z(T x, const Policy&, boost::integral_constant<int, 3> const&);   //  for long double (128-bit) type.
+template <typename T, typename Policy>
+T lambert_w0_small_z(T x, const Policy&, std::integral_constant<int, 3> const&);   //  for long double (128-bit) type.
 
-template <class T, class Policy>
-T lambert_w0_small_z(T x, const Policy&, boost::integral_constant<int, 4> const&);   //  for float128 quadmath Q type.
+template <typename T, typename Policy>
+T lambert_w0_small_z(T x, const Policy&, std::integral_constant<int, 4> const&);   //  for float128 quadmath Q type.
 
-template <class T, class Policy>
-T lambert_w0_small_z(T x, const Policy&, boost::integral_constant<int, 5> const&);   //  Generic multiprecision T.
+template <typename T, typename Policy>
+T lambert_w0_small_z(T x, const Policy&, std::integral_constant<int, 5> const&);   //  Generic multiprecision T.
                                                                         // Set tag_type depending on max_digits10.
-template <class T, class Policy>
+template <typename T, typename Policy>
 T lambert_w0_small_z(T x, const Policy& pol)
 { //std::numeric_limits<T>::max_digits10 == 36 ? 3 : // 128-bit long double.
-  typedef boost::integral_constant<int,
+  using tag_type = std::integral_constant<int,
      std::numeric_limits<T>::is_specialized == 0 ? 5 :
 #ifndef BOOST_NO_CXX11_NUMERIC_LIMITS
     std::numeric_limits<T>::max_digits10 <=  9 ? 0 : // for float 32-bit.
@@ -531,11 +532,10 @@ T lambert_w0_small_z(T x, const Policy& pol)
      std::numeric_limits<T>::digits <= 64 ? 2 : // for 80-bit double extended.
      std::numeric_limits<T>::digits <= 113 ? 4  // for both 128-bit long double (3) and 128-bit quad suffix Q type (4).
 #endif
-      :  5                                            // All Generic multiprecision types.
-    > tag_type;
+      :  5>;                                           // All Generic multiprecision types.
   // std::cout << "\ntag type = " << tag_type << std::endl; // error C2275: 'tag_type': illegal use of this type as an expression.
   return lambert_w0_small_z(x, pol, tag_type());
-} // template <class T> T lambert_w0_small_z(T x)
+} // template <typename T> T lambert_w0_small_z(T x)
 
   //! Specialization of float (32-bit) series expansion used for small z (abs(z) < 0.05).
   // Only 9 Coefficients are computed to 21 decimal digits precision, ample for 32-bit float used by most platforms.
@@ -543,8 +543,8 @@ T lambert_w0_small_z(T x, const Policy& pol)
   // N[InverseSeries[Series[z Exp[z],{z,0,34}]],50],
   // as proposed by Tosio Fukushima and implemented by Darko Veberic.
 
-template <class T, class Policy>
-T lambert_w0_small_z(T z, const Policy&, boost::integral_constant<int, 0> const&)
+template <typename T, typename Policy>
+T lambert_w0_small_z(T z, const Policy&, std::integral_constant<int, 0> const&)
 {
 #ifdef BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES
   std::streamsize prec = std::cout.precision(std::numeric_limits<T>::max_digits10); // Save.
@@ -568,15 +568,15 @@ T lambert_w0_small_z(T z, const Policy&, boost::integral_constant<int, 0> const&
 #endif // BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES
 
   return result;
-} // template <class T>   T lambert_w0_small_z(T x, boost::integral_constant<int, 0> const&)
+} // template <typename T>   T lambert_w0_small_z(T x, std::integral_constant<int, 0> const&)
 
   //! Specialization of double (64-bit double) series expansion used for small z (abs(z) < 0.05).
   // 17 Coefficients are computed to 21 decimal digits precision suitable for 64-bit double used by most platforms.
   // Taylor series coefficients used are computed by Wolfram to 50 decimal digits using instruction
   // N[InverseSeries[Series[z Exp[z],{z,0,34}]],50], as proposed by Tosio Fukushima and implemented by Veberic.
 
-template <class T, class Policy>
-T lambert_w0_small_z(const T z, const Policy&, boost::integral_constant<int, 1> const&)
+template <typename T, typename Policy>
+T lambert_w0_small_z(const T z, const Policy&, std::integral_constant<int, 1> const&)
 {
 #ifdef BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES
   std::streamsize prec = std::cout.precision(std::numeric_limits<T>::max_digits10); // Save.
@@ -608,15 +608,15 @@ T lambert_w0_small_z(const T z, const Policy&, boost::integral_constant<int, 1> 
 #endif // BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES
 
   return result;
-} // T lambert_w0_small_z(const T z, boost::integral_constant<int, 1> const&)
+} // T lambert_w0_small_z(const T z, std::integral_constant<int, 1> const&)
 
   //! Specialization of long double (80-bit double extended) series expansion used for small z (abs(z) < 0.05).
   // 21 Coefficients are computed to 21 decimal digits precision suitable for 80-bit long double used by some
   // platforms including GCC and Clang when generating for Intel X86 floating-point processors with 80-bit operations enabled (the default).
   // (This is NOT used by Microsoft Visual Studio where double and long always both use only 64-bit type.
   // Nor used for 128-bit float128.)
-template <class T, class Policy>
-T lambert_w0_small_z(const T z, const Policy&, boost::integral_constant<int, 2> const&)
+template <typename T, typename Policy>
+T lambert_w0_small_z(const T z, const Policy&, std::integral_constant<int, 2> const&)
 {
 #ifdef BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES
   std::streamsize precision = std::cout.precision(std::numeric_limits<T>::max_digits10); // Save.
@@ -676,7 +676,7 @@ z * (2.154990206091088289321708745358647e6L // z^20 distance -5 without term 20
   std::cout.precision(precision); // Restore.
 #endif // BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES
   return result;
-}  // long double lambert_w0_small_z(const T z, boost::integral_constant<int, 1> const&)
+}  // long double lambert_w0_small_z(const T z, std::integral_constant<int, 1> const&)
 
 //! Specialization of 128-bit long double series expansion used for small z (abs(z) < 0.05).
 // 34 Taylor series coefficients used are computed by Wolfram to 50 decimal digits using instruction
@@ -686,8 +686,8 @@ z * (2.154990206091088289321708745358647e6L // z^20 distance -5 without term 20
 // nor multiprecision type cpp_bin_float_quad that can only be initialised at full precision of the type
 // constructed with a decimal digit string like "2.6666666666666666666666666666666666666666666666667".)
 
-template <class T, class Policy>
-T lambert_w0_small_z(const T z, const Policy&, boost::integral_constant<int, 3> const&)
+template <typename T, typename Policy>
+T lambert_w0_small_z(const T z, const Policy&, std::integral_constant<int, 3> const&)
 {
 #ifdef BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES
   std::streamsize precision = std::cout.precision(std::numeric_limits<T>::max_digits10); // Save.
@@ -719,7 +719,7 @@ T lambert_w0_small_z(const T z, const Policy&, boost::integral_constant<int, 3> 
   std::cout.precision(precision); // Restore.
 #endif // BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES
   return result;
-}  // T lambert_w0_small_z(const T z, boost::integral_constant<int, 3> const&)
+}  // T lambert_w0_small_z(const T z, std::integral_constant<int, 3> const&)
 
 //! Specialization of 128-bit quad series expansion used for small z (abs(z) < 0.05).
 // 34 Taylor series coefficients used were computed by Wolfram to 50 decimal digits using instruction
@@ -732,8 +732,8 @@ T lambert_w0_small_z(const T z, const Policy&, boost::integral_constant<int, 3> 
 // it is slightly slower than getting a double approximation followed by a single Halley step.
 
 #ifdef BOOST_HAS_FLOAT128
-template <class T, class Policy>
-T lambert_w0_small_z(const T z, const Policy&, boost::integral_constant<int, 4> const&)
+template <typename T, typename Policy>
+T lambert_w0_small_z(const T z, const Policy&, std::integral_constant<int, 4> const&)
 {
 #ifdef BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES
   std::streamsize precision = std::cout.precision(std::numeric_limits<T>::max_digits10); // Save.
@@ -784,24 +784,24 @@ T lambert_w0_small_z(const T z, const Policy&, boost::integral_constant<int, 4> 
 #endif // BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES
 
   return result;
-}  // T lambert_w0_small_z(const T z, boost::integral_constant<int, 4> const&) float128
+}  // T lambert_w0_small_z(const T z, std::integral_constant<int, 4> const&) float128
 
 #else
 
-template <class T, class Policy>
-inline T lambert_w0_small_z(const T z, const Policy& pol, boost::integral_constant<int, 4> const&)
+template <typename T, typename Policy>
+inline T lambert_w0_small_z(const T z, const Policy& pol, std::integral_constant<int, 4> const&)
 {
-   return lambert_w0_small_z(z, pol, boost::integral_constant<int, 5>());
+   return lambert_w0_small_z(z, pol, std::integral_constant<int, 5>());
 }
 
 #endif // BOOST_HAS_FLOAT128
 
 //! Series functor to compute series term using pow and factorial.
 //! \details Functor is called after evaluating polynomial with the coefficients as rationals below.
-template <class T>
+template <typename T>
 struct lambert_w0_small_z_series_term
 {
-  typedef T result_type;
+  using result_type = T;
   //! \param _z Lambert W argument z.
   //! \param -term  -pow<18>(z) / 6402373705728000uLL
   //! \param _k number of terms == initially 18
@@ -825,11 +825,11 @@ private:
   int k;
   T z;
   T term;
-}; // template <class T> struct lambert_w0_small_z_series_term
+}; // template <typename T> struct lambert_w0_small_z_series_term
 
    //! Generic variant for T a User-defined types like Boost.Multiprecision.
-template <class T, class Policy>
-inline T lambert_w0_small_z(T z, const Policy& pol, boost::integral_constant<int, 5> const&)
+template <typename T, typename Policy>
+inline T lambert_w0_small_z(T z, const Policy& pol, std::integral_constant<int, 5> const&)
 {
 #ifdef BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES
   std::streamsize precision = std::cout.precision(std::numeric_limits<T>::max_digits10); // Save.
@@ -913,7 +913,7 @@ inline T lambert_w0_small_z(T z, const Policy& pol, boost::integral_constant<int
   // std::streamsize prec = std::cout.precision(std::numeric_limits <T>::max_digits10);
 
   T result = evaluate_polynomial(coeff, z);
-  //  template <std::size_t N, class T, class V>
+  //  template <std::size_t N, typename T, typename V>
   //  V evaluate_polynomial(const T(&poly)[N], const V& val);
   // Size of coeff found from N
   //std::cout << "evaluate_polynomial(coeff, z); == " << result << std::endl;
@@ -942,7 +942,7 @@ inline T lambert_w0_small_z(T z, const Policy& pol, boost::integral_constant<int
   //}
   //std::cout.precision(saved_precision);
 
-  boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>(); // Max iterations from policy.
+  std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>(); // Max iterations from policy.
 #ifdef BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES
   std::cout << "max iter from policy = " << max_iter << std::endl;
   // //   max iter from policy = 1000000 is default.
@@ -950,7 +950,7 @@ inline T lambert_w0_small_z(T z, const Policy& pol, boost::integral_constant<int
 
   result = sum_series(s, get_epsilon<T, Policy>(), max_iter, result);
   // result == evaluate_polynomial.
-  //sum_series(Functor& func, int bits, boost::uintmax_t& max_terms, const U& init_value)
+  //sum_series(Functor& func, int bits, std::uintmax_t& max_terms, const U& init_value)
   // std::cout << "sum_series(s, get_epsilon<T, Policy>(), max_iter, result); = " << result << std::endl;
 
   //T epsilon = get_epsilon<T, Policy>();
@@ -965,13 +965,12 @@ inline T lambert_w0_small_z(T z, const Policy& pol, boost::integral_constant<int
   std::cout.precision(prec); // Restore.
 #endif // BOOST_MATH_INSTRUMENT_LAMBERT_W_SMALL_Z_SERIES_ITERATIONS
   return result;
-} // template <class T, class Policy> inline T lambert_w0_small_z_series(T z, const Policy& pol)
+} // template <typename T, typename Policy> inline T lambert_w0_small_z_series(T z, const Policy& pol)
 
 // Approximate lambert_w0 (used for z values that are outside range of lookup table or rational functions)
 // Corless equation 4.19, page 349, and Chapeau-Blondeau equation 20, page 2162.
 template <typename T>
-inline
-T lambert_w0_approx(T z)
+inline T lambert_w0_approx(T z)
 {
   BOOST_MATH_STD_USING
   T lz = log(z);
@@ -995,34 +994,32 @@ T lambert_w0_approx(T z)
 //! For higher precisions, a 64-bit double approximation is computed first,
 //! and then refined using Halley iterations.
 
-template <class T>
-inline T get_near_singularity_param(T z)
+template <typename T>
+inline T do_get_near_singularity_param(T z)
 {
    BOOST_MATH_STD_USING
    const T p2 = 2 * (boost::math::constants::e<T>() * z + 1);
    const T p = sqrt(p2);
    return p;
 }
-inline float get_near_singularity_param(float z)
+template <typename T, typename Policy>
+inline T get_near_singularity_param(T z, const Policy)
 {
-   return static_cast<float>(get_near_singularity_param((double)z));
-}
-inline double get_near_singularity_param(double z)
-{
-   return static_cast<double>(get_near_singularity_param((long double)z));
+   using value_type = typename policies::evaluation<T, Policy>::type;
+   return static_cast<T>(do_get_near_singularity_param(static_cast<value_type>(z)));
 }
 
 // Forward declarations:
 
-//template <class T, class Policy> T lambert_w0_small_z(T z, const Policy& pol);
-//template <class T, class Policy>
-//T lambert_w0_imp(T w, const Policy& pol, const boost::integral_constant<int, 0>&); // 32 bit usually float.
-//template <class T, class Policy>
-//T lambert_w0_imp(T w, const Policy& pol, const boost::integral_constant<int, 1>&); //  64 bit usually double.
-//template <class T, class Policy>
-//T lambert_w0_imp(T w, const Policy& pol, const boost::integral_constant<int, 2>&); // 80-bit long double.
+//template <typename T, typename Policy> T lambert_w0_small_z(T z, const Policy& pol);
+//template <typename T, typename Policy>
+//T lambert_w0_imp(T w, const Policy& pol, const std::integral_constant<int, 0>&); // 32 bit usually float.
+//template <typename T, typename Policy>
+//T lambert_w0_imp(T w, const Policy& pol, const std::integral_constant<int, 1>&); //  64 bit usually double.
+//template <typename T, typename Policy>
+//T lambert_w0_imp(T w, const Policy& pol, const std::integral_constant<int, 2>&); // 80-bit long double.
 
-template <class T>
+template <typename T>
 T lambert_w_positive_rational_float(T z)
 {
    BOOST_MATH_STD_USING
@@ -1166,7 +1163,7 @@ T lambert_w_positive_rational_float(T z)
    }
 }
 
-template <class T, class Policy>
+template <typename T, typename Policy>
 T lambert_w_negative_rational_float(T z, const Policy& pol)
 {
    BOOST_MATH_STD_USING
@@ -1220,13 +1217,13 @@ T lambert_w_negative_rational_float(T z, const Policy& pol)
    else
    {
       // z is very close (within 0.01) of the singularity at e^-1.
-      return lambert_w_singularity_series(get_near_singularity_param(z));
+      return lambert_w_singularity_series(get_near_singularity_param(z, pol));
    }
 }
 
 //! Lambert_w0 @b 'float' implementation, selected when T is 32-bit precision.
-template <class T, class Policy>
-inline T lambert_w0_imp(T z, const Policy& pol, const boost::integral_constant<int, 1>&)
+template <typename T, typename Policy>
+inline T lambert_w0_imp(T z, const Policy& pol, const std::integral_constant<int, 1>&)
 {
   static const char* function = "boost::math::lambert_w0<%1%>"; // For error messages.
   BOOST_MATH_STD_USING // Aid ADL of std functions.
@@ -1255,9 +1252,9 @@ inline T lambert_w0_imp(T z, const Policy& pol, const boost::integral_constant<i
    {
       return lambert_w_negative_rational_float(z, pol);
    }
-} // T lambert_w0_imp(T z, const Policy& pol, const boost::integral_constant<int, 1>&) for 32-bit usually float.
+} // T lambert_w0_imp(T z, const Policy& pol, const std::integral_constant<int, 1>&) for 32-bit usually float.
 
-template <class T>
+template <typename T>
 T lambert_w_positive_rational_double(T z)
 {
    BOOST_MATH_STD_USING
@@ -1493,7 +1490,7 @@ T lambert_w_positive_rational_double(T z)
    }
 }
 
-template <class T, class Policy>
+template <typename T, typename Policy>
 T lambert_w_negative_rational_double(T z, const Policy& pol)
 {
    BOOST_MATH_STD_USING
@@ -1624,14 +1621,14 @@ T lambert_w_negative_rational_double(T z, const Policy& pol)
 }
 
 //! Lambert_w0 @b 'double' implementation, selected when T is 64-bit precision.
-template <class T, class Policy>
-inline T lambert_w0_imp(T z, const Policy& pol, const boost::integral_constant<int, 2>&)
+template <typename T, typename Policy>
+inline T lambert_w0_imp(T z, const Policy& pol, const std::integral_constant<int, 2>&)
 {
    static const char* function = "boost::math::lambert_w0<%1%>";
    BOOST_MATH_STD_USING // Aid ADL of std functions.
 
    // Detect unusual case of 32-bit double with a wider/64-bit long double
-   BOOST_STATIC_ASSERT_MSG(std::numeric_limits<double>::digits >= 53,
+   static_assert(std::numeric_limits<double>::digits >= 53,
    "Our double precision coefficients will be truncated, "
    "please file a bug report with details of your platform's floating point types "
    "- or possibly edit the coefficients to have "
@@ -1662,14 +1659,14 @@ inline T lambert_w0_imp(T z, const Policy& pol, const boost::integral_constant<i
    {
       return lambert_w_negative_rational_double(z, pol);
    }
-} // T lambert_w0_imp(T z, const Policy& pol, const boost::integral_constant<int, 2>&) 64-bit precision, usually double.
+} // T lambert_w0_imp(T z, const Policy& pol, const std::integral_constant<int, 2>&) 64-bit precision, usually double.
 
 //! lambert_W0 implementation for extended precision types including
 //! long double (80-bit and 128-bit), ???
 //! quad float128, Boost.Multiprecision types like cpp_bin_float_quad, cpp_bin_float_50...
 
-template <class T, class Policy>
-inline T lambert_w0_imp(T z, const Policy& pol, const boost::integral_constant<int, 0>&)
+template <typename T, typename Policy>
+inline T lambert_w0_imp(T z, const Policy& pol, const std::integral_constant<int, 0>&)
 {
    static const char* function = "boost::math::lambert_w0<%1%>";
    BOOST_MATH_STD_USING // Aid ADL of std functions.
@@ -1725,27 +1722,27 @@ inline T lambert_w0_imp(T z, const Policy& pol, const boost::integral_constant<i
    // true_type if there are so many digits precision wanted that iteration is necessary.
    // false_type if a single Halley step is sufficient.
 
-   typedef typename policies::precision<T, Policy>::type precision_type;
-   typedef boost::integral_constant<bool,
+   using precision_type = typename policies::precision<T, Policy>::type;
+   using tag_type = std::integral_constant<bool,
       (precision_type::value == 0) || (precision_type::value > 113) ?
       true // Unknown at compile-time, variable/arbitrary, or more than float128 or cpp_bin_quad 128-bit precision.
       : false // float, double, float128, cpp_bin_quad 128-bit, so single Halley step.
-   > tag_type;
+   >;
 
    // For speed, we also cast z to type double when that is possible
-   //   if (boost::is_constructible<double, T>() == true).
-   T w = lambert_w0_imp(maybe_reduce_to_double(z, boost::is_constructible<double, T>()), pol, boost::integral_constant<int, 2>());
+   //   if (std::is_constructible<double, T>() == true).
+   T w = lambert_w0_imp(maybe_reduce_to_double(z, std::is_constructible<double, T>()), pol, std::integral_constant<int, 2>());
 
    return lambert_w_maybe_halley_iterate(w, z, tag_type());
 
-} // T lambert_w0_imp(T z, const Policy& pol, const boost::integral_constant<int, 0>&)  all extended precision types.
+} // T lambert_w0_imp(T z, const Policy& pol, const std::integral_constant<int, 0>&)  all extended precision types.
 
   // Lambert w-1 implementation
 // ==============================================================================================
 
   //! Lambert W for W-1 branch, -max(z) < z <= -1/e.
   // TODO is -max(z) allowed?
-template<typename T, class Policy>
+template<typename T, typename Policy>
 T lambert_wm1_imp(const T z, const Policy&  pol)
 {
   // Catch providing an integer value as parameter x to lambert_w, for example, lambert_w(1).
@@ -1755,7 +1752,7 @@ T lambert_wm1_imp(const T z, const Policy&  pol)
   // Integral types should be promoted to double by user Lambert w functions.
   // If integral type provided to user function lambert_w0 or lambert_wm1,
   // then should already have been promoted to double.
-  BOOST_STATIC_ASSERT_MSG(!boost::is_integral<T>::value,
+  static_assert(!std::is_integral<T>::value,
     "Must be floating-point or fixed type (not integer type), for example: lambert_wm1(1.), not lambert_wm1(1)!");
 
   BOOST_MATH_STD_USING // Aid argument dependent lookup (ADL) of abs.
@@ -1921,7 +1918,7 @@ T lambert_wm1_imp(const T z, const Policy&  pol)
     using boost::math::policies::digits2;
     using boost::math::policies::policy;
     // Compute a 50-bit precision approximate W0 in a double (no Halley refinement).
-    T double_approx(static_cast<T>(lambert_wm1_imp(must_reduce_to_double(z, boost::is_constructible<double, T>()), policy<digits2<50> >())));
+    T double_approx(static_cast<T>(lambert_wm1_imp(must_reduce_to_double(z, std::is_constructible<double, T>()), policy<digits2<50>>())));
 #ifdef BOOST_MATH_INSTRUMENT_LAMBERT_WM1_NOT_BUILTIN
     std::streamsize saved_precision = std::cout.precision(std::numeric_limits<T>::max_digits10);
     std::cout << "Lambert_wm1 Argument Type " << typeid(T).name() << " approximation double = " << double_approx << std::endl;
@@ -2011,7 +2008,7 @@ T lambert_wm1_imp(const T z, const Policy&  pol)
     using lambert_w_lookup::halves;
     using lambert_w_lookup::sqrtwm1s;
 
-    typedef typename mpl::if_c<boost::is_constructible<lookup_t, T>::value, lookup_t, T>::type calc_type;
+    using calc_type = typename std::conditional<std::is_constructible<lookup_t, T>::value, lookup_t, T>::type;
 
     calc_type w = -static_cast<calc_type>(n); // Equation 25,
     calc_type y = static_cast<calc_type>(z * wm1es[n - 1]); // Equation 26,
@@ -2047,82 +2044,82 @@ T lambert_wm1_imp(const T z, const Policy&  pol)
 /////////////////////////////  User Lambert w functions. //////////////////////////////
 
 //! Lambert W0 using User-defined policy.
-  template <class T, class Policy>
+  template <typename T, typename Policy>
   inline
     typename boost::math::tools::promote_args<T>::type
     lambert_w0(T z, const Policy& pol)
   {
      // Promote integer or expression template arguments to double,
      // without doing any other internal promotion like float to double.
-    typedef typename tools::promote_args<T>::type result_type;
+    using result_type = typename tools::promote_args<T>::type;
 
     // Work out what precision has been selected,
     // based on the Policy and the number type.
-    typedef typename policies::precision<result_type, Policy>::type precision_type;
+    using precision_type = typename policies::precision<result_type, Policy>::type;
     // and then select the correct implementation based on that precision (not the type T):
-    typedef boost::integral_constant<int,
+    using tag_type = std::integral_constant<int,
       (precision_type::value == 0) || (precision_type::value > 53) ?
         0  // either variable precision (0), or greater than 64-bit precision.
       : (precision_type::value <= 24) ? 1 // 32-bit (probably float) precision.
       : 2  // 64-bit (probably double) precision.
-      > tag_type;
+      >;
 
     return lambert_w_detail::lambert_w0_imp(result_type(z), pol, tag_type()); // 
   } // lambert_w0(T z, const Policy& pol)
 
   //! Lambert W0 using default policy.
-  template <class T>
+  template <typename T>
   inline
     typename tools::promote_args<T>::type
     lambert_w0(T z)
   {
     // Promote integer or expression template arguments to double,
     // without doing any other internal promotion like float to double.
-    typedef typename tools::promote_args<T>::type result_type;
+    using result_type = typename tools::promote_args<T>::type;
 
     // Work out what precision has been selected, based on the Policy and the number type.
     // For the default policy version, we want the *default policy* precision for T.
-    typedef typename policies::precision<result_type, policies::policy<> >::type precision_type;
+    using precision_type = typename policies::precision<result_type, policies::policy<>>::type;
     // and then select the correct implementation based on that (not the type T):
-    typedef boost::integral_constant<int,
+    using tag_type = std::integral_constant<int,
       (precision_type::value == 0) || (precision_type::value > 53) ?
       0  // either variable precision (0), or greater than 64-bit precision.
       : (precision_type::value <= 24) ? 1 // 32-bit (probably float) precision.
       : 2  // 64-bit (probably double) precision.
-    > tag_type;
+    >;
     return lambert_w_detail::lambert_w0_imp(result_type(z),  policies::policy<>(), tag_type());
   } // lambert_w0(T z) using default policy.
 
     //! W-1 branch (-max(z) < z <= -1/e).
 
     //! Lambert W-1 using User-defined policy.
-  template <class T, class Policy>
+  template <typename T, typename Policy>
   inline
     typename tools::promote_args<T>::type
     lambert_wm1(T z, const Policy& pol)
   {
     // Promote integer or expression template arguments to double,
     // without doing any other internal promotion like float to double.
-    typedef typename tools::promote_args<T>::type result_type;
+    using result_type = typename tools::promote_args<T>::type;
     return lambert_w_detail::lambert_wm1_imp(result_type(z), pol); //
   }
 
   //! Lambert W-1 using default policy.
-  template <class T>
+  template <typename T>
   inline
     typename tools::promote_args<T>::type
     lambert_wm1(T z)
   {
-    typedef typename tools::promote_args<T>::type result_type;
+    using result_type = typename tools::promote_args<T>::type;
     return lambert_w_detail::lambert_wm1_imp(result_type(z), policies::policy<>());
   } // lambert_wm1(T z)
 
   // First derivative of Lambert W0 and W-1.
-  template <class T, class Policy>
+  template <typename T, typename Policy>
   inline typename tools::promote_args<T>::type
   lambert_w0_prime(T z, const Policy& pol)
   {
-    typedef typename tools::promote_args<T>::type result_type;
+    using result_type = typename tools::promote_args<T>::type;
     using std::numeric_limits;
     if (z == 0)
     {
@@ -2146,19 +2143,19 @@ T lambert_wm1_imp(const T z, const Policy&  pol)
     return w / (z * (1 + w));
   } // lambert_w0_prime(T z)
 
-  template <class T>
+  template <typename T>
   inline typename tools::promote_args<T>::type
      lambert_w0_prime(T z)
   {
      return lambert_w0_prime(z, policies::policy<>());
   }
   
-  template <class T, class Policy>
+  template <typename T, typename Policy>
   inline typename tools::promote_args<T>::type
   lambert_wm1_prime(T z, const Policy& pol)
   {
     using std::numeric_limits;
-    typedef typename tools::promote_args<T>::type result_type;
+    using result_type = typename tools::promote_args<T>::type;
     //if (z == 0)
     //{
     //      return static_cast<result_type>(1);
@@ -2173,7 +2170,7 @@ T lambert_wm1_imp(const T z, const Policy&  pol)
     return w/(z*(1+w));
   } // lambert_wm1_prime(T z)
 
-  template <class T>
+  template <typename T>
   inline typename tools::promote_args<T>::type
      lambert_wm1_prime(T z)
   {
@@ -2184,3 +2181,7 @@ T lambert_wm1_imp(const T z, const Policy&  pol)
 
 #endif // #ifdef BOOST_MATH_SF_LAMBERT_W_HPP
 
+
+/* lambert_w.hpp
+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
+*/

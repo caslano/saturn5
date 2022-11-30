@@ -1,5 +1,5 @@
 /* Proposed SG14 status_code
-(C) 2018-2020 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
+(C) 2018-2022 Niall Douglas <http://www.nedproductions.biz/> (5 commits)
 File Created: Feb 2018
 
 
@@ -89,12 +89,13 @@ namespace detail
            ((parse_hex_byte(s[19]) << 0) | (parse_hex_byte(s[20]) << 4) | (parse_hex_byte(s[21]) << 8) | (parse_hex_byte(s[22]) << 12) | (parse_hex_byte(s[24]) << 16) | (parse_hex_byte(s[25]) << 20) | (parse_hex_byte(s[26]) << 24) | (parse_hex_byte(s[27]) << 28) | (parse_hex_byte(s[28]) << 32) |
             (parse_hex_byte(s[29]) << 36) | (parse_hex_byte(s[30]) << 40) | (parse_hex_byte(s[31]) << 44) | (parse_hex_byte(s[32]) << 48) | (parse_hex_byte(s[33]) << 52) | (parse_hex_byte(s[34]) << 56) | (parse_hex_byte(s[35]) << 60));
   }
-  template <size_t N> constexpr inline unsigned long long parse_uuid(const char (&uuid)[N]) { return (N == 37) ? parse_uuid2(uuid) : ((N == 39) ? parse_uuid2(uuid + 1) : BOOST_OUTCOME_SYSTEM_ERROR2_FAIL_CONSTEXPR("UUID does not have correct length")); }
+  template <size_t N> constexpr inline unsigned long long parse_uuid_from_array(const char (&uuid)[N]) { return (N == 37) ? parse_uuid2(uuid) : ((N == 39) ? parse_uuid2(uuid + 1) : BOOST_OUTCOME_SYSTEM_ERROR2_FAIL_CONSTEXPR("UUID does not have correct length")); }
+  template <size_t N> constexpr inline unsigned long long parse_uuid_from_pointer(const char *uuid) { return (N == 36) ? parse_uuid2(uuid) : ((N == 38) ? parse_uuid2(uuid + 1) : BOOST_OUTCOME_SYSTEM_ERROR2_FAIL_CONSTEXPR("UUID does not have correct length")); }
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
-  static constexpr unsigned long long test_uuid_parse = parse_uuid("430f1201-94fc-06c7-430f-120194fc06c7");
-  //static constexpr unsigned long long test_uuid_parse2 = parse_uuid("x30f1201-94fc-06c7-430f-120194fc06c7");
+  static constexpr unsigned long long test_uuid_parse = parse_uuid_from_array("430f1201-94fc-06c7-430f-120194fc06c7");
+  //static constexpr unsigned long long test_uuid_parse2 = parse_uuid_from_array("x30f1201-94fc-06c7-430f-120194fc06c7");
 }  // namespace detail
 
 /*! Abstract base class for a coding domain of a status code.
@@ -184,7 +185,7 @@ public:
     {
     }
     //! Copy construct the derived implementation.
-    string_ref(const string_ref &o)
+    BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR20 string_ref(const string_ref &o)
         : _begin(o._begin)
         , _end(o._end)
         , _state{o._state[0], o._state[1], o._state[2]}
@@ -196,7 +197,7 @@ public:
       }
     }
     //! Move construct the derived implementation.
-    string_ref(string_ref &&o) noexcept
+    BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR20 string_ref(string_ref &&o) noexcept
         : _begin(o._begin)
         , _end(o._end)
         , _state{o._state[0], o._state[1], o._state[2]}
@@ -208,7 +209,7 @@ public:
       }
     }
     //! Copy assignment
-    string_ref &operator=(const string_ref &o)
+    BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR20 string_ref &operator=(const string_ref &o)
     {
       if(this != &o)
       {
@@ -232,7 +233,7 @@ public:
       return *this;
     }
     //! Move assignment
-    string_ref &operator=(string_ref &&o) noexcept
+    BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR20 string_ref &operator=(string_ref &&o) noexcept
     {
       if(this != &o)
       {
@@ -242,7 +243,7 @@ public:
       return *this;
     }
     //! Destruction
-    ~string_ref()
+    BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR20 ~string_ref()
     {
       if(_thunk != nullptr)
       {
@@ -252,25 +253,25 @@ public:
     }
 
     //! Returns whether the reference is empty or not
-    BOOST_OUTCOME_SYSTEM_ERROR2_NODISCARD bool empty() const noexcept { return _begin == _end; }
+    BOOST_OUTCOME_SYSTEM_ERROR2_NODISCARD constexpr bool empty() const noexcept { return _begin == _end; }
     //! Returns the size of the string
-    size_type size() const noexcept { return _end - _begin; }
+    constexpr size_type size() const noexcept { return _end - _begin; }
     //! Returns a null terminated C string
-    const_pointer c_str() const noexcept { return _begin; }
+    constexpr const_pointer c_str() const noexcept { return _begin; }
     //! Returns a null terminated C string
-    const_pointer data() const noexcept { return _begin; }
+    constexpr const_pointer data() const noexcept { return _begin; }
     //! Returns the beginning of the string
-    iterator begin() noexcept { return _begin; }
+    BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 iterator begin() noexcept { return _begin; }
     //! Returns the beginning of the string
-    const_iterator begin() const noexcept { return _begin; }
+    BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 const_iterator begin() const noexcept { return _begin; }
     //! Returns the beginning of the string
-    const_iterator cbegin() const noexcept { return _begin; }
+    constexpr const_iterator cbegin() const noexcept { return _begin; }
     //! Returns the end of the string
-    iterator end() noexcept { return _end; }
+    BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 iterator end() noexcept { return _end; }
     //! Returns the end of the string
-    const_iterator end() const noexcept { return _end; }
+    BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR14 const_iterator end() const noexcept { return _end; }
     //! Returns the end of the string
-    const_iterator cend() const noexcept { return _end; }
+    constexpr const_iterator cend() const noexcept { return _end; }
   };
 
   /*! A reference counted, threadsafe reference to a message string.
@@ -281,10 +282,10 @@ public:
     {
       mutable std::atomic<unsigned> count{1};
     };
-    _allocated_msg *&_msg() noexcept { return reinterpret_cast<_allocated_msg *&>(this->_state[0]); }                  // NOLINT
-    const _allocated_msg *_msg() const noexcept { return reinterpret_cast<const _allocated_msg *>(this->_state[0]); }  // NOLINT
+     _allocated_msg *&_msg() noexcept { return reinterpret_cast<_allocated_msg *&>(this->_state[0]); }  // NOLINT
+     const _allocated_msg *_msg() const noexcept { return reinterpret_cast<const _allocated_msg *>(this->_state[0]); }  // NOLINT
 
-    static void _refcounted_string_thunk(string_ref *_dest, const string_ref *_src, _thunk_op op) noexcept
+    static BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR20 void _refcounted_string_thunk(string_ref *_dest, const string_ref *_src, _thunk_op op) noexcept
     {
       auto dest = static_cast<atomic_refcounted_string_ref *>(_dest);      // NOLINT
       auto src = static_cast<const atomic_refcounted_string_ref *>(_src);  // NOLINT
@@ -359,7 +360,16 @@ protected:
    */
   template <size_t N>
   constexpr explicit status_code_domain(const char (&uuid)[N]) noexcept
-      : _id(detail::parse_uuid<N>(uuid))
+      : _id(detail::parse_uuid_from_array<N>(uuid))
+  {
+  }
+  template <size_t N> struct _uuid_size
+  {
+  };
+  //! Alternative UUID constructor
+  template <size_t N>
+  constexpr explicit status_code_domain(const char *uuid, _uuid_size<N> /*unused*/) noexcept
+      : _id(detail::parse_uuid_from_pointer<N>(uuid))
   {
   }
   //! No public copying at type erased level
@@ -384,20 +394,20 @@ public:
   //! Returns the unique id used to identify identical category instances.
   constexpr unique_id_type id() const noexcept { return _id; }
   //! Name of this category.
-  virtual string_ref name() const noexcept = 0;
+  BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR20 virtual string_ref name() const noexcept = 0;
 
 protected:
   //! True if code means failure.
-  virtual bool _do_failure(const status_code<void> &code) const noexcept = 0;
+  BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR20 virtual bool _do_failure(const status_code<void> &code) const noexcept = 0;
   //! True if code is (potentially non-transitively) equivalent to another code in another domain.
-  virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept = 0;
+  BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR20 virtual bool _do_equivalent(const status_code<void> &code1, const status_code<void> &code2) const noexcept = 0;
   //! Returns the generic code closest to this code, if any.
-  virtual generic_code _generic_code(const status_code<void> &code) const noexcept = 0;
+  BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR20 virtual generic_code _generic_code(const status_code<void> &code) const noexcept = 0;
   //! Return a reference to a string textually representing a code.
-  virtual string_ref _do_message(const status_code<void> &code) const noexcept = 0;
+  BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR20 virtual string_ref _do_message(const status_code<void> &code) const noexcept = 0;
 #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || defined(BOOST_OUTCOME_STANDARDESE_IS_IN_THE_HOUSE)
   //! Throw a code as a C++ exception.
-  BOOST_OUTCOME_SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> &code) const = 0;
+  BOOST_OUTCOME_SYSTEM_ERROR2_NORETURN BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR20 virtual void _do_throw_exception(const status_code<void> &code) const = 0;
 #else
   // Keep a vtable slot for binary compatibility
   BOOST_OUTCOME_SYSTEM_ERROR2_NORETURN virtual void _do_throw_exception(const status_code<void> & /*code*/) const { abort(); }
@@ -405,7 +415,7 @@ protected:
   // For a `status_code<erased<T>>` only, copy from `src` to `dst`. Default implementation uses `memcpy()`.
   virtual void _do_erased_copy(status_code<void> &dst, const status_code<void> &src, size_t bytes) const { memcpy(&dst, &src, bytes); }  // NOLINT
   // For a `status_code<erased<T>>` only, destroy the erased value type. Default implementation does nothing.
-  virtual void _do_erased_destroy(status_code<void> &code, size_t bytes) const noexcept  // NOLINT
+  BOOST_OUTCOME_SYSTEM_ERROR2_CONSTEXPR20 virtual void _do_erased_destroy(status_code<void> &code, size_t bytes) const noexcept  // NOLINT
   {
     (void) code;
     (void) bytes;
@@ -415,3 +425,7 @@ protected:
 BOOST_OUTCOME_SYSTEM_ERROR2_NAMESPACE_END
 
 #endif
+
+/* status_code_domain.hpp
+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
+*/

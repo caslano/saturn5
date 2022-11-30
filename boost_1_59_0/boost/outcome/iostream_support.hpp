@@ -1,5 +1,5 @@
 /* iostream specialisations for result and outcome
-(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (21 commits)
+(C) 2017-2022 Niall Douglas <http://www.nedproductions.biz/> (21 commits)
 File Created: July 2017
 
 
@@ -42,7 +42,29 @@ namespace detail
 {
   template <class T> typename std::add_lvalue_reference<T>::type lvalueref() noexcept;
 
-  template <class T> inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<T> &v)
+  template <template <class, class> class ValueStorage, class T, class E> inline std::ostream &value_storage_out(std::ostream &s, const ValueStorage<T, E> &v)
+  {
+    s << static_cast<uint16_t>(v._status.status_value) << " " << v._status.spare_storage_value << " ";
+    if(v._status.have_value())
+    {
+      s << v._value;  // NOLINT
+    }
+    if(v._status.have_error())
+    {
+      s << v._error;  // NOLINT
+    }
+    return s;
+  }
+  template <template <class, class> class ValueStorage, class E> inline std::ostream &value_storage_out(std::ostream &s, const ValueStorage<void, E> &v)
+  {
+    s << static_cast<uint16_t>(v._status.status_value) << " " << v._status.spare_storage_value << " ";
+    if(v._status.have_error())
+    {
+      s << v._error;  // NOLINT
+    }
+    return s;
+  }
+  template <template <class, class> class ValueStorage, class T> inline std::ostream &value_storage_out(std::ostream &s, const ValueStorage<T, void> &v)
   {
     s << static_cast<uint16_t>(v._status.status_value) << " " << v._status.spare_storage_value << " ";
     if(v._status.have_value())
@@ -51,23 +73,52 @@ namespace detail
     }
     return s;
   }
-  inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<void> &v)
+
+  template <class T, class E> inline std::ostream &operator<<(std::ostream &s, const value_storage_trivial<T, E> &v) { return value_storage_out(s, v); }
+  template <class T, class E> inline std::ostream &operator<<(std::ostream &s, const value_storage_nontrivial<T, E> &v) { return value_storage_out(s, v); }
+
+  template <template <class, class> class ValueStorage, class T, class E> inline std::istream &value_storage_in(std::istream &s, ValueStorage<T, E> &v)
   {
-    s << static_cast<uint16_t>(v._status.status_value) << " " << v._status.spare_storage_value << " ";
-    return s;
-  }
-  template <class T> inline std::ostream &operator<<(std::ostream &s, const value_storage_nontrivial<T> &v)
-  {
-    s << static_cast<uint16_t>(v._status.status_value) << " " << v._status.spare_storage_value << " ";
+    using type = ValueStorage<T, E>;
+    v.~type();
+    new(&v) type;
+    uint16_t x, y;
+    s >> x >> y;
+    v._status.status_value = static_cast<detail::status>(x);
+    v._status.spare_storage_value = y;
     if(v._status.have_value())
     {
-      s << v._value;  // NOLINT
+      new(&v._value) decltype(v._value)();  // NOLINT
+      s >> v._value;                        // NOLINT
+    }
+    if(v._status.have_error())
+    {
+      new(&v._error) decltype(v._error)();  // NOLINT
+      s >> v._error;                        // NOLINT
     }
     return s;
   }
-  template <class T> inline std::istream &operator>>(std::istream &s, value_storage_trivial<T> &v)
+  template <template <class, class> class ValueStorage, class E> inline std::istream &value_storage_in(std::istream &s, ValueStorage<void, E> &v)
   {
-    v = value_storage_trivial<T>();
+    using type = ValueStorage<void, E>;
+    v.~type();
+    new(&v) type;
+    uint16_t x, y;
+    s >> x >> y;
+    v._status.status_value = static_cast<detail::status>(x);
+    v._status.spare_storage_value = y;
+    if(v._status.have_error())
+    {
+      new(&v._error) decltype(v._error)();  // NOLINT
+      s >> v._error;                        // NOLINT
+    }
+    return s;
+  }
+  template <template <class, class> class ValueStorage, class T> inline std::istream &value_storage_in(std::istream &s, ValueStorage<T, void> &v)
+  {
+    using type = ValueStorage<T, void>;
+    v.~type();
+    new(&v) type;
     uint16_t x, y;
     s >> x >> y;
     v._status.status_value = static_cast<detail::status>(x);
@@ -79,29 +130,8 @@ namespace detail
     }
     return s;
   }
-  inline std::istream &operator>>(std::istream &s, value_storage_trivial<devoid<void>> &v)
-  {
-    v = value_storage_trivial<devoid<void>>();
-    uint16_t x, y;
-    s >> x >> y;
-    v._status.status_value = static_cast<detail::status>(x);
-    v._status.spare_storage_value = y;
-    return s;
-  }
-  template <class T> inline std::istream &operator>>(std::istream &s, value_storage_nontrivial<T> &v)
-  {
-    v = value_storage_nontrivial<T>();
-    uint16_t x, y;
-    s >> x >> y;
-    v._status.status_value = static_cast<detail::status>(x);
-    v._status.spare_storage_value = y;
-    if(v._status.have_value())
-    {
-      new(&v._value) decltype(v._value)();  // NOLINT
-      s >> v._value;                        // NOLINT
-    }
-    return s;
-  }
+  template <class T, class E> inline std::istream &operator>>(std::istream &s, value_storage_trivial<T, E> &v) { return value_storage_in(s, v); }
+  template <class T, class E> inline std::istream &operator>>(std::istream &s, value_storage_nontrivial<T, E> &v) { return value_storage_in(s, v); }
   BOOST_OUTCOME_TEMPLATE(class T)
   BOOST_OUTCOME_TREQUIRES(BOOST_OUTCOME_TPRED(!std::is_constructible<std::error_code, T>::value))
   inline std::string safe_message(T && /*unused*/) { return {}; }
@@ -283,3 +313,7 @@ template <class R, class S, class P, class N> inline std::string print(const out
 BOOST_OUTCOME_V2_NAMESPACE_END
 
 #endif
+
+/* iostream_support.hpp
+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
+*/

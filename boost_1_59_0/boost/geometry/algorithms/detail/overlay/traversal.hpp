@@ -2,8 +2,8 @@
 
 // Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
-// This file was modified by Oracle on 2017, 2018.
-// Modifications copyright (c) 2017-2018 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2017-2020.
+// Modifications copyright (c) 2017-2020 Oracle and/or its affiliates.
 
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
@@ -17,9 +17,12 @@
 #include <cstddef>
 #include <set>
 
-#include <boost/range.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
+#include <boost/range/value_type.hpp>
 
 #include <boost/geometry/algorithms/detail/overlay/cluster_info.hpp>
+#include <boost/geometry/algorithms/detail/overlay/cluster_exits.hpp>
 #include <boost/geometry/algorithms/detail/overlay/is_self_turn.hpp>
 #include <boost/geometry/algorithms/detail/overlay/sort_by_side.hpp>
 #include <boost/geometry/algorithms/detail/overlay/turn_info.hpp>
@@ -88,21 +91,6 @@ template
 struct traversal
 {
 private :
-    struct linked_turn_op_info
-    {
-        explicit linked_turn_op_info(signed_size_type ti = -1, int oi = -1,
-                    signed_size_type nti = -1)
-            : turn_index(ti)
-            , op_index(oi)
-            , next_turn_index(nti)
-            , rank_index(-1)
-        {}
-
-        signed_size_type turn_index;
-        int op_index;
-        signed_size_type next_turn_index;
-        signed_size_type rank_index;
-    };
 
     static const operation_type target_operation = operation_from_overlay<OverlayType>::value;
 
@@ -581,28 +569,24 @@ public :
         return true;
     }
 
-
-    template <typename RankedPoint>
-    inline turn_operation_type const& operation_from_rank(RankedPoint const& rp) const
-    {
-        return m_turns[rp.turn_index].operations[rp.operation_index];
-    }
-
-    inline int select_turn_in_cluster_union(sort_by_side::rank_type selected_rank,
+    inline int priority_of_turn_in_cluster_union(sort_by_side::rank_type selected_rank,
             typename sbs_type::rp const& ranked_point,
+            std::set<signed_size_type> const& cluster_indices,
             signed_size_type start_turn_index, int start_op_index) const
     {
-        // Returns 0 if it not OK
-        // Returns 1 if it OK
-        // Returns 2 if it OK and start turn matches
-        // Returns 3 if it OK and start turn and start op both match
+        // Returns 0: not OK
+        // Returns 1: OK but next turn is in same cluster
+        // Returns 2: OK
+        // Returns 3: OK and start turn matches
+        // Returns 4: OK and start turn and start op both match
         if (ranked_point.rank != selected_rank
             || ranked_point.direction != sort_by_side::dir_to)
         {
             return 0;
         }
 
-        turn_operation_type const& op = operation_from_rank(ranked_point);
+        auto const& turn = m_turns[ranked_point.turn_index];
+        auto const& op = turn.operations[ranked_point.operation_index];
 
         // Check finalized: TODO: this should be finetuned, it is not necessary
         if (op.visited.finalized())
@@ -618,38 +602,51 @@ public :
             return 0;
         }
 
-        return ranked_point.turn_index == start_turn_index
-                && ranked_point.operation_index == start_op_index ? 3
-            : ranked_point.turn_index == start_turn_index ? 2
-            : 1
+        bool const to_start = ranked_point.turn_index == start_turn_index;
+        bool const to_start_index = ranked_point.operation_index == start_op_index;
+
+        bool const next_in_same_cluster
+                = cluster_indices.count(op.enriched.get_next_turn_index()) > 0;
+
+        return to_start && to_start_index ? 4
+            : to_start ? 3
+            : next_in_same_cluster ? 1
+            : 2
             ;
     }
 
-    inline sort_by_side::rank_type select_rank(sbs_type const& sbs,
-                                        bool skip_isolated) const
+    template <typename RankedPoint>
+    inline turn_operation_type const& operation_from_rank(RankedPoint const& rp) const
     {
+        return m_turns[rp.turn_index].operations[rp.operation_index];
+    }
+
+    inline sort_by_side::rank_type select_rank(sbs_type const& sbs) const
+    {
+        static bool const is_intersection
+                = target_operation == operation_intersection;
+
         // Take the first outgoing rank corresponding to incoming region,
         // or take another region if it is not isolated
-        turn_operation_type const& incoming_op
-                = operation_from_rank(sbs.m_ranked_points.front());
+        auto const& in_op = operation_from_rank(sbs.m_ranked_points.front());
 
         for (std::size_t i = 0; i < sbs.m_ranked_points.size(); i++)
         {
-            typename sbs_type::rp const& rp = sbs.m_ranked_points[i];
+            auto const& rp = sbs.m_ranked_points[i];
             if (rp.rank == 0 || rp.direction == sort_by_side::dir_from)
             {
                 continue;
             }
-            turn_operation_type const& op = operation_from_rank(rp);
+            auto const& out_op = operation_from_rank(rp);
 
-            if (op.operation != target_operation
-                && op.operation != operation_continue)
+            if (out_op.operation != target_operation
+                && out_op.operation != operation_continue)
             {
                 continue;
             }
 
-            if (op.enriched.region_id == incoming_op.enriched.region_id
-                || (skip_isolated && ! op.enriched.isolated))
+            if (in_op.enriched.region_id == out_op.enriched.region_id
+                || (is_intersection && ! out_op.enriched.isolated))
             {
                 // Region corresponds to incoming region, or (for intersection)
                 // there is a non-isolated other region which should be taken
@@ -660,250 +657,102 @@ public :
     }
 
     inline bool select_from_cluster_union(signed_size_type& turn_index,
+        std::set<signed_size_type> const& cluster_indices,
         int& op_index, sbs_type const& sbs,
         signed_size_type start_turn_index, int start_op_index) const
     {
-        sort_by_side::rank_type const selected_rank = select_rank(sbs, false);
+        sort_by_side::rank_type const selected_rank = select_rank(sbs);
 
-        int best_code = 0;
-        bool result = false;
+        int current_priority = 0;
         for (std::size_t i = 1; i < sbs.m_ranked_points.size(); i++)
         {
             typename sbs_type::rp const& ranked_point = sbs.m_ranked_points[i];
 
             if (ranked_point.rank > selected_rank)
             {
-                // Sorted on rank, so it makes no sense to continue
                 break;
             }
 
-            int const code
-                = select_turn_in_cluster_union(selected_rank, ranked_point,
-                    start_turn_index, start_op_index);
+            int const priority = priority_of_turn_in_cluster_union(selected_rank,
+                ranked_point, cluster_indices, start_turn_index, start_op_index);
 
-            if (code > best_code)
+            if (priority > current_priority)
             {
-                // It is 1 or higher and matching better than previous
-                best_code = code;
+                current_priority = priority;
                 turn_index = ranked_point.turn_index;
                 op_index = ranked_point.operation_index;
-                result = true;
             }
         }
-        return result;
+        return current_priority > 0;
     }
 
     inline bool analyze_cluster_intersection(signed_size_type& turn_index,
                 int& op_index, sbs_type const& sbs) const
     {
-        sort_by_side::rank_type const selected_rank = select_rank(sbs, true);
+        // Select the rank based on regions and isolation
+        sort_by_side::rank_type const selected_rank = select_rank(sbs);
 
-        if (selected_rank > 0)
-        {
-            typename turn_operation_type::comparable_distance_type
-                    min_remaining_distance = 0;
-
-            std::size_t selected_index = sbs.m_ranked_points.size();
-            for (std::size_t i = 0; i < sbs.m_ranked_points.size(); i++)
-            {
-                typename sbs_type::rp const& ranked_point = sbs.m_ranked_points[i];
-
-                if (ranked_point.rank == selected_rank)
-                {
-                    turn_operation_type const& op = operation_from_rank(ranked_point);
-
-                    if (op.visited.finalized())
-                    {
-                        // This direction is already traveled before, the same
-                        // cannot be traveled again
-                        continue;
-                    }
-
-                    // Take turn with the smallest remaining distance
-                    if (selected_index == sbs.m_ranked_points.size()
-                            || op.remaining_distance < min_remaining_distance)
-                    {
-                        selected_index = i;
-                        min_remaining_distance = op.remaining_distance;
-                    }
-                }
-            }
-
-            if (selected_index < sbs.m_ranked_points.size())
-            {
-                typename sbs_type::rp const& ranked_point = sbs.m_ranked_points[selected_index];
-                turn_index = ranked_point.turn_index;
-                op_index = ranked_point.operation_index;
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    inline signed_size_type get_rank(sbs_type const& sbs,
-            linked_turn_op_info const& info) const
-    {
-        for (std::size_t i = 0; i < sbs.m_ranked_points.size(); i++)
-        {
-            typename sbs_type::rp const& rp = sbs.m_ranked_points[i];
-            if (rp.turn_index == info.turn_index
-                    && rp.operation_index == info.op_index
-                    && rp.direction == sort_by_side::dir_to)
-            {
-                return rp.rank;
-            }
-        }
-        return -1;
-    }
-
-    // Function checks simple cases, such as a cluster with two turns,
-    // arriving at the first turn, first turn points to second turn,
-    // second turn points further.
-    inline bool select_turn_from_cluster_linked(signed_size_type& turn_index,
-            int& op_index,
-            std::set<signed_size_type> const& ids,
-            segment_identifier const& previous_seg_id) const
-    {
-        typedef typename std::set<signed_size_type>::const_iterator sit_type;
-
-        std::vector<linked_turn_op_info> possibilities;
-        std::vector<linked_turn_op_info> blocked;
-        for (sit_type it = ids.begin(); it != ids.end(); ++it)
-        {
-            signed_size_type cluster_turn_index = *it;
-            turn_type const& cluster_turn = m_turns[cluster_turn_index];
-            if (cluster_turn.discarded)
-            {
-                continue;
-            }
-            if (cluster_turn.both(target_operation))
-            {
-                // Not (yet) supported, can be cluster of u/u turns
-                return false;
-            }
-            for (int i = 0; i < 2; i++)
-            {
-                turn_operation_type const& op = cluster_turn.operations[i];
-                turn_operation_type const& other_op = cluster_turn.operations[1 - i];
-                signed_size_type const ni = op.enriched.get_next_turn_index();
-                if (op.operation == target_operation
-                    || op.operation == operation_continue)
-                {
-                    if (ni == cluster_turn_index)
-                    {
-                        // Not (yet) supported, traveling to itself, can be
-                        // hole
-                        return false;
-                    }
-                    possibilities.push_back(
-                        linked_turn_op_info(cluster_turn_index, i, ni));
-                }
-                else if (op.operation == operation_blocked
-                         && ! (ni == other_op.enriched.get_next_turn_index())
-                         && ids.count(ni) == 0)
-                {
-                    // Points to turn, not part of this cluster,
-                    // and that way is blocked. But if the other operation
-                    // points at the same turn, it is still fine.
-                    blocked.push_back(
-                        linked_turn_op_info(cluster_turn_index, i, ni));
-                }
-            }
-        }
-
-        typedef typename std::vector<linked_turn_op_info>::const_iterator const_it_type;
-
-        if (! blocked.empty())
-        {
-            sbs_type sbs(m_strategy);
-
-            if (! fill_sbs(sbs, turn_index, ids, previous_seg_id))
-            {
-                return false;
-            }
-
-            for (typename std::vector<linked_turn_op_info>::iterator it = possibilities.begin();
-                 it != possibilities.end(); ++it)
-            {
-                linked_turn_op_info& info = *it;
-                info.rank_index = get_rank(sbs, info);
-            }
-            for (typename std::vector<linked_turn_op_info>::iterator it = blocked.begin();
-                 it != blocked.end(); ++it)
-            {
-                linked_turn_op_info& info = *it;
-                info.rank_index = get_rank(sbs, info);
-            }
-
-
-            for (const_it_type it = possibilities.begin();
-                 it != possibilities.end(); ++it)
-            {
-                linked_turn_op_info const& lti = *it;
-                for (const_it_type bit = blocked.begin();
-                     bit != blocked.end(); ++bit)
-                {
-                    linked_turn_op_info const& blti = *bit;
-                    if (blti.next_turn_index == lti.next_turn_index
-                            && blti.rank_index == lti.rank_index)
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        // Traversal can either enter the cluster in the first turn,
-        // or it can start halfway.
-        // If there is one (and only one) possibility pointing outside
-        // the cluster, take that one.
-        linked_turn_op_info target;
-        for (const_it_type it = possibilities.begin();
-             it != possibilities.end(); ++it)
-        {
-            linked_turn_op_info const& lti = *it;
-            if (ids.count(lti.next_turn_index) == 0)
-            {
-                if (target.turn_index >= 0
-                    && target.next_turn_index != lti.next_turn_index)
-                {
-                    // Points to different target
-                    return false;
-                }
-                if (BOOST_GEOMETRY_CONDITION(OverlayType == overlay_buffer)
-                    && target.turn_index > 0)
-                {
-                    // Target already assigned, so there are more targets
-                    // or more ways to the same target
-                    return false;
-                }
-
-                target = lti;
-            }
-        }
-        if (target.turn_index < 0)
+        if (selected_rank <= 0)
         {
             return false;
         }
 
-        turn_index = target.turn_index;
-        op_index = target.op_index;
+        // From these ranks, select the index: the first, or the one with
+        // the smallest remaining distance
+        typename turn_operation_type::comparable_distance_type
+                min_remaining_distance = 0;
 
+        std::size_t selected_index = sbs.m_ranked_points.size();
+        for (std::size_t i = 0; i < sbs.m_ranked_points.size(); i++)
+        {
+            auto const& ranked_point = sbs.m_ranked_points[i];
+
+            if (ranked_point.rank > selected_rank)
+            {
+                break;
+            }
+            else if (ranked_point.rank == selected_rank)
+            {
+                auto const& op = operation_from_rank(ranked_point);
+
+                if (op.visited.finalized())
+                {
+                    // This direction is already traveled,
+                    // it cannot be traveled again
+                    continue;
+                }
+
+                if (selected_index == sbs.m_ranked_points.size()
+                        || op.remaining_distance < min_remaining_distance)
+                {
+                    // It was unassigned or it is better
+                    selected_index = i;
+                    min_remaining_distance = op.remaining_distance;
+                }
+            }
+        }
+
+        if (selected_index == sbs.m_ranked_points.size())
+        {
+            // Should not happen, there must be points with the selected rank
+            return false;
+        }
+
+        auto const& ranked_point = sbs.m_ranked_points[selected_index];
+        turn_index = ranked_point.turn_index;
+        op_index = ranked_point.operation_index;
         return true;
     }
 
     inline bool fill_sbs(sbs_type& sbs,
                          signed_size_type turn_index,
-                         std::set<signed_size_type> const& ids,
+                         std::set<signed_size_type> const& cluster_indices,
                          segment_identifier const& previous_seg_id) const
     {
-        for (typename std::set<signed_size_type>::const_iterator sit = ids.begin();
-             sit != ids.end(); ++sit)
+
+        for (auto cluster_turn_index : cluster_indices)
         {
-            signed_size_type cluster_turn_index = *sit;
             turn_type const& cluster_turn = m_turns[cluster_turn_index];
-            bool const departure_turn = cluster_turn_index == turn_index;
             if (cluster_turn.discarded)
             {
                 // Defensive check, discarded turns should not be in cluster
@@ -912,10 +761,11 @@ public :
 
             for (int i = 0; i < 2; i++)
             {
-                sbs.add(cluster_turn.operations[i],
+                sbs.add(cluster_turn,
+                        cluster_turn.operations[i],
                         cluster_turn_index, i, previous_seg_id,
                         m_geometry1, m_geometry2,
-                        departure_turn);
+                        cluster_turn_index == turn_index);
             }
         }
 
@@ -943,26 +793,35 @@ public :
         BOOST_ASSERT(mit != m_clusters.end());
 
         cluster_info const& cinfo = mit->second;
-        std::set<signed_size_type> const& ids = cinfo.turn_indices;
-
-        if (select_turn_from_cluster_linked(turn_index, op_index, ids, previous_seg_id))
-        {
-            return true;
-        }
+        std::set<signed_size_type> const& cluster_indices = cinfo.turn_indices;
 
         sbs_type sbs(m_strategy);
 
-        if (! fill_sbs(sbs, turn_index, ids, previous_seg_id))
+
+        if (! fill_sbs(sbs, turn_index, cluster_indices, previous_seg_id))
         {
             return false;
+        }
+
+        cluster_exits<OverlayType, Turns, sbs_type> exits(m_turns, cluster_indices, sbs);
+
+        if (exits.apply(turn_index, op_index))
+        {
+            return true;
         }
 
         bool result = false;
 
         if (is_union)
         {
-            result = select_from_cluster_union(turn_index, op_index, sbs,
-                start_turn_index, start_op_index);
+            result = select_from_cluster_union(turn_index, cluster_indices,
+                                               op_index, sbs,
+                                               start_turn_index, start_op_index);
+            if (! result)
+            {
+               // There no way out found, try second pass in collected cluster exits
+               result = exits.apply(turn_index, op_index, false);
+            }
         }
         else
         {
@@ -971,6 +830,7 @@ public :
         return result;
     }
 
+    // Analyzes a non-clustered "ii" intersection, as if it is clustered.
     inline bool analyze_ii_intersection(signed_size_type& turn_index, int& op_index,
                     turn_type const& current_turn,
                     segment_identifier const& previous_seg_id)
@@ -980,7 +840,8 @@ public :
         // Add this turn to the sort-by-side sorter
         for (int i = 0; i < 2; i++)
         {
-            sbs.add(current_turn.operations[i],
+            sbs.add(current_turn,
+                    current_turn.operations[i],
                     turn_index, i, previous_seg_id,
                     m_geometry1, m_geometry2,
                     true);
@@ -1188,3 +1049,7 @@ private :
 }} // namespace boost::geometry
 
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_TRAVERSAL_HPP
+
+/* traversal.hpp
+GnK5PeyG6wBUHAGgjBzk9lg5JXHhRdMNGJqYwxEHl3kciOZkyb8gIFqtpSIQ1c30sMxXY87sjmTUggLcmIWE+oeGGMEa9jLdw/7xSkzptw0Yp/55KLRuPVdhj6fe0fWtfJ7vxqTzfDdUvm4k3kpUYaQ+CiPohUndGxa8fkgZriCEHNAra+haLNm7XBs2OaKKlA1uJwGiZ/aSJIrZES27XC27u+/lnFjeipkGSYSYqN59+fQxkI72J8Mcf04fUCI93LgEGBH/5NwuewtdQllcLp81Qv3DyawEOksIgYkcQF7UlVQOYq9TuYp9J/Ki/ku9mTnq1FD+L+gRx3o8XhRuXOzJmcmCiuPlqWuhA0tbGppMxdVA+9BKF7o1kRptNvhkwWcmfHKU98koDLbGPs/Izc6hFuTkwScfPoXAIhRlEhZthJbQPtpeYsu3hF5EJ3TQom8i/F8IhLFQtdSemY1exvDCTYT207omb0W7bivakSkv9Tb+LRAZloTWZj1iDh9edCgvVBjRNi4TGkr1pXk8aLE6M6a5IDRlQJpsvec5btOGXCUOLTKgdHm/K3Ys7PNfGvE9qfeaZCROqfaduDeW1k0YNIkvn6VtA7eRG7YE6GlGeR+gceXw9dN2ZIY2CXXgOb6JOIDCbDTH209DuBOG8DUrATTiIxE50LTTwI3gX+QxYub5Fhr4/xx5H0Eo8hPj/Lo/Gb2hF6IVH/eIHsyOcacFfCuhaWTA0AXbL/j8rwZ+NcadUkcDAEv8ezLw3ma8CndXA8pj91cmR5w/lnss284Dl3Zz9+fWeqCKN1AH9yEq48D9nBUWUrzcNwC/8XoqeNwiWjDgIUgCJpQExvhR3UQKLCFCHv+QzR46Te+VRCj4iXOxPdmJZ6USn/Q4dvnyWVKgDJUOudjURV9zM2dbEXsz11kyLhKOpXdGTKictRhyZv21mjU/Dzkz9MLp+JAzi0+ofPY8afGQ/clGFH0meauu2h5gH3REo86swwx5ZyPdjBec01RWi58lbKgcHiH2TPW1PPbMMcAbi9XYM19GYs8MAtaBtTnuVmPPfCki5xoXM2cJTuCtnPgJFHzDBEQ+gXycwMWxEyAmcKeYMIGfbPr6CTya819OoAgnMDphAj/+XfwEguUnFBwK8AHqFNbyKTTgFGoejJnCWprC2oQp7No4fApjtPg//8On0BVsOqHQDNrODJsBUCmaAmQlTEENPfjYzRGfumafwIZu4e+ovioe3sqHz6ivztTiWwHxGCtkGgS61qqKxLfqWXdEDWfVQy4JZ7x4MMCeqOAvzS10eyGY6KJmQnGsth9FJNxTcDA8lADQ2rZt27Zt27Zt27Zt226/2u5f2+12d2dyZpJMJslTcpOHC95jY2fkMrBNW25cBHyK/e88YC80iHj0y9ozyFrn3K2bIx0PPbHmhJLVB2uM2CF0vMqUZkvmQ++B3HsVDb/Q5tgLXfQ/zuSVKO7f5SiwViNtIdETU6DM9ItB9xTBiOUz4ptjLpUVoDrkEC/rc76UgkQpYwMKFVaqBMVyoGPoCdsLwbaNo+YqQtAam6oZ1i5ZSB543Jowq67AM3UEdp1I9N9giGzh5bcjxIHZ1oAWLkR69Kco9bqenhNqYtDsgs+4W7WidyH5QkR8oZT8A2NJ3TcjC3ek0zRtU2P3/NYkYg4vg8g+FXe8HitvIJo4uqgPdzANG4eqBg/niIFh8g6vGMyNLWCdcTK12jLxjsy99imTXE61iYMqtmZlTS3MwAMNvYbRzKgECcTZCgtyoVqWT6of6SxfWHryuGvHiGIsBWGiVgofxC8G1rtNLtnuIlPJqiB3b+8N92ik2yJJ/GMUb0O4KqbsN4/3dWS65zWbd+uA2H7Is+vR5GEn/duzvFRwlfkp4/dZbG+xg9WRQdJMBpeeoeTNLUnUkLHJtj2UV7D4MJeWQ4LupuyAayAnr9sYk0BekL0DlNglG3nYxXbRFOv1YY5T8HcjjA6JKb9ezhcBv8DaPmL4hj1BRQAEYAn2e0GOamF6Z/4YqWBJSwbmJYAeiaxYx5bomkTnaNM5tFIoAJ1DkLS6/2Sfe9+pYySVWKzbTbUVzWw0Oyeensd1VLU7FyTxuW2Pgblr/oMI/96Z+e2pc9vFl63APmyVod2TJp09xWH7ZG+E/gpggAFdMPzu687SU7IfeUkdHngHmOMnI+tOHT52/YRJ7Vo13ThlOH89zCf5MA759XRQ8kotnl4QPEFQ+dedKvzWheM7ePtF4ETDDV4fBQsZB2L/kHqveFNiLq/PMJW7nP8fbTfY3WTTSwaFu5xnKTPb1M6iPpQ+9kkd/2X/3/CjPlpqv+1bu667jmqDbVaOG/XbaEz31J4mKrftZTqGm55fq+3c3DWSc6wlbyCC0dBRC8IgthqR4vwFi6dIaxbjRAE4P+GQd4k4sfZg+ALTciwWF64i2lgf4taKaPgxQZVOtXpQoFMVTaIhPKJQBvTPizENj+9SwdKF9uL5UAxTUC/2dYkocRI0/W97kuc3tBI0zi0hdkUcQJlFhIE+/QoIATtOBF4oWmx6iVN2f+DMdjncdwD7HzImf44j/poK3E/ycNWQZ4vCVw6eFw/Ho/mUC1ax3nKYRVOZ0mjWHL7yu3/2G9HUerN0vmRuo83PFSfbq6aePd1qN3Heki/agPAVZfKtAogbhErSr3shJjwBDN8zt5Myp1gyFJmtrAN4RSCORJuQbcWOQAm5xwbphDygxNr3HiLIC5oq0GaHvHMnO0mJRjUZyLKTQdar0D/RCrT3gjQzM8tJoPaLQ76B19w/3+0A2c/j/lQTFUMX759HPEZBxWGXK+VScaJOll0q3SJONKCRMKJ24egirG9GG/+oVWmOZKdkMR2wlrozXYOxaR1xYSkwzYgiMTk+D0bNcX4oB8msQUcDkuhPemK7sdrOSBPetbJq1Cg6F/ihxg369VY4OZ7GeXcLownFZWv0/h4gbFiFDuulUp2pajhoN0o8JhVKrok6KsTEj8ZulEfDZfssgTUkSFcLpzyxWBpgPX3oGpsDnD6EkYERab0QiP/o1D7jnaWuOo3M6WTDjFvzFDTA/Sk6IUL8WENBHszvuwfkeEa7K0rJg9L7A/iQMEOf30yajyh9TIfMp3w8cz8SHGO/MLS6OjZ3geMG+fq17k3CxCmpgR86rEz7YAssauBbAdrnxFzTHAD7ecg9kW7P6nguKwrP4mXw1y6CAmXF5B7V0xO+uKVuTLmFxQaSIliJSCqog76Cpm3AhPeM16zTjZ+ch/pVjdsN+vbnBzLfydtAZCZQP8fbQBZs24AdPRdvtusgMDl+mBICb/XR5MF2v1R5MNfjsElSkWkTulW1GiAsBs0GSmycpWFoNUjqdVCkoZf82HLQLJK0Vk2rSlaXXIC83+JDWfGAivHl/WtIoyLzYH2CVDapeumKCrW1+PVE0KbEhUp1EWedBd75ym8/7Vhf3lxVE8B0AMN4eI+D/bTn8RKluoVK8d+YdHlLwRMst7W9NMpLTOWOEdfiWYuFTNGNOCwErKxLou0XqffOceBlAT8JW0EJaFU24fiX0oSKdPoE9XfxrIaBLx9OPPVnBYfjH9RIbRFPlbwarKPo7QePzPuV9IY37Spdap00PGsTyZTCRi2UDlzWcUYAt7oaQHzDh+GT3Y6CGHMaBe/rR8ffhDF8C1SlBtvfhZ3eE1jA17VZAjM4OEkHnQlCS1vSs77QJik4YTCIkppPPWCdlcL/y96GNOAl5/Y3Bo4fubC3eh07CmYGmaVSsB0SFlIl9uc0ilc29oB0Y4xXgZtB5yVopXT9ad84up8FqhOkZ54jwlARvIU6ltxO3RRGEZX8njlawkrHBcMpnR7ezfmoXKqkeGJSts9PPpYXm+0l4RTN/DcbYw4PEm+MIrNb/6GEvhgV48kWX1r5r8+kZYoG30i/1xIFwugaT6r6lKrMZay8m/efTq+KKu2zyrR4SoveDD2+U+cGzPpwqGtj+s3Tuitv/rAbjnPvTiSw3QDgmQFcY4X3ZdB4NBIKfmXHl13vDigqQMDQh8Ham1f3pPyTlUyvDawb6b/23rNfc5uiSKRXQaOny8Od+/aIMqvpNlTJPN11wRu+zvI+g4EHiXZs4/FaQe/ej6BmhpFOjhFG867okWjn141p2TTxbmHTYpdCHnKaIYQYL8GKkcSQAkIs2q1TrWGwN/w1hA+U9Kn2rAVqpztj47vY+0E637u3hJ9YL+8fCGBcSsQMTJsxGaDAxtJPHhjVNRYVfBssJJqtl1ApGcnqvOrq2V3cVjPlSsx8td5ezPSNQGcGOzoiv/ZdXVk9mGPtWuiCai9Llxs+GvLPWQZffbPc8NP0A5A7Wkuuygn0jVtcGyVY8n7oCMGu1xYeRnd909LxE+Xt1NTrdoA0f6jrqQQGHtwb8CEFkM9+jl2X0xSmaGCA/jcXRnSjEF4z0zQ3rgQSkm2tp7WRQn6A4n0s4IJ+OaeEMC6pGyvYhmPijnwXEqe9ZO9LaDlNPE9hra8kl0u0dS2NMCMdsPUgosonVYS8XWAZPCpEA2rQyX7M81xGjrUY+m3jKBR/8vZcWDgzNtZ3psViOKI5uSIrS+zFqtX9AEOUK9saV2b0hXJQACHxq5P6qLQEwrXSQLFMYsm+VmYSuYXp9j4UqswYAAQeThSbTaBkD1RCMz7BGZ/k3h7lHpx9jR6RF4xj9mbv5xN61J5OJHcbt9LqpizbjIg86tpnjzPFvk69penS3I0duhYX54v4Lk2Ah+bveiHEE68dKmD9pX14WSDPkJDkzE83XGQlROoxekdJl0jGp0uZgTe8vXOuPY5Kn3H8D8UiDpD1hWPsaH9R84qe6iV1COYaTHmeiWe+p8MxSMWGSugFseSfq0O6vddqznfH9xyMBg7YSIVW+AG3hGIHlWFxuc2mWnG6PUALYxYg03cE8b08SI6FkHAO2CAiChANlYBN3brIJQ4E/KXh4oNP0aedKHfM5jeike1+DW7m+l+At71qypgRLI4Wt5YSM35ypJAQsZtWm8u2HgsfnrdGvV+xV4Mkk5TuwA8NPRcMAlrQ5aeAyuHHFQ+B76sbAHZ1gUfgFtWEvQtK3IFyEbIvbMtjSIlCdKPReROXE8egrzY4leYWwdAayCz1fBWNvX+K4HC5uGtiIQ+wa2KkwkkreZ8bCUJm9HkKomTcrf+VAOnbxAyi750rjMqkVa0BhqNW1SXaJfjZ/JUkP5uxnIAVmqZmSS7Bzc5gOkdFXvuNpVoCXiL61B/cFOJ7SXsy32HyCqyPF/IegmJ7irzacPvH0lOayg3MVvQktyQy7WZ1q7qkLGyDYgXRcs/MlmSVDaOghvs1Y0vyTKprHonWqRIz9DXkmktCSFQ06YgO0ztMrlux0WHjjaxYaPey8YlmZVG09tH6MQYGOPoNLkd6zGe9wOyGglZ/B0iFS1fwo2FnXm+F/Ua7/8osFw8WiDXj4dRDaztelUHVbNXncq4BJ+fq1CnU6blHMhJsUZkJqYEjU4bDqhx/3en3ZcTJ/L5nexGrM6fxsJU0pmYysLnh7wbKT0EsDUEYadevkEYUr9bIeO9Q6TQyyM/5YNPK5Hb1q3la+ayEQMgJ13PoIyrxtq9guXIRdIigMo5/eebsBP5FghC8R/6WVM3zIbyO4PagU8VC2/kHgRkKPUY8b2/sKAM7skmn6tSCi4CrC98wRs4M1gvW1wijeIqC4PRBsX506BgBBsh382EOX2IEzQUY6fMc+8N/pqPBCwH3dH1bV8sH/hdupugqzQAAYpyixEWRDi81B9C2Esx4cPI92kOqgvG1mVYXkLY6T7RIPKyHfCcPxQb73xcANKBg24eLU/0DAtUdOrHgs338ouTBFwJoxrJXJ01bup4brv0qBDDKaokiMH4VHZ1D5GtlH/z8yMNjWYmGH5+VfNaM1w26Qj2G5VwsBkeBI0wC1mi5OfRLYrfge+5CcXAAwcae4JUGxDcefOuBPXreVyw1wFze6CO5xz2D0Go/Y3S6gbm/3NeVKMMPgtkCCtripyDWpU/EyktKKhsTt9c5aR2iUvqnG623vQ1MK4Tb1oeckHhjEEk+tRbMwYwqRW1s1uaTuIHE2TLgyZUBI3puxIL6ZkoLLrJCqtBuvya5lmmxGpSx57+bMGZSeRdKeEOpDnxKzRE7GkjGoLi69wlPff5ulxnN0G22ydLvl6zltDZvRRrbOShOG7qZ/O6HkiA6KEqxYDWySJ8UM6XA6oKA9gNIE8UPQ/qJYtKB/Y6rJT+WPkzR0C6+G/V1eT8vrcY1jJHb5gF5y++3Q8wO92wkN2+jKptaMW8PlisrlR0A4dcizErgtg8iHIWHB+egQ/xB+tQeBrNe8LsuwL5E/oMUqZ5hfbDebYp0JpsjLpvhbrSwWCK6lGS0fINXHHOoAypBSw5Y3I711e5Fo2sONvtFLmOTX7D+9WlcHW/n/F4zxIYOUHtAmdO24Q571uk50aabK30e9P4zOL8v+/pBEghaewwA3pmzwTxoaLfP8Wozz/pIi7S1cEYkDVvwiwam+wPCB5WIRvALn7stOH9ELpcetGBHsuLp0hc4pyQrhd4yvwB1pauNNgmjs/RPODC3M7zgwObez2EpD94uTknx+EaUfwqOtIG3kuuAfbJGjfrX4v5ELA0wWBqI1rmIRxhzm+8flwAitcucmoYe670TlwVtTrzv2ybYeCG5cBgj0xvA8GQ3lFLCxsco2wk+FW3xRoldi+sOisDmkEHetm9AQNwMAKBq035hDWNdBziCOzycoNe4luKqFefk3xTNp2rmw1Ec8lz/7pTtsCDqOGnf0K9W4Pd5Dd/piBVbrKoaPpipCr14ErsL13BOtcNBpwse6HDawaF/bp0oOKaPqszE8ZAB/hlskuM/G5uyAx3PA+r4cIHU5n4oK+CKhdydJWXJNXDD5wUvX96+XlRvHMfPUcqVe5gmYH6hdeYc/NPhF4eynNjkAV7AzmIe8AP0/2TLO/uaA7Y67PJ2UF9HZ4ul81o29MkF3E7dsrHozIdywpIg+2IIwdCibMst+I0nZuP5Ju6bY6lvY05bpUcA/6n09wawqGPkBA13TNwOezb4/qgT+Vf80u9iRMescJP6IKV816OHg89j37CganvnE3Ui6AK0LcxrOnT1mRB5V5crO9sngUpb6yGLVtUwxbXN1L84W/YDwcmIRYINC0AgDxPqkJKqx8uOc7S5w64cLxnLLtA+uzH4OHnYsf/e+GOzu2O6oPu2tE3nXYl6nHw8fUCe7+jBQs9wjWKLfkv2KrzeuGbhNcsQASRfUYvv2JdNyhvlUpCf9h8wC9e/0PN6aU9YbcjFrI515dtcZWwFveHGD6eqzKP6M4t0jJlA2m4ewjxqd7G+058I5oe0H4GQmutELdvzb5JVbs9q2O+SCrgpadkH9Qp10nQt4WqlQEKKxg0Slzf6PdAChyubyswnIPSNqf2jIHlUMaLAeaI3msaWPFFbPBidwyIInDT1TvC0I8StJKbsWN+OqxIhQDDGlICnEFvgp3k9j4iW8hyUlmlRRwsPE9jFtOBGeYGCA0bucWMGzOlo0rbMN328KuNJ07bSJovHIrpk0yO/naMPX9Dwm0o9U4pzvQsi/3OGaQC7JnRAxCyQ
+*/

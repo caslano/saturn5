@@ -28,8 +28,8 @@
   #include <sstream>
   #include <stdexcept>
   #include <string>
-  #include <boost/static_assert.hpp>
-  #include <boost/throw_exception.hpp>
+  #include <boost/math/tools/assert.hpp>
+  #include <boost/math/tools/throw_exception.hpp>
 
 //  #if (0)
   #if defined(__GNUC__)
@@ -86,7 +86,7 @@
                                         my_digits,
                                         x);
 
-      if(v < 0) { BOOST_THROW_EXCEPTION(std::runtime_error("Formatting of boost::float128_t failed internally in quadmath_snprintf().")); }
+      if(v < 0) { BOOST_MATH_THROW_EXCEPTION(std::runtime_error("Formatting of boost::float128_t failed internally in quadmath_snprintf().")); }
 
       if(v >= static_cast<int>(sizeof(my_buffer) - 1U))
       {
@@ -106,7 +106,7 @@
         }
         catch(const std::bad_alloc&)
         {
-          BOOST_THROW_EXCEPTION(std::runtime_error("Formatting of boost::float128_t failed while allocating memory."));
+          BOOST_MATH_THROW_EXCEPTION(std::runtime_error("Formatting of boost::float128_t failed while allocating memory."));
         }
 #endif
         const int v2 = ::quadmath_snprintf(my_buffer2,
@@ -117,7 +117,7 @@
 
         if(v2 >= v + 3)
         {
-          BOOST_THROW_EXCEPTION(std::runtime_error("Formatting of boost::float128_t failed."));
+          BOOST_MATH_THROW_EXCEPTION(std::runtime_error("Formatting of boost::float128_t failed."));
         }
 
         static_cast<void>(ostr << my_buffer2);
@@ -152,7 +152,7 @@
 
         is.setstate(ios_base::failbit);
 
-        BOOST_THROW_EXCEPTION(std::runtime_error("Unable to interpret input string as a boost::float128_t"));
+        BOOST_MATH_THROW_EXCEPTION(std::runtime_error("Unable to interpret input string as a boost::float128_t"));
       }
 
       return is;
@@ -160,7 +160,7 @@
   }
 
 //  #elif defined(__GNUC__)
-  #elif defined(BOOST_INTEL)
+  #elif defined(__INTEL_COMPILER)
 
   // The section for I/O stream support for the ICC compiler is particularly
   // long, because these functions must be painstakingly synthesized from
@@ -173,8 +173,7 @@
 
   #include <cstring>
   #include <cctype>
-  #include <boost/lexical_cast.hpp>
-
+  
   namespace boost { namespace math { namespace cstdfloat { namespace detail {
 
   template<class string_type>
@@ -331,7 +330,8 @@
       }
 
       str.append(1U, 'e');
-      string_type e = boost::lexical_cast<string_type>(std::abs(my_exp));
+
+      string_type e = std::to_string(std::abs(my_exp));
 
       if(e.size() < 2U)
       {
@@ -576,12 +576,12 @@
     bool is_neg       = false;
     bool is_neg_expon = false;
 
-    BOOST_CONSTEXPR_OR_CONST int ten = 10;
+    constexpr int ten = 10;
 
     int expon       = 0;
     int digits_seen = 0;
 
-    BOOST_CONSTEXPR_OR_CONST int max_digits = std::numeric_limits<float_type>::max_digits10 + 1;
+    constexpr int max_digits = std::numeric_limits<float_type>::max_digits10 + 1;
 
     if(*p == static_cast<char>('+'))
     {
@@ -760,15 +760,19 @@
 
         is.setstate(ios_base::failbit);
 
-        BOOST_THROW_EXCEPTION(std::runtime_error("Unable to interpret input string as a boost::float128_t"));
+        BOOST_MATH_THROW_EXCEPTION(std::runtime_error("Unable to interpret input string as a boost::float128_t"));
       }
 
       return is;
     }
   }
 
-  #endif // Use __GNUC__ or BOOST_INTEL libquadmath
+  #endif // Use __GNUC__ or __INTEL_COMPILER libquadmath
 
   #endif // Not BOOST_CSTDFLOAT_NO_LIBQUADMATH_SUPPORT (i.e., the user would like to have libquadmath support)
 
 #endif // BOOST_MATH_CSTDFLOAT_IOSTREAM_2014_02_15_HPP_
+
+/* cstdfloat_iostream.hpp
+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
+*/

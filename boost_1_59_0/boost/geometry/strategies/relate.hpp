@@ -1,177 +1,25 @@
 // Boost.Geometry
 
-// Copyright (c) 2017, Oracle and/or its affiliates.
+// Copyright (c) 2020, Oracle and/or its affiliates.
+
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
-// Use, modification and distribution is subject to the Boost Software License,
-// Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
+// Licensed under the Boost Software License version 1.0.
+// http://www.boost.org/users/license.html
 
 #ifndef BOOST_GEOMETRY_STRATEGIES_RELATE_HPP
 #define BOOST_GEOMETRY_STRATEGIES_RELATE_HPP
 
 
-#include <boost/mpl/assert.hpp>
-#include <boost/type_traits/is_same.hpp>
-
-#include <boost/geometry/core/cs.hpp>
-#include <boost/geometry/core/point_type.hpp>
-#include <boost/geometry/core/topological_dimension.hpp>
-
-#include <boost/geometry/strategies/covered_by.hpp>
-#include <boost/geometry/strategies/intersection.hpp>
-#include <boost/geometry/strategies/within.hpp>
+#include <boost/config/pragma_message.hpp>
+BOOST_PRAGMA_MESSAGE("This include file is deprecated and will be removed in the future.")
 
 
-namespace boost { namespace geometry
-{
-
-namespace strategy
-{
-    
-namespace point_in_geometry
-{
-
-#ifndef DOXYGEN_NO_STRATEGY_SPECIALIZATIONS
-namespace services
-{
-
-template
-<
-    typename Point,
-    typename Geometry,
-    typename Tag1 = typename tag<Point>::type,
-    typename Tag2 = typename tag<Geometry>::type
->
-struct default_strategy
-    : strategy::within::services::default_strategy
-        <
-            Point,
-            Geometry
-        >
-{
-    typedef typename default_strategy::type within_strategy_type;
-
-    typedef typename strategy::covered_by::services::default_strategy
-        <
-            Point,
-            Geometry
-        >::type covered_by_strategy_type;
-
-    static const bool same_strategies = boost::is_same<within_strategy_type, covered_by_strategy_type>::value;
-    BOOST_MPL_ASSERT_MSG((same_strategies),
-                         DEFAULT_WITHIN_AND_COVERED_BY_STRATEGIES_NOT_COMPATIBLE,
-                         (within_strategy_type, covered_by_strategy_type));
-};
-
-template<typename Point, typename Geometry>
-struct default_strategy<Point, Geometry, point_tag, point_tag>
-    : strategy::within::services::default_strategy<Point, Geometry>
-{};
-
-template<typename Point, typename Geometry>
-struct default_strategy<Point, Geometry, point_tag, multi_point_tag>
-    : strategy::within::services::default_strategy<Point, Geometry>
-{};
-
-
-} // namespace services
-#endif // DOXYGEN_NO_STRATEGY_SPECIALIZATIONS
-
-
-} // namespace point_in_geometry
-
-namespace relate
-{
-
-#ifndef DOXYGEN_NO_DETAIL
-namespace detail
-{
-
-template <typename Geometry>
-struct default_intersection_strategy
-    : strategy::intersection::services::default_strategy
-        <
-            typename cs_tag<Geometry>::type
-        >
-{};
-
-template <typename PointLike, typename Geometry>
-struct default_point_in_geometry_strategy
-    : point_in_geometry::services::default_strategy
-        <
-            typename point_type<PointLike>::type,
-            Geometry
-        >
-{};
-
-} // namespace detail
-#endif // DOXYGEN_NO_DETAIL
-
-#ifndef DOXYGEN_NO_STRATEGY_SPECIALIZATIONS
-namespace services
-{
-
-template
-<
-    typename Geometry1,
-    typename Geometry2,
-    int TopDim1 = geometry::topological_dimension<Geometry1>::value,
-    int TopDim2 = geometry::topological_dimension<Geometry2>::value
->
-struct default_strategy
-{
-    BOOST_MPL_ASSERT_MSG
-    (
-        false, NOT_IMPLEMENTED_FOR_THESE_TYPES
-        , (types<Geometry1, Geometry2>)
-    );
-};
-
-template <typename PointLike1, typename PointLike2>
-struct default_strategy<PointLike1, PointLike2, 0, 0>
-    : detail::default_point_in_geometry_strategy<PointLike1, PointLike2>
-{};
-
-template <typename PointLike, typename Geometry, int TopDim2>
-struct default_strategy<PointLike, Geometry, 0, TopDim2>
-    : detail::default_point_in_geometry_strategy<PointLike, Geometry>
-{};
-
-template <typename Geometry, typename PointLike, int TopDim1>
-struct default_strategy<Geometry, PointLike, TopDim1, 0>
-    : detail::default_point_in_geometry_strategy<PointLike, Geometry>
-{};
-
-template <typename Geometry1, typename Geometry2>
-struct default_strategy<Geometry1, Geometry2, 1, 1>
-    : detail::default_intersection_strategy<Geometry1>
-{};
-
-template <typename Geometry1, typename Geometry2>
-struct default_strategy<Geometry1, Geometry2, 1, 2>
-    : detail::default_intersection_strategy<Geometry1>
-{};
-
-template <typename Geometry1, typename Geometry2>
-struct default_strategy<Geometry1, Geometry2, 2, 1>
-    : detail::default_intersection_strategy<Geometry1>
-{};
-
-template <typename Geometry1, typename Geometry2>
-struct default_strategy<Geometry1, Geometry2, 2, 2>
-    : detail::default_intersection_strategy<Geometry1>
-{};
-
-} // namespace services
-#endif // DOXYGEN_NO_STRATEGY_SPECIALIZATIONS
-
-} // namespace relate
-
-} // namespace strategy
-
-
-}} // namespace boost::geometry
+#include <boost/geometry/strategy/relate.hpp>
 
 
 #endif // BOOST_GEOMETRY_STRATEGIES_RELATE_HPP
+
+/* relate.hpp
+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
+*/

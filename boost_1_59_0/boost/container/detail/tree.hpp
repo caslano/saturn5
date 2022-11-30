@@ -52,6 +52,7 @@
 #include <boost/move/detail/fwd_macros.hpp>
 #endif
 #include <boost/move/detail/move_helpers.hpp>
+#include <boost/move/detail/force_ptr.hpp>
 // other
 #include <boost/core/no_exceptions_support.hpp>
 
@@ -120,104 +121,9 @@ struct tree_internal_data_type< std::pair<T1, T2> >
    typedef pair<typename boost::move_detail::remove_const<T1>::type, T2> type;
 };
 
-//The node to be store in the tree
 template <class T, class VoidPointer, boost::container::tree_type_enum tree_type_value, bool OptimizeSize>
-struct tree_node
-   :  public intrusive_tree_hook<VoidPointer, tree_type_value, OptimizeSize>::type
+struct iiterator_node_value_type< base_node<T, intrusive_tree_hook<VoidPointer, tree_type_value, OptimizeSize> > >
 {
-   public:
-   typedef typename intrusive_tree_hook
-      <VoidPointer, tree_type_value, OptimizeSize>::type hook_type;
-   typedef T value_type;
-   typedef typename tree_internal_data_type<T>::type     internal_type;
-
-   typedef tree_node< T, VoidPointer
-                    , tree_type_value, OptimizeSize>     node_t;
-
-   typedef typename boost::container::dtl::aligned_storage
-      <sizeof(T), boost::container::dtl::alignment_of<T>::value>::type storage_t;
-   storage_t m_storage;
-
-   #if defined(BOOST_GCC) && (BOOST_GCC >= 40600) && (BOOST_GCC < 80000)
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-      #define BOOST_CONTAINER_DISABLE_ALIASING_WARNING
-   #  endif
-
-   BOOST_CONTAINER_FORCEINLINE T &get_data()
-   {  return *reinterpret_cast<T*>(this->m_storage.data);   }
-
-   BOOST_CONTAINER_FORCEINLINE const T &get_data() const
-   {  return *reinterpret_cast<const T*>(this->m_storage.data);  }
-
-   BOOST_CONTAINER_FORCEINLINE T *get_data_ptr()
-   {  return reinterpret_cast<T*>(this->m_storage.data);  }
-
-   BOOST_CONTAINER_FORCEINLINE const T *get_data_ptr() const
-   {  return reinterpret_cast<T*>(this->m_storage.data);  }
-
-   BOOST_CONTAINER_FORCEINLINE internal_type &get_real_data()
-   {  return *reinterpret_cast<internal_type*>(this->m_storage.data);   }
-
-   BOOST_CONTAINER_FORCEINLINE const internal_type &get_real_data() const
-   {  return *reinterpret_cast<const internal_type*>(this->m_storage.data);  }
-
-   BOOST_CONTAINER_FORCEINLINE internal_type *get_real_data_ptr()
-   {  return reinterpret_cast<internal_type*>(this->m_storage.data);  }
-
-   BOOST_CONTAINER_FORCEINLINE const internal_type *get_real_data_ptr() const
-   {  return reinterpret_cast<internal_type*>(this->m_storage.data);  }
-
-   BOOST_CONTAINER_FORCEINLINE ~tree_node()
-   {  reinterpret_cast<internal_type*>(this->m_storage.data)->~internal_type();  }
-
-   #if defined(BOOST_CONTAINER_DISABLE_ALIASING_WARNING)
-      #pragma GCC diagnostic pop
-      #undef BOOST_CONTAINER_DISABLE_ALIASING_WARNING
-   #  endif
-
-   BOOST_CONTAINER_FORCEINLINE void destroy_header()
-   {  static_cast<hook_type*>(this)->~hook_type();  }
-
-   template<class T1, class T2>
-   BOOST_CONTAINER_FORCEINLINE void do_assign(const std::pair<const T1, T2> &p)
-   {
-      const_cast<T1&>(this->get_real_data().first) = p.first;
-      this->get_real_data().second  = p.second;
-   }
-
-   template<class T1, class T2>
-   BOOST_CONTAINER_FORCEINLINE void do_assign(const pair<const T1, T2> &p)
-   {
-      const_cast<T1&>(this->get_real_data().first) = p.first;
-      this->get_real_data().second  = p.second;
-   }
-
-   template<class V>
-   BOOST_CONTAINER_FORCEINLINE void do_assign(const V &v)
-   {  this->get_real_data() = v; }
-
-   template<class T1, class T2>
-   BOOST_CONTAINER_FORCEINLINE void do_move_assign(std::pair<const T1, T2> &p)
-   {
-      const_cast<T1&>(this->get_real_data().first) = ::boost::move(p.first);
-      this->get_real_data().second = ::boost::move(p.second);
-   }
-
-   template<class T1, class T2>
-   BOOST_CONTAINER_FORCEINLINE void do_move_assign(pair<const T1, T2> &p)
-   {
-      const_cast<T1&>(this->get_real_data().first) = ::boost::move(p.first);
-      this->get_real_data().second  = ::boost::move(p.second);
-   }
-
-   template<class V>
-   BOOST_CONTAINER_FORCEINLINE void do_move_assign(V &v)
-   {  this->get_real_data() = ::boost::move(v); }
-};
-
-template <class T, class VoidPointer, boost::container::tree_type_enum tree_type_value, bool OptimizeSize>
-struct iiterator_node_value_type< tree_node<T, VoidPointer, tree_type_value, OptimizeSize> > {
   typedef T type;
 };
 
@@ -320,9 +226,8 @@ struct intrusive_tree_type
       allocator_traits<Allocator>::void_pointer            void_pointer;
    typedef typename boost::container::
       allocator_traits<Allocator>::size_type               size_type;
-   typedef typename dtl::tree_node
-         < value_type, void_pointer
-         , tree_type_value, OptimizeSize>                   node_t;
+   typedef base_node<value_type, intrusive_tree_hook
+      <void_pointer, tree_type_value, OptimizeSize> >        node_t;
    typedef value_to_node_compare
       <node_t, ValueCompare>                                node_compare_type;
    //Deducing the hook type from node_t (e.g. node_t::hook_type) would
@@ -387,13 +292,14 @@ class RecyclingCloner
       :  m_holder(holder), m_icont(itree)
    {}
 
-   BOOST_CONTAINER_FORCEINLINE static void do_assign(node_ptr_type &p, const node_t &other, bool_<true>)
-   {  p->do_move_assign(const_cast<node_t &>(other).get_real_data());   }
+   BOOST_CONTAINER_FORCEINLINE static void do_assign(node_ptr_type p, node_t &other, bool_<true>)
+   {  p->do_move_assign(other.get_real_data());   }
 
-   BOOST_CONTAINER_FORCEINLINE static void do_assign(node_ptr_type &p, const node_t &other, bool_<false>)
+   BOOST_CONTAINER_FORCEINLINE static void do_assign(node_ptr_type p, const node_t &other, bool_<false>)
    {  p->do_assign(other.get_real_data());   }
 
-   node_ptr_type operator()(const node_t &other) const
+   node_ptr_type operator()
+      (typename dtl::if_c<DoMove, node_t &, const node_t&>::type other) const
    {
       if(node_ptr_type p = m_icont.unlink_leftmost_without_rebalance()){
          //First recycle a node (this can't throw)
@@ -413,7 +319,7 @@ class RecyclingCloner
          BOOST_CATCH_END
       }
       else{
-         return m_holder.create_node(other.get_real_data());
+         return m_holder.create_node(boost::move(other.get_real_data()));
       }
    }
 
@@ -438,7 +344,7 @@ struct key_node_compare
 
    template <class T, class VoidPointer, boost::container::tree_type_enum tree_type_value, bool OptimizeSize>
    BOOST_CONTAINER_FORCEINLINE static const key_type &
-      key_from(const tree_node<T, VoidPointer, tree_type_value, OptimizeSize> &n)
+      key_from(const base_node<T, intrusive_tree_hook<VoidPointer, tree_type_value, OptimizeSize> > &n)
    {
       return key_of_value()(n.get_data());
    }
@@ -503,7 +409,7 @@ struct real_key_of_value<std::pair<T1, T2>, int>
 };
 
 template<class T1, class T2>
-struct real_key_of_value<boost::container::pair<T1, T2>, int>
+struct real_key_of_value<boost::container::dtl::pair<T1, T2>, int>
 {
    typedef dtl::select1st<T1> type;
 };
@@ -550,7 +456,7 @@ class tree
    typedef typename AllocHolder::Node                       Node;
    typedef typename Icont::iterator                         iiterator;
    typedef typename Icont::const_iterator                   iconst_iterator;
-   typedef dtl::allocator_destroyer<NodeAlloc> Destroyer;
+   typedef dtl::allocator_node_destroyer<NodeAlloc> Destroyer;
    typedef typename AllocHolder::alloc_version              alloc_version;
    typedef intrusive_tree_proxy<options_type::tree_type>    intrusive_tree_proxy_t;
 
@@ -669,7 +575,7 @@ class tree
       if(unique_insertion){
          const const_iterator end_it(this->cend());
          for ( ; first != last; ++first){
-            this->insert_unique_convertible(end_it, *first);
+            this->insert_unique_hint_convertible(end_it, *first);
          }
       }
       else{
@@ -693,7 +599,7 @@ class tree
       //for the constructor
       const const_iterator end_it(this->cend());
       for ( ; first != last; ++first){
-         this->insert_equal_convertible(end_it, *first);
+         this->insert_equal_hint_convertible(end_it, *first);
       }
    }
 
@@ -710,7 +616,7 @@ class tree
    {
       //Optimized allocation and construction
       this->allocate_many_and_construct
-         ( first, boost::container::iterator_distance(first, last)
+         ( first, boost::container::iterator_udistance(first, last)
          , insert_equal_end_hint_functor<Node, Icont>(this->icont()));
    }
 
@@ -727,7 +633,7 @@ class tree
    {
       //Optimized allocation and construction
       this->allocate_many_and_construct
-         ( first, boost::container::iterator_distance(first, last)
+         ( first, boost::container::iterator_udistance(first, last)
          , dtl::push_back_functor<Node, Icont>(this->icont()));
       //AllocHolder clears in case of exception
    }
@@ -863,43 +769,57 @@ class tree
 
    public:
    // accessors:
-   BOOST_CONTAINER_FORCEINLINE value_compare value_comp() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      value_compare value_comp() const
    {  return this->icont().value_comp().predicate(); }
 
-   BOOST_CONTAINER_FORCEINLINE key_compare key_comp() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      key_compare key_comp() const
    {  return this->icont().value_comp().predicate().key_comp(); }
 
-   BOOST_CONTAINER_FORCEINLINE allocator_type get_allocator() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      allocator_type get_allocator() const
    {  return allocator_type(this->node_alloc()); }
 
-   BOOST_CONTAINER_FORCEINLINE const stored_allocator_type &get_stored_allocator() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const stored_allocator_type &get_stored_allocator() const
    {  return this->node_alloc(); }
 
-   BOOST_CONTAINER_FORCEINLINE stored_allocator_type &get_stored_allocator()
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      stored_allocator_type &get_stored_allocator()
    {  return this->node_alloc(); }
 
-   BOOST_CONTAINER_FORCEINLINE iterator begin()
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      iterator begin()
    { return iterator(this->icont().begin()); }
 
-   BOOST_CONTAINER_FORCEINLINE const_iterator begin() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator begin() const
    {  return this->cbegin();  }
 
-   BOOST_CONTAINER_FORCEINLINE iterator end()
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      iterator end()
    {  return iterator(this->icont().end());  }
 
-   BOOST_CONTAINER_FORCEINLINE const_iterator end() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator end() const
    {  return this->cend();  }
 
-   BOOST_CONTAINER_FORCEINLINE reverse_iterator rbegin()
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      reverse_iterator rbegin()
    {  return reverse_iterator(end());  }
 
-   BOOST_CONTAINER_FORCEINLINE const_reverse_iterator rbegin() const
+   
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reverse_iterator rbegin() const
    {  return this->crbegin();  }
 
-   BOOST_CONTAINER_FORCEINLINE reverse_iterator rend()
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      reverse_iterator rend()
    {  return reverse_iterator(begin());   }
 
-   BOOST_CONTAINER_FORCEINLINE const_reverse_iterator rend() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reverse_iterator rend() const
    {  return this->crend();   }
 
    //! <b>Effects</b>: Returns a const_iterator to the first element contained in the container.
@@ -907,7 +827,8 @@ class tree
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   BOOST_CONTAINER_FORCEINLINE const_iterator cbegin() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator cbegin() const
    { return const_iterator(this->non_const_icont().begin()); }
 
    //! <b>Effects</b>: Returns a const_iterator to the end of the container.
@@ -915,7 +836,8 @@ class tree
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   BOOST_CONTAINER_FORCEINLINE const_iterator cend() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator cend() const
    { return const_iterator(this->non_const_icont().end()); }
 
    //! <b>Effects</b>: Returns a const_reverse_iterator pointing to the beginning
@@ -924,7 +846,8 @@ class tree
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   BOOST_CONTAINER_FORCEINLINE const_reverse_iterator crbegin() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reverse_iterator crbegin() const
    { return const_reverse_iterator(cend()); }
 
    //! <b>Effects</b>: Returns a const_reverse_iterator pointing to the end
@@ -933,16 +856,20 @@ class tree
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   BOOST_CONTAINER_FORCEINLINE const_reverse_iterator crend() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reverse_iterator crend() const
    { return const_reverse_iterator(cbegin()); }
 
-   BOOST_CONTAINER_FORCEINLINE bool empty() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      bool empty() const
    {  return !this->size();  }
 
-   BOOST_CONTAINER_FORCEINLINE size_type size() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      size_type size() const
    {  return this->icont().size();   }
 
-   BOOST_CONTAINER_FORCEINLINE size_type max_size() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      size_type max_size() const
    {  return AllocHolder::max_size();  }
 
    BOOST_CONTAINER_FORCEINLINE void swap(ThisType& x)
@@ -977,14 +904,14 @@ class tree
       (BOOST_FWD_REF(MovableConvertible) v, insert_commit_data &data)
    {
       NodePtr tmp = AllocHolder::create_node(boost::forward<MovableConvertible>(v));
-      scoped_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());
+      scoped_node_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());
       iterator ret(this->icont().insert_unique_commit(*tmp, data));
       destroy_deallocator.release();
       return ret;
    }
 
    template<class MovableConvertible>
-   std::pair<iterator,bool> insert_unique(BOOST_FWD_REF(MovableConvertible) v)
+   std::pair<iterator,bool> insert_unique_convertible(BOOST_FWD_REF(MovableConvertible) v)
    {
       insert_commit_data data;
       std::pair<iterator,bool> ret =
@@ -995,6 +922,19 @@ class tree
       return ret;
    }
 
+   template<class MovableConvertible>
+   iterator insert_unique_hint_convertible(const_iterator hint, BOOST_FWD_REF(MovableConvertible) v)
+   {
+      BOOST_ASSERT((priv_is_linked)(hint));
+      insert_commit_data data;
+      std::pair<iterator,bool> ret =
+         this->insert_unique_check(hint, key_of_value_t()(v), data);
+      if(!ret.second)
+         return ret.first;
+      return this->insert_unique_commit(boost::forward<MovableConvertible>(v), data);
+   }
+
+
    private:
 
    template<class KeyConvertible, class M>
@@ -1002,7 +942,7 @@ class tree
       (BOOST_FWD_REF(KeyConvertible) key, BOOST_FWD_REF(M) obj, insert_commit_data &data)
    {
       NodePtr tmp = AllocHolder::create_node(boost::forward<KeyConvertible>(key), boost::forward<M>(obj));
-      scoped_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());
+      scoped_node_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());
       iiterator ret(this->icont().insert_unique_commit(*tmp, data));
       destroy_deallocator.release();
       return ret;
@@ -1025,11 +965,11 @@ class tree
       this->icont().push_back(*tmp);
    }
 
-   std::pair<iterator, bool> emplace_unique_impl(NodePtr p)
+   std::pair<iterator, bool> emplace_unique_node(NodePtr p)
    {
       value_type &v = p->get_data();
       insert_commit_data data;
-      scoped_destroy_deallocator<NodeAlloc> destroy_deallocator(p, this->node_alloc());
+      scoped_node_destroy_deallocator<NodeAlloc> destroy_deallocator(p, this->node_alloc());
       std::pair<iterator,bool> ret =
          this->insert_unique_check(key_of_value_t()(v), data);
       if(!ret.second){
@@ -1042,7 +982,7 @@ class tree
          , true );
    }
 
-   iterator emplace_unique_hint_impl(const_iterator hint, NodePtr p)
+   iterator emplace_hint_unique_node(const_iterator hint, NodePtr p)
    {
       BOOST_ASSERT((priv_is_linked)(hint));
       value_type &v = p->get_data();
@@ -1050,6 +990,7 @@ class tree
       std::pair<iterator,bool> ret =
          this->insert_unique_check(hint, key_of_value_t()(v), data);
       if(!ret.second){
+         //Destroy unneeded node
          Destroyer(this->node_alloc())(p);
          return ret.first;
       }
@@ -1062,17 +1003,17 @@ class tree
 
    template <class... Args>
    BOOST_CONTAINER_FORCEINLINE std::pair<iterator, bool> emplace_unique(BOOST_FWD_REF(Args)... args)
-   {  return this->emplace_unique_impl(AllocHolder::create_node(boost::forward<Args>(args)...));   }
+   {  return this->emplace_unique_node(AllocHolder::create_node(boost::forward<Args>(args)...));   }
 
    template <class... Args>
    BOOST_CONTAINER_FORCEINLINE iterator emplace_hint_unique(const_iterator hint, BOOST_FWD_REF(Args)... args)
-   {  return this->emplace_unique_hint_impl(hint, AllocHolder::create_node(boost::forward<Args>(args)...));   }
+   {  return this->emplace_hint_unique_node(hint, AllocHolder::create_node(boost::forward<Args>(args)...));   }
 
    template <class... Args>
    iterator emplace_equal(BOOST_FWD_REF(Args)... args)
    {
       NodePtr tmp(AllocHolder::create_node(boost::forward<Args>(args)...));
-      scoped_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());
+      scoped_node_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());
       iterator ret(this->icont().insert_equal(this->icont().end(), *tmp));
       destroy_deallocator.release();
       return ret;
@@ -1083,7 +1024,7 @@ class tree
    {
       BOOST_ASSERT((priv_is_linked)(hint));
       NodePtr tmp(AllocHolder::create_node(boost::forward<Args>(args)...));
-      scoped_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());
+      scoped_node_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());
       iterator ret(this->icont().insert_equal(hint.get(), *tmp));
       destroy_deallocator.release();
       return ret;
@@ -1110,17 +1051,17 @@ class tree
    #define BOOST_CONTAINER_TREE_EMPLACE_CODE(N) \
    BOOST_MOVE_TMPL_LT##N BOOST_MOVE_CLASS##N BOOST_MOVE_GT##N \
    std::pair<iterator, bool> emplace_unique(BOOST_MOVE_UREF##N)\
-   {  return this->emplace_unique_impl(AllocHolder::create_node(BOOST_MOVE_FWD##N));  }\
+   {  return this->emplace_unique_node(AllocHolder::create_node(BOOST_MOVE_FWD##N));  }\
    \
    BOOST_MOVE_TMPL_LT##N BOOST_MOVE_CLASS##N BOOST_MOVE_GT##N \
    iterator emplace_hint_unique(const_iterator hint BOOST_MOVE_I##N BOOST_MOVE_UREF##N)\
-   {  return this->emplace_unique_hint_impl(hint, AllocHolder::create_node(BOOST_MOVE_FWD##N)); }\
+   {  return this->emplace_hint_unique_node(hint, AllocHolder::create_node(BOOST_MOVE_FWD##N)); }\
    \
    BOOST_MOVE_TMPL_LT##N BOOST_MOVE_CLASS##N BOOST_MOVE_GT##N \
    iterator emplace_equal(BOOST_MOVE_UREF##N)\
    {\
       NodePtr tmp(AllocHolder::create_node(BOOST_MOVE_FWD##N));\
-      scoped_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());\
+      scoped_node_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());\
       iterator ret(this->icont().insert_equal(this->icont().end(), *tmp));\
       destroy_deallocator.release();\
       return ret;\
@@ -1131,7 +1072,7 @@ class tree
    {\
       BOOST_ASSERT((priv_is_linked)(hint));\
       NodePtr tmp(AllocHolder::create_node(BOOST_MOVE_FWD##N));\
-      scoped_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());\
+      scoped_node_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());\
       iterator ret(this->icont().insert_equal(hint.get(), *tmp));\
       destroy_deallocator.release();\
       return ret;\
@@ -1158,64 +1099,44 @@ class tree
 
    #endif   // !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES)
 
-   template<class MovableConvertible>
-   iterator insert_unique_convertible(const_iterator hint, BOOST_FWD_REF(MovableConvertible) v)
-   {
-      BOOST_ASSERT((priv_is_linked)(hint));
-      insert_commit_data data;
-      std::pair<iterator,bool> ret =
-         this->insert_unique_check(hint, key_of_value_t()(v), data);
-      if(!ret.second)
-         return ret.first;
-      return this->insert_unique_commit(boost::forward<MovableConvertible>(v), data);
-   }
-
-   BOOST_MOVE_CONVERSION_AWARE_CATCH_1ARG(insert_unique, value_type, iterator, this->insert_unique_convertible, const_iterator, const_iterator)
+   //BOOST_MOVE_CONVERSION_AWARE_CATCH_1ARG(insert_unique, value_type, iterator, this->insert_unique_hint_convertible, const_iterator, const_iterator)
 
    template <class InputIterator>
-   void insert_unique(InputIterator first, InputIterator last)
+   void insert_unique_range(InputIterator first, InputIterator last)
    {
       for( ; first != last; ++first)
-         this->insert_unique(*first);
-   }
-
-   iterator insert_equal(const value_type& v)
-   {
-      NodePtr tmp(AllocHolder::create_node(v));
-      scoped_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());
-      iterator ret(this->icont().insert_equal(this->icont().end(), *tmp));
-      destroy_deallocator.release();
-      return ret;
+         this->insert_unique_convertible(*first);
    }
 
    template<class MovableConvertible>
-   iterator insert_equal(BOOST_FWD_REF(MovableConvertible) v)
+   iterator insert_equal_convertible(BOOST_FWD_REF(MovableConvertible) v)
    {
       NodePtr tmp(AllocHolder::create_node(boost::forward<MovableConvertible>(v)));
-      scoped_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());
+      scoped_node_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());
       iterator ret(this->icont().insert_equal(this->icont().end(), *tmp));
       destroy_deallocator.release();
       return ret;
    }
 
    template<class MovableConvertible>
-   iterator insert_equal_convertible(const_iterator hint, BOOST_FWD_REF(MovableConvertible) v)
+   iterator insert_equal_hint_convertible(const_iterator hint, BOOST_FWD_REF(MovableConvertible) v)
    {
       BOOST_ASSERT((priv_is_linked)(hint));
       NodePtr tmp(AllocHolder::create_node(boost::forward<MovableConvertible>(v)));
-      scoped_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());
+      scoped_node_destroy_deallocator<NodeAlloc> destroy_deallocator(tmp, this->node_alloc());
       iterator ret(this->icont().insert_equal(hint.get(), *tmp));
       destroy_deallocator.release();
       return ret;
    }
 
-   BOOST_MOVE_CONVERSION_AWARE_CATCH_1ARG(insert_equal, value_type, iterator, this->insert_equal_convertible, const_iterator, const_iterator)
+   BOOST_MOVE_CONVERSION_AWARE_CATCH_1ARG
+      (insert_equal, value_type, iterator, this->insert_equal_hint_convertible, const_iterator, const_iterator)
 
    template <class InputIterator>
-   void insert_equal(InputIterator first, InputIterator last)
+   void insert_equal_range(InputIterator first, InputIterator last)
    {
       for( ; first != last; ++first)
-         this->insert_equal(*first);
+         this->insert_equal_convertible(*first);
    }
 
    template<class KeyType, class M>
@@ -1243,6 +1164,15 @@ class tree
 
    BOOST_CONTAINER_FORCEINLINE size_type erase(const key_type& k)
    {  return AllocHolder::erase_key(k, KeyNodeCompare(key_comp()), alloc_version()); }
+
+   size_type erase_unique(const key_type& k)
+   {
+      iterator i = this->find(k);
+      size_type ret = static_cast<size_type>(i != this->end());
+      if (ret)
+         this->erase(i);
+      return ret;
+   }
 
    iterator erase(const_iterator first, const_iterator last)
    {
@@ -1330,86 +1260,96 @@ class tree
 
    // search operations. Const and non-const overloads even if no iterator is returned
    // so splay implementations can to their rebalancing when searching in non-const versions
-   BOOST_CONTAINER_FORCEINLINE iterator find(const key_type& k)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      iterator find(const key_type& k)
    {  return iterator(this->icont().find(k, KeyNodeCompare(key_comp())));  }
 
-   BOOST_CONTAINER_FORCEINLINE const_iterator find(const key_type& k) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator find(const key_type& k) const
    {  return const_iterator(this->non_const_icont().find(k, KeyNodeCompare(key_comp())));  }
 
    template <class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K, iterator>::type
          find(const K& k)
    {  return iterator(this->icont().find(k, KeyNodeCompare(key_comp())));  }
 
    template <class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K, const_iterator>::type
          find(const K& k) const
    {  return const_iterator(this->non_const_icont().find(k, KeyNodeCompare(key_comp())));  }
 
-   BOOST_CONTAINER_FORCEINLINE size_type count(const key_type& k) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      size_type count(const key_type& k) const
    {  return size_type(this->icont().count(k, KeyNodeCompare(key_comp()))); }
 
    template <class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K, size_type>::type
          count(const K& k) const
    {  return size_type(this->icont().count(k, KeyNodeCompare(key_comp()))); }
 
-   BOOST_CONTAINER_FORCEINLINE bool contains(const key_type& x) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      bool contains(const key_type& x) const
    {  return this->find(x) != this->cend();  }
 
    template<typename K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K, bool>::type
          contains(const K& x) const
    {  return this->find(x) != this->cend();  }
 
-   BOOST_CONTAINER_FORCEINLINE iterator lower_bound(const key_type& k)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      iterator lower_bound(const key_type& k)
    {  return iterator(this->icont().lower_bound(k, KeyNodeCompare(key_comp())));  }
 
-   BOOST_CONTAINER_FORCEINLINE const_iterator lower_bound(const key_type& k) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator lower_bound(const key_type& k) const
    {  return const_iterator(this->non_const_icont().lower_bound(k, KeyNodeCompare(key_comp())));  }
 
    template <class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K, iterator>::type
          lower_bound(const K& k)
    {  return iterator(this->icont().lower_bound(k, KeyNodeCompare(key_comp())));  }
 
    template <class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K, const_iterator>::type
          lower_bound(const K& k) const
    {  return const_iterator(this->non_const_icont().lower_bound(k, KeyNodeCompare(key_comp())));  }
 
-   BOOST_CONTAINER_FORCEINLINE iterator upper_bound(const key_type& k)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      iterator upper_bound(const key_type& k)
    {  return iterator(this->icont().upper_bound(k, KeyNodeCompare(key_comp())));   }
 
-   BOOST_CONTAINER_FORCEINLINE const_iterator upper_bound(const key_type& k) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator upper_bound(const key_type& k) const
    {  return const_iterator(this->non_const_icont().upper_bound(k, KeyNodeCompare(key_comp())));  }
 
    template <class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K, iterator>::type
          upper_bound(const K& k)
    {  return iterator(this->icont().upper_bound(k, KeyNodeCompare(key_comp())));   }
 
    template <class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K, const_iterator>::type
          upper_bound(const K& k) const
    {  return const_iterator(this->non_const_icont().upper_bound(k, KeyNodeCompare(key_comp())));  }
 
-   std::pair<iterator,iterator> equal_range(const key_type& k)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      std::pair<iterator,iterator> equal_range(const key_type& k)
    {
       std::pair<iiterator, iiterator> ret =
          this->icont().equal_range(k, KeyNodeCompare(key_comp()));
       return std::pair<iterator,iterator>(iterator(ret.first), iterator(ret.second));
    }
 
-   std::pair<const_iterator, const_iterator> equal_range(const key_type& k) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      std::pair<const_iterator, const_iterator> equal_range(const key_type& k) const
    {
       std::pair<iiterator, iiterator> ret =
          this->non_const_icont().equal_range(k, KeyNodeCompare(key_comp()));
@@ -1418,7 +1358,7 @@ class tree
    }
 
    template <class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K, std::pair<iterator,iterator> >::type
          equal_range(const K& k)
    {
@@ -1428,7 +1368,7 @@ class tree
    }
 
    template <class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K, std::pair<const_iterator, const_iterator> >::type
          equal_range(const K& k) const
    {
@@ -1438,14 +1378,16 @@ class tree
          (const_iterator(ret.first), const_iterator(ret.second));
    }
 
-   std::pair<iterator,iterator> lower_bound_range(const key_type& k)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      std::pair<iterator,iterator> lower_bound_range(const key_type& k)
    {
       std::pair<iiterator, iiterator> ret =
          this->icont().lower_bound_range(k, KeyNodeCompare(key_comp()));
       return std::pair<iterator,iterator>(iterator(ret.first), iterator(ret.second));
    }
 
-   std::pair<const_iterator, const_iterator> lower_bound_range(const key_type& k) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      std::pair<const_iterator, const_iterator> lower_bound_range(const key_type& k) const
    {
       std::pair<iiterator, iiterator> ret =
          this->non_const_icont().lower_bound_range(k, KeyNodeCompare(key_comp()));
@@ -1454,7 +1396,7 @@ class tree
    }
 
    template <class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K, std::pair<iterator,iterator> >::type
          lower_bound_range(const K& k)
    {
@@ -1464,7 +1406,7 @@ class tree
    }
 
    template <class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K, std::pair<const_iterator, const_iterator> >::type
          lower_bound_range(const K& k) const
    {
@@ -1477,22 +1419,28 @@ class tree
    BOOST_CONTAINER_FORCEINLINE void rebalance()
    {  intrusive_tree_proxy_t::rebalance(this->icont());   }
 
-   BOOST_CONTAINER_FORCEINLINE friend bool operator==(const tree& x, const tree& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator==(const tree& x, const tree& y)
    {  return x.size() == y.size() && ::boost::container::algo_equal(x.begin(), x.end(), y.begin());  }
 
-   BOOST_CONTAINER_FORCEINLINE friend bool operator<(const tree& x, const tree& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator<(const tree& x, const tree& y)
    {  return ::boost::container::algo_lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());  }
 
-   BOOST_CONTAINER_FORCEINLINE friend bool operator!=(const tree& x, const tree& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator!=(const tree& x, const tree& y)
    {  return !(x == y);  }
 
-   BOOST_CONTAINER_FORCEINLINE friend bool operator>(const tree& x, const tree& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator>(const tree& x, const tree& y)
    {  return y < x;  }
 
-   BOOST_CONTAINER_FORCEINLINE friend bool operator<=(const tree& x, const tree& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator<=(const tree& x, const tree& y)
    {  return !(y < x);  }
 
-   BOOST_CONTAINER_FORCEINLINE friend bool operator>=(const tree& x, const tree& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator>=(const tree& x, const tree& y)
    {  return !(x < y);  }
 
    BOOST_CONTAINER_FORCEINLINE friend void swap(tree& x, tree& y)
@@ -1528,3 +1476,7 @@ struct has_trivial_destructor_after_move
 #include <boost/container/detail/config_end.hpp>
 
 #endif //BOOST_CONTAINER_TREE_HPP
+
+/* tree.hpp
+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
+*/

@@ -8,6 +8,9 @@
 #ifndef BOOST_MP_CPP_INT_DIV_HPP
 #define BOOST_MP_CPP_INT_DIV_HPP
 
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
+#include <boost/multiprecision/detail/assert.hpp>
+
 namespace boost { namespace multiprecision { namespace backends {
 
 template <class CppInt1, class CppInt2, class CppInt3>
@@ -61,7 +64,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
    //
    // Find the most significant words of numerator and denominator.
    //
-   limb_type y_order = y.size() - 1;
+   std::size_t y_order = y.size() - 1;
 
    if (y_order == 0)
    {
@@ -77,7 +80,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
    typename CppInt2::const_limb_pointer px = x.limbs();
    typename CppInt3::const_limb_pointer py = y.limbs();
 
-   limb_type r_order = x.size() - 1;
+   std::size_t r_order = x.size() - 1;
    if ((r_order == 0) && (*px == 0))
    {
       // x is zero, so is the result:
@@ -123,7 +126,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
    {
       double_limb_type a = (static_cast<double_limb_type>(px[1]) << CppInt1::limb_bits) | px[0];
       double_limb_type b = y_order ? (static_cast<double_limb_type>(py[1]) << CppInt1::limb_bits) | py[0]
-                  : py[0];
+                                   : py[0];
       if (result)
       {
          *result = a / b;
@@ -142,7 +145,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
    if (result)
    {
       pr = result->limbs();
-      for (unsigned i = 1; i < 1 + r_order - y_order; ++i)
+      for (std::size_t i = 1; i < 1 + r_order - y_order; ++i)
          pr[i] = 0;
    }
    bool first_pass = true;
@@ -172,14 +175,15 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
       {
          double_limb_type a = (static_cast<double_limb_type>(prem[r_order]) << CppInt1::limb_bits) | prem[r_order - 1];
          double_limb_type b = (y_order > 0) ? (static_cast<double_limb_type>(py[y_order]) << CppInt1::limb_bits) | py[y_order - 1] : (static_cast<double_limb_type>(py[y_order]) << CppInt1::limb_bits);
+         BOOST_MP_ASSERT(b);
          double_limb_type v = a / b;
-         guess = static_cast<limb_type>(v);
+         guess              = static_cast<limb_type>(v);
       }
-      BOOST_ASSERT(guess); // If the guess ever gets to zero we go on forever....
+      BOOST_MP_ASSERT(guess); // If the guess ever gets to zero we go on forever....
       //
       // Update result:
       //
-      limb_type shift = r_order - y_order;
+      std::size_t shift = r_order - y_order;
       if (result)
       {
          if (r_neg)
@@ -190,7 +194,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
             {
                t.resize(shift + 1, shift + 1);
                t.limbs()[shift] = guess;
-               for (unsigned i = 0; i < shift; ++i)
+               for (std::size_t i = 0; i < shift; ++i)
                   t.limbs()[i] = 0;
                eval_subtract(*result, t);
             }
@@ -201,7 +205,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
          {
             t.resize(shift + 1, shift + 1);
             t.limbs()[shift] = guess;
-            for (unsigned i = 0; i < shift; ++i)
+            for (std::size_t i = 0; i < shift; ++i)
                t.limbs()[i] = 0;
             eval_add(*result, t);
          }
@@ -214,9 +218,9 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
       t.resize(y.size() + shift + 1, y.size() + shift);
       bool                           truncated_t = (t.size() != y.size() + shift + 1);
       typename CppInt1::limb_pointer pt          = t.limbs();
-      for (unsigned i = 0; i < shift; ++i)
+      for (std::size_t i = 0; i < shift; ++i)
          pt[i] = 0;
-      for (unsigned i = 0; i < y.size(); ++i)
+      for (std::size_t i = 0; i < y.size(); ++i)
       {
          carry += static_cast<double_limb_type>(py[i]) * static_cast<double_limb_type>(guess);
 #ifdef __MSVC_RUNTIME_CHECKS
@@ -249,7 +253,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
          // Simplest way is to get 2^n - r by complementing
          // r, then add t to it.  Note that we can't call eval_complement
          // in case this is a signed checked type:
-         for (unsigned i = 0; i <= r_order; ++i)
+         for (std::size_t i = 0; i <= r_order; ++i)
             r.limbs()[i] = ~prem[i];
          r.normalize();
          eval_increment(r);
@@ -305,7 +309,7 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
          eval_subtract(r, y, r);
    }
 
-   BOOST_ASSERT(r.compare_unsigned(y) < 0); // remainder must be less than the divisor or our code has failed
+   BOOST_MP_ASSERT(r.compare_unsigned(y) < 0); // remainder must be less than the divisor or our code has failed
 }
 
 template <class CppInt1, class CppInt2>
@@ -336,12 +340,12 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
 
    if (y == 0)
    {
-      BOOST_THROW_EXCEPTION(std::overflow_error("Integer Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Integer Division by zero."));
    }
    //
    // Find the most significant word of numerator.
    //
-   limb_type r_order = x.size() - 1;
+   std::size_t r_order = x.size() - 1;
 
    //
    // Set remainder and result to their initial values:
@@ -446,11 +450,11 @@ BOOST_MP_CXX14_CONSTEXPR void divide_unsigned_helper(
    r.normalize();
    r.sign(x.sign());
 
-   BOOST_ASSERT(r.compare(y) < 0); // remainder must be less than the divisor or our code has failed
+   BOOST_MP_ASSERT(r.compare(y) < 0); // remainder must be less than the divisor or our code has failed
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> >::value>::type
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, std::size_t MinBits3, std::size_t MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> >::value>::type
 eval_divide(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
@@ -462,8 +466,8 @@ eval_divide(
    result.sign(s);
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
 eval_divide(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
@@ -475,8 +479,8 @@ eval_divide(
    result.sign(s);
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
 eval_divide(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
@@ -488,8 +492,8 @@ eval_divide(
    result.sign(s);
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
 eval_divide(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& b)
@@ -499,8 +503,8 @@ eval_divide(
    eval_divide(result, a, b);
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_divide(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
     limb_type                                                             b)
@@ -510,8 +514,8 @@ eval_divide(
    eval_divide(result, a, b);
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_divide(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
     signed_limb_type                                                      b)
@@ -521,43 +525,57 @@ eval_divide(
    eval_divide(result, a, b);
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, unsigned MinBits3, unsigned MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> >::value>::type
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2, std::size_t MinBits3, std::size_t MaxBits3, cpp_integer_type SignType3, cpp_int_check_type Checked3, class Allocator3>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3> >::value>::type
 eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
     const cpp_int_backend<MinBits3, MaxBits3, SignType3, Checked3, Allocator3>& b)
 {
    bool s = a.sign();
-   divide_unsigned_helper(static_cast<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>*>(0), a, b, result);
+   if (b.size() == 1)
+      eval_modulus(result, a, *b.limbs());
+   else
+      divide_unsigned_helper(static_cast<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>*>(0), a, b, result);
    result.sign(s);
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
-eval_modulus(
-    cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
-    const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a, limb_type b)
-{
-   bool s = a.sign();
-   divide_unsigned_helper(static_cast<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>*>(0), a, b, result);
-   result.sign(s);
-}
-
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
 eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
-    signed_limb_type                                                            b)
+    const limb_type                                                             mod)
 {
-   bool s = a.sign();
-   divide_unsigned_helper(static_cast<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>*>(0), a, static_cast<limb_type>(boost::multiprecision::detail::unsigned_abs(b)), result);
-   result.sign(s);
+   const std::ptrdiff_t n = a.size();
+   const double_limb_type two_n_mod = static_cast<limb_type>(1u) + (~static_cast<limb_type>(0u) - mod) % mod;
+   limb_type              res       = a.limbs()[n - 1] % mod;
+
+   for (std::ptrdiff_t i = n - 2; i >= 0; --i)
+      res = (res * two_n_mod + a.limbs()[i]) % mod;
+   //
+   // We must not modify result until here in case
+   // result and a are the same object:
+   //
+   result.resize(1, 1);
+   *result.limbs() = res;
+   result.sign(a.sign());
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, unsigned MinBits2, unsigned MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
+eval_modulus(
+   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
+   const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& a,
+   signed_limb_type                                                            b)
+{
+   const limb_type t = b < 0 ? -b : b;
+   eval_modulus(result, a, t);
+   result.sign(a.sign());
+}
+
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1, std::size_t MinBits2, std::size_t MaxBits2, cpp_integer_type SignType2, cpp_int_check_type Checked2, class Allocator2>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && !is_trivial_cpp_int<cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2> >::value>::type
 eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits2, MaxBits2, SignType2, Checked2, Allocator2>& b)
@@ -567,65 +585,63 @@ eval_modulus(
    eval_modulus(result, a, b);
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
     limb_type                                                             b)
 {
-   // There is no in place divide:
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> a(result);
-   eval_modulus(result, a, b);
+   // Single limb modulus is in place:
+   eval_modulus(result, result, b);
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<!is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& result,
     signed_limb_type                                                      b)
 {
-   // There is no in place divide:
-   cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> a(result);
-   eval_modulus(result, a, b);
+   // Single limb modulus is in place:
+   eval_modulus(result, result, b);
 }
 
 //
 // Over again for trivial cpp_int's:
 //
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && (is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value || is_signed_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value)>::type
 eval_divide(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& o)
 {
    if (!*o.limbs())
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    *result.limbs() /= *o.limbs();
    result.sign(result.sign() != o.sign());
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_unsigned_number<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_divide(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& o)
 {
    if (!*o.limbs())
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    *result.limbs() /= *o.limbs();
 }
 
-template <unsigned MinBits1, unsigned MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
-BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename enable_if_c<
+template <std::size_t MinBits1, std::size_t MaxBits1, cpp_integer_type SignType1, cpp_int_check_type Checked1, class Allocator1>
+BOOST_MP_FORCEINLINE BOOST_MP_CXX14_CONSTEXPR typename std::enable_if<
     is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value && is_trivial_cpp_int<cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1> >::value>::type
 eval_modulus(
     cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>&       result,
     const cpp_int_backend<MinBits1, MaxBits1, SignType1, Checked1, Allocator1>& o)
 {
    if (!*o.limbs())
-      BOOST_THROW_EXCEPTION(std::overflow_error("Division by zero."));
+      BOOST_MP_THROW_EXCEPTION(std::overflow_error("Division by zero."));
    *result.limbs() %= *o.limbs();
    result.sign(result.sign());
 }
@@ -633,3 +649,7 @@ eval_modulus(
 }}} // namespace boost::multiprecision::backends
 
 #endif
+
+/* divide.hpp
+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
+*/

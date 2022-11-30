@@ -43,6 +43,7 @@
 #  include <boost/move/detail/fwd_macros.hpp>
 #endif
 #include <boost/move/detail/move_helpers.hpp>
+#include <boost/move/detail/force_ptr.hpp>
 
 // intrusive
 #include <boost/intrusive/pointer_traits.hpp>
@@ -68,61 +69,8 @@ struct list_hook
 };
 
 template <class T, class VoidPointer>
-struct list_node
-   :  public list_hook<VoidPointer>::type
+struct iiterator_node_value_type< base_node<T, list_hook<VoidPointer> > >
 {
-   public:
-   typedef T value_type;
-   typedef T internal_type;
-   typedef typename list_hook<VoidPointer>::type hook_type;
-
-   typedef typename dtl::aligned_storage<sizeof(T), dtl::alignment_of<T>::value>::type storage_t;
-   storage_t m_storage;
-
-   #if defined(BOOST_GCC) && (BOOST_GCC >= 40600) && (BOOST_GCC < 80000)
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-      #define BOOST_CONTAINER_DISABLE_ALIASING_WARNING
-   #  endif
-
-   BOOST_CONTAINER_FORCEINLINE T &get_data()
-   {  return *reinterpret_cast<T*>(this->m_storage.data);   }
-
-   BOOST_CONTAINER_FORCEINLINE const T &get_data() const
-   {  return *reinterpret_cast<const T*>(this->m_storage.data);  }
-
-   BOOST_CONTAINER_FORCEINLINE T *get_data_ptr()
-   {  return reinterpret_cast<T*>(this->m_storage.data);  }
-
-   BOOST_CONTAINER_FORCEINLINE const T *get_data_ptr() const
-   {  return reinterpret_cast<T*>(this->m_storage.data);  }
-
-   BOOST_CONTAINER_FORCEINLINE internal_type &get_real_data()
-   {  return *reinterpret_cast<internal_type*>(this->m_storage.data);   }
-
-   BOOST_CONTAINER_FORCEINLINE const internal_type &get_real_data() const
-   {  return *reinterpret_cast<const internal_type*>(this->m_storage.data);  }
-
-   BOOST_CONTAINER_FORCEINLINE internal_type *get_real_data_ptr()
-   {  return reinterpret_cast<internal_type*>(this->m_storage.data);  }
-
-   BOOST_CONTAINER_FORCEINLINE const internal_type *get_real_data_ptr() const
-   {  return reinterpret_cast<internal_type*>(this->m_storage.data);  }
-
-   BOOST_CONTAINER_FORCEINLINE ~list_node()
-   {  reinterpret_cast<T*>(this->m_storage.data)->~T();  }
-
-   #if defined(BOOST_CONTAINER_DISABLE_ALIASING_WARNING)
-      #pragma GCC diagnostic pop
-      #undef BOOST_CONTAINER_DISABLE_ALIASING_WARNING
-   #  endif
-
-   BOOST_CONTAINER_FORCEINLINE void destroy_header()
-   {  static_cast<hook_type*>(this)->~hook_type();  }
-};
-
-template <class T, class VoidPointer>
-struct iiterator_node_value_type< list_node<T,VoidPointer> > {
   typedef T type;
 };
 
@@ -135,8 +83,7 @@ struct intrusive_list_type
       <typename allocator_traits_type::pointer>::template
          rebind_pointer<void>::type
             void_pointer;
-   typedef typename dtl::list_node
-         <value_type, void_pointer>             node_type;
+   typedef base_node<value_type, list_hook<void_pointer> > node_type;
    typedef typename dtl::bi::make_list
       < node_type
       , dtl::bi::base_hook<typename list_hook<void_pointer>::type>
@@ -183,7 +130,7 @@ class list
    typedef typename AllocHolder::NodeAlloc                        NodeAlloc;
    typedef typename AllocHolder::ValAlloc                         ValAlloc;
    typedef typename AllocHolder::Node                             Node;
-   typedef dtl::allocator_destroyer<NodeAlloc>                    Destroyer;
+   typedef dtl::allocator_node_destroyer<NodeAlloc>                    Destroyer;
    typedef typename AllocHolder::alloc_version                    alloc_version;
    typedef boost::container::allocator_traits<ValueAllocator>     allocator_traits_type;
    typedef boost::container::equal_to_value
@@ -354,7 +301,7 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Linear to the number of elements.
-   ~list() BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_FORCEINLINE ~list() BOOST_NOEXCEPT_OR_NOTHROW
    {} //AllocHolder clears the list
 
    //! <b>Effects</b>: Makes *this contain the same elements as x.
@@ -430,9 +377,9 @@ class list
    //! <b>Throws</b>: If memory allocation throws or T's copy constructor throws.
    //!
    //! <b>Complexity</b>: Linear to the number of elements in x.
-   list& operator=(std::initializer_list<value_type> il)
+   BOOST_CONTAINER_FORCEINLINE list& operator=(std::initializer_list<value_type> il)
    {
-      assign(il.begin(), il.end());
+      this->assign(il.begin(), il.end());
       return *this;
    }
 #endif
@@ -442,9 +389,9 @@ class list
    //! <b>Throws</b>: If memory allocation throws or T's copy constructor throws.
    //!
    //! <b>Complexity</b>: Linear to n.
-   void assign(size_type n, const T& val)
+   BOOST_CONTAINER_FORCEINLINE void assign(size_type n, const T& val)
    {
-      typedef constant_iterator<value_type, difference_type> cvalue_iterator;
+      typedef constant_iterator<value_type> cvalue_iterator;
       return this->assign(cvalue_iterator(val, n), cvalue_iterator());
    }
 
@@ -479,8 +426,8 @@ class list
    //!   T's constructor from dereferencing std::initializer_list iterator throws.
    //!
    //! <b>Complexity</b>: Linear to n.
-   void assign(std::initializer_list<value_type> il)
-   { assign(il.begin(), il.end()); }
+   BOOST_CONTAINER_FORCEINLINE void assign(std::initializer_list<value_type> il)
+   { this->assign(il.begin(), il.end()); }
 #endif
 
    //! <b>Effects</b>: Returns a copy of the internal allocator.
@@ -488,7 +435,8 @@ class list
    //! <b>Throws</b>: If allocator's copy constructor throws.
    //!
    //! <b>Complexity</b>: Constant.
-   allocator_type get_allocator() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      allocator_type get_allocator() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return allocator_type(this->node_alloc()); }
 
    //! <b>Effects</b>: Returns a reference to the internal allocator.
@@ -498,7 +446,8 @@ class list
    //! <b>Complexity</b>: Constant.
    //!
    //! <b>Note</b>: Non-standard extension.
-   stored_allocator_type &get_stored_allocator() BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      stored_allocator_type &get_stored_allocator() BOOST_NOEXCEPT_OR_NOTHROW
    {  return this->node_alloc(); }
 
    //! <b>Effects</b>: Returns a reference to the internal allocator.
@@ -508,7 +457,8 @@ class list
    //! <b>Complexity</b>: Constant.
    //!
    //! <b>Note</b>: Non-standard extension.
-   const stored_allocator_type &get_stored_allocator() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const stored_allocator_type &get_stored_allocator() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return this->node_alloc(); }
 
    //////////////////////////////////////////////
@@ -522,7 +472,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   iterator begin() BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      iterator begin() BOOST_NOEXCEPT_OR_NOTHROW
    { return iterator(this->icont().begin()); }
 
    //! <b>Effects</b>: Returns a const_iterator to the first element contained in the list.
@@ -530,7 +481,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   const_iterator begin() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator begin() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return this->cbegin();   }
 
    //! <b>Effects</b>: Returns an iterator to the end of the list.
@@ -538,7 +490,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   iterator end() BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      iterator end() BOOST_NOEXCEPT_OR_NOTHROW
    {  return iterator(this->icont().end());  }
 
    //! <b>Effects</b>: Returns a const_iterator to the end of the list.
@@ -546,7 +499,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   const_iterator end() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator end() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return this->cend();  }
 
    //! <b>Effects</b>: Returns a reverse_iterator pointing to the beginning
@@ -555,7 +509,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   reverse_iterator rbegin() BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      reverse_iterator rbegin() BOOST_NOEXCEPT_OR_NOTHROW
    {  return reverse_iterator(end());  }
 
    //! <b>Effects</b>: Returns a const_reverse_iterator pointing to the beginning
@@ -564,7 +519,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   const_reverse_iterator rbegin() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reverse_iterator rbegin() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return this->crbegin();  }
 
    //! <b>Effects</b>: Returns a reverse_iterator pointing to the end
@@ -573,7 +529,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   reverse_iterator rend() BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      reverse_iterator rend() BOOST_NOEXCEPT_OR_NOTHROW
    {  return reverse_iterator(begin());   }
 
    //! <b>Effects</b>: Returns a const_reverse_iterator pointing to the end
@@ -582,7 +539,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   const_reverse_iterator rend() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reverse_iterator rend() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return this->crend();   }
 
    //! <b>Effects</b>: Returns a const_iterator to the first element contained in the list.
@@ -590,7 +548,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   const_iterator cbegin() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator cbegin() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return const_iterator(this->non_const_icont().begin());   }
 
    //! <b>Effects</b>: Returns a const_iterator to the end of the list.
@@ -598,7 +557,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   const_iterator cend() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator cend() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return const_iterator(this->non_const_icont().end());  }
 
    //! <b>Effects</b>: Returns a const_reverse_iterator pointing to the beginning
@@ -607,7 +567,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   const_reverse_iterator crbegin() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reverse_iterator crbegin() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return const_reverse_iterator(this->cend());  }
 
    //! <b>Effects</b>: Returns a const_reverse_iterator pointing to the end
@@ -616,7 +577,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   const_reverse_iterator crend() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reverse_iterator crend() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return const_reverse_iterator(this->cbegin());   }
 
    //////////////////////////////////////////////
@@ -630,7 +592,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   bool empty() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      bool empty() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return !this->size();  }
 
    //! <b>Effects</b>: Returns the number of the elements contained in the list.
@@ -638,7 +601,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   size_type size() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      size_type size() const BOOST_NOEXCEPT_OR_NOTHROW
    {   return this->icont().size();   }
 
    //! <b>Effects</b>: Returns the largest possible size of the list.
@@ -646,7 +610,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   size_type max_size() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      size_type max_size() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return AllocHolder::max_size();  }
 
    //! <b>Effects</b>: Inserts or erases elements at the end such that
@@ -658,7 +623,7 @@ class list
    void resize(size_type new_size)
    {
       if(!priv_try_shrink(new_size)){
-         typedef value_init_construct_iterator<value_type, difference_type> value_init_iterator;
+         typedef value_init_construct_iterator<value_type> value_init_iterator;
          this->insert(this->cend(), value_init_iterator(new_size - this->size()), value_init_iterator());
       }
    }
@@ -690,7 +655,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   reference front() BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      reference front() BOOST_NOEXCEPT_OR_NOTHROW
    {
       BOOST_ASSERT(!this->empty());
       return *this->begin();
@@ -704,7 +670,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   const_reference front() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reference front() const BOOST_NOEXCEPT_OR_NOTHROW
    {
       BOOST_ASSERT(!this->empty());
       return *this->begin();
@@ -718,7 +685,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   reference back() BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      reference back() BOOST_NOEXCEPT_OR_NOTHROW
    {
       BOOST_ASSERT(!this->empty());
       return *(--this->end());
@@ -732,7 +700,8 @@ class list
    //! <b>Throws</b>: Nothing.
    //!
    //! <b>Complexity</b>: Constant.
-   const_reference back() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reference back() const BOOST_NOEXCEPT_OR_NOTHROW
    {
       BOOST_ASSERT(!this->empty());
       return *(--this->end());
@@ -889,7 +858,7 @@ class list
    iterator insert(const_iterator position, size_type n, const T& x)
    {
       //range check is done by insert
-      typedef constant_iterator<value_type, difference_type> cvalue_iterator;
+      typedef constant_iterator<value_type> cvalue_iterator;
       return this->insert(position, cvalue_iterator(x, n), cvalue_iterator());
    }
 
@@ -944,7 +913,7 @@ class list
       insertion_functor func(this->icont(), position.get());
       iterator before_p(position.get());
       --before_p;
-      this->allocate_many_and_construct(first, boost::container::iterator_distance(first, last), func);
+      this->allocate_many_and_construct(first, boost::container::iterator_udistance(first, last), func);
       return ++before_p;
    }
    #endif
@@ -1374,43 +1343,50 @@ class list
    //! <b>Effects</b>: Returns true if x and y are equal
    //!
    //! <b>Complexity</b>: Linear to the number of elements in the container.
-   friend bool operator==(const list& x, const list& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator==(const list& x, const list& y)
    {  return x.size() == y.size() && ::boost::container::algo_equal(x.begin(), x.end(), y.begin());  }
 
    //! <b>Effects</b>: Returns true if x and y are unequal
    //!
    //! <b>Complexity</b>: Linear to the number of elements in the container.
-   friend bool operator!=(const list& x, const list& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator!=(const list& x, const list& y)
    {  return !(x == y); }
 
    //! <b>Effects</b>: Returns true if x is less than y
    //!
    //! <b>Complexity</b>: Linear to the number of elements in the container.
-   friend bool operator<(const list& x, const list& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator<(const list& x, const list& y)
    {  return boost::container::algo_lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());  }
 
    //! <b>Effects</b>: Returns true if x is greater than y
    //!
    //! <b>Complexity</b>: Linear to the number of elements in the container.
-   friend bool operator>(const list& x, const list& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator>(const list& x, const list& y)
    {  return y < x;  }
 
    //! <b>Effects</b>: Returns true if x is equal or less than y
    //!
    //! <b>Complexity</b>: Linear to the number of elements in the container.
-   friend bool operator<=(const list& x, const list& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator<=(const list& x, const list& y)
    {  return !(y < x);  }
 
    //! <b>Effects</b>: Returns true if x is equal or greater than y
    //!
    //! <b>Complexity</b>: Linear to the number of elements in the container.
-   friend bool operator>=(const list& x, const list& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator>=(const list& x, const list& y)
    {  return !(x < y);  }
 
    //! <b>Effects</b>: x.swap(y)
    //!
    //! <b>Complexity</b>: Constant.
-   friend void swap(list& x, list& y)
+   BOOST_CONTAINER_FORCEINLINE friend void swap(list& x, list& y)
+       BOOST_NOEXCEPT_IF(BOOST_NOEXCEPT(x.swap(y)))
    {  x.swap(y);  }
 
    #ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
@@ -1465,17 +1441,13 @@ class list
       return iterator(this->icont().insert(p.get(), *tmp));
    }
 
-   void priv_push_back (const T &x)
-   {  this->insert(this->cend(), x);    }
+   template<class U>
+   void priv_push_back(BOOST_FWD_REF(U) x)
+   {  this->icont().push_back(*this->create_node(::boost::forward<U>(x))); }
 
-   void priv_push_back (BOOST_RV_REF(T) x)
-   {  this->insert(this->cend(), boost::move(x));    }
-
-   void priv_push_front (const T &x)
-   {  this->insert(this->cbegin(), x);  }
-
-   void priv_push_front (BOOST_RV_REF(T) x)
-   {  this->insert(this->cbegin(), boost::move(x));  }
+   template<class U>
+   void priv_push_front(BOOST_FWD_REF(U) x)
+   {  this->icont().push_front(*this->create_node(::boost::forward<U>(x))); }
 
    class insertion_functor;
    friend class insertion_functor;
@@ -1537,3 +1509,7 @@ namespace container {
 #include <boost/container/detail/config_end.hpp>
 
 #endif // BOOST_CONTAINER_LIST_HPP
+
+/* list.hpp
+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
+*/

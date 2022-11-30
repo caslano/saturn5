@@ -10,6 +10,7 @@
 #pragma once
 #endif
 
+#include <limits>
 #include <vector>
 #include <boost/math/special_functions/legendre.hpp>
 #include <boost/math/constants/constants.hpp>
@@ -28,11 +29,11 @@ struct gauss_constant_category
       (std::numeric_limits<T>::is_specialized == 0) ? 999 :
       (std::numeric_limits<T>::radix == 2) ?
       (
-         (std::numeric_limits<T>::digits <= std::numeric_limits<float>::digits) && boost::is_convertible<float, T>::value ? 0 :
-         (std::numeric_limits<T>::digits <= std::numeric_limits<double>::digits) && boost::is_convertible<double, T>::value ? 1 :
-         (std::numeric_limits<T>::digits <= std::numeric_limits<long double>::digits) && boost::is_convertible<long double, T>::value ? 2 :
+         (std::numeric_limits<T>::digits <= std::numeric_limits<float>::digits) && std::is_convertible<float, T>::value ? 0 :
+         (std::numeric_limits<T>::digits <= std::numeric_limits<double>::digits) && std::is_convertible<double, T>::value ? 1 :
+         (std::numeric_limits<T>::digits <= std::numeric_limits<long double>::digits) && std::is_convertible<long double, T>::value ? 2 :
 #ifdef BOOST_HAS_FLOAT128
-         (std::numeric_limits<T>::digits <= 113) && boost::is_constructible<__float128, T>::value ? 3 :
+         (std::numeric_limits<T>::digits <= 113) && std::is_constructible<__float128, T>::value ? 3 :
 #endif
          (std::numeric_limits<T>::digits10 <= 110) ? 4 : 999
       ) : (std::numeric_limits<T>::digits10 <= 110) ? 4 : 999;
@@ -80,7 +81,7 @@ class gauss_detail<T, 7, 0>
 public:
    static std::array<T, 4> const & abscissa()
    {
-      static const std::array<T, 4> data = {
+      static constexpr std::array<T, 4> data = {
          0.000000000e+00f,
          4.058451514e-01f,
          7.415311856e-01f,
@@ -90,7 +91,7 @@ public:
    }
    static std::array<T, 4> const & weights()
    {
-      static const std::array<T, 4> data = {
+      static constexpr std::array<T, 4> data = {
          4.179591837e-01f,
          3.818300505e-01f,
          2.797053915e-01f,
@@ -106,7 +107,7 @@ class gauss_detail<T, 7, 1>
 public:
    static std::array<T, 4> const & abscissa()
    {
-      static const std::array<T, 4> data = {
+      static constexpr std::array<T, 4> data = {
          0.00000000000000000e+00,
          4.05845151377397167e-01,
          7.41531185599394440e-01,
@@ -116,7 +117,7 @@ public:
    }
    static std::array<T, 4> const & weights()
    {
-      static const std::array<T, 4> data = {
+      static constexpr std::array<T, 4> data = {
          4.17959183673469388e-01,
          3.81830050505118945e-01,
          2.79705391489276668e-01,
@@ -132,7 +133,7 @@ class gauss_detail<T, 7, 2>
 public:
    static std::array<T, 4> const & abscissa()
    {
-      static const std::array<T, 4> data = {
+      static constexpr std::array<T, 4> data = {
          0.00000000000000000000000000000000000e+00L,
          4.05845151377397166906606412076961463e-01L,
          7.41531185599394439863864773280788407e-01L,
@@ -142,7 +143,7 @@ public:
    }
    static std::array<T, 4> const & weights()
    {
-      static const std::array<T, 4> data = {
+      static constexpr std::array<T, 4> data = {
          4.17959183673469387755102040816326531e-01L,
          3.81830050505118944950369775488975134e-01L,
          2.79705391489276667901467771423779582e-01L,
@@ -210,7 +211,7 @@ class gauss_detail<T, 10, 0>
 public:
    static std::array<T, 5> const & abscissa()
    {
-      static const std::array<T, 5> data = {
+      static constexpr std::array<T, 5> data = {
          1.488743390e-01f,
          4.333953941e-01f,
          6.794095683e-01f,
@@ -221,7 +222,7 @@ public:
    }
    static std::array<T, 5> const & weights()
    {
-      static const std::array<T, 5> data = {
+      static constexpr std::array<T, 5> data = {
          2.955242247e-01f,
          2.692667193e-01f,
          2.190863625e-01f,
@@ -238,7 +239,7 @@ class gauss_detail<T, 10, 1>
 public:
    static std::array<T, 5> const & abscissa()
    {
-      static const std::array<T, 5> data = {
+      static constexpr std::array<T, 5> data = {
          1.48874338981631211e-01,
          4.33395394129247191e-01,
          6.79409568299024406e-01,
@@ -249,7 +250,7 @@ public:
    }
    static std::array<T, 5> const & weights()
    {
-      static const std::array<T, 5> data = {
+      static constexpr std::array<T, 5> data = {
          2.95524224714752870e-01,
          2.69266719309996355e-01,
          2.19086362515982044e-01,
@@ -266,7 +267,7 @@ class gauss_detail<T, 10, 2>
 public:
    static std::array<T, 5> const & abscissa()
    {
-      static const std::array<T, 5> data = {
+      static constexpr std::array<T, 5> data = {
          1.48874338981631210884826001129719985e-01L,
          4.33395394129247190799265943165784162e-01L,
          6.79409568299024406234327365114873576e-01L,
@@ -277,7 +278,7 @@ public:
    }
    static std::array<T, 5> const & weights()
    {
-      static const std::array<T, 5> data = {
+      static constexpr std::array<T, 5> data = {
          2.95524224714752870173892994651338329e-01L,
          2.69266719309996355091226921569469353e-01L,
          2.19086362515982043995534934228163192e-01L,
@@ -350,7 +351,7 @@ class gauss_detail<T, 15, 0>
 public:
    static std::array<T, 8> const & abscissa()
    {
-      static const std::array<T, 8> data = {
+      static constexpr std::array<T, 8> data = {
          0.000000000e+00f,
          2.011940940e-01f,
          3.941513471e-01f,
@@ -364,7 +365,7 @@ public:
    }
    static std::array<T, 8> const & weights()
    {
-      static const std::array<T, 8> data = {
+      static constexpr std::array<T, 8> data = {
          2.025782419e-01f,
          1.984314853e-01f,
          1.861610000e-01f,
@@ -384,7 +385,7 @@ class gauss_detail<T, 15, 1>
 public:
    static std::array<T, 8> const & abscissa()
    {
-      static const std::array<T, 8> data = {
+      static constexpr std::array<T, 8> data = {
          0.00000000000000000e+00,
          2.01194093997434522e-01,
          3.94151347077563370e-01,
@@ -398,7 +399,7 @@ public:
    }
    static std::array<T, 8> const & weights()
    {
-      static const std::array<T, 8> data = {
+      static constexpr std::array<T, 8> data = {
          2.02578241925561273e-01,
          1.98431485327111576e-01,
          1.86161000015562211e-01,
@@ -418,7 +419,7 @@ class gauss_detail<T, 15, 2>
 public:
    static std::array<T, 8> const & abscissa()
    {
-      static const std::array<T, 8> data = {
+      static constexpr std::array<T, 8> data = {
          0.00000000000000000000000000000000000e+00L,
          2.01194093997434522300628303394596208e-01L,
          3.94151347077563369897207370981045468e-01L,
@@ -432,7 +433,7 @@ public:
    }
    static std::array<T, 8> const & weights()
    {
-      static const std::array<T, 8> data = {
+      static constexpr std::array<T, 8> data = {
          2.02578241925561272880620199967519315e-01L,
          1.98431485327111576456118326443839325e-01L,
          1.86161000015562211026800561866422825e-01L,
@@ -520,7 +521,7 @@ class gauss_detail<T, 20, 0>
 public:
    static std::array<T, 10> const & abscissa()
    {
-      static const std::array<T, 10> data = {
+      static constexpr std::array<T, 10> data = {
          7.652652113e-02f,
          2.277858511e-01f,
          3.737060887e-01f,
@@ -536,7 +537,7 @@ public:
    }
    static std::array<T, 10> const & weights()
    {
-      static const std::array<T, 10> data = {
+      static constexpr std::array<T, 10> data = {
          1.527533871e-01f,
          1.491729865e-01f,
          1.420961093e-01f,
@@ -558,7 +559,7 @@ class gauss_detail<T, 20, 1>
 public:
    static std::array<T, 10> const & abscissa()
    {
-      static const std::array<T, 10> data = {
+      static constexpr std::array<T, 10> data = {
          7.65265211334973338e-02,
          2.27785851141645078e-01,
          3.73706088715419561e-01,
@@ -574,7 +575,7 @@ public:
    }
    static std::array<T, 10> const & weights()
    {
-      static const std::array<T, 10> data = {
+      static constexpr std::array<T, 10> data = {
          1.52753387130725851e-01,
          1.49172986472603747e-01,
          1.42096109318382051e-01,
@@ -596,7 +597,7 @@ class gauss_detail<T, 20, 2>
 public:
    static std::array<T, 10> const & abscissa()
    {
-      static const std::array<T, 10> data = {
+      static constexpr std::array<T, 10> data = {
          7.65265211334973337546404093988382110e-02L,
          2.27785851141645078080496195368574625e-01L,
          3.73706088715419560672548177024927237e-01L,
@@ -612,7 +613,7 @@ public:
    }
    static std::array<T, 10> const & weights()
    {
-      static const std::array<T, 10> data = {
+      static constexpr std::array<T, 10> data = {
          1.52753387130725850698084331955097593e-01L,
          1.49172986472603746787828737001969437e-01L,
          1.42096109318382051329298325067164933e-01L,
@@ -710,7 +711,7 @@ class gauss_detail<T, 25, 0>
 public:
    static std::array<T, 13> const & abscissa()
    {
-      static const std::array<T, 13> data = {
+      static constexpr std::array<T, 13> data = {
          0.000000000e+00f,
          1.228646926e-01f,
          2.438668837e-01f,
@@ -729,7 +730,7 @@ public:
    }
    static std::array<T, 13> const & weights()
    {
-      static const std::array<T, 13> data = {
+      static constexpr std::array<T, 13> data = {
          1.231760537e-01f,
          1.222424430e-01f,
          1.194557635e-01f,
@@ -754,7 +755,7 @@ class gauss_detail<T, 25, 1>
 public:
    static std::array<T, 13> const & abscissa()
    {
-      static const std::array<T, 13> data = {
+      static constexpr std::array<T, 13> data = {
          0.00000000000000000e+00,
          1.22864692610710396e-01,
          2.43866883720988432e-01,
@@ -773,7 +774,7 @@ public:
    }
    static std::array<T, 13> const & weights()
    {
-      static const std::array<T, 13> data = {
+      static constexpr std::array<T, 13> data = {
          1.23176053726715451e-01,
          1.22242442990310042e-01,
          1.19455763535784772e-01,
@@ -798,7 +799,7 @@ class gauss_detail<T, 25, 2>
 public:
    static std::array<T, 13> const & abscissa()
    {
-      static const std::array<T, 13> data = {
+      static constexpr std::array<T, 13> data = {
          0.00000000000000000000000000000000000e+00L,
          1.22864692610710396387359818808036806e-01L,
          2.43866883720988432045190362797451586e-01L,
@@ -817,7 +818,7 @@ public:
    }
    static std::array<T, 13> const & weights()
    {
-      static const std::array<T, 13> data = {
+      static constexpr std::array<T, 13> data = {
          1.23176053726715451203902873079050142e-01L,
          1.22242442990310041688959518945851506e-01L,
          1.19455763535784772228178126512901047e-01L,
@@ -930,7 +931,7 @@ class gauss_detail<T, 30, 0>
 public:
    static std::array<T, 15> const & abscissa()
    {
-      static const std::array<T, 15> data = {
+      static constexpr std::array<T, 15> data = {
          5.147184256e-02f,
          1.538699136e-01f,
          2.546369262e-01f,
@@ -951,7 +952,7 @@ public:
    }
    static std::array<T, 15> const & weights()
    {
-      static const std::array<T, 15> data = {
+      static constexpr std::array<T, 15> data = {
          1.028526529e-01f,
          1.017623897e-01f,
          9.959342059e-02f,
@@ -978,7 +979,7 @@ class gauss_detail<T, 30, 1>
 public:
    static std::array<T, 15> const & abscissa()
    {
-      static const std::array<T, 15> data = {
+      static constexpr std::array<T, 15> data = {
          5.14718425553176958e-02,
          1.53869913608583547e-01,
          2.54636926167889846e-01,
@@ -999,7 +1000,7 @@ public:
    }
    static std::array<T, 15> const & weights()
    {
-      static const std::array<T, 15> data = {
+      static constexpr std::array<T, 15> data = {
          1.02852652893558840e-01,
          1.01762389748405505e-01,
          9.95934205867952671e-02,
@@ -1026,7 +1027,7 @@ class gauss_detail<T, 30, 2>
 public:
    static std::array<T, 15> const & abscissa()
    {
-      static const std::array<T, 15> data = {
+      static constexpr std::array<T, 15> data = {
          5.14718425553176958330252131667225737e-02L,
          1.53869913608583546963794672743255920e-01L,
          2.54636926167889846439805129817805108e-01L,
@@ -1047,7 +1048,7 @@ public:
    }
    static std::array<T, 15> const & weights()
    {
-      static const std::array<T, 15> data = {
+      static constexpr std::array<T, 15> data = {
          1.02852652893558840341285636705415044e-01L,
          1.01762389748405504596428952168554045e-01L,
          9.95934205867952670627802821035694765e-02L,
@@ -1178,6 +1179,8 @@ public:
      // In many math texts, K represents the field of real or complex numbers.
      // Too bad we can't put blackboard bold into C++ source!
       typedef decltype(f(Real(0))) K;
+      static_assert(!std::is_integral<K>::value,
+                   "The return type cannot be integral, it must be either a real or complex floating point type.");
       using std::abs;
       unsigned non_zero_start = 1;
       K result = Real(0);
@@ -1295,3 +1298,7 @@ public:
 #endif
 
 #endif // BOOST_MATH_QUADRATURE_GAUSS_HPP
+
+/* gauss.hpp
+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
+*/

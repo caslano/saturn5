@@ -17,16 +17,14 @@
 
 #if defined(BOOST_CSTDFLOAT_HAS_INTERNAL_FLOAT128_T) && defined(BOOST_MATH_USE_FLOAT128) && !defined(BOOST_CSTDFLOAT_NO_LIBQUADMATH_SUPPORT)
 
+#include <cstdint>
 #include <cmath>
 #include <stdexcept>
 #include <iostream>
-#include <boost/cstdint.hpp>
-#include <boost/static_assert.hpp>
-#include <boost/throw_exception.hpp>
-#include <boost/core/enable_if.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/type_traits/is_convertible.hpp>
-#include <boost/scoped_array.hpp>
+#include <type_traits>
+#include <memory>
+#include <boost/math/tools/assert.hpp>
+#include <boost/math/tools/throw_exception.hpp>
 
 #if defined(_WIN32) && defined(__GNUC__)
   // Several versions of Mingw and probably cygwin too have broken
@@ -84,7 +82,7 @@ namespace boost {
                         : +std::numeric_limits<float_type>::infinity());
                   }
 
-                  if (p == static_cast<integer_type>(2)) { return  (x * x); }
+                  if      (p == static_cast<integer_type>(2)) { return  (x * x); }
                   else if (p == static_cast<integer_type>(3)) { return ((x * x) * x); }
                   else if (p == static_cast<integer_type>(4)) { const float_type x2 = (x * x); return (x2 * x2); }
                   else
@@ -120,7 +118,7 @@ namespace boost {
 } // boost::math::cstdfloat::detail
 
 // We will now define preprocessor symbols representing quadruple-precision <cmath> functions.
-#if defined(BOOST_INTEL)
+#if defined(__INTEL_COMPILER)
 #define BOOST_CSTDFLOAT_FLOAT128_LDEXP  __ldexpq
 #define BOOST_CSTDFLOAT_FLOAT128_FREXP  __frexpq
 #define BOOST_CSTDFLOAT_FLOAT128_FABS   __fabsq
@@ -375,20 +373,8 @@ inline boost::math::cstdfloat::detail::float_internal128_t BOOST_CSTDFLOAT_FLOAT
 {
    // Compute exp(x) - 1 for x small.
 
-   // Use an order-36 polynomial approximation of the exponential function
-   // in the range of (-ln2 < x < ln2). Scale the argument to this range
-   // and subsequently multiply the result by 2^n accordingly.
-
-   // Derive the polynomial coefficients with Mathematica(R) by generating
-   // a table of high-precision values of exp(x) in the range (-ln2 < x < ln2)
-   // and subsequently applying the built-in *Fit* function.
-
-   // Table[{x, Exp[x] - 1}, {x, -Log[2], Log[2], 1/180}]
-   // N[%, 120]
-   // Fit[%, {x, x^2, x^3, x^4, x^5, x^6, x^7, x^8, x^9, x^10, x^11, x^12,
-   //         x^13, x^14, x^15, x^16, x^17, x^18, x^19, x^20, x^21, x^22,
-   //         x^23, x^24, x^25, x^26, x^27, x^28, x^29, x^30, x^31, x^32,
-   //         x^33, x^34, x^35, x^36}, x]
+   // Use an order-12 Pade approximation of the exponential function.
+   // PadeApproximant[Exp[x] - 1, {x, 0, 12, 12}].
 
    typedef boost::math::cstdfloat::detail::float_internal128_t float_type;
 
@@ -400,43 +386,32 @@ inline boost::math::cstdfloat::detail::float_internal128_t BOOST_CSTDFLOAT_FLOAT
    }
    else
    {
-      // Compute the polynomial approximation of exp(alpha).
-      sum = ((((((((((((((((((((((((((((((((((((float_type(BOOST_FLOAT128_C(2.69291698127774166063293705964720493864630783729857438187365E-42))  * x
-         + float_type(BOOST_FLOAT128_C(9.70937085471487654794114679403710456028986572118859594614033E-41))) * x
-         + float_type(BOOST_FLOAT128_C(3.38715585158055097155585505318085512156885389014410753080500E-39))) * x
-         + float_type(BOOST_FLOAT128_C(1.15162718532861050809222658798662695267019717760563645440433E-37))) * x
-         + float_type(BOOST_FLOAT128_C(3.80039074689434663295873584133017767349635602413675471702393E-36))) * x
-         + float_type(BOOST_FLOAT128_C(1.21612504934087520075905434734158045947460467096773246215239E-34))) * x
-         + float_type(BOOST_FLOAT128_C(3.76998762883139753126119821241037824830069851253295480396224E-33))) * x
-         + float_type(BOOST_FLOAT128_C(1.13099628863830344684998293828608215735777107850991029729440E-31))) * x
-         + float_type(BOOST_FLOAT128_C(3.27988923706982293204067897468714277771890104022419696770352E-30))) * x
-         + float_type(BOOST_FLOAT128_C(9.18368986379558482800593745627556950089950023355628325088207E-29))) * x
-         + float_type(BOOST_FLOAT128_C(2.47959626322479746949155352659617642905315302382639380521497E-27))) * x
-         + float_type(BOOST_FLOAT128_C(6.44695028438447337900255966737803112935639344283098705091949E-26))) * x
-         + float_type(BOOST_FLOAT128_C(1.61173757109611834904452725462599961406036904573072897122957E-24))) * x
-         + float_type(BOOST_FLOAT128_C(3.86817017063068403772269360016918092488847584660382953555804E-23))) * x
-         + float_type(BOOST_FLOAT128_C(8.89679139245057328674891109315654704307721758924206107351744E-22))) * x
-         + float_type(BOOST_FLOAT128_C(1.95729410633912612308475595397946731738088422488032228717097E-20))) * x
-         + float_type(BOOST_FLOAT128_C(4.11031762331216485847799061511674191805055663711439605760231E-19))) * x
-         + float_type(BOOST_FLOAT128_C(8.22063524662432971695598123977873600603370758794431071426640E-18))) * x
-         + float_type(BOOST_FLOAT128_C(1.56192069685862264622163643500633782667263448653185159383285E-16))) * x
-         + float_type(BOOST_FLOAT128_C(2.81145725434552076319894558300988749849555291507956994126835E-15))) * x
-         + float_type(BOOST_FLOAT128_C(4.77947733238738529743820749111754320727153728139716409114011E-14))) * x
-         + float_type(BOOST_FLOAT128_C(7.64716373181981647590113198578807092707697416852226691068627E-13))) * x
-         + float_type(BOOST_FLOAT128_C(1.14707455977297247138516979786821056670509688396295740818677E-11))) * x
-         + float_type(BOOST_FLOAT128_C(1.60590438368216145993923771701549479323291461578567184216302E-10))) * x
-         + float_type(BOOST_FLOAT128_C(2.08767569878680989792100903212014323125428376052986408239620E-09))) * x
-         + float_type(BOOST_FLOAT128_C(2.50521083854417187750521083854417187750523408006206780016659E-08))) * x
-         + float_type(BOOST_FLOAT128_C(2.75573192239858906525573192239858906525573195144226062684604E-07))) * x
-         + float_type(BOOST_FLOAT128_C(2.75573192239858906525573192239858906525573191310049321957902E-06))) * x
-         + float_type(BOOST_FLOAT128_C(0.00002480158730158730158730158730158730158730158730149317774)))     * x
-         + float_type(BOOST_FLOAT128_C(0.00019841269841269841269841269841269841269841269841293575920)))     * x
-         + float_type(BOOST_FLOAT128_C(0.00138888888888888888888888888888888888888888888888889071045)))     * x
-         + float_type(BOOST_FLOAT128_C(0.00833333333333333333333333333333333333333333333333332986595)))     * x
-         + float_type(BOOST_FLOAT128_C(0.04166666666666666666666666666666666666666666666666666664876)))     * x
-         + float_type(BOOST_FLOAT128_C(0.16666666666666666666666666666666666666666666666666666669048)))     * x
-         + float_type(BOOST_FLOAT128_C(0.50000000000000000000000000000000000000000000000000000000006)))     * x
-         + float_type(BOOST_FLOAT128_C(0.99999999999999999999999999999999999999999999999999999999995)))     * x);
+      const float_type x2 = (x * x);
+
+      const float_type top = (((((  float_type(BOOST_FLOAT128_C(2.4087176110456818621091195109360728010934088788572E-13))  * x2
+                                  + float_type(BOOST_FLOAT128_C(9.2735628025258751691201101171038802842096241836000E-10))) * x2
+                                  + float_type(BOOST_FLOAT128_C(9.0806726962333369656024118266681195742980640005812E-07))) * x2
+                                  + float_type(BOOST_FLOAT128_C(3.1055900621118012422360248447204968944099378881988E-04))) * x2
+                                  + float_type(BOOST_FLOAT128_C(3.6231884057971014492753623188405797101449275362319E-02))) * x2
+                                  + float_type(BOOST_FLOAT128_C(1.00000000000000000000000000000000000000000000000000000)))
+                                  ;
+
+      const float_type bot = ((((((((((((  float_type(BOOST_FLOAT128_C(+7.7202487533515444298369215094104897470942592271063E-16))  * x
+                                         + float_type(BOOST_FLOAT128_C(-1.2043588055228409310545597554680364005467044394286E-13))) * x
+                                         + float_type(BOOST_FLOAT128_C(+9.2735628025258751691201101171038802842096241836000E-12))) * x
+                                         + float_type(BOOST_FLOAT128_C(-4.6367814012629375845600550585519401421048120918000E-10))) * x
+                                         + float_type(BOOST_FLOAT128_C(+1.6692413044546575304416198210786984511577323530480E-08))) * x
+                                         + float_type(BOOST_FLOAT128_C(-4.5403363481166684828012059133340597871490320002906E-07))) * x
+                                         + float_type(BOOST_FLOAT128_C(+9.5347063310450038138825324180015255530129672006102E-06))) * x
+                                         + float_type(BOOST_FLOAT128_C(-1.5527950310559006211180124223602484472049689440994E-04))) * x
+                                         + float_type(BOOST_FLOAT128_C(+1.9409937888198757763975155279503105590062111801242E-03))) * x
+                                         + float_type(BOOST_FLOAT128_C(-1.8115942028985507246376811594202898550724637681159E-02))) * x
+                                         + float_type(BOOST_FLOAT128_C(+1.1956521739130434782608695652173913043478260869565E-01))) * x
+                                         + float_type(BOOST_FLOAT128_C(-0.50000000000000000000000000000000000000000000000000000))) * x
+                                         + float_type(BOOST_FLOAT128_C(+1.00000000000000000000000000000000000000000000000000000)))
+                                         ;
+
+      sum = (x * top) / bot;
    }
 
    return sum;
@@ -446,28 +421,13 @@ inline boost::math::cstdfloat::detail::float_internal128_t BOOST_CSTDFLOAT_FLOAT
    // Patch the expq() function for a subset of broken GCC compilers
    // like GCC 4.7, 4.8 on MinGW.
 
-   // Use an order-36 polynomial approximation of the exponential function
-   // in the range of (-ln2 < x < ln2). Scale the argument to this range
-   // and subsequently multiply the result by 2^n accordingly.
-
-   // Derive the polynomial coefficients with Mathematica(R) by generating
-   // a table of high-precision values of exp(x) in the range (-ln2 < x < ln2)
-   // and subsequently applying the built-in *Fit* function.
-
-   // Table[{x, Exp[x] - 1}, {x, -Log[2], Log[2], 1/180}]
-   // N[%, 120]
-   // Fit[%, {x, x^2, x^3, x^4, x^5, x^6, x^7, x^8, x^9, x^10, x^11, x^12,
-   //         x^13, x^14, x^15, x^16, x^17, x^18, x^19, x^20, x^21, x^22,
-   //         x^23, x^24, x^25, x^26, x^27, x^28, x^29, x^30, x^31, x^32,
-   //         x^33, x^34, x^35, x^36}, x]
-
    typedef boost::math::cstdfloat::detail::float_internal128_t float_type;
 
    // Scale the argument x to the range (-ln2 < x < ln2).
-   BOOST_CONSTEXPR_OR_CONST float_type one_over_ln2 = float_type(BOOST_FLOAT128_C(1.44269504088896340735992468100189213742664595415299));
+   constexpr float_type one_over_ln2 = float_type(BOOST_FLOAT128_C(1.44269504088896340735992468100189213742664595415299));
    const float_type x_over_ln2 = x * one_over_ln2;
 
-   boost::int_fast32_t n;
+   int n;
 
    if (x != x)
    {
@@ -477,12 +437,12 @@ inline boost::math::cstdfloat::detail::float_internal128_t BOOST_CSTDFLOAT_FLOAT
    else if (::BOOST_CSTDFLOAT_FLOAT128_FABS(x) > BOOST_FLOAT128_C(+0.693147180559945309417232121458176568075500134360255))
    {
       // The absolute value of the argument exceeds ln2.
-      n = static_cast<boost::int_fast32_t>(::BOOST_CSTDFLOAT_FLOAT128_FLOOR(x_over_ln2));
+      n = static_cast<int>(::BOOST_CSTDFLOAT_FLOAT128_FLOOR(x_over_ln2));
    }
    else if (::BOOST_CSTDFLOAT_FLOAT128_FABS(x) < BOOST_FLOAT128_C(+0.693147180559945309417232121458176568075500134360255))
    {
       // The absolute value of the argument is less than ln2.
-      n = static_cast<boost::int_fast32_t>(0);
+      n = 0;
    }
    else
    {
@@ -496,7 +456,7 @@ inline boost::math::cstdfloat::detail::float_internal128_t BOOST_CSTDFLOAT_FLOAT
    if (::BOOST_CSTDFLOAT_FLOAT128_FABS(x - floor_of_x) < float_type(BOOST_CSTDFLOAT_FLOAT128_EPS))
    {
       // Return e^n for arguments very near an integer.
-      return boost::math::cstdfloat::detail::pown(BOOST_FLOAT128_C(2.71828182845904523536028747135266249775724709369996), static_cast<boost::int_fast32_t>(floor_of_x));
+      return boost::math::cstdfloat::detail::pown(BOOST_FLOAT128_C(2.71828182845904523536028747135266249775724709369996), static_cast<std::int_fast32_t>(floor_of_x));
    }
 
    // Compute the scaled argument alpha.
@@ -594,11 +554,11 @@ inline boost::math::cstdfloat::detail::float_internal128_t BOOST_CSTDFLOAT_FLOAT
       // Take the reflection checks (slightly adapted) from <boost/math/gamma.hpp>.
       const bool floor_of_z_is_equal_to_z = (positive_x == ::BOOST_CSTDFLOAT_FLOAT128_FLOOR(positive_x));
 
-      BOOST_CONSTEXPR_OR_CONST float_type my_pi = BOOST_FLOAT128_C(3.14159265358979323846264338327950288419716939937511);
+      constexpr float_type my_pi = BOOST_FLOAT128_C(3.14159265358979323846264338327950288419716939937511);
 
       if (floor_of_z_is_equal_to_z)
       {
-         const bool is_odd = ((boost::int32_t(floor_of_positive_x) % boost::int32_t(2)) != boost::int32_t(0));
+         const bool is_odd = ((std::int32_t(floor_of_positive_x) % std::int32_t(2)) != std::int32_t(0));
 
          return (is_odd ? -std::numeric_limits<float_type>::infinity()
             : +std::numeric_limits<float_type>::infinity());
@@ -613,7 +573,7 @@ inline boost::math::cstdfloat::detail::float_internal128_t BOOST_CSTDFLOAT_FLOAT
 
       if (result_is_too_large_to_represent)
       {
-         const bool is_odd = ((boost::int32_t(floor_of_positive_x) % boost::int32_t(2)) != boost::int32_t(0));
+         const bool is_odd = ((std::int32_t(floor_of_positive_x) % std::int32_t(2)) != std::int32_t(0));
 
          return (is_odd ? -std::numeric_limits<float_type>::infinity()
             : +std::numeric_limits<float_type>::infinity());
@@ -682,25 +642,25 @@ namespace boost {
 
             inline boost::math::cstdfloat::detail::float_internal128_t  fmax(boost::math::cstdfloat::detail::float_internal128_t x, boost::math::cstdfloat::detail::float_internal128_t y) { return ::BOOST_CSTDFLOAT_FLOAT128_FMAX(x, y); }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                fmax(boost::math::cstdfloat::detail::float_internal128_t x, T y) { return ::BOOST_CSTDFLOAT_FLOAT128_FMAX(x, y); }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                fmax(T x, boost::math::cstdfloat::detail::float_internal128_t y) { return ::BOOST_CSTDFLOAT_FLOAT128_FMAX(x, y); }
             inline boost::math::cstdfloat::detail::float_internal128_t  fmin(boost::math::cstdfloat::detail::float_internal128_t x, boost::math::cstdfloat::detail::float_internal128_t y) { return ::BOOST_CSTDFLOAT_FLOAT128_FMIN(x, y); }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                fmin(boost::math::cstdfloat::detail::float_internal128_t x, T y) { return ::BOOST_CSTDFLOAT_FLOAT128_FMIN(x, y); }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                fmin(T x, boost::math::cstdfloat::detail::float_internal128_t y) { return ::BOOST_CSTDFLOAT_FLOAT128_FMIN(x, y); }
 
             inline boost::math::cstdfloat::detail::float_internal128_t  fdim(boost::math::cstdfloat::detail::float_internal128_t x, boost::math::cstdfloat::detail::float_internal128_t y) { return ::BOOST_CSTDFLOAT_FLOAT128_FDIM(x, y); }
@@ -715,14 +675,14 @@ namespace boost {
             inline boost::math::cstdfloat::detail::float_internal128_t  hypot(boost::math::cstdfloat::detail::float_internal128_t x, boost::math::cstdfloat::detail::float_internal128_t y, boost::math::cstdfloat::detail::float_internal128_t z) { return ::BOOST_CSTDFLOAT_FLOAT128_SQRT(x*x + y * y + z * z); }
             inline boost::math::cstdfloat::detail::float_internal128_t  hypot(boost::math::cstdfloat::detail::float_internal128_t x, boost::math::cstdfloat::detail::float_internal128_t y) { return ::BOOST_CSTDFLOAT_FLOAT128_HYPOT(x, y); }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                hypot(boost::math::cstdfloat::detail::float_internal128_t x, T y) { return ::BOOST_CSTDFLOAT_FLOAT128_HYPOT(x, y); }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                hypot(T x, boost::math::cstdfloat::detail::float_internal128_t y) { return ::BOOST_CSTDFLOAT_FLOAT128_HYPOT(x, y); }
 
 
@@ -772,14 +732,14 @@ namespace boost {
                return x > y;
             }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                isgreater BOOST_PREVENT_MACRO_SUBSTITUTION(boost::math::cstdfloat::detail::float_internal128_t x, T y) { return isgreater BOOST_PREVENT_MACRO_SUBSTITUTION(x, (boost::math::cstdfloat::detail::float_internal128_t)y); }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                isgreater BOOST_PREVENT_MACRO_SUBSTITUTION(T x, boost::math::cstdfloat::detail::float_internal128_t y) { return isgreater BOOST_PREVENT_MACRO_SUBSTITUTION((boost::math::cstdfloat::detail::float_internal128_t)x, y); }
 
             inline bool                                      isgreaterequal BOOST_PREVENT_MACRO_SUBSTITUTION(boost::math::cstdfloat::detail::float_internal128_t x, boost::math::cstdfloat::detail::float_internal128_t y)
@@ -789,14 +749,14 @@ namespace boost {
                return x >= y;
             }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                isgreaterequal BOOST_PREVENT_MACRO_SUBSTITUTION(boost::math::cstdfloat::detail::float_internal128_t x, T y) { return isgreaterequal BOOST_PREVENT_MACRO_SUBSTITUTION(x, (boost::math::cstdfloat::detail::float_internal128_t)y); }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                isgreaterequal BOOST_PREVENT_MACRO_SUBSTITUTION(T x, boost::math::cstdfloat::detail::float_internal128_t y) { return isgreaterequal BOOST_PREVENT_MACRO_SUBSTITUTION((boost::math::cstdfloat::detail::float_internal128_t)x, y); }
 
             inline bool                                      isless      BOOST_PREVENT_MACRO_SUBSTITUTION(boost::math::cstdfloat::detail::float_internal128_t x, boost::math::cstdfloat::detail::float_internal128_t y)
@@ -806,14 +766,14 @@ namespace boost {
                return x < y;
             }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                isless BOOST_PREVENT_MACRO_SUBSTITUTION(boost::math::cstdfloat::detail::float_internal128_t x, T y) { return isless BOOST_PREVENT_MACRO_SUBSTITUTION(x, (boost::math::cstdfloat::detail::float_internal128_t)y); }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                isless BOOST_PREVENT_MACRO_SUBSTITUTION(T x, boost::math::cstdfloat::detail::float_internal128_t y) { return isless BOOST_PREVENT_MACRO_SUBSTITUTION((boost::math::cstdfloat::detail::float_internal128_t)x, y); }
 
 
@@ -824,14 +784,14 @@ namespace boost {
                return x <= y;
             }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                islessequal BOOST_PREVENT_MACRO_SUBSTITUTION(boost::math::cstdfloat::detail::float_internal128_t x, T y) { return islessequal BOOST_PREVENT_MACRO_SUBSTITUTION(x, (boost::math::cstdfloat::detail::float_internal128_t)y); }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                islessequal BOOST_PREVENT_MACRO_SUBSTITUTION(T x, boost::math::cstdfloat::detail::float_internal128_t y) { return islessequal BOOST_PREVENT_MACRO_SUBSTITUTION((boost::math::cstdfloat::detail::float_internal128_t)x, y); }
 
 
@@ -842,27 +802,27 @@ namespace boost {
                return (x < y) || (x > y);
             }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                islessgreater BOOST_PREVENT_MACRO_SUBSTITUTION(boost::math::cstdfloat::detail::float_internal128_t x, T y) { return islessgreater BOOST_PREVENT_MACRO_SUBSTITUTION(x, (boost::math::cstdfloat::detail::float_internal128_t)y); }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                islessgreater BOOST_PREVENT_MACRO_SUBSTITUTION(T x, boost::math::cstdfloat::detail::float_internal128_t y) { return islessgreater BOOST_PREVENT_MACRO_SUBSTITUTION((boost::math::cstdfloat::detail::float_internal128_t)x, y); }
 
 
             inline bool                                      isunordered   BOOST_PREVENT_MACRO_SUBSTITUTION(boost::math::cstdfloat::detail::float_internal128_t x, boost::math::cstdfloat::detail::float_internal128_t y) { return ::BOOST_CSTDFLOAT_FLOAT128_ISNAN(x) || ::BOOST_CSTDFLOAT_FLOAT128_ISNAN(y); }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                isunordered BOOST_PREVENT_MACRO_SUBSTITUTION(boost::math::cstdfloat::detail::float_internal128_t x, T y) { return isunordered BOOST_PREVENT_MACRO_SUBSTITUTION(x, (boost::math::cstdfloat::detail::float_internal128_t)y); }
             template <class T>
-            inline typename boost::enable_if_c<
-               boost::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
-               && !boost::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
+            inline typename std::enable_if<
+               std::is_convertible<T, boost::math::cstdfloat::detail::float_internal128_t>::value
+               && !std::is_same<T, boost::math::cstdfloat::detail::float_internal128_t>::value, boost::math::cstdfloat::detail::float_internal128_t>::type
                isunordered BOOST_PREVENT_MACRO_SUBSTITUTION(T x, boost::math::cstdfloat::detail::float_internal128_t y) { return isunordered BOOST_PREVENT_MACRO_SUBSTITUTION((boost::math::cstdfloat::detail::float_internal128_t)x, y); }
 
 
@@ -881,7 +841,10 @@ namespace std
    using boost::math::cstdfloat::detail::fabs;
 
 #if !(defined(_GLIBCXX_USE_FLOAT128) && defined(__GNUC__) && (__GNUC__ >= 7))
+#if (defined(__clang__) && !(!defined(__STRICT_ANSI__) && defined(_GLIBCXX_USE_FLOAT128))) || (__GNUC__ <= 6 && !defined(__clang__)) 
+   // workaround for clang using libstdc++ and old GCC
    using boost::math::cstdfloat::detail::abs;
+#endif
 #endif
 
    using boost::math::cstdfloat::detail::floor;
@@ -964,7 +927,7 @@ namespace std
       std::string s;
 
       char buf[100];
-      boost::scoped_array<char> buf2;
+      std::unique_ptr<char[]> buf2;
       std::string format = "%";
       if (f & std::ios_base::showpos)
          format += "+";
@@ -990,7 +953,7 @@ namespace std
          v = quadmath_snprintf(&buf2[0], v_max + 3, format.c_str(), digits, m_value);
          if (v >= v_max + 3)
          {
-            BOOST_THROW_EXCEPTION(std::runtime_error("Formatting of float128_type failed."));
+            BOOST_MATH_THROW_EXCEPTION(std::runtime_error("Formatting of float128_type failed."));
          }
          s = &buf2[0];
       }
@@ -1092,3 +1055,7 @@ namespace std
 
 #endif // BOOST_MATH_CSTDFLOAT_CMATH_2014_02_15_HPP_
 
+
+/* cstdfloat_cmath.hpp
+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
+*/

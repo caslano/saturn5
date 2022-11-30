@@ -11,6 +11,7 @@
 #ifndef BOOST_MOVE_MERGE_HPP
 #define BOOST_MOVE_MERGE_HPP
 
+#include <boost/core/ignore_unused.hpp>
 #include <boost/move/algo/move.hpp>
 #include <boost/move/adl_move_swap.hpp>
 #include <boost/move/algo/detail/basic_op.hpp>
@@ -21,10 +22,15 @@
 #include <boost/assert.hpp>
 #include <cstddef>
 
+#if defined(BOOST_CLANG) || (defined(BOOST_GCC) && (BOOST_GCC >= 40600))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
+
 namespace boost {
 namespace movelib {
 
-template<class T, class RandRawIt = T*, class SizeType = typename iterator_traits<RandRawIt>::size_type>
+template<class T, class RandRawIt = T*, class SizeType = typename iter_size<RandRawIt>::type>
 class adaptive_xbuf
 {
    adaptive_xbuf(const adaptive_xbuf &);
@@ -38,28 +44,29 @@ class adaptive_xbuf
    typedef RandRawIt iterator;
    typedef SizeType  size_type;
 
-   adaptive_xbuf()
+   BOOST_MOVE_FORCEINLINE adaptive_xbuf()
       : m_ptr(), m_size(0), m_capacity(0)
    {}
 
-   adaptive_xbuf(RandRawIt raw_memory, size_type capacity)
-      : m_ptr(raw_memory), m_size(0), m_capacity(capacity)
+   BOOST_MOVE_FORCEINLINE adaptive_xbuf(RandRawIt raw_memory, size_type cap)
+      : m_ptr(raw_memory), m_size(0), m_capacity(cap)
    {}
 
    template<class RandIt>
    void move_assign(RandIt first, size_type n)
    {
+      typedef typename iterator_traits<RandIt>::difference_type rand_diff_t;
       if(n <= m_size){
-         boost::move(first, first+n, m_ptr);
-         size_type size = m_size;
-         while(size-- != n){
-            m_ptr[size].~T();
+         boost::move(first, first+rand_diff_t(n), m_ptr);
+         size_type sz = m_size;
+         while(sz-- != n){
+            m_ptr[sz].~T();
          }
          m_size = n;
       }
       else{
-         RandRawIt result = boost::move(first, first+m_size, m_ptr);
-         boost::uninitialized_move(first+m_size, first+n, result);
+         RandRawIt result = boost::move(first, first+rand_diff_t(m_size), m_ptr);
+         boost::uninitialized_move(first+rand_diff_t(m_size), first+rand_diff_t(n), result);
          m_size = n;
       }
    }
@@ -96,30 +103,30 @@ class adaptive_xbuf
       }
    }
 
-   void set_size(size_type size)
+   BOOST_MOVE_FORCEINLINE void set_size(size_type sz)
    {
-      m_size = size;
+      m_size = sz;
    }
 
-   void shrink_to_fit(size_type const size)
+   void shrink_to_fit(size_type const sz)
    {
-      if(m_size > size){
-         for(size_type szt_i = size; szt_i != m_size; ++szt_i){
+      if(m_size > sz){
+         for(size_type szt_i = sz; szt_i != m_size; ++szt_i){
             m_ptr[szt_i].~T();
          }
-         m_size = size;
+         m_size = sz;
       }
    }
 
-   void initialize_until(size_type const size, T &t)
+   void initialize_until(size_type const sz, T &t)
    {
       BOOST_ASSERT(m_size < m_capacity);
-      if(m_size < size){
+      if(m_size < sz){
          BOOST_TRY
          {
             ::new((void*)&m_ptr[m_size]) T(::boost::move(t));
             ++m_size;
-            for(; m_size != size; ++m_size){
+            for(; m_size != sz; ++m_size){
                ::new((void*)&m_ptr[m_size]) T(::boost::move(m_ptr[m_size-1]));
             }
             t = ::boost::move(m_ptr[m_size-1]);
@@ -138,22 +145,22 @@ class adaptive_xbuf
 
    private:
    template<class RIt>
-   static bool is_raw_ptr(RIt)
+   BOOST_MOVE_FORCEINLINE static bool is_raw_ptr(RIt)
    {
       return false;
    }
 
-   static bool is_raw_ptr(T*)
+   BOOST_MOVE_FORCEINLINE static bool is_raw_ptr(T*)
    {
       return true;
    }
 
    public:
    template<class U>
-   bool supports_aligned_trailing(size_type size, size_type trail_count) const
+   bool supports_aligned_trailing(size_type sz, size_type trail_count) const
    {
       if(this->is_raw_ptr(this->data()) && m_capacity){
-         uintptr_t u_addr_sz = uintptr_t(&*(this->data()+size));
+         uintptr_t u_addr_sz = uintptr_t(&*(this->data()+sz));
          uintptr_t u_addr_cp = uintptr_t(&*(this->data()+this->capacity()));
          u_addr_sz = ((u_addr_sz + sizeof(U)-1)/sizeof(U))*sizeof(U);
          return (u_addr_cp >= u_addr_sz) && ((u_addr_cp - u_addr_sz)/sizeof(U) >= trail_count);
@@ -162,43 +169,43 @@ class adaptive_xbuf
    }
 
    template<class U>
-   U *aligned_trailing() const
+   BOOST_MOVE_FORCEINLINE U *aligned_trailing() const
    {
       return this->aligned_trailing<U>(this->size());
    }
 
    template<class U>
-   U *aligned_trailing(size_type pos) const
+   BOOST_MOVE_FORCEINLINE U *aligned_trailing(size_type pos) const
    {
       uintptr_t u_addr = uintptr_t(&*(this->data()+pos));
       u_addr = ((u_addr + sizeof(U)-1)/sizeof(U))*sizeof(U);
       return (U*)u_addr;
    }
 
-   ~adaptive_xbuf()
+   BOOST_MOVE_FORCEINLINE ~adaptive_xbuf()
    {
       this->clear();
    }
 
-   size_type capacity() const
+   BOOST_MOVE_FORCEINLINE size_type capacity() const
    {  return m_capacity;   }
 
-   iterator data() const
+   BOOST_MOVE_FORCEINLINE iterator data() const
    {  return m_ptr;   }
 
-   iterator begin() const
+   BOOST_MOVE_FORCEINLINE iterator begin() const
    {  return m_ptr;   }
 
-   iterator end() const
+   BOOST_MOVE_FORCEINLINE iterator end() const
    {  return m_ptr+m_size;   }
 
-   size_type size() const
+   BOOST_MOVE_FORCEINLINE size_type size() const
    {  return m_size;   }
 
-   bool empty() const
+   BOOST_MOVE_FORCEINLINE bool empty() const
    {  return !m_size;   }
 
-   void clear()
+   BOOST_MOVE_FORCEINLINE void clear()
    {
       this->shrink_to_fit(0u);
    }
@@ -227,7 +234,8 @@ class range_xbuf
    void move_assign(RandIt first, size_type n)
    {
       BOOST_ASSERT(size_type(n) <= size_type(m_cap-m_first));
-      m_last = Op()(forward_t(), first, first+n, m_first);
+      typedef typename iter_difference<RandIt>::type d_type;
+      m_last = Op()(forward_t(), first, first+d_type(n), m_first);
    }
 
    ~range_xbuf()
@@ -262,10 +270,10 @@ class range_xbuf
       return pos;
    }
 
-   void set_size(size_type size)
+   void set_size(size_type sz)
    {
       m_last  = m_first;
-      m_last += size;
+      m_last += sz;
    }
 
    private:
@@ -307,26 +315,28 @@ Unsigned gcd(Unsigned x, Unsigned y)
    else{
       Unsigned z = 1;
       while((!(x&1)) & (!(y&1))){
-         z <<=1, x>>=1, y>>=1;
+         z = Unsigned(z << 1);
+         x = Unsigned(x >> 1);
+         y = Unsigned(y >> 1);
       }
       while(x && y){
          if(!(x&1))
-            x >>=1;
+            x = Unsigned(x >> 1);
          else if(!(y&1))
-            y >>=1;
+            y = Unsigned (y >> 1);
          else if(x >=y)
-            x = (x-y) >> 1;
+            x = Unsigned((x-y) >> 1u);
          else
-            y = (y-x) >> 1;
+            y = Unsigned((y-x) >> 1);
       }
-      return z*(x+y);
+      return Unsigned(z*(x+y));
    }
 }
 
 template<typename RandIt>
 RandIt rotate_gcd(RandIt first, RandIt middle, RandIt last)
 {
-   typedef typename iterator_traits<RandIt>::size_type size_type;
+   typedef typename iter_size<RandIt>::type size_type;
    typedef typename iterator_traits<RandIt>::value_type value_type;
 
    if(first == middle)
@@ -350,7 +360,7 @@ RandIt rotate_gcd(RandIt first, RandIt middle, RandIt last)
             *it_j = boost::move(*it_k);
             it_j = it_k;
             size_type const left = size_type(last - it_j);
-            it_k = left > middle_pos ? it_j + middle_pos : first + (middle_pos - left);
+            it_k = left > middle_pos ? it_j + middle_pos : first + middle_pos - left;
          } while(it_k != it_i);
          *it_j = boost::move(temp);
       }
@@ -362,19 +372,18 @@ template <class RandIt, class T, class Compare>
 RandIt lower_bound
    (RandIt first, const RandIt last, const T& key, Compare comp)
 {
-   typedef typename iterator_traits
-      <RandIt>::size_type size_type;
+   typedef typename iter_size<RandIt>::type size_type;
    size_type len = size_type(last - first);
    RandIt middle;
 
    while (len) {
-      size_type step = len >> 1;
+      size_type step = size_type(len >> 1);
       middle = first;
       middle += step;
 
       if (comp(*middle, key)) {
          first = ++middle;
-         len -= step + 1;
+         len = size_type(len - (step + 1));
       }
       else{
          len = step;
@@ -387,19 +396,18 @@ template <class RandIt, class T, class Compare>
 RandIt upper_bound
    (RandIt first, const RandIt last, const T& key, Compare comp)
 {
-   typedef typename iterator_traits
-      <RandIt>::size_type size_type;
+   typedef typename iter_size<RandIt>::type size_type;
    size_type len = size_type(last - first);
    RandIt middle;
 
    while (len) {
-      size_type step = len >> 1;
+      size_type step = size_type(len >> 1);
       middle = first;
       middle += step;
 
       if (!comp(key, *middle)) {
          first = ++middle;
-         len -= step + 1;
+         len = size_type(len - (step + 1));
       }
       else{
          len = step;
@@ -521,7 +529,7 @@ void op_buffered_merge
       , Buf &xbuf)
 {
    if(first != middle && middle != last && comp(*middle, middle[-1])){
-      typedef typename iterator_traits<RandIt>::size_type   size_type;
+      typedef typename iter_size<RandIt>::type   size_type;
       size_type const len1 = size_type(middle-first);
       size_type const len2 = size_type(last-middle);
       if(len1 <= len2){
@@ -586,11 +594,11 @@ static const std::size_t MergeBufferlessONLogNRotationThreshold = 16u;
 template <class RandIt, class Compare>
 void merge_bufferless_ONlogN_recursive
    ( RandIt first, RandIt middle, RandIt last
-   , typename iterator_traits<RandIt>::size_type len1
-   , typename iterator_traits<RandIt>::size_type len2
+   , typename iter_size<RandIt>::type len1
+   , typename iter_size<RandIt>::type len2
    , Compare comp)
 {
-   typedef typename iterator_traits<RandIt>::size_type size_type;
+   typedef typename iter_size<RandIt>::type size_type;
 
    while(1) {
       //trivial cases
@@ -629,16 +637,17 @@ void merge_bufferless_ONlogN_recursive
       RandIt new_middle = rotate_gcd(first_cut, middle, second_cut);
 
       //Avoid one recursive call doing a manual tail call elimination on the biggest range
-      const size_type len_internal = len11+len22;
+      const size_type len_internal = size_type(len11+len22);
       if( len_internal < (len1 + len2 - len_internal) ) {
-         merge_bufferless_ONlogN_recursive(first, first_cut,  new_middle, len11, len22,        comp);
+         merge_bufferless_ONlogN_recursive(first, first_cut,  new_middle, len11, len22, comp);
          first = new_middle;
          middle = second_cut;
-         len1 -= len11;
-         len2 -= len22;
+         len1 = size_type(len1-len11);
+         len2 = size_type(len2-len22);
       }
       else {
-         merge_bufferless_ONlogN_recursive(new_middle, second_cut, last, len1 - len11, len2 - len22, comp);
+         merge_bufferless_ONlogN_recursive
+            (new_middle, second_cut, last, size_type(len1 - len11), size_type(len2 - len22), comp);
          middle = first_cut;
          last = new_middle;
          len1 = len11;
@@ -652,7 +661,7 @@ void merge_bufferless_ONlogN_recursive
 template<class RandIt, class Compare>
 void merge_bufferless_ONlogN(RandIt first, RandIt middle, RandIt last, Compare comp)
 {
-   typedef typename iterator_traits<RandIt>::size_type size_type;
+   typedef typename iter_size<RandIt>::type size_type;
    merge_bufferless_ONlogN_recursive
       (first, middle, last, size_type(middle - first), size_type(last - middle), comp);
 }
@@ -680,7 +689,7 @@ void op_merge_with_right_placed
       if (r_first == r_last) {
          InputOutIterator end = op(forward_t(), first, last, dest_first);
          BOOST_ASSERT(end == r_last);
-         (void)end;
+         boost::ignore_unused(end);
          return;
       }
       else if (comp(*r_first, *first)) {
@@ -717,7 +726,7 @@ void op_merge_with_left_placed
       if(first == last) {
          BidirOutIterator res = op(backward_t(), r_first, r_last, dest_last);
          BOOST_ASSERT(last == res);
-         (void)res;
+         boost::ignore_unused(res);
          return;
       }
       --r_last;
@@ -781,7 +790,7 @@ void uninitialized_merge_with_right_placed
          d.release();
          InputOutIterator end = ::boost::move(first, last, original_r_first);
          BOOST_ASSERT(end == r_last);
-         (void)end;
+         boost::ignore_unused(end);
          return;
       }
       else if (comp(*r_first, *first)) {
@@ -800,61 +809,16 @@ void uninitialized_merge_with_right_placed
    merge_with_right_placed(first, last, original_r_first, r_first, r_last, comp);
 }
 
-/*
-// [r_first, r_last) are already in the right part of the destination range.
-// [dest_first, r_first) is uninitialized memory
-template <class Compare, class BidirOutIterator, class BidirIterator>
-void uninitialized_merge_with_left_placed
-   ( BidirOutIterator dest_first, BidirOutIterator r_first, BidirOutIterator r_last
-   , BidirIterator first, BidirIterator last
-   , Compare comp)
-{
-   BOOST_ASSERT((last - first) == (r_last - r_first));
-   typedef typename iterator_traits<BidirOutIterator>::value_type value_type;
-   BidirOutIterator const original_r_last = r_last;
-
-   destruct_n<value_type> d(&*dest_last);
-
-   while ( first != last && dest_first != original_r_first ) {
-      if (r_first == r_last) {
-         for(; dest_first != original_r_first; ++dest_first, ++first){
-            ::new(&*dest_first) value_type(::boost::move(*first));
-            d.incr();
-         }
-         d.release();
-         BidirOutIterator end = ::boost::move(first, last, original_r_first);
-         BOOST_ASSERT(end == r_last);
-         (void)end;
-         return;
-      }
-      else if (comp(*r_first, *first)) {
-         ::new(&*dest_first) value_type(::boost::move(*r_first));
-         d.incr();
-         ++r_first;
-      }
-      else {
-         ::new(&*dest_first) value_type(::boost::move(*first));
-         d.incr();
-         ++first;
-      }
-      ++dest_first;
-   }
-   d.release();
-   merge_with_right_placed(first, last, original_r_first, r_first, r_last, comp);
-}
-*/
-
-
 /// This is a helper function for the merge routines.
 template<typename BidirectionalIterator1, typename BidirectionalIterator2>
    BidirectionalIterator1
    rotate_adaptive(BidirectionalIterator1 first,
       BidirectionalIterator1 middle,
       BidirectionalIterator1 last,
-      typename iterator_traits<BidirectionalIterator1>::size_type len1,
-      typename iterator_traits<BidirectionalIterator1>::size_type len2,
+      typename iter_size<BidirectionalIterator1>::type len1,
+      typename iter_size<BidirectionalIterator1>::type len2,
       BidirectionalIterator2 buffer,
-      typename iterator_traits<BidirectionalIterator1>::size_type buffer_size)
+      typename iter_size<BidirectionalIterator1>::type buffer_size)
 {
    if (len1 > len2 && len2 <= buffer_size)
    {
@@ -889,58 +853,57 @@ template<typename BidirectionalIterator,
    (BidirectionalIterator first,
       BidirectionalIterator middle,
       BidirectionalIterator last,
-      typename iterator_traits<BidirectionalIterator>::size_type len1,
-      typename iterator_traits<BidirectionalIterator>::size_type len2,
+      typename  iter_size<BidirectionalIterator>::type len1,
+      typename  iter_size<BidirectionalIterator>::type len2,
       Pointer buffer,
-      typename iterator_traits<BidirectionalIterator>::size_type buffer_size,
+      typename  iter_size<BidirectionalIterator>::type buffer_size,
       Compare comp)
 {
-   typedef typename iterator_traits<BidirectionalIterator>::size_type size_type;
+   typedef typename  iter_size<BidirectionalIterator>::type size_type;
    //trivial cases
    if (!len2 || !len1) {
-      return;
+      // no-op
    }
-   else if (len1 <= buffer_size || len2 <= buffer_size)
-   {
+   else if (len1 <= buffer_size || len2 <= buffer_size) {
       range_xbuf<Pointer, size_type, move_op> rxbuf(buffer, buffer + buffer_size);
       buffered_merge(first, middle, last, comp, rxbuf);
    }
    else if (size_type(len1 + len2) == 2u) {
       if (comp(*middle, *first))
          adl_move_swap(*first, *middle);
-      return;
    }
    else if (size_type(len1 + len2) < MergeBufferlessONLogNRotationThreshold) {
       merge_bufferless_ON2(first, middle, last, comp);
-      return;
    }
-   BidirectionalIterator first_cut = first;
-   BidirectionalIterator second_cut = middle;
-   size_type len11 = 0;
-   size_type len22 = 0;
-   if (len1 > len2)  //(len1 < len2)
-   {
-      len11 = len1 / 2;
-      first_cut += len11;
-      second_cut = boost::movelib::lower_bound(middle, last, *first_cut, comp);
-      len22 = second_cut - middle;
-   }
-   else
-   {
-      len22 = len2 / 2;
-      second_cut += len22;
-      first_cut = boost::movelib::upper_bound(first, middle, *second_cut, comp);
-      len11 = first_cut - first;
-   }
+   else {
+      BidirectionalIterator first_cut = first;
+      BidirectionalIterator second_cut = middle;
+      size_type len11 = 0;
+      size_type len22 = 0;
+      if (len1 > len2)  //(len1 < len2)
+      {
+         len11 = len1 / 2;
+         first_cut += len11;
+         second_cut = boost::movelib::lower_bound(middle, last, *first_cut, comp);
+         len22 = size_type(second_cut - middle);
+      }
+      else
+      {
+         len22 = len2 / 2;
+         second_cut += len22;
+         first_cut = boost::movelib::upper_bound(first, middle, *second_cut, comp);
+         len11 = size_type(first_cut - first);
+      }
 
-   BidirectionalIterator new_middle
-      = rotate_adaptive(first_cut, middle, second_cut,
-         size_type(len1 - len11), len22, buffer,
-         buffer_size);
-   merge_adaptive_ONlogN_recursive(first, first_cut, new_middle, len11,
-      len22, buffer, buffer_size, comp);
-   merge_adaptive_ONlogN_recursive(new_middle, second_cut, last,
-      len1 - len11, len2 - len22, buffer, buffer_size, comp);
+      BidirectionalIterator new_middle
+         = rotate_adaptive(first_cut, middle, second_cut,
+            size_type(len1 - len11), len22, buffer,
+            buffer_size);
+      merge_adaptive_ONlogN_recursive(first, first_cut, new_middle, len11,
+         len22, buffer, buffer_size, comp);
+      merge_adaptive_ONlogN_recursive(new_middle, second_cut, last,
+         size_type(len1 - len11), size_type(len2 - len22), buffer, buffer_size, comp);
+   }
 }
 
 
@@ -950,10 +913,10 @@ void merge_adaptive_ONlogN(BidirectionalIterator first,
 		                     BidirectionalIterator last,
 		                     Compare comp,
                            RandRawIt uninitialized,
-                           typename iterator_traits<BidirectionalIterator>::size_type uninitialized_len)
+                           typename  iter_size<BidirectionalIterator>::type uninitialized_len)
 {
    typedef typename iterator_traits<BidirectionalIterator>::value_type  value_type;
-   typedef typename iterator_traits<BidirectionalIterator>::size_type   size_type;
+   typedef typename  iter_size<BidirectionalIterator>::type   size_type;
 
    if (first == middle || middle == last)
       return;
@@ -973,8 +936,15 @@ void merge_adaptive_ONlogN(BidirectionalIterator first,
    }
 }
 
-
 }  //namespace movelib {
 }  //namespace boost {
 
+#if defined(BOOST_CLANG) || (defined(BOOST_GCC) && (BOOST_GCC >= 40600))
+#pragma GCC diagnostic pop
+#endif
+
 #endif   //#define BOOST_MOVE_MERGE_HPP
+
+/* merge.hpp
+Yhbnospji2su3/UUTm5XJTScM251BtnZxbqNxIFXr7ndIAovc5JvvkL/DDTarlOit66P7vpnxgrMXGw2znqpMPD4WulBxp7T8GJdbPpC8+Bh7gaSFjchmqgV4m57BjYQKytyadlrYAVzf4FlhmHjql3Ri+esY9Mx914+9ef9PGexYtrzVq/Y5RMlHxzDX55ew1tYD+XkN95zWZPJUpeHramGZ3OE19aSzrhA/czz7zGEtxIDjyzk+udEPgQfAK31SOgxlLcpMaf+hnZin7s8RzzznlNingzHMpdPRUOnqNa2jgNHTqHm9I/FLypMg9zVpt/L6c2SEM91VgmtAwahtpcZKqi25+YzW2UNr2m3q9blng78julHp9mxj+dWQ6gyXwMvnmvTzMVP0eBr6Xnoxl7s8612qvsGIV39au31urQ4tY5g/QAHLPjT+Tq4nxuFO0prMQ82BYMtgNRi2tE7CE2LHS4NlTne9Atca9IMdLnwSPwthwdd6h+m4z02qoHGlir4ObXc2IZYioYxNoWi/Bj4LmI9Xao8pNp+eR/lvsqkAvbZz4/+NgmUWiUTpBYvb4ezizPR25tTGqJLDlbsWH0e50PRSldP9U2et1pAFhfeHRhATpYawkTmICGj4mIa84tGff1j8xH+pO/GJDC2VOIo6uKpoYSk/aPcJYlGzcLpSVBU+pdMzRj5owoTyo7D2kssMu3wP8W8N97z2tRkojO6ZqrjJCf4263gjRlNjGZ3mmWNF0bOjzdWJI6sE82GbWN8gHEYZFLkGpVTWFeT13+ekWFS0G2RPivf1ZfcN2bNCHGfPbG2k5oXl6//Ds0lb8KdYEoj39nYD3Gp9r0vQLnfEcfkMB/ENs9BuqICr+pcgA2sVh+pIG5ivjQYpq5KuylfcUgUQteKSCVb0GhHYVFd6jAM/ecxnit6HNKOxidngRy1FJf1RZ+VHynehJ+NQ1QYUsr+3O2Z3n8c48iqHUnwy2JgriyOYaLHSUaGo84xE9muQgG12vBvLoUbo4xLlcsh+FHIzzCvoJCRYlpMoDEoFDx5CyNaiXOkZ4Kz1aVeypGDpNwUiLQ6KuFAP/wZeZ/n3GylhC0XbLi2ES7SM3Y+fxdv7uGThEmbvJiDUhrS0rCsh8uu2YIUQdTohHOCz0uCsSSjnbTyjpzTE8HVAD+N4AXT1GlCNoKO27jULLt0b6u2dhq5qLx3+vSgXP5jUggdLbm1gxrh33kqKgtJuFfI7HBM7k5ze2oUb4l6jxe//PV7JGRC2OvUQj6el0JgHfv1oHqODKx3+HOy+BMzdXZ63jinoNO3rf22p5LbNp4+1aJ2TbqSfocLXGE5XsxHFOubH12mSDOF3kLlqzAyBpm595lei3lOXs1F8vGODALQz8fRx4OvSIzv0xmWJXFYJ3nvMV38bNqwtFq9jkaiuMGrwbjlxfGH/LdxednO73BA7MAvuTEPSxrRMjS5SJ5GTgvnVevXsdDpIPPp+emQXKS9vP4noGAxS1iAed8t/mKavkUn9dA/0TmZ62YhMpHotS22THgiW03372BpHdgc11NsIFoQBuDatm3btm3bbre2bdu2bdvc2u3W9m3uJF/Oy3mbSeYfx58HlNX5br0QtET07PciCa7I3R0UbQ461tUOVswSNHwYJO+paFW/xNP50uaUYsj3/dnjwqEwarXkdkEsBmAAMyXw3Rr9eshNmueLkNPSXWzfjaU31GM+cDRh9tsr+rZTERNDfjBffZUnupfkWknPt8lqRWFr18F6TR0VRBjeCGCwKJaj9GH5P/UCDWfKXLLMwRXu3G1+gmVVSUFe3zoEyu21SLe3e+i5RU9//vhxSdOVjkl4/qY+srTkZVaoi2yFnZxsQf000HRxP+p/erqoPDHY9O3s9/rEMcTS3YRKXDnamaLI7ccwAlm5yoVGMqGE94IQ1Zxf1D6ASYX8c3MBI4Zgc2m7W0uP1tFpnvKrtx676lP4TR3nH4ctmYfHtMHwb0qGlo/zzoXgewexUHo76pXBU7rd4VDYvBbXp1hDMKdgu0sZ7XL6xBO4jtYtZwsblhec53ZZ5w+ca1iVXcCbmyXO1olXA3/eVWr0tfmIxnh0//nC34R9GuK1uXLF8Av/s72mqY9R0bBkqMW0qgdl9Mx1rU4r1FYlft3q3ulxPMLGPkHZMbuo12+x1RnL/quKIbe8xYPIcm3oReVhKeTh1lAj+eOadRXUFFl5YTHyh23iTGeQxDvskyKqo2aIZTOKyB9QdcVhTheD7N+O5T/T6jVzDBL0thWNpfp/V7kWawwBLTzd2+KD8698QadrDQqBROckcTXoOTmNPifGFc++NIHVg8XVRsXewkQibrfm2k1dy5XuWycSQXZHxEOEtchKcduFgue6e3WsxoWsoQg/gqSf2WmSo5mjWmENGJWwlkGKi/1NJocPjcHVwdnBI8SLAlbhZwsE0fTBZF6MF0BMTf4eiD7jZbfVzp5w4whcn0ianxhS+S4/PgRkZr0pIcRPWgcUskRwEHuqcerA7C5IHEX/ZGRDfn7gzkeF+GOOk/hCAqt1ohALwk2Sn4Ex+XzwdePtJiEjsl6MJ/towqju1evV/k0GUoZm0KRUbhGUOe836+ZnGsxIQppygO4f+NDr9/EkbCrwMimEthTCBSL22jrD2PtFDhUs7/rIEuBhAioggZm8owzo5tHvs05NRf/rCw0JrA9lU2rKhj/EZuW3H9co0G28XUD3JWlxChjlb+nMSyGkVp4RRKGIrfKf0F2CDixcNrP+xpuQmzI+8pbJD9syu71UkuV2unn/ItlY6t+WisIVku2KqKq3xuDkqK+qc4Yi70U30XvXsEqkaORtNrWc4lQLaBPc5rxvzbMX9qxDaRz9rB00tl5oBmE/MgTm985zWQuB9xt4MlnZlROx60l88E49yQkg2dFFUD1wvNA9xeBog4VX5ePwBnKTgjWjZiFmUd1RrwUK0RrgiLgtYPvTbvj6dqNMmiPNcbDHD4ZF/kXWu/TSIdej2W8duRWQ5r2xoBvjeThgzYi+FfHRe76Ym2YLrA9Pf8FMHw1/Nt3uyJKp8NxgwQ/rGdluTCkEEdbyTm0ugmkY02GvPD0Ua9LQ+dIBALFnPzGW+u9mwO0aR2ylj8nJaGlZkrh6jYHi1LAohH8wsO+KOLZTnUScKFCaEPls1eZz0FrENODepILJEh/i9sW50QJ66viphy1GYH2/6bAIKG4FVS7/wiiKR8SCuJslmcEIiD1M9htvKTSeCMnqzGGoFX7LafJvu2DnyjCVKhP3tq0N2MyuMLTgEj5bef+9XhBG/L/EqmOGL4NpEbGZAoHVltHBy/P0pgrD9U18jGl98jpIiUEcviU6wQQTehc1bn1+SL75BjQJj5V8H8kmjuISdm78N4mNKc/oLdDrBgL8JEq7oRPVUhwjXF+uFFJTKn60qyYqrMzM6Kb5I187x4sP6U/zGa49UWomY75u4VbahYwHosr5/cv3N2JVw4NIw4W84DaWXQj5m3Y1QGQoj0Tc04MxqnoPl6GDTyMeCOg062ILURCwaLQJbsCLOHDfyw3FjBrvhgJ9imrHAxKRZtQNX488aasKEpDIifL1QhgZqepgqs0Mx1q0LuERDumLSNbAOPik4yVjpasCalYBFpBB+he6ivNtkebdIiDA6mEw6mJvkmI0iHL2hxZRw1pT/IhBiYDcUNLGEPJQRTE2YzkMOUQwQuSeHzoJ/Q4RLqgaD4MuTEKFuge1EucSkQ6r+5OGFU3auvY0cy4PVfFDcZsHPw9TeS+4sdfJcfui5tQyjLtveK25xB1B+BTLPcoqnXZHgMbBhZCsIj1x1ONyEetAPUg09F617/jtNkbvwrcaQHEJVydApdOJsI2US+tb6/JsFxZIpU8veGEUtSxjoGciqqxg+WSVQysTnvNJ6VrjNa2GPsbUeq/rxFTZwrYrHrRvjxxPiUgvQGJiNJCjyWNVXGduCStGzRQSbUn1v3THH/hL26yE5QbkjWgRSDwdwa/eQYD9KFmF/lFwME/FH1ZYf+veS6bkdGlEZqRDS6JVUCk8Hc0LCdILV0oKLALSrCckCgYMVV0WTPwqDGrGVBtHoqLFi1U0MLinMbbfJySNG+6WLMQYHAmrmDqb632nN6M3O+0Ph9rzLkn7nhZCvpuwuC5msrFfWddgYBw8oD6eYBX+wUQhxKx7raSG1538ARYirQ8fs1QQxZKyhf5KehO1A9fGll56T0eV0ANn8GkN5rB66/UifokVOf/LsJ7+V5bn/NhE4VhKHdhOYujnTNz9VZMBusHipulUmPM+2anxLURtTgjPDizjh6xvQ55srYNzcnsZb6OUpzZV29n3WfyBDLDuFEGRwZynls+OK2W/MuCvUTCO8TWWhsa4sBXvuk6jvnp0d+x7D4xWrDxZn2nn9gZpiBfwsV71At/9k9kKYOJxts91iAXto5IQvwE/IxKNdrnOyIIgAiHF6grpKSZFmccmUmDa8ggzKdSVLsFUYUfhaLhN22NjcPoqV73JZ3ZRNWrC0fsIxocTVmFrMqzcRWtqGviyW3N24RTNX42SWJ62F0tuvatkP8mAPbCm7CYJ5zXg3Hwedy/97bWKB+85AFMsV0eSv7uNRzy78nc4j1obwkvr9IoVYnuR9wBHMNufnwI5xouJWJNs6F1RhaIfzbvXpqncZr2XzBTDU9oTHI4Y6/tGDANLZNzxOZIBeWe79oiGhVCG5Am4jvnjL9XMVysoGQWXBv540SCUasztTvgYytaTs0L1xK0+d4aF6gduViXEe2FNg1i0DL7cIWo48IZoV72kNBHBRTPWG1tnTUn4Vgn7y8Y+dNW8r6Uvi9WByaDSt2o3xOczPl06NWVNAaVO6j8xRT86TFJ5p2/NwIoM0YGis+wDV2Yq0gQyuHRcWnox1zQ9P7li3s6Lwgo/Ap5T7jRX7WRRYfXg1IRj1szEHTAVT/FfSRm47sfu354JIwcO7BzDzRbDCnvlVy3TlgBgdBmpNs+1kY0nJAt6oDSWy5CrOy7e78IxsFFECnlllFZDVWNpF6v5P217KZbwwd5jJsnSOnDEN6qVHFnrMBkBFYlauJxPOgfkaorLKxRTjhdQ8IaEKsj16mceVJeqjCvJuIhDmnJM+49+7O3Z8eaeJ/KzQ+ISVtaxVIZwxh75a5pgXkOoIelNOalDEsAK6WNxNgobqMXcl2dUppbmx+avje84Ts9zqWAfapGr7EZJdXvYR3o51c5JNC6vl3W9n9aklFBDmuky+EwgIk8rumkOB+0IycWyTsW6zCAfqxX6NtZLkDw00JwKD5WUifFa6KGuZFPusmHGUINX8EsTWZEU1E8NZSfshUO0ReP92G/gi0JxwIE/c9a3QmjSdkVz3/mkJsj8K8PjgoGjUdnBbN85KCjUEE45i41P33xLwz4VSiaeyDiBz15JhjcsiGSfI4mi6aYqD8YK0th+eHZRSr2jTDsXj/j4pIDgBQQc8Gr0kIVrmb76s+GB4o2HzmNplhbm3nsu792e3NzCezxcvHgwo5CkrGGKoPgX3/lPDYSHWzuk7EfZPpUA/G8N5umx4EPB05NXGtC6JtuFuZmxVySZSnPr/9AG7tBAMNOmoKiS/zhpI+PVbW/XgAb7HmC606N3Huoq96gOk8PlI84bUGWw4p6WqdU21xwHhFl6w7rNoMklOPKkRQIEnAd1jMcT8/CLO6vkwYjRfs2kyd/ynRa0NVwuCm4Bus5y8CYcfMfXhZWX4TAsEcAR+9z6pNfT6U4pZVzE+IYXnJbMzq1yno/fXg64/N0iGxwZFyeTJneI9m5kFbP25EOUxzdEOj2TIJzkiXpnwvTGD0M+FJWeibI6m0F1Rj9ybtpDIxuIITWScb8Jq2tOh7RNOkhDFF/xvN/CCfnD3r8k6NOijyN4UVGsXXfnWLqG/7lDbqnjsLhStOzqpS01Tbbayp7Nq048iPj1FEH8ely+HFc7QQeCty6aHDIXDFzp5pFAerZYiuwudnVmUBmKMw4l0m4mbQeD1KNlVmBloBonBcbzjZc1ae0VAQ7lzIgvEXjfW9slvxR0loZriBsEe15Um1S+edyg2UsBs8rikY3dA+9cnPPv71rlYe8dargGGzy6mz6ulf7RgUjDsMC/e+kcHjbsEip6K78rn/HGdmOpsxpU4AxeNsU/NZDbK6B/FuHMUN7nga8C2kpmEsFsTjbznkPJ1Ra4B9B6dezu4qPiJm4S+2YvjBAwqbRHe4Irzn6mEB6yCuy0Rrbb8HJKTcwEp+IwsT2QGOhhTiNI7VFDQu1x/n0pMYzo9MSEIcG552fnlk5tLUdU/suhdg7e8c0lfMOF6IrMeUoZh6phgo2ydjKiy9sUkNenH+Jln8zj492KpPkbYaD5znNFCOvm47CNd/N4yIuKP44emuoxVVU3Js06eiQulvZpr5EFmgzwXCQd2HM54bTqsBYbr0ShfVHQCZHTJlxpz7YqAV0724OmWxX6ugVa7FS15PhH42L58HZwNpLo4Hx2aGsoyt4uG+wR77rN6SJ8qBr+TrDN0oXeDxQ35BKc7dtJfrDZZlfMs7O+X0yau4p0Xym6QJT17a6IkHUZYcX82rPjVcABcsqDlI5LPjDOPZbIsNWpOLMzZYGAqsKACmqgkzb2opNDneu8mUGd2uRpHLHK9S13lQHidQer4GQ/0k+fJA3HkkznrndR88sSzT7ixheG125VKD2J4kQWymsF7Y1sZcV31GNZTJgqEX8kI7Eip1B9rU7qKz32B1kUGVUWU5znWTSF44iQQhQjlOUz+W9azCXT6iigE+QUfIvlzXLO+cFwNhwscUdQjeX+3Pdr7/DhAQ2xI8tkoVEtnELm1dlglHlfs8AHhzevGR/4aofqRmMoZ2qR5D5fOklZz8+mGHkVZ2Sg5cw1/jwTHyT/wC1RU27leGr6i+bth296Pkbv0Cijv22y7MLkI4jL97HuG08p6KD+SR250avfPeKz15OD7BGHjyP3CwIBOEU1Wuprj8qbAp3S3AU6CI9ZYLT/JKrtzou4xB0OKNJXWV2MpKbZ31jQzMVe6upE2EXOAY4oWX7uE7WVbOkoCumfWTebhpEmRZaoHS1xGzFbbJ5N6lPIR3GDjRv9n/tsq/0fasLoB6Ogl2O3aY3XR2q5d2OGrOnsabjuT3c+s1UV+a5Q2el/4I88kaI8PgNKBR6Q2aiy8WYCyG6Y0F4PH/KcYQAw96CMA+f6hhEPHirWM2B2cejm5aX7b3PgLH4HqgD2RHHT0qpozjtdYBf0o0jJToW1QTFTXYv4q/lz1U4K7RKkMVqa8DciqcHKQ2F9gEY+QBDK81rpVz7xRMpPIc54Ppncfp99Kyf/vu376LxQe5CdEtq4PdVHahiKR/jROHLeNjpvGZdBLy7h9Y87A2AhTBL8EguOtETF4QauN3Jy1G/b6QABZgPE3aWyfANRPZVSCkRQP6F7UD0fvVAwIldYudwJLVbWr4LDZDPpIlZ99j0kRTklB9XiUSwYHHyY0lL9m4q0JzqSRIKAZgi3AKsT4CPyuvRGXLhCcpKI1LtxKVA7TolIo9sCVXHktaA1DMdiA2/yVXm44PiuSEF9vazTpv4egZ/7wqr3bWgkI1nKBMUG1eUb
+*/

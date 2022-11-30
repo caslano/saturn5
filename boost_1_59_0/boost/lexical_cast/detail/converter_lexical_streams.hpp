@@ -1,6 +1,6 @@
 // Copyright Kevlin Henney, 2000-2005.
 // Copyright Alexander Nasonov, 2006-2010.
-// Copyright Antony Polukhin, 2011-2020.
+// Copyright Antony Polukhin, 2011-2022.
 //
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
@@ -36,8 +36,8 @@
 #include <boost/type_traits/conditional.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/detail/lcast_precision.hpp>
 #include <boost/detail/workaround.hpp>
-
 
 #ifndef BOOST_NO_STD_LOCALE
 #   include <locale>
@@ -154,7 +154,7 @@ namespace boost {
             CharT   buffer[CharacterBufferSize];
 
             // After the `operator <<`  finishes, `[start, finish)` is
-            // the range to output by `operator >>` 
+            // the range to output by `operator >>`
             const CharT*  start;
             const CharT*  finish;
 
@@ -165,7 +165,7 @@ namespace boost {
               , start(buffer)
               , finish(buffer + CharacterBufferSize)
             {}
-    
+
             const CharT* cbegin() const BOOST_NOEXCEPT {
                 return start;
             }
@@ -282,7 +282,7 @@ namespace boost {
 #if defined(_MSC_VER) && (_MSC_VER >= 1400) && !defined(__SGI_STL_PORT) && !defined(_STLPORT_VERSION)
                     sprintf_s(begin, CharacterBufferSize,
 #else
-                    sprintf(begin, 
+                    sprintf(begin,
 #endif
                     "%.*g", static_cast<int>(boost::detail::lcast_get_precision<float>()), val_as_double);
                 return finish > start;
@@ -294,7 +294,7 @@ namespace boost {
 #if defined(_MSC_VER) && (_MSC_VER >= 1400) && !defined(__SGI_STL_PORT) && !defined(_STLPORT_VERSION)
                     sprintf_s(begin, CharacterBufferSize,
 #else
-                    sprintf(begin, 
+                    sprintf(begin,
 #endif
                     "%.*g", static_cast<int>(boost::detail::lcast_get_precision<double>()), val);
                 return finish > start;
@@ -307,7 +307,7 @@ namespace boost {
 #if defined(_MSC_VER) && (_MSC_VER >= 1400) && !defined(__SGI_STL_PORT) && !defined(_STLPORT_VERSION)
                     sprintf_s(begin, CharacterBufferSize,
 #else
-                    sprintf(begin, 
+                    sprintf(begin,
 #endif
                     "%.*Lg", static_cast<int>(boost::detail::lcast_get_precision<long double>()), val );
                 return finish > start;
@@ -375,15 +375,15 @@ namespace boost {
             }
 
             template <class C>
-            BOOST_DEDUCED_TYPENAME boost::disable_if<boost::is_const<C>, bool>::type 
+            BOOST_DEDUCED_TYPENAME boost::disable_if<boost::is_const<C>, bool>::type
             operator<<(const iterator_range<C*>& rng) BOOST_NOEXCEPT {
                 return (*this) << iterator_range<const C*>(rng.begin(), rng.end());
             }
-            
+
             bool operator<<(const iterator_range<const CharT*>& rng) BOOST_NOEXCEPT {
                 start = rng.begin();
                 finish = rng.end();
-                return true; 
+                return true;
             }
 
             bool operator<<(const iterator_range<const signed char*>& rng) BOOST_NOEXCEPT {
@@ -454,43 +454,43 @@ namespace boost {
                 return shl_real(static_cast<double>(val));
 #endif
             }
-            
+
             // Adding constness to characters. Constness does not change layout
             template <class C, std::size_t N>
             BOOST_DEDUCED_TYPENAME boost::disable_if<boost::is_const<C>, bool>::type
-            operator<<(boost::array<C, N> const& input) BOOST_NOEXCEPT { 
+            operator<<(boost::array<C, N> const& input) BOOST_NOEXCEPT {
                 BOOST_STATIC_ASSERT_MSG(
                     (sizeof(boost::array<const C, N>) == sizeof(boost::array<C, N>)),
                     "boost::array<C, N> and boost::array<const C, N> must have exactly the same layout."
                 );
-                return ((*this) << reinterpret_cast<boost::array<const C, N> const& >(input)); 
+                return ((*this) << reinterpret_cast<boost::array<const C, N> const& >(input));
             }
 
             template <std::size_t N>
-            bool operator<<(boost::array<const CharT, N> const& input) BOOST_NOEXCEPT { 
+            bool operator<<(boost::array<const CharT, N> const& input) BOOST_NOEXCEPT {
                 return shl_char_array_limited(input.data(), N);
             }
 
             template <std::size_t N>
-            bool operator<<(boost::array<const unsigned char, N> const& input) BOOST_NOEXCEPT { 
-                return ((*this) << reinterpret_cast<boost::array<const char, N> const& >(input)); 
+            bool operator<<(boost::array<const unsigned char, N> const& input) BOOST_NOEXCEPT {
+                return ((*this) << reinterpret_cast<boost::array<const char, N> const& >(input));
             }
 
             template <std::size_t N>
-            bool operator<<(boost::array<const signed char, N> const& input) BOOST_NOEXCEPT { 
-                return ((*this) << reinterpret_cast<boost::array<const char, N> const& >(input)); 
+            bool operator<<(boost::array<const signed char, N> const& input) BOOST_NOEXCEPT {
+                return ((*this) << reinterpret_cast<boost::array<const char, N> const& >(input));
             }
- 
+
 #ifndef BOOST_NO_CXX11_HDR_ARRAY
             // Making a Boost.Array from std::array
             template <class C, std::size_t N>
-            bool operator<<(std::array<C, N> const& input) BOOST_NOEXCEPT { 
+            bool operator<<(std::array<C, N> const& input) BOOST_NOEXCEPT {
                 BOOST_STATIC_ASSERT_MSG(
                     (sizeof(std::array<C, N>) == sizeof(boost::array<C, N>)),
                     "std::array and boost::array must have exactly the same layout. "
                     "Bug in implementation of std::array or boost::array."
                 );
-                return ((*this) << reinterpret_cast<boost::array<C, N> const& >(input)); 
+                return ((*this) << reinterpret_cast<boost::array<C, N> const& >(input));
             }
 #endif
             template <class InStreamable>
@@ -500,7 +500,7 @@ namespace boost {
 
         template <class CharT, class Traits>
         class lexical_ostream_limited_src: boost::noncopyable {
-            //`[start, finish)` is the range to output by `operator >>` 
+            //`[start, finish)` is the range to output by `operator >>`
             const CharT*        start;
             const CharT* const  finish;
 
@@ -580,7 +580,7 @@ namespace boost {
 #else
                 typedef BOOST_DEDUCED_TYPENAME out_stream_helper_trait<CharT, Traits>::buffer_t buffer_t;
                 buffer_t buf;
-                // Usually `istream` and `basic_istream` do not modify 
+                // Usually `istream` and `basic_istream` do not modify
                 // content of buffer; `buffer_t` assures that this is true
                 buf.setbuf(const_cast<CharT*>(start), static_cast<typename buffer_t::streamsize>(finish - start));
 #if defined(BOOST_NO_STD_LOCALE)
@@ -597,7 +597,7 @@ namespace boost {
                 stream.unsetf(std::ios::skipws);
                 lcast_set_precision(stream, static_cast<InputStreamable*>(0));
 
-                return (stream >> output) 
+                return (stream >> output)
                     && (stream.get() == Traits::eof());
 
 #ifndef BOOST_NO_EXCEPTIONS
@@ -625,7 +625,7 @@ namespace boost {
             bool shr_std_array(ArrayT& output) BOOST_NOEXCEPT {
                 using namespace std;
                 const std::size_t size = static_cast<std::size_t>(finish - start);
-                if (size > N - 1) { // `-1` because we need to store \0 at the end 
+                if (size > N - 1) { // `-1` because we need to store \0 at the end
                     return false;
                 }
 
@@ -668,33 +668,33 @@ namespace boost {
             bool operator>>(char32_t& output)                   { return shr_xchar(output); }
 #endif
             template<class Alloc>
-            bool operator>>(std::basic_string<CharT,Traits,Alloc>& str) { 
-                str.assign(start, finish); return true; 
+            bool operator>>(std::basic_string<CharT,Traits,Alloc>& str) {
+                str.assign(start, finish); return true;
             }
 
             template<class Alloc>
-            bool operator>>(boost::container::basic_string<CharT,Traits,Alloc>& str) { 
-                str.assign(start, finish); return true; 
+            bool operator>>(boost::container::basic_string<CharT,Traits,Alloc>& str) {
+                str.assign(start, finish); return true;
             }
 
             template <std::size_t N>
-            bool operator>>(boost::array<CharT, N>& output) BOOST_NOEXCEPT { 
-                return shr_std_array<N>(output); 
+            bool operator>>(boost::array<CharT, N>& output) BOOST_NOEXCEPT {
+                return shr_std_array<N>(output);
             }
 
             template <std::size_t N>
-            bool operator>>(boost::array<unsigned char, N>& output) BOOST_NOEXCEPT { 
-                return ((*this) >> reinterpret_cast<boost::array<char, N>& >(output)); 
+            bool operator>>(boost::array<unsigned char, N>& output) BOOST_NOEXCEPT {
+                return ((*this) >> reinterpret_cast<boost::array<char, N>& >(output));
             }
 
             template <std::size_t N>
-            bool operator>>(boost::array<signed char, N>& output) BOOST_NOEXCEPT { 
-                return ((*this) >> reinterpret_cast<boost::array<char, N>& >(output)); 
+            bool operator>>(boost::array<signed char, N>& output) BOOST_NOEXCEPT {
+                return ((*this) >> reinterpret_cast<boost::array<char, N>& >(output));
             }
- 
+
 #ifndef BOOST_NO_CXX11_HDR_ARRAY
             template <class C, std::size_t N>
-            bool operator>>(std::array<C, N>& output) BOOST_NOEXCEPT { 
+            bool operator>>(std::array<C, N>& output) BOOST_NOEXCEPT {
                 BOOST_STATIC_ASSERT_MSG(
                     (sizeof(std::array<C, N>) == sizeof(boost::array<C, N>)),
                     "std::array<C, N> and boost::array<C, N> must have exactly the same layout."
@@ -773,8 +773,8 @@ namespace boost {
             // Generic istream-based algorithm.
             // lcast_streambuf_for_target<InputStreamable>::value is true.
             template <typename InputStreamable>
-            bool operator>>(InputStreamable& output) { 
-                return shr_using_base_class(output); 
+            bool operator>>(InputStreamable& output) {
+                return shr_using_base_class(output);
             }
         };
     }
@@ -784,3 +784,7 @@ namespace boost {
 
 #endif // BOOST_LEXICAL_CAST_DETAIL_CONVERTER_LEXICAL_HPP
 
+
+/* converter_lexical_streams.hpp
+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
+*/

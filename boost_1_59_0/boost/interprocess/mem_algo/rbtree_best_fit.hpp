@@ -40,6 +40,7 @@
 #include <boost/container/detail/placement_new.hpp>
 // move/detail
 #include <boost/move/detail/type_traits.hpp> //make_unsigned, alignment_of
+#include <boost/move/detail/force_ptr.hpp> //make_unsigned, alignment_of
 // intrusive
 #include <boost/intrusive/pointer_traits.hpp>
 #include <boost/intrusive/set.hpp>
@@ -107,6 +108,7 @@ class rbtree_best_fit
 
    struct SizeHolder
    {
+      static const size_type size_mask = size_type(-1) >> 2;
       //!This block's memory size (including block_ctrl
       //!header) in Alignment units
       size_type m_prev_size;
@@ -384,28 +386,28 @@ void rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::
    BOOST_ASSERT(segment_size >= (BlockCtrlBytes + EndCtrlBlockBytes));
 
    //Initialize the first big block and the "end" node
-   block_ctrl *first_big_block = ::new(addr, boost_container_new_t())block_ctrl;
-   first_big_block->m_size = segment_size/Alignment - EndCtrlBlockUnits;
+   block_ctrl *first_big_block = ::new(addr, boost_container_new_t()) block_ctrl;
+   first_big_block->m_size = (segment_size/Alignment - EndCtrlBlockUnits) & block_ctrl::size_mask;
    BOOST_ASSERT(first_big_block->m_size >= BlockCtrlUnits);
 
    //The "end" node is just a node of size 0 with the "end" bit set
-   block_ctrl *end_block = static_cast<block_ctrl*>
-      (new (reinterpret_cast<char*>(addr) + first_big_block->m_size*Alignment)SizeHolder);
+   SizeHolder *end_block =
+      ::new(reinterpret_cast<char*>(addr) + first_big_block->m_size*Alignment, boost_container_new_t()) SizeHolder;
 
    //This will overwrite the prev part of the "end" node
    priv_mark_as_free_block (first_big_block);
    #ifdef BOOST_INTERPROCESS_RBTREE_BEST_FIT_ABI_V1_HPP
    first_big_block->m_prev_size = end_block->m_size =
-      (reinterpret_cast<char*>(first_big_block) - reinterpret_cast<char*>(end_block))/Alignment;
+      size_type(reinterpret_cast<char*>(first_big_block) - reinterpret_cast<char*>(end_block))/Alignmen) & block_ctrl::size_mask;
    #else
    first_big_block->m_prev_size = end_block->m_size =
-      (reinterpret_cast<char*>(end_block) - reinterpret_cast<char*>(first_big_block))/Alignment;
+      size_type(reinterpret_cast<char*>(end_block) - reinterpret_cast<char*>(first_big_block))/Alignment & block_ctrl::size_mask;
    #endif
    end_block->m_allocated = 1;
    first_big_block->m_prev_allocated = 1;
 
    BOOST_ASSERT(priv_next_block(first_big_block) == end_block);
-   BOOST_ASSERT(priv_prev_block(end_block) == first_big_block);
+   BOOST_ASSERT(priv_prev_block((block_ctrl*)end_block) == first_big_block);
    BOOST_ASSERT(priv_first_block() == first_big_block);
    BOOST_ASSERT(priv_end_block() == end_block);
 
@@ -424,8 +426,8 @@ inline typename rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::block_c
        rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>
    ::priv_first_block()
 {
-   size_type block1_off = priv_first_block_offset_from_this(this, m_header.m_extra_hdr_bytes);
-   return reinterpret_cast<block_ctrl *>(reinterpret_cast<char*>(this) + block1_off);
+   const size_type block1_off = priv_first_block_offset_from_this(this, m_header.m_extra_hdr_bytes);
+   return move_detail::force_ptr<block_ctrl*>(reinterpret_cast<char*>(this) + block1_off);
 }
 
 template<class MutexFamily, class VoidPointer, std::size_t MemAlignment>
@@ -433,10 +435,10 @@ inline typename rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::block_c
        rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>
    ::priv_end_block()
 {
-   size_type block1_off  = priv_first_block_offset_from_this(this, m_header.m_extra_hdr_bytes);
-   const size_type original_first_block_size = m_header.m_size/Alignment*Alignment - block1_off/Alignment*Alignment - EndCtrlBlockBytes;
-   block_ctrl *end_block = reinterpret_cast<block_ctrl*>
-      (reinterpret_cast<char*>(this) + block1_off + original_first_block_size);
+   const size_type block1_off = priv_first_block_offset_from_this(this, m_header.m_extra_hdr_bytes);
+   const size_type original_first_block_size = (m_header.m_size - block1_off)/Alignment - EndCtrlBlockUnits;
+   block_ctrl *end_block = move_detail::force_ptr<block_ctrl*>
+      (reinterpret_cast<char*>(this) + block1_off + original_first_block_size*Alignment);
    return end_block;
 }
 
@@ -483,7 +485,7 @@ void rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::grow(size_type ext
 
    //Now create a new block between the old end and the new end
    size_type align_offset = (m_header.m_size - old_border_offset)/Alignment;
-   block_ctrl *new_end_block = reinterpret_cast<block_ctrl*>
+   block_ctrl *new_end_block = move_detail::force_ptr<block_ctrl*>
       (reinterpret_cast<char*>(old_end_block) + align_offset*Alignment);
 
    //the last and first block are special:
@@ -491,11 +493,11 @@ void rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::grow(size_type ext
    //between them
    new_end_block->m_allocated = 1;
    #ifdef BOOST_INTERPROCESS_RBTREE_BEST_FIT_ABI_V1_HPP
-   new_end_block->m_size      = (reinterpret_cast<char*>(first_block) -
-                                 reinterpret_cast<char*>(new_end_block))/Alignment;
+   new_end_block->m_size      = size_type(reinterpret_cast<char*>(first_block) -
+                                          reinterpret_cast<char*>(new_end_block))/Alignment & block_ctrl::size_mask;
    #else
-   new_end_block->m_size      = (reinterpret_cast<char*>(new_end_block) -
-                                 reinterpret_cast<char*>(first_block))/Alignment;
+   new_end_block->m_size      = size_type(reinterpret_cast<char*>(new_end_block) -
+                                          reinterpret_cast<char*>(first_block))/Alignment & block_ctrl::size_mask;
    #endif
    first_block->m_prev_size = new_end_block->m_size;
    first_block->m_prev_allocated = 1;
@@ -503,8 +505,8 @@ void rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::grow(size_type ext
 
    //The old end block is the new block
    block_ctrl *new_block = old_end_block;
-   new_block->m_size = (reinterpret_cast<char*>(new_end_block) -
-                        reinterpret_cast<char*>(new_block))/Alignment;
+   new_block->m_size = size_type(reinterpret_cast<char*>(new_end_block) -
+                                 reinterpret_cast<char*>(new_block))/Alignment & block_ctrl::size_mask;
    BOOST_ASSERT(new_block->m_size >= BlockCtrlUnits);
    priv_mark_as_allocated_block(new_block);
    BOOST_ASSERT(priv_next_block(new_block) == new_end_block);
@@ -568,11 +570,13 @@ void rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::shrink_to_fit()
 
    //Write new end block attributes
    #ifdef BOOST_INTERPROCESS_RBTREE_BEST_FIT_ABI_V1_HPP
-   new_end_block->m_size = first_block->m_prev_size =
-      (reinterpret_cast<char*>(first_block) - reinterpret_cast<char*>(new_end_block))/Alignment;
+   new_end_block->m_size = 
+      size_type(reinterpret_cast<char*>(first_block) - reinterpret_cast<char*>(new_end_block))/Alignment & block_ctrl::size_mask;
+   first_block->m_prev_size = new_end_block->m_size;
    #else
-   new_end_block->m_size = first_block->m_prev_size =
-      (reinterpret_cast<char*>(new_end_block) - reinterpret_cast<char*>(first_block))/Alignment;
+   new_end_block->m_size =
+      size_type(reinterpret_cast<char*>(new_end_block) - reinterpret_cast<char*>(first_block))/Alignment & block_ctrl::size_mask;
+   first_block->m_prev_size = new_end_block->m_size;
    #endif
 
    new_end_block->m_allocated = 1;
@@ -581,7 +585,7 @@ void rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::shrink_to_fit()
    BOOST_ASSERT(new_end_block->m_size == (old_end_block_size - last_block_size));
 
    //Update managed buffer's size
-   m_header.m_size = shrunk_border_offset;
+   m_header.m_size = shrunk_border_offset & block_ctrl::size_mask;
    BOOST_ASSERT(priv_end_block() == new_end_block);
    if(unique_buffer)
       priv_deallocate(unique_buffer);
@@ -849,17 +853,17 @@ void* rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::
          }
          //We need a minimum size to split the previous one
          if(prev_block->m_size >= (needs_backwards_aligned/Alignment + BlockCtrlUnits)){
-            block_ctrl *new_block = reinterpret_cast<block_ctrl *>
+            block_ctrl *new_block = move_detail::force_ptr<block_ctrl*>
                (reinterpret_cast<char*>(reuse) - needs_backwards_aligned);
 
             //Free old previous buffer
             new_block->m_size =
-               AllocatedCtrlUnits + (needs_backwards_aligned + (prefer_in_recvd_out_size - UsableByPreviousChunk))/Alignment;
+               (AllocatedCtrlUnits + (needs_backwards_aligned + (prefer_in_recvd_out_size - UsableByPreviousChunk))/Alignment) & block_ctrl::size_mask;
             BOOST_ASSERT(new_block->m_size >= BlockCtrlUnits);
             priv_mark_as_allocated_block(new_block);
 
-            prev_block->m_size = (reinterpret_cast<char*>(new_block) -
-                                  reinterpret_cast<char*>(prev_block))/Alignment;
+            prev_block->m_size = size_type(reinterpret_cast<char*>(new_block) -
+                                           reinterpret_cast<char*>(prev_block))/Alignment & block_ctrl::size_mask;
             BOOST_ASSERT(prev_block->m_size >= BlockCtrlUnits);
             priv_mark_as_free_block(prev_block);
 
@@ -886,7 +890,7 @@ void* rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::
             //first bytes, fill them with a pattern
             void *p = priv_get_user_buffer(new_block);
             void *user_ptr = reinterpret_cast<char*>(p);
-            BOOST_ASSERT((static_cast<char*>(reuse_ptr) - static_cast<char*>(user_ptr)) % backwards_multiple == 0);
+            BOOST_ASSERT(size_type(static_cast<char*>(reuse_ptr) - static_cast<char*>(user_ptr)) % backwards_multiple == 0);
             algo_impl_t::assert_alignment(user_ptr);
             return user_ptr;
          }
@@ -903,14 +907,14 @@ void* rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::
 
             m_header.m_allocated += (size_type)prev_block->m_size*Alignment;
             //Now update sizes
-            prev_block->m_size = prev_block->m_size + reuse->m_size;
+            prev_block->m_size = size_type(prev_block->m_size + reuse->m_size) & block_ctrl::size_mask;
             BOOST_ASSERT(prev_block->m_size >= BlockCtrlUnits);
             priv_mark_as_allocated_block(prev_block);
 
             //If the backwards expansion has remaining bytes in the
             //first bytes, fill them with a pattern
             void *user_ptr = priv_get_user_buffer(prev_block);
-            BOOST_ASSERT((static_cast<char*>(reuse_ptr) - static_cast<char*>(user_ptr)) % backwards_multiple == 0);
+            BOOST_ASSERT(size_type(static_cast<char*>(reuse_ptr) - static_cast<char*>(user_ptr)) % backwards_multiple == 0);
             algo_impl_t::assert_alignment(user_ptr);
             return user_ptr;
          }
@@ -999,7 +1003,7 @@ typename rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::block_ctrl *
    rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::priv_get_block(const void *ptr)
 {
    return const_cast<block_ctrl*>
-      (reinterpret_cast<const block_ctrl*>
+      (move_detail::force_ptr<const block_ctrl*>
          (reinterpret_cast<const char*>(ptr) - AllocatedCtrlBytes));
 }
 
@@ -1086,29 +1090,19 @@ bool rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::
       //overwrite the tree hook of the old next block. So we first erase the
       //old if needed and we'll insert the new one after creating the new next
       imultiset_iterator old_next_block_it(Imultiset::s_iterator_to(*next_block));
-      const bool size_invariants_broken =
-            (next_block->m_size - rem_units ) < BlockCtrlUnits ||
-            (old_next_block_it != m_header.m_imultiset.begin() &&
-            (--imultiset_iterator(old_next_block_it))->m_size > rem_units);
-      if(size_invariants_broken){
-         m_header.m_imultiset.erase(old_next_block_it);
-      }
+      m_header.m_imultiset.erase(old_next_block_it);
+
       //This is the remaining block
-      block_ctrl *rem_block = ::new(reinterpret_cast<block_ctrl*>
-                     (reinterpret_cast<char*>(block) + intended_units*Alignment), boost_container_new_t())block_ctrl;
-      rem_block->m_size  = rem_units;
+      block_ctrl *rem_block = 
+         ::new(reinterpret_cast<char*>(block) + intended_units*Alignment, boost_container_new_t()) block_ctrl;
+      rem_block->m_size = rem_units & block_ctrl::size_mask;
       algo_impl_t::assert_alignment(rem_block);
       BOOST_ASSERT(rem_block->m_size >= BlockCtrlUnits);
       priv_mark_as_free_block(rem_block);
-
-      //Now the second part of the fixup
-      if(size_invariants_broken)
-         m_header.m_imultiset.insert(m_header.m_imultiset.begin(), *rem_block);
-      else
-         m_header.m_imultiset.replace_node(old_next_block_it, *rem_block);
+      m_header.m_imultiset.insert(*rem_block);
 
       //Write the new length
-      block->m_size = intended_user_units + AllocatedCtrlUnits;
+      block->m_size = (intended_user_units + AllocatedCtrlUnits) & block_ctrl::size_mask;
       BOOST_ASSERT(block->m_size >= BlockCtrlUnits);
       m_header.m_allocated += (intended_units - old_block_units)*Alignment;
    }
@@ -1118,7 +1112,7 @@ bool rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::
       m_header.m_imultiset.erase(Imultiset::s_iterator_to(*next_block));
 
       //Write the new length
-      block->m_size = merged_units;
+      block->m_size = merged_units & block_ctrl::size_mask;
       BOOST_ASSERT(block->m_size >= BlockCtrlUnits);
       m_header.m_allocated += (merged_units - old_block_units)*Alignment;
    }
@@ -1133,7 +1127,7 @@ typename rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::block_ctrl *
       (typename rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::block_ctrl *ptr)
 {
    BOOST_ASSERT(!ptr->m_prev_allocated);
-   return reinterpret_cast<block_ctrl *>
+   return move_detail::force_ptr<block_ctrl*>
       (reinterpret_cast<char*>(ptr) - ptr->m_prev_size*Alignment);
 }
 
@@ -1147,7 +1141,7 @@ typename rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::block_ctrl *
    //The first block's logic is different from the rest of blocks: stores in m_prev_size the absolute
    //distance with the end block
    BOOST_ASSERT(first_segment_block->m_prev_allocated);
-   block_ctrl *end_block = reinterpret_cast<block_ctrl *>
+   block_ctrl *end_block = move_detail::force_ptr<block_ctrl*>
       (reinterpret_cast<char*>(first_segment_block) + first_segment_block->m_prev_size*Alignment);
    (void)end_block;
    BOOST_ASSERT(end_block->m_allocated == 1);
@@ -1164,7 +1158,7 @@ typename rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::block_ctrl *
    //The first block's logic is different from the rest of blocks: stores in m_prev_size the absolute
    //distance with the end block
    BOOST_ASSERT(end_segment_block->m_allocated);
-   block_ctrl *first_block = reinterpret_cast<block_ctrl *>
+   block_ctrl *first_block = move_detail::force_ptr<block_ctrl*>
       (reinterpret_cast<char*>(end_segment_block) - end_segment_block->m_size*Alignment);
    (void)first_block;
    BOOST_ASSERT(first_block->m_prev_allocated == 1);
@@ -1179,7 +1173,7 @@ typename rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::block_ctrl *
    rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::priv_next_block
       (typename rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::block_ctrl *ptr)
 {
-   return reinterpret_cast<block_ctrl *>
+   return move_detail::force_ptr<block_ctrl*>
       (reinterpret_cast<char*>(ptr) + ptr->m_size*Alignment);
 }
 
@@ -1190,7 +1184,7 @@ bool rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::priv_is_allocated_
    bool allocated = block->m_allocated != 0;
    #ifndef NDEBUG
    if(block != priv_end_block()){
-      block_ctrl *next_block = reinterpret_cast<block_ctrl *>
+      block_ctrl *next_block = move_detail::force_ptr<block_ctrl*>
          (reinterpret_cast<char*>(block) + block->m_size*Alignment);
       bool next_block_prev_allocated = next_block->m_prev_allocated != 0;
       (void)next_block_prev_allocated;
@@ -1225,7 +1219,7 @@ void rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::priv_mark_as_alloc
       (typename rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::block_ctrl *block)
 {
    block->m_allocated = 1;
-   reinterpret_cast<block_ctrl *>
+   move_detail::force_ptr<block_ctrl*>
       (reinterpret_cast<char*>(block)+ block->m_size*Alignment)->m_prev_allocated = 1;
 }
 
@@ -1254,34 +1248,20 @@ void* rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::priv_check_and_al
       //two blocks, the first's size will be "units" and
       //the second's size "block->m_size-units"
       size_type block_old_size = block->m_size;
-      block->m_size = nunits;
+      block->m_size = nunits & block_ctrl::size_mask;
       BOOST_ASSERT(block->m_size >= BlockCtrlUnits);
 
       //This is the remaining block
-      block_ctrl *rem_block = ::new(reinterpret_cast<block_ctrl*>
-                     (reinterpret_cast<char*>(block) + Alignment*nunits), boost_container_new_t())block_ctrl;
+      block_ctrl *rem_block =
+         ::new(reinterpret_cast<char*>(block) + Alignment*nunits, boost_container_new_t()) block_ctrl;
       algo_impl_t::assert_alignment(rem_block);
-      rem_block->m_size  = block_old_size - nunits;
+      rem_block->m_size = (block_old_size - nunits) & block_ctrl::size_mask;
       BOOST_ASSERT(rem_block->m_size >= BlockCtrlUnits);
       priv_mark_as_free_block(rem_block);
 
-      imultiset_iterator it_hint;
-      if(it_old == m_header.m_imultiset.begin()
-         || (--imultiset_iterator(it_old))->m_size <= rem_block->m_size){
-         //option a: slow but secure
-         //m_header.m_imultiset.insert(m_header.m_imultiset.erase(it_old), *rem_block);
-         //option b: Construct an empty node and swap
-         //Imultiset::init_node(*rem_block);
-         //block->swap_nodes(*rem_block);
-         //option c: replace the node directly
-         m_header.m_imultiset.replace_node(Imultiset::s_iterator_to(*it_old), *rem_block);
-      }
-      else{
-         //Now we have to update the data in the tree
-         m_header.m_imultiset.erase(it_old);
-         m_header.m_imultiset.insert(m_header.m_imultiset.begin(), *rem_block);
-      }
-
+      //Now we have to update the data in the tree.
+      //Use the position of the erased one as a hint
+      m_header.m_imultiset.insert(m_header.m_imultiset.erase(it_old), *rem_block);
    }
    else if (block->m_size >= nunits){
       m_header.m_imultiset.erase(it_old);
@@ -1302,7 +1282,7 @@ void* rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::priv_check_and_al
    //cleared with zero_free_memory
    TreeHook *t = static_cast<TreeHook*>(block);
    //Just clear the memory part reserved for the user
-   std::size_t tree_hook_offset_in_block = (char*)t - (char*)block;
+   std::size_t tree_hook_offset_in_block = std::size_t((char*)t - (char*)block);
    //volatile char *ptr =
    char *ptr = reinterpret_cast<char*>(block)+tree_hook_offset_in_block;
    const std::size_t s = BlockCtrlBytes - tree_hook_offset_in_block;
@@ -1354,40 +1334,20 @@ void rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::priv_deallocate(vo
       if(merge_with_prev){
          //Get the previous block
          block_to_insert = priv_prev_block(block);
-         block_to_insert->m_size += block->m_size;
+         block_to_insert->m_size = size_type(block_to_insert->m_size + block->m_size) & block_ctrl::size_mask;
          BOOST_ASSERT(block_to_insert->m_size >= BlockCtrlUnits);
+         m_header.m_imultiset.erase(Imultiset::s_iterator_to(*block_to_insert));
       }
       //Merge if the next is free
       if(merge_with_next){
-         block_to_insert->m_size += next_block->m_size;
+         block_to_insert->m_size = size_type(block_to_insert->m_size + next_block->m_size) & block_ctrl::size_mask;
          BOOST_ASSERT(block_to_insert->m_size >= BlockCtrlUnits);
          const imultiset_iterator next_it = Imultiset::s_iterator_to(*next_block);
-         if(merge_with_prev){
-            m_header.m_imultiset.erase(next_it);
-         }
-         else{
-            m_header.m_imultiset.replace_node(next_it, *block_to_insert);
-         }
+         m_header.m_imultiset.erase(next_it);
       }
-
-      //Now try to shortcut erasure + insertion (O(log(N))) with
-      //a O(1) operation if merging does not alter tree positions
-      const imultiset_iterator block_to_check_it = Imultiset::s_iterator_to(*block_to_insert);
-      imultiset_const_iterator next_to_check_it(block_to_check_it), end_it(m_header.m_imultiset.end());
-
-      if(++next_to_check_it != end_it && block_to_insert->m_size > next_to_check_it->m_size){
-         //Block is bigger than next, so move it
-         m_header.m_imultiset.erase(block_to_check_it);
-         m_header.m_imultiset.insert(end_it, *block_to_insert);
-      }
-      else{
-         //Block size increment didn't violate tree invariants so there is nothing to fix
-      }
-   }
-   else{
-      m_header.m_imultiset.insert(m_header.m_imultiset.begin(), *block_to_insert);
    }
    priv_mark_as_free_block(block_to_insert);
+   m_header.m_imultiset.insert(*block_to_insert);
 }
 
 #endif   //#ifndef BOOST_INTERPROCESS_DOXYGEN_INVOKED
@@ -1398,3 +1358,7 @@ void rbtree_best_fit<MutexFamily, VoidPointer, MemAlignment>::priv_deallocate(vo
 #include <boost/interprocess/detail/config_end.hpp>
 
 #endif   //#ifndef BOOST_INTERPROCESS_MEM_ALGO_RBTREE_BEST_FIT_HPP
+
+/* rbtree_best_fit.hpp
+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
+*/

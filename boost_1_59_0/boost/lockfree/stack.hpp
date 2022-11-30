@@ -9,13 +9,13 @@
 
 #include <boost/assert.hpp>
 #include <boost/checked_delete.hpp>
+#include <boost/core/allocator_access.hpp>
 #include <boost/core/no_exceptions_support.hpp>
 #include <boost/integer_traits.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/type_traits/is_copy_constructible.hpp>
 
-#include <boost/lockfree/detail/allocator_rebind_helper.hpp>
 #include <boost/lockfree/detail/atomic.hpp>
 #include <boost/lockfree/detail/copy_payload.hpp>
 #include <boost/lockfree/detail/freelist.hpp>
@@ -135,48 +135,72 @@ public:
         return tos.is_lock_free() && pool.is_lock_free();
     }
 
-    //! Construct stack
-    // @{
+    /** Construct a fixed-sized stack
+     *
+     *  \pre Must specify a capacity<> argument
+     * */
     stack(void):
         pool(node_allocator(), capacity)
     {
+        // Don't use BOOST_STATIC_ASSERT() here since it will be evaluated when compiling
+        // this function and this function may be compiled even when it isn't being used.
         BOOST_ASSERT(has_capacity);
         initialize();
     }
 
+    /** Construct a fixed-sized stack with a custom allocator
+     *
+     *  \pre Must specify a capacity<> argument
+     * */
     template <typename U>
-    explicit stack(typename detail::allocator_rebind_helper<node_allocator, U>::type const & alloc):
+    explicit stack(typename boost::allocator_rebind<node_allocator, U>::type const & alloc):
         pool(alloc, capacity)
     {
         BOOST_STATIC_ASSERT(has_capacity);
         initialize();
     }
 
+    /** Construct a fixed-sized stack with a custom allocator
+     *
+     *  \pre Must specify a capacity<> argument
+     * */
     explicit stack(allocator const & alloc):
         pool(alloc, capacity)
     {
+        // Don't use BOOST_STATIC_ASSERT() here since it will be evaluated when compiling
+        // this function and this function may be compiled even when it isn't being used.
         BOOST_ASSERT(has_capacity);
         initialize();
     }
-    // @}
 
-    //! Construct stack, allocate n nodes for the freelist.
-    // @{
+    /** Construct a variable-sized stack
+     *
+     *  Allocate n nodes initially for the freelist
+     *
+     *  \pre Must \b not specify a capacity<> argument
+     * */
     explicit stack(size_type n):
         pool(node_allocator(), n)
     {
+        // Don't use BOOST_STATIC_ASSERT() here since it will be evaluated when compiling
+        // this function and this function may be compiled even when it isn't being used.
         BOOST_ASSERT(!has_capacity);
         initialize();
     }
 
+    /** Construct a variable-sized stack with a custom allocator
+     *
+     *  Allocate n nodes initially for the freelist
+     *
+     *  \pre Must \b not specify a capacity<> argument
+     * */
     template <typename U>
-    stack(size_type n, typename detail::allocator_rebind_helper<node_allocator, U>::type const & alloc):
+    stack(size_type n, typename boost::allocator_rebind<node_allocator, U>::type const & alloc):
         pool(alloc, n)
     {
         BOOST_STATIC_ASSERT(!has_capacity);
         initialize();
     }
-    // @}
 
     /** Allocate n nodes for freelist
      *
@@ -186,7 +210,9 @@ public:
      * */
     void reserve(size_type n)
     {
-        BOOST_STATIC_ASSERT(!has_capacity);
+        // Don't use BOOST_STATIC_ASSERT() here since it will be evaluated when compiling
+        // this function and this function may be compiled even when it isn't being used.
+        BOOST_ASSERT(!has_capacity);
         pool.template reserve<true>(n);
     }
 
@@ -198,7 +224,9 @@ public:
      * */
     void reserve_unsafe(size_type n)
     {
-        BOOST_STATIC_ASSERT(!has_capacity);
+        // Don't use BOOST_STATIC_ASSERT() here since it will be evaluated when compiling
+        // this function and this function may be compiled even when it isn't being used.
+        BOOST_ASSERT(!has_capacity);
         pool.template reserve<false>(n);
     }
 
@@ -209,9 +237,8 @@ public:
      * */
     ~stack(void)
     {
-        T dummy;
-        while(unsynchronized_pop(dummy))
-        {}
+        detail::consume_noop consume_functor;
+        (void)consume_all(consume_functor);
     }
 
 private:
@@ -238,7 +265,7 @@ private:
         tagged_node_handle old_tos = tos.load(detail::memory_order_relaxed);
 
         tagged_node_handle new_tos (pool.get_handle(new_top_node), old_tos.get_tag());
-        end_node->next = pool.get_pointer(old_tos);
+        end_node->next = pool.get_handle(old_tos);
 
         tos.store(new_tos, memory_order_relaxed);
     }
@@ -795,3 +822,7 @@ private:
 } /* namespace boost */
 
 #endif /* BOOST_LOCKFREE_STACK_HPP_INCLUDED */
+
+/* stack.hpp
+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
+*/

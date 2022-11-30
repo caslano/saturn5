@@ -10,25 +10,19 @@
 #pragma once
 #endif
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 #pragma warning(push) // Temporary until lexical cast fixed.
 #pragma warning(disable: 4127 4701)
 #endif
-#ifndef BOOST_MATH_NO_LEXICAL_CAST
-#include <boost/lexical_cast.hpp>
-#endif
-#ifdef BOOST_MSVC
+#include <boost/math/tools/convert_from_string.hpp>
+#ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 #include <cmath>
 #include <boost/math/special_functions/math_fwd.hpp>
 #include <boost/math/tools/cxx03_warn.hpp>
-
-#ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
 #include <array>
-#else
-#include <boost/array.hpp>
-#endif
+#include <type_traits>
 
 #if defined(__GNUC__) && defined(BOOST_MATH_USE_FLOAT128)
 //
@@ -53,7 +47,7 @@ inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION float unchecked_factorial<float>(unsi
 #ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
    constexpr std::array<float, 35> factorials = { {
 #else
-   static const boost::array<float, 35> factorials = {{
+   static const std::array<float, 35> factorials = {{
 #endif
       1.0F,
       1.0F,
@@ -98,9 +92,198 @@ inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION float unchecked_factorial<float>(unsi
 template <>
 struct max_factorial<float>
 {
-   BOOST_STATIC_CONSTANT(unsigned, value = 34);
+   static constexpr unsigned value = 34;
 };
 
+template <>
+inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION double unchecked_factorial<double>(unsigned i BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(double))
+{
+#ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
+   constexpr std::array<double, 171> factorials = { {
+#else
+   static const std::array<double, 171> factorials = {{
+#endif
+      1.0,
+      1.0,
+      2.0,
+      6.0,
+      24.0,
+      120.0,
+      720.0,
+      5040.0,
+      40320.0,
+      362880.0,
+      3628800.0,
+      39916800.0,
+      479001600.0,
+      6227020800.0,
+      87178291200.0,
+      1307674368000.0,
+      20922789888000.0,
+      355687428096000.0,
+      6402373705728000.0,
+      121645100408832000.0,
+      0.243290200817664e19,
+      0.5109094217170944e20,
+      0.112400072777760768e22,
+      0.2585201673888497664e23,
+      0.62044840173323943936e24,
+      0.15511210043330985984e26,
+      0.403291461126605635584e27,
+      0.10888869450418352160768e29,
+      0.304888344611713860501504e30,
+      0.8841761993739701954543616e31,
+      0.26525285981219105863630848e33,
+      0.822283865417792281772556288e34,
+      0.26313083693369353016721801216e36,
+      0.868331761881188649551819440128e37,
+      0.29523279903960414084761860964352e39,
+      0.103331479663861449296666513375232e41,
+      0.3719933267899012174679994481508352e42,
+      0.137637530912263450463159795815809024e44,
+      0.5230226174666011117600072241000742912e45,
+      0.203978820811974433586402817399028973568e47,
+      0.815915283247897734345611269596115894272e48,
+      0.3345252661316380710817006205344075166515e50,
+      0.1405006117752879898543142606244511569936e52,
+      0.6041526306337383563735513206851399750726e53,
+      0.265827157478844876804362581101461589032e55,
+      0.1196222208654801945619631614956577150644e57,
+      0.5502622159812088949850305428800254892962e58,
+      0.2586232415111681806429643551536119799692e60,
+      0.1241391559253607267086228904737337503852e62,
+      0.6082818640342675608722521633212953768876e63,
+      0.3041409320171337804361260816606476884438e65,
+      0.1551118753287382280224243016469303211063e67,
+      0.8065817517094387857166063685640376697529e68,
+      0.427488328406002556429801375338939964969e70,
+      0.2308436973392413804720927426830275810833e72,
+      0.1269640335365827592596510084756651695958e74,
+      0.7109985878048634518540456474637249497365e75,
+      0.4052691950487721675568060190543232213498e77,
+      0.2350561331282878571829474910515074683829e79,
+      0.1386831185456898357379390197203894063459e81,
+      0.8320987112741390144276341183223364380754e82,
+      0.507580213877224798800856812176625227226e84,
+      0.3146997326038793752565312235495076408801e86,
+      0.1982608315404440064116146708361898137545e88,
+      0.1268869321858841641034333893351614808029e90,
+      0.8247650592082470666723170306785496252186e91,
+      0.5443449390774430640037292402478427526443e93,
+      0.3647111091818868528824985909660546442717e95,
+      0.2480035542436830599600990418569171581047e97,
+      0.1711224524281413113724683388812728390923e99,
+      0.1197857166996989179607278372168909873646e101,
+      0.8504785885678623175211676442399260102886e102,
+      0.6123445837688608686152407038527467274078e104,
+      0.4470115461512684340891257138125051110077e106,
+      0.3307885441519386412259530282212537821457e108,
+      0.2480914081139539809194647711659403366093e110,
+      0.188549470166605025498793226086114655823e112,
+      0.1451830920282858696340707840863082849837e114,
+      0.1132428117820629783145752115873204622873e116,
+      0.8946182130782975286851441715398316520698e117,
+      0.7156945704626380229481153372318653216558e119,
+      0.5797126020747367985879734231578109105412e121,
+      0.4753643337012841748421382069894049466438e123,
+      0.3945523969720658651189747118012061057144e125,
+      0.3314240134565353266999387579130131288001e127,
+      0.2817104114380550276949479442260611594801e129,
+      0.2422709538367273238176552320344125971528e131,
+      0.210775729837952771721360051869938959523e133,
+      0.1854826422573984391147968456455462843802e135,
+      0.1650795516090846108121691926245361930984e137,
+      0.1485715964481761497309522733620825737886e139,
+      0.1352001527678402962551665687594951421476e141,
+      0.1243841405464130725547532432587355307758e143,
+      0.1156772507081641574759205162306240436215e145,
+      0.1087366156656743080273652852567866010042e147,
+      0.103299784882390592625997020993947270954e149,
+      0.9916779348709496892095714015418938011582e150,
+      0.9619275968248211985332842594956369871234e152,
+      0.942689044888324774562618574305724247381e154,
+      0.9332621544394415268169923885626670049072e156,
+      0.9332621544394415268169923885626670049072e158,
+      0.9425947759838359420851623124482936749562e160,
+      0.9614466715035126609268655586972595484554e162,
+      0.990290071648618040754671525458177334909e164,
+      0.1029901674514562762384858386476504428305e167,
+      0.1081396758240290900504101305800329649721e169,
+      0.1146280563734708354534347384148349428704e171,
+      0.1226520203196137939351751701038733888713e173,
+      0.132464181945182897449989183712183259981e175,
+      0.1443859583202493582204882102462797533793e177,
+      0.1588245541522742940425370312709077287172e179,
+      0.1762952551090244663872161047107075788761e181,
+      0.1974506857221074023536820372759924883413e183,
+      0.2231192748659813646596607021218715118256e185,
+      0.2543559733472187557120132004189335234812e187,
+      0.2925093693493015690688151804817735520034e189,
+      0.339310868445189820119825609358857320324e191,
+      0.396993716080872089540195962949863064779e193,
+      0.4684525849754290656574312362808384164393e195,
+      0.5574585761207605881323431711741977155627e197,
+      0.6689502913449127057588118054090372586753e199,
+      0.8094298525273443739681622845449350829971e201,
+      0.9875044200833601362411579871448208012564e203,
+      0.1214630436702532967576624324188129585545e206,
+      0.1506141741511140879795014161993280686076e208,
+      0.1882677176888926099743767702491600857595e210,
+      0.237217324288004688567714730513941708057e212,
+      0.3012660018457659544809977077527059692324e214,
+      0.3856204823625804217356770659234636406175e216,
+      0.4974504222477287440390234150412680963966e218,
+      0.6466855489220473672507304395536485253155e220,
+      0.8471580690878820510984568758152795681634e222,
+      0.1118248651196004307449963076076169029976e225,
+      0.1487270706090685728908450891181304809868e227,
+      0.1992942746161518876737324194182948445223e229,
+      0.269047270731805048359538766214698040105e231,
+      0.3659042881952548657689727220519893345429e233,
+      0.5012888748274991661034926292112253883237e235,
+      0.6917786472619488492228198283114910358867e237,
+      0.9615723196941089004197195613529725398826e239,
+      0.1346201247571752460587607385894161555836e242,
+      0.1898143759076170969428526414110767793728e244,
+      0.2695364137888162776588507508037290267094e246,
+      0.3854370717180072770521565736493325081944e248,
+      0.5550293832739304789551054660550388118e250,
+      0.80479260574719919448490292577980627711e252,
+      0.1174997204390910823947958271638517164581e255,
+      0.1727245890454638911203498659308620231933e257,
+      0.2556323917872865588581178015776757943262e259,
+      0.380892263763056972698595524350736933546e261,
+      0.571338395644585459047893286526105400319e263,
+      0.8627209774233240431623188626544191544816e265,
+      0.1311335885683452545606724671234717114812e268,
+      0.2006343905095682394778288746989117185662e270,
+      0.308976961384735088795856467036324046592e272,
+      0.4789142901463393876335775239063022722176e274,
+      0.7471062926282894447083809372938315446595e276,
+      0.1172956879426414428192158071551315525115e279,
+      0.1853271869493734796543609753051078529682e281,
+      0.2946702272495038326504339507351214862195e283,
+      0.4714723635992061322406943211761943779512e285,
+      0.7590705053947218729075178570936729485014e287,
+      0.1229694218739449434110178928491750176572e290,
+      0.2004401576545302577599591653441552787813e292,
+      0.3287218585534296227263330311644146572013e294,
+      0.5423910666131588774984495014212841843822e296,
+      0.9003691705778437366474261723593317460744e298,
+      0.1503616514864999040201201707840084015944e301,
+      0.2526075744973198387538018869171341146786e303,
+      0.4269068009004705274939251888899566538069e305,
+      0.7257415615307998967396728211129263114717e307,
+   }};
+
+   return factorials[i];
+}
+
+template <>
+struct max_factorial<double>
+{
+   static constexpr unsigned value = 170;
+};
 
 template <>
 inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION long double unchecked_factorial<long double>(unsigned i BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(long double))
@@ -108,7 +291,7 @@ inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION long double unchecked_factorial<long 
 #ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
    constexpr std::array<long double, 171> factorials = { {
 #else
-   static const boost::array<long double, 171> factorials = {{
+   static const std::array<long double, 171> factorials = {{
 #endif
       1L,
       1L,
@@ -289,7 +472,7 @@ inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION long double unchecked_factorial<long 
 template <>
 struct max_factorial<long double>
 {
-   BOOST_STATIC_CONSTANT(unsigned, value = 170);
+   static constexpr unsigned value = 170;
 };
 
 #ifdef BOOST_MATH_USE_FLOAT128
@@ -300,7 +483,7 @@ inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION BOOST_MATH_FLOAT128_TYPE unchecked_fa
 #ifdef BOOST_MATH_HAVE_CONSTEXPR_TABLES
    constexpr std::array<BOOST_MATH_FLOAT128_TYPE, 171> factorials = { {
 #else
-   static const boost::array<BOOST_MATH_FLOAT128_TYPE, 171> factorials = { {
+   static const std::array<BOOST_MATH_FLOAT128_TYPE, 171> factorials = { {
 #endif
       1,
       1,
@@ -481,25 +664,10 @@ inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION BOOST_MATH_FLOAT128_TYPE unchecked_fa
 template <>
 struct max_factorial<BOOST_MATH_FLOAT128_TYPE>
 {
-   BOOST_STATIC_CONSTANT(unsigned, value = 170);
+   static constexpr unsigned value = 170;
 };
 
 #endif
-
-template <>
-inline BOOST_MATH_CONSTEXPR_TABLE_FUNCTION double unchecked_factorial<double>(unsigned i BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(double))
-{
-   return static_cast<double>(boost::math::unchecked_factorial<long double>(i));
-}
-
-template <>
-struct max_factorial<double>
-{
-   BOOST_STATIC_CONSTANT(unsigned,
-      value = ::boost::math::max_factorial<long double>::value);
-};
-
-#ifndef BOOST_MATH_NO_LEXICAL_CAST
 
 template <class T>
 struct unchecked_factorial_initializer
@@ -524,19 +692,24 @@ const typename unchecked_factorial_initializer<T>::init unchecked_factorial_init
 
 
 template <class T, int N>
-inline T unchecked_factorial_imp(unsigned i, const boost::integral_constant<int, N>&)
+inline T unchecked_factorial_imp(unsigned i, const std::integral_constant<int, N>&)
 {
-   BOOST_STATIC_ASSERT(!boost::is_integral<T>::value);
-   // factorial<unsigned int>(n) is not implemented
+   //
+   // If you're foolish enough to instantiate factorial
+   // on an integer type then you end up here.  But this code is
+   // only intended for (fixed precision) multiprecision types.
+   // 
+   // Note, factorial<unsigned int>(n) is not implemented
    // because it would overflow integral type T for too small n
    // to be useful. Use instead a floating-point type,
    // and convert to an unsigned type if essential, for example:
    // unsigned int nfac = static_cast<unsigned int>(factorial<double>(n));
    // See factorial documentation for more detail.
+   //
+   static_assert(!std::is_integral<T>::value && !std::numeric_limits<T>::is_integer, "Type T must not be an integral type");
 
-   unchecked_factorial_initializer<T>::force_instantiate();
-
-   static const boost::array<T, 101> factorials = {{
+   // We rely on C++11 thread safe initialization here:
+   static const std::array<T, 101> factorials = {{
       T(boost::math::tools::convert_from_string<T>("1")),
       T(boost::math::tools::convert_from_string<T>("1")),
       T(boost::math::tools::convert_from_string<T>("2")),
@@ -644,18 +817,22 @@ inline T unchecked_factorial_imp(unsigned i, const boost::integral_constant<int,
 }
 
 template <class T>
-inline T unchecked_factorial_imp(unsigned i, const boost::integral_constant<int, 0>&)
+inline T unchecked_factorial_imp(unsigned i, const std::integral_constant<int, 0>&)
 {
-   BOOST_STATIC_ASSERT(!boost::is_integral<T>::value);
-   // factorial<unsigned int>(n) is not implemented
+   //
+   // If you're foolish enough to instantiate factorial
+   // on an integer type then you end up here.  But this code is
+   // only intended for (variable precision) multiprecision types.
+   // 
+   // Note, factorial<unsigned int>(n) is not implemented
    // because it would overflow integral type T for too small n
    // to be useful. Use instead a floating-point type,
    // and convert to an unsigned type if essential, for example:
    // unsigned int nfac = static_cast<unsigned int>(factorial<double>(n));
    // See factorial documentation for more detail.
-#ifdef BOOST_NO_CXX11_THREAD_LOCAL
-   unchecked_factorial_initializer<T>::force_instantiate();
-#endif
+   //
+   static_assert(!std::is_integral<T>::value && !std::numeric_limits<T>::is_integer, "Type T must not be an integral type");
+
    static const char* const factorial_strings[] = {
          "1",
          "1",
@@ -759,7 +936,9 @@ inline T unchecked_factorial_imp(unsigned i, const boost::integral_constant<int,
          "933262154439441526816992388562667004907159682643816214685929638952175999932299156089414639761565182862536979208272237582511852109168640000000000000000000000",
          "93326215443944152681699238856266700490715968264381621468592963895217599993229915608941463976156518286253697920827223758251185210916864000000000000000000000000",
       };
-
+      //
+      // we rely on C++11 thread safe initialization in the event that we have no thread locals:
+      //
       static BOOST_MATH_THREAD_LOCAL T factorials[sizeof(factorial_strings) / sizeof(factorial_strings[0])];
       static BOOST_MATH_THREAD_LOCAL int digits = 0;
 
@@ -776,27 +955,27 @@ inline T unchecked_factorial_imp(unsigned i, const boost::integral_constant<int,
 }
 
 template <class T>
-inline T unchecked_factorial_imp(unsigned i, const boost::integral_constant<int, std::numeric_limits<float>::digits>&)
+inline T unchecked_factorial_imp(unsigned i, const std::integral_constant<int, std::numeric_limits<float>::digits>&)
 {
    return unchecked_factorial<float>(i);
 }
 
 template <class T>
-inline T unchecked_factorial_imp(unsigned i, const boost::integral_constant<int, std::numeric_limits<double>::digits>&)
+inline T unchecked_factorial_imp(unsigned i, const std::integral_constant<int, std::numeric_limits<double>::digits>&)
 {
    return unchecked_factorial<double>(i);
 }
 
 #if DBL_MANT_DIG != LDBL_MANT_DIG
 template <class T>
-inline T unchecked_factorial_imp(unsigned i, const boost::integral_constant<int, LDBL_MANT_DIG>&)
+inline T unchecked_factorial_imp(unsigned i, const std::integral_constant<int, LDBL_MANT_DIG>&)
 {
    return unchecked_factorial<long double>(i);
 }
 #endif
 #ifdef BOOST_MATH_USE_FLOAT128
 template <class T>
-inline T unchecked_factorial_imp(unsigned i, const boost::integral_constant<int, 113>&)
+inline T unchecked_factorial_imp(unsigned i, const std::integral_constant<int, 113>&)
 {
    return unchecked_factorial<BOOST_MATH_FLOAT128_TYPE>(i);
 }
@@ -818,31 +997,15 @@ inline T unchecked_factorial(unsigned i)
 template <class T>
 struct max_factorial
 {
-   BOOST_STATIC_CONSTANT(unsigned, value = 
+   static constexpr unsigned value = 
       std::numeric_limits<T>::digits == std::numeric_limits<float>::digits ? max_factorial<float>::value 
       : std::numeric_limits<T>::digits == std::numeric_limits<double>::digits ? max_factorial<double>::value 
       : std::numeric_limits<T>::digits == std::numeric_limits<long double>::digits ? max_factorial<long double>::value 
       BOOST_MATH_DETAIL_FLOAT128_MAX_FACTORIAL
-      : 100);
+      : 100;
 };
 
 #undef BOOST_MATH_DETAIL_FLOAT128_MAX_FACTORIAL
-
-#else // BOOST_MATH_NO_LEXICAL_CAST
-
-template <class T>
-inline T unchecked_factorial(unsigned i BOOST_MATH_APPEND_EXPLICIT_TEMPLATE_TYPE_SPEC(T))
-{
-   return 1;
-}
-
-template <class T>
-struct max_factorial
-{
-   BOOST_STATIC_CONSTANT(unsigned, value = 0);
-};
-
-#endif
 
 #ifndef BOOST_NO_INCLASS_MEMBER_INITIALIZATION
 template <class T>
@@ -854,3 +1017,7 @@ const unsigned max_factorial<T>::value;
 
 #endif // BOOST_MATH_SP_UC_FACTORIALS_HPP
 
+
+/* unchecked_factorial.hpp
+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
+*/

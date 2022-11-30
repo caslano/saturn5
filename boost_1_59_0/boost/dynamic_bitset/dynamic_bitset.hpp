@@ -23,6 +23,7 @@
 #include <string>
 #include <stdexcept>
 #include <algorithm>
+#include <iterator>     // used to implement append(Iter, Iter)
 #include <vector>
 #include <climits>      // for CHAR_BIT
 
@@ -43,12 +44,11 @@
 #include "boost/dynamic_bitset_fwd.hpp"
 #include "boost/dynamic_bitset/detail/dynamic_bitset.hpp"
 #include "boost/dynamic_bitset/detail/lowest_bit.hpp"
-#include "boost/detail/iterator.hpp" // used to implement append(Iter, Iter)
 #include "boost/move/move.hpp"
 #include "boost/limits.hpp"
 #include "boost/static_assert.hpp"
-#include "boost/utility/addressof.hpp"
-#include "boost/detail/no_exceptions_support.hpp"
+#include "boost/core/addressof.hpp"
+#include "boost/core/no_exceptions_support.hpp"
 #include "boost/throw_exception.hpp"
 #include "boost/functional/hash/hash.hpp"
 
@@ -247,7 +247,7 @@ public:
     {
         assert(first != last);
         block_width_type r = count_extra_bits();
-        std::size_t d = boost::detail::distance(first, last);
+        std::size_t d = std::distance(first, last);
         m_bits.reserve(num_blocks() + d);
         if (r == 0) {
             for( ; first != last; ++first)
@@ -267,7 +267,7 @@ public:
     void append(BlockInputIterator first, BlockInputIterator last) // strong guarantee
     {
         if (first != last) {
-            typename detail::iterator_traits<BlockInputIterator>::iterator_category cat;
+            typename std::iterator_traits<BlockInputIterator>::iterator_category cat;
             m_append(first, last, cat);
         }
     }
@@ -375,6 +375,7 @@ private:
     void m_zero_unused_bits();
     bool m_check_invariants() const;
 
+    static bool m_not_empty(Block x){ return x != Block(0); };
     size_type m_do_find_from(size_type first_block) const;
 
     block_width_type count_extra_bits() const BOOST_NOEXCEPT { return bit_index(size()); }
@@ -1441,15 +1442,14 @@ bool dynamic_bitset<Block, Allocator>::intersects(const dynamic_bitset & b) cons
 // look for the first bit "on", starting
 // from the block with index first_block
 //
+
 template <typename Block, typename Allocator>
 typename dynamic_bitset<Block, Allocator>::size_type
 dynamic_bitset<Block, Allocator>::m_do_find_from(size_type first_block) const
 {
-    size_type i = first_block;
 
-    // skip null blocks
-    while (i < num_blocks() && m_bits[i] == 0)
-        ++i;
+    size_type i = std::distance(m_bits.begin(),
+        std::find_if(m_bits.begin() + first_block, m_bits.end(), m_not_empty) );
 
     if (i >= num_blocks())
         return npos; // not found
@@ -2144,3 +2144,7 @@ namespace std
 
 #endif // include guard
 
+
+/* dynamic_bitset.hpp
+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
+*/

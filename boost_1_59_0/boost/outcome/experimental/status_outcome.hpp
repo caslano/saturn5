@@ -1,5 +1,5 @@
 /* A less simple result type
-(C) 2018-2020 Niall Douglas <http://www.nedproductions.biz/> (17 commits)
+(C) 2018-2022 Niall Douglas <http://www.nedproductions.biz/> (17 commits)
 File Created: Apr 2018
 
 
@@ -63,19 +63,21 @@ namespace experimental
   namespace policy
   {
     template <class T, class EC, class E>
-    using default_status_outcome_policy = std::conditional_t<                                                                                                                              //
-    std::is_void<EC>::value && std::is_void<E>::value,                                                                                                                                     //
-    BOOST_OUTCOME_V2_NAMESPACE::policy::terminate,                                                                                                                                               //
-    std::conditional_t<(is_status_code<EC>::value || is_errored_status_code<EC>::value) && (std::is_void<E>::value || BOOST_OUTCOME_V2_NAMESPACE::trait::is_exception_ptr_available<E>::value),  //
-                       status_code_throw<T, EC, E>,                                                                                                                                        //
-                       BOOST_OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers                                                                                                             //
+    using default_status_outcome_policy = std::conditional_t<  //
+    std::is_void<EC>::value && std::is_void<E>::value,         //
+    BOOST_OUTCOME_V2_NAMESPACE::policy::terminate,                   //
+    std::conditional_t<(is_status_code<EC>::value || is_errored_status_code<EC>::value) &&
+                       (std::is_void<E>::value || BOOST_OUTCOME_V2_NAMESPACE::trait::is_exception_ptr_available<E>::value),  //
+                       status_code_throw<T, EC, E>,                                                                    //
+                       BOOST_OUTCOME_V2_NAMESPACE::policy::fail_to_compile_observers                                         //
                        >>;
   }  // namespace policy
 
-  /*! AWAITING HUGO JSON CONVERSION TOOL 
+  /*! AWAITING HUGO JSON CONVERSION TOOL
 SIGNATURE NOT RECOGNISED
 */
-  template <class R, class S = system_code, class P = std::exception_ptr, class NoValuePolicy = policy::default_status_outcome_policy<R, S, P>>  //
+  template <class R, class S = errored_status_code<erased<typename system_code::value_type>>, class P = std::exception_ptr,
+            class NoValuePolicy = policy::default_status_outcome_policy<R, S, P>>  //
   using status_outcome = basic_outcome<R, S, P, NoValuePolicy>;
 
   namespace policy
@@ -89,7 +91,8 @@ SIGNATURE NOT RECOGNISED
         {
           if(base::_has_exception(static_cast<Impl &&>(self)))
           {
-            BOOST_OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::is_exception_ptr_available<E>::value>(base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));  // NOLINT
+            BOOST_OUTCOME_V2_NAMESPACE::policy::detail::_rethrow_exception<trait::is_exception_ptr_available<E>::value>(
+            base::_exception<T, status_code<DomainType>, E, status_code_throw>(static_cast<Impl &&>(self)));  // NOLINT
           }
           if(base::_has_error(static_cast<Impl &&>(self)))
           {
@@ -104,7 +107,8 @@ SIGNATURE NOT RECOGNISED
       template <class Impl> static constexpr void wide_error_check(Impl &&self) { _base::narrow_error_check(static_cast<Impl &&>(self)); }
       template <class Impl> static constexpr void wide_exception_check(Impl &&self) { _base::narrow_exception_check(static_cast<Impl &&>(self)); }
     };
-    template <class T, class DomainType, class E> struct status_code_throw<T, errored_status_code<DomainType>, E> : status_code_throw<T, status_code<DomainType>, E>
+    template <class T, class DomainType, class E>
+    struct status_code_throw<T, errored_status_code<DomainType>, E> : status_code_throw<T, status_code<DomainType>, E>
     {
       status_code_throw() = default;
       using status_code_throw<T, status_code<DomainType>, E>::status_code_throw;
@@ -116,3 +120,7 @@ SIGNATURE NOT RECOGNISED
 BOOST_OUTCOME_V2_NAMESPACE_END
 
 #endif
+
+/* status_outcome.hpp
+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
+*/

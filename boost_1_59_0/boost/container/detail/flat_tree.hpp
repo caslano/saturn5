@@ -46,6 +46,7 @@
 #include <boost/move/make_unique.hpp>
 #include <boost/move/iterator.hpp>
 #include <boost/move/adl_move_swap.hpp>
+#include <boost/move/detail/force_ptr.hpp>
 #include <boost/move/algo/adaptive_sort.hpp>
 #include <boost/move/algo/detail/pdqsort.hpp>
 
@@ -54,6 +55,11 @@
 #endif
 
 #ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
+
+#if defined(BOOST_GCC) && (BOOST_GCC >= 40600)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+#endif
 
 //merge_unique
 #define BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_FUNCNAME merge_unique
@@ -103,6 +109,11 @@
 #define BOOST_INTRUSIVE_HAS_MEMBER_FUNCTION_CALLABLE_WITH_MAX 0
 #include <boost/intrusive/detail/has_member_function_callable_with.hpp>
 
+#if defined(BOOST_GCC) && (BOOST_GCC >= 40600)
+#pragma GCC diagnostic pop
+#endif
+
+
 #endif   //#ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
 
 namespace boost {
@@ -123,18 +134,19 @@ BOOST_INTRUSIVE_INSTANTIATE_DEFAULT_TYPE_TMPLT(stored_allocator_type)
 //
 ///////////////////////////////////////
 template<class SequenceContainer, class Compare>
-void flat_tree_container_inplace_merge //is_contiguous_container == true
+BOOST_CONTAINER_FORCEINLINE void flat_tree_container_inplace_merge //is_contiguous_container == true
    (SequenceContainer& dest, typename SequenceContainer::iterator it, Compare comp , dtl::true_)
 {
    typedef typename SequenceContainer::value_type  value_type;
    value_type *const braw = boost::movelib::iterator_to_raw_pointer(dest.begin());
    value_type *const iraw = boost::movelib::iterator_to_raw_pointer(it);
    value_type *const eraw = boost::movelib::iterator_to_raw_pointer(dest.end());
-   boost::movelib::adaptive_merge(braw, iraw, eraw, comp, eraw, dest.capacity()- dest.size());
+   boost::movelib::adaptive_merge
+      (braw, iraw, eraw, comp, eraw, back_free_capacity<SequenceContainer>::get(dest));
 }
 
 template<class SequenceContainer, class Compare>
-void flat_tree_container_inplace_merge //is_contiguous_container == false
+BOOST_CONTAINER_FORCEINLINE void flat_tree_container_inplace_merge //is_contiguous_container == false
    (SequenceContainer& dest, typename SequenceContainer::iterator it, Compare comp, dtl::false_)
 {
    boost::movelib::adaptive_merge(dest.begin(), it, dest.end(), comp);
@@ -146,17 +158,18 @@ void flat_tree_container_inplace_merge //is_contiguous_container == false
 //
 ///////////////////////////////////////
 template<class SequenceContainer, class Compare>
-void flat_tree_container_inplace_sort_ending //is_contiguous_container == true
+BOOST_CONTAINER_FORCEINLINE void flat_tree_container_inplace_sort_ending //is_contiguous_container == true
    (SequenceContainer& dest, typename SequenceContainer::iterator it, Compare comp, dtl::true_)
 {
    typedef typename SequenceContainer::value_type  value_type;
    value_type *const iraw = boost::movelib::iterator_to_raw_pointer(it);
    value_type *const eraw = boost::movelib::iterator_to_raw_pointer(dest.end());
-   boost::movelib::adaptive_sort(iraw, eraw, comp, eraw, dest.capacity()- dest.size());
+   boost::movelib::adaptive_sort
+      (iraw, eraw, comp, eraw, back_free_capacity<SequenceContainer>::get(dest));
 }
 
 template<class SequenceContainer, class Compare>
-void flat_tree_container_inplace_sort_ending //is_contiguous_container == false
+BOOST_CONTAINER_FORCEINLINE void flat_tree_container_inplace_sort_ending //is_contiguous_container == false
    (SequenceContainer& dest, typename SequenceContainer::iterator it, Compare comp , dtl::false_)
 {
    boost::movelib::adaptive_sort(it, dest.end(), comp);
@@ -200,15 +213,16 @@ template<class SequenceContainer, class Iterator, class Compare>
 BOOST_CONTAINER_FORCEINLINE void flat_tree_merge_unique  //has_merge_unique == false
    (SequenceContainer& dest, Iterator first, Iterator last, Compare comp, dtl::false_)
 {
-   typedef typename SequenceContainer::iterator    iterator;
-   typedef typename SequenceContainer::size_type   size_type;
+   typedef typename SequenceContainer::iterator          iterator;
+   typedef typename SequenceContainer::size_type         size_type;
+   typedef typename SequenceContainer::difference_type   difference_type;
 
    size_type const old_sz = dest.size();
    iterator const first_new = dest.insert(dest.cend(), first, last );
    iterator e = boost::movelib::inplace_set_unique_difference(first_new, dest.end(), dest.begin(), first_new, comp);
    dest.erase(e, dest.end());
    dtl::bool_<is_contiguous_container<SequenceContainer>::value> contiguous_tag;
-   (flat_tree_container_inplace_merge)(dest, dest.begin()+old_sz, comp, contiguous_tag);
+   (flat_tree_container_inplace_merge)(dest, dest.begin() + difference_type(old_sz), comp, contiguous_tag);
 }
 
 ///////////////////////////////////////
@@ -251,7 +265,7 @@ BOOST_CONTAINER_FORCEINLINE Iterator
    flat_tree_nth  // has_nth == false
       (SequenceContainer& cont, typename SequenceContainer::size_type n, dtl::false_)
 {
-   return cont.begin()+ n;
+   return cont.begin()+ typename SequenceContainer::difference_type(n);
 }
 
 ///////////////////////////////////////
@@ -312,7 +326,7 @@ void flat_tree_sort_contiguous_to_adopt // is_contiguous_container == true
 }
 
 template<class SequenceContainer, class Compare>
-void flat_tree_adopt_sequence_equal // is_contiguous_container == true
+BOOST_CONTAINER_FORCEINLINE void flat_tree_adopt_sequence_equal // is_contiguous_container == true
    (SequenceContainer &tseq, BOOST_RV_REF(SequenceContainer) seq, Compare comp, dtl::true_)
 {
    flat_tree_sort_contiguous_to_adopt(tseq, boost::move(seq), comp);
@@ -320,7 +334,7 @@ void flat_tree_adopt_sequence_equal // is_contiguous_container == true
 }
 
 template<class SequenceContainer, class Compare>
-void flat_tree_adopt_sequence_equal // is_contiguous_container == false
+BOOST_CONTAINER_FORCEINLINE void flat_tree_adopt_sequence_equal // is_contiguous_container == false
    (SequenceContainer &tseq, BOOST_RV_REF(SequenceContainer) seq, Compare comp, dtl::false_)
 {
    boost::movelib::adaptive_sort(seq.begin(), seq.end(), comp);
@@ -406,24 +420,24 @@ class flat_tree_value_compare
    typedef Value              second_argument_type;
    typedef bool               return_type;
    public:
-   flat_tree_value_compare()
+   BOOST_CONTAINER_FORCEINLINE flat_tree_value_compare()
       : Compare()
    {}
 
-   flat_tree_value_compare(const Compare &pred)
+   BOOST_CONTAINER_FORCEINLINE flat_tree_value_compare(const Compare &pred)
       : Compare(pred)
    {}
 
-   bool operator()(const Value& lhs, const Value& rhs) const
+   BOOST_CONTAINER_FORCEINLINE bool operator()(const Value& lhs, const Value& rhs) const
    {
       KeyOfValue key_extract;
       return Compare::operator()(key_extract(lhs), key_extract(rhs));
    }
 
-   const Compare &get_comp() const
+   BOOST_CONTAINER_FORCEINLINE const Compare &get_comp() const
       {  return *this;  }
 
-   Compare &get_comp()
+   BOOST_CONTAINER_FORCEINLINE Compare &get_comp()
       {  return *this;  }
 };
 
@@ -477,35 +491,35 @@ class flat_tree
       BOOST_COPYABLE_AND_MOVABLE(Data)
 
       public:
-      Data()
+      BOOST_CONTAINER_FORCEINLINE Data()
          : value_compare(), m_seq()
       {}
 
-      explicit Data(const allocator_t &alloc)
+      BOOST_CONTAINER_FORCEINLINE explicit Data(const allocator_t &alloc)
          : value_compare(), m_seq(alloc)
       {}
 
-      explicit Data(const Compare &comp)
+      BOOST_CONTAINER_FORCEINLINE explicit Data(const Compare &comp)
          : value_compare(comp), m_seq()
       {}
 
-      Data(const Compare &comp, const allocator_t &alloc)
+      BOOST_CONTAINER_FORCEINLINE Data(const Compare &comp, const allocator_t &alloc)
          : value_compare(comp), m_seq(alloc)
       {}
 
-      explicit Data(const Data &d)
+      BOOST_CONTAINER_FORCEINLINE explicit Data(const Data &d)
          : value_compare(static_cast<const value_compare&>(d)), m_seq(d.m_seq)
       {}
 
-      Data(BOOST_RV_REF(Data) d)
+      BOOST_CONTAINER_FORCEINLINE Data(BOOST_RV_REF(Data) d)
          : value_compare(boost::move(static_cast<value_compare&>(d))), m_seq(boost::move(d.m_seq))
       {}
 
-      Data(const Data &d, const allocator_t &a)
+      BOOST_CONTAINER_FORCEINLINE Data(const Data &d, const allocator_t &a)
          : value_compare(static_cast<const value_compare&>(d)), m_seq(d.m_seq, a)
       {}
 
-      Data(BOOST_RV_REF(Data) d, const allocator_t &a)
+      BOOST_CONTAINER_FORCEINLINE Data(BOOST_RV_REF(Data) d, const allocator_t &a)
          : value_compare(boost::move(static_cast<value_compare&>(d))), m_seq(boost::move(d.m_seq), a)
       {}
 
@@ -724,68 +738,88 @@ class flat_tree
 
    public:
    // accessors:
-   BOOST_CONTAINER_FORCEINLINE Compare key_comp() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      Compare key_comp() const
    { return this->m_data.get_comp(); }
 
-   BOOST_CONTAINER_FORCEINLINE value_compare value_comp() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      value_compare value_comp() const
    { return this->m_data; }
 
-   BOOST_CONTAINER_FORCEINLINE allocator_type get_allocator() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      allocator_type get_allocator() const
    { return this->m_data.m_seq.get_allocator(); }
 
-   BOOST_CONTAINER_FORCEINLINE get_stored_allocator_const_return_t get_stored_allocator() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      get_stored_allocator_const_return_t get_stored_allocator() const
    {
       return flat_tree_get_stored_allocator(this->m_data.m_seq, dtl::bool_<has_stored_allocator_type>());
    }
 
-   BOOST_CONTAINER_FORCEINLINE get_stored_allocator_noconst_return_t get_stored_allocator()
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      get_stored_allocator_noconst_return_t get_stored_allocator()
    {
       return flat_tree_get_stored_allocator(this->m_data.m_seq, dtl::bool_<has_stored_allocator_type>());
    }
 
-   BOOST_CONTAINER_FORCEINLINE iterator begin()
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      iterator begin()
    { return this->m_data.m_seq.begin(); }
 
-   BOOST_CONTAINER_FORCEINLINE const_iterator begin() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator begin() const
    { return this->cbegin(); }
 
-   BOOST_CONTAINER_FORCEINLINE const_iterator cbegin() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator cbegin() const
    { return this->m_data.m_seq.begin(); }
 
-   BOOST_CONTAINER_FORCEINLINE iterator end()
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      iterator end()
    { return this->m_data.m_seq.end(); }
 
-   BOOST_CONTAINER_FORCEINLINE const_iterator end() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator end() const
    { return this->cend(); }
 
-   BOOST_CONTAINER_FORCEINLINE const_iterator cend() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator cend() const
    { return this->m_data.m_seq.end(); }
 
-   BOOST_CONTAINER_FORCEINLINE reverse_iterator rbegin()
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      reverse_iterator rbegin()
    { return reverse_iterator(this->end()); }
 
-   BOOST_CONTAINER_FORCEINLINE const_reverse_iterator rbegin() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reverse_iterator rbegin() const
    {  return this->crbegin();  }
 
-   BOOST_CONTAINER_FORCEINLINE const_reverse_iterator crbegin() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reverse_iterator crbegin() const
    {  return const_reverse_iterator(this->cend());  }
 
-   BOOST_CONTAINER_FORCEINLINE reverse_iterator rend()
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      reverse_iterator rend()
    { return reverse_iterator(this->begin()); }
 
-   BOOST_CONTAINER_FORCEINLINE const_reverse_iterator rend() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reverse_iterator rend() const
    { return this->crend(); }
 
-   BOOST_CONTAINER_FORCEINLINE const_reverse_iterator crend() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_reverse_iterator crend() const
    { return const_reverse_iterator(this->cbegin()); }
 
-   BOOST_CONTAINER_FORCEINLINE bool empty() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      bool empty() const
    { return this->m_data.m_seq.empty(); }
 
-   BOOST_CONTAINER_FORCEINLINE size_type size() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      size_type size() const
    { return this->m_data.m_seq.size(); }
 
-   BOOST_CONTAINER_FORCEINLINE size_type max_size() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      size_type max_size() const
    { return this->m_data.m_seq.max_size(); }
 
    BOOST_CONTAINER_FORCEINLINE void swap(flat_tree& other)
@@ -927,9 +961,9 @@ class flat_tree
    std::pair<iterator, bool> emplace_unique(BOOST_FWD_REF(Args)... args)
    {
       typename dtl::aligned_storage<sizeof(value_type), dtl::alignment_of<value_type>::value>::type v;
-      value_type *pval = reinterpret_cast<value_type *>(v.data);
       get_stored_allocator_noconst_return_t a = this->get_stored_allocator();
-      stored_allocator_traits::construct(a, pval, ::boost::forward<Args>(args)... );
+      stored_allocator_traits::construct(a, move_detail::force_ptr<value_type *>(&v), ::boost::forward<Args>(args)... );
+      value_type *pval = move_detail::force_ptr<value_type *>(&v);
       value_destructor<stored_allocator_type, value_type> d(a, *pval);
       return this->insert_unique(::boost::move(*pval));
    }
@@ -939,9 +973,9 @@ class flat_tree
    {
       //hint checked in insert_unique
       typename dtl::aligned_storage<sizeof(value_type), dtl::alignment_of<value_type>::value>::type v;
-      value_type *pval = reinterpret_cast<value_type *>(v.data);
       get_stored_allocator_noconst_return_t a = this->get_stored_allocator();
-      stored_allocator_traits::construct(a, pval, ::boost::forward<Args>(args)... );
+      stored_allocator_traits::construct(a, move_detail::force_ptr<value_type *>(&v), ::boost::forward<Args>(args)... );
+      value_type *pval = move_detail::force_ptr<value_type *>(&v);
       value_destructor<stored_allocator_type, value_type> d(a, *pval);
       return this->insert_unique(hint, ::boost::move(*pval));
    }
@@ -950,9 +984,9 @@ class flat_tree
    iterator emplace_equal(BOOST_FWD_REF(Args)... args)
    {
       typename dtl::aligned_storage<sizeof(value_type), dtl::alignment_of<value_type>::value>::type v;
-      value_type *pval = reinterpret_cast<value_type *>(v.data);
       get_stored_allocator_noconst_return_t a = this->get_stored_allocator();
-      stored_allocator_traits::construct(a, pval, ::boost::forward<Args>(args)... );
+      stored_allocator_traits::construct(a, move_detail::force_ptr<value_type *>(&v), ::boost::forward<Args>(args)... );
+      value_type *pval = move_detail::force_ptr<value_type *>(&v);
       value_destructor<stored_allocator_type, value_type> d(a, *pval);
       return this->insert_equal(::boost::move(*pval));
    }
@@ -962,9 +996,9 @@ class flat_tree
    {
       //hint checked in insert_equal
       typename dtl::aligned_storage<sizeof(value_type), dtl::alignment_of<value_type>::value>::type v;
-      value_type *pval = reinterpret_cast<value_type *>(v.data);
       get_stored_allocator_noconst_return_t a = this->get_stored_allocator();
-      stored_allocator_traits::construct(a, pval, ::boost::forward<Args>(args)... );
+      stored_allocator_traits::construct(a, move_detail::force_ptr<value_type *>(&v), ::boost::forward<Args>(args)... );
+      value_type *pval = move_detail::force_ptr<value_type *>(&v);
       value_destructor<stored_allocator_type, value_type> d(a, *pval);
       return this->insert_equal(hint, ::boost::move(*pval));
    }
@@ -981,13 +1015,10 @@ class flat_tree
          : this->priv_insert_unique_prepare(hint, k, data);
 
       if(!ret.second){
-         ret.first  = this->nth(data.position - this->cbegin());
+         ret.first  = this->nth(size_type(data.position - this->cbegin()));
       }
       else{
-         typedef typename emplace_functor_type<try_emplace_t, KeyType, Args...>::type func_t;
-         typedef emplace_iterator<value_type, func_t, difference_type> it_t;
-         func_t func(try_emplace_t(), ::boost::forward<KeyType>(key), ::boost::forward<Args>(args)...);
-         ret.first = this->m_data.m_seq.insert(data.position, it_t(func), it_t());
+         ret.first = this->m_data.m_seq.emplace(data.position, try_emplace_t(), ::boost::forward<KeyType>(key), ::boost::forward<Args>(args)...);
       }
       return ret;
    }
@@ -999,9 +1030,9 @@ class flat_tree
    std::pair<iterator, bool> emplace_unique(BOOST_MOVE_UREF##N)\
    {\
       typename dtl::aligned_storage<sizeof(value_type), dtl::alignment_of<value_type>::value>::type v;\
-      value_type *pval = reinterpret_cast<value_type *>(v.data);\
       get_stored_allocator_noconst_return_t a = this->get_stored_allocator();\
-      stored_allocator_traits::construct(a, pval BOOST_MOVE_I##N BOOST_MOVE_FWD##N);\
+      stored_allocator_traits::construct(a, move_detail::force_ptr<value_type *>(&v) BOOST_MOVE_I##N BOOST_MOVE_FWD##N);\
+      value_type *pval = move_detail::force_ptr<value_type *>(&v);\
       value_destructor<stored_allocator_type, value_type> d(a, *pval);\
       return this->insert_unique(::boost::move(*pval));\
    }\
@@ -1010,9 +1041,9 @@ class flat_tree
    iterator emplace_hint_unique(const_iterator hint BOOST_MOVE_I##N BOOST_MOVE_UREF##N)\
    {\
       typename dtl::aligned_storage<sizeof(value_type), dtl::alignment_of<value_type>::value>::type v;\
-      value_type *pval = reinterpret_cast<value_type *>(v.data);\
       get_stored_allocator_noconst_return_t a = this->get_stored_allocator();\
-      stored_allocator_traits::construct(a, pval BOOST_MOVE_I##N BOOST_MOVE_FWD##N);\
+      stored_allocator_traits::construct(a, move_detail::force_ptr<value_type *>(&v) BOOST_MOVE_I##N BOOST_MOVE_FWD##N);\
+      value_type *pval = move_detail::force_ptr<value_type *>(&v);\
       value_destructor<stored_allocator_type, value_type> d(a, *pval);\
       return this->insert_unique(hint, ::boost::move(*pval));\
    }\
@@ -1021,9 +1052,9 @@ class flat_tree
    iterator emplace_equal(BOOST_MOVE_UREF##N)\
    {\
       typename dtl::aligned_storage<sizeof(value_type), dtl::alignment_of<value_type>::value>::type v;\
-      value_type *pval = reinterpret_cast<value_type *>(v.data);\
       get_stored_allocator_noconst_return_t a = this->get_stored_allocator();\
-      stored_allocator_traits::construct(a, pval BOOST_MOVE_I##N BOOST_MOVE_FWD##N);\
+      stored_allocator_traits::construct(a, move_detail::force_ptr<value_type *>(&v) BOOST_MOVE_I##N BOOST_MOVE_FWD##N);\
+      value_type *pval = move_detail::force_ptr<value_type *>(&v);\
       value_destructor<stored_allocator_type, value_type> d(a, *pval);\
       return this->insert_equal(::boost::move(*pval));\
    }\
@@ -1032,9 +1063,9 @@ class flat_tree
    iterator emplace_hint_equal(const_iterator hint BOOST_MOVE_I##N BOOST_MOVE_UREF##N)\
    {\
       typename dtl::aligned_storage <sizeof(value_type), dtl::alignment_of<value_type>::value>::type v;\
-      value_type *pval = reinterpret_cast<value_type *>(v.data);\
       get_stored_allocator_noconst_return_t a = this->get_stored_allocator();\
-      stored_allocator_traits::construct(a, pval BOOST_MOVE_I##N BOOST_MOVE_FWD##N);\
+      stored_allocator_traits::construct(a, move_detail::force_ptr<value_type *>(&v) BOOST_MOVE_I##N BOOST_MOVE_FWD##N);\
+      value_type *pval = move_detail::force_ptr<value_type *>(&v);\
       value_destructor<stored_allocator_type, value_type> d(a, *pval);\
       return this->insert_equal(hint, ::boost::move(*pval));\
    }\
@@ -1050,13 +1081,10 @@ class flat_tree
          : this->priv_insert_unique_prepare(hint, k, data);\
       \
       if(!ret.second){\
-         ret.first  = this->nth(data.position - this->cbegin());\
+         ret.first  = this->nth(size_type(data.position - this->cbegin()));\
       }\
       else{\
-         typedef typename emplace_functor_type<try_emplace_t, KeyType BOOST_MOVE_I##N BOOST_MOVE_TARG##N>::type func_t;\
-         typedef emplace_iterator<value_type, func_t, difference_type> it_t;\
-         func_t func(try_emplace_t(), ::boost::forward<KeyType>(key) BOOST_MOVE_I##N BOOST_MOVE_FWD##N);\
-         ret.first = this->m_data.m_seq.insert(data.position, it_t(func), it_t());\
+         ret.first = this->m_data.m_seq.emplace(data.position, try_emplace_t(), ::boost::forward<KeyType>(key) BOOST_MOVE_I##N BOOST_MOVE_FWD##N);\
       }\
       return ret;\
    }\
@@ -1076,14 +1104,11 @@ class flat_tree
          ? this->priv_insert_unique_prepare(k, data)
          : this->priv_insert_unique_prepare(hint, k, data);
       if(!ret.second){
-         ret.first  = this->nth(data.position - this->cbegin());
+         ret.first  = this->nth(size_type(data.position - this->cbegin()));
          ret.first->second = boost::forward<M>(obj);
       }
       else{
-         typedef typename emplace_functor_type<KeyType, M>::type func_t;
-         typedef emplace_iterator<value_type, func_t, difference_type> it_t;
-         func_t func(boost::forward<KeyType>(key), boost::forward<M>(obj));
-         ret.first = this->m_data.m_seq.insert(data.position, it_t(func), it_t());
+         ret.first = this->m_data.m_seq.emplace(data.position, boost::forward<KeyType>(key), boost::forward<M>(obj));
       }
       return ret;
    }
@@ -1098,6 +1123,15 @@ class flat_tree
       if (ret){
          this->m_data.m_seq.erase(itp.first, itp.second);
       }
+      return ret;
+   }
+
+   size_type erase_unique(const key_type& k)
+   {
+      iterator i = this->find(k);
+      size_type ret = static_cast<size_type>(i != this->end());
+      if (ret)
+         this->erase(i);
       return ret;
    }
 
@@ -1123,21 +1157,24 @@ class flat_tree
       return flat_tree_nth<iterator>(this->m_data.m_seq, n, dtl::bool_<value>());
    }
 
-   BOOST_CONTAINER_FORCEINLINE const_iterator nth(size_type n) const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator nth(size_type n) const BOOST_NOEXCEPT_OR_NOTHROW
    {
       const bool value = boost::container::dtl::
          has_member_function_callable_with_nth<container_type, size_type>::value;
       return flat_tree_nth<const_iterator>(this->m_data.m_seq, n, dtl::bool_<value>());
    }
 
-   BOOST_CONTAINER_FORCEINLINE size_type index_of(iterator p) BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      size_type index_of(iterator p) BOOST_NOEXCEPT_OR_NOTHROW
    {
       const bool value = boost::container::dtl::
          has_member_function_callable_with_index_of<container_type, iterator>::value;
       return flat_tree_index_of(this->m_data.m_seq, p, dtl::bool_<value>());
    }
 
-   BOOST_CONTAINER_FORCEINLINE size_type index_of(const_iterator p) const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      size_type index_of(const_iterator p) const BOOST_NOEXCEPT_OR_NOTHROW
    {
       const bool value = boost::container::dtl::
          has_member_function_callable_with_index_of<container_type, const_iterator>::value;
@@ -1145,7 +1182,8 @@ class flat_tree
    }
 
    // set operations:
-   iterator find(const key_type& k)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD
+      iterator find(const key_type& k)
    {
       iterator i = this->lower_bound(k);
       iterator end_it = this->end();
@@ -1155,6 +1193,7 @@ class flat_tree
       return i;
    }
 
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD
    const_iterator find(const key_type& k) const
    {
       const_iterator i = this->lower_bound(k);
@@ -1167,7 +1206,8 @@ class flat_tree
    }
 
    template<class K>
-   typename dtl::enable_if_transparent<key_compare, K, iterator>::type
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD
+      typename dtl::enable_if_transparent<key_compare, K, iterator>::type
       find(const K& k)
    {
       iterator i = this->lower_bound(k);
@@ -1179,7 +1219,8 @@ class flat_tree
    }
 
    template<class K>
-   typename dtl::enable_if_transparent<key_compare, K, const_iterator>::type
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD
+      typename dtl::enable_if_transparent<key_compare, K, const_iterator>::type
       find(const K& k) const
    {
       const_iterator i = this->lower_bound(k);
@@ -1191,27 +1232,29 @@ class flat_tree
       return i;
    }
 
-   size_type count(const key_type& k) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD
+      size_type count(const key_type& k) const
    {
       std::pair<const_iterator, const_iterator> p = this->equal_range(k);
-      size_type n = p.second - p.first;
+      size_type n = size_type(p.second - p.first);
       return n;
    }
 
    template<class K>
-   typename dtl::enable_if_transparent<key_compare, K, size_type>::type
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD
+      typename dtl::enable_if_transparent<key_compare, K, size_type>::type
       count(const K& k) const
    {
       std::pair<const_iterator, const_iterator> p = this->equal_range(k);
-      size_type n = p.second - p.first;
+      size_type n = size_type(p.second - p.first);
       return n;
    }
 
-   BOOST_CONTAINER_FORCEINLINE bool contains(const key_type& x) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE bool contains(const key_type& x) const
    {  return this->find(x) != this->cend();  }
 
    template<typename K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K, bool>::type
          contains(const K& x) const
    {  return this->find(x) != this->cend();  }
@@ -1254,99 +1297,111 @@ class flat_tree
          , dtl::bool_<value>());
    }
 
-   BOOST_CONTAINER_FORCEINLINE iterator lower_bound(const key_type& k)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      iterator lower_bound(const key_type& k)
    {  return this->priv_lower_bound(this->begin(), this->end(), k);  }
 
-   BOOST_CONTAINER_FORCEINLINE const_iterator lower_bound(const key_type& k) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      const_iterator lower_bound(const key_type& k) const
    {  return this->priv_lower_bound(this->cbegin(), this->cend(), k);  }
 
    template<class K>
-   BOOST_CONTAINER_FORCEINLINE 
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE 
       typename dtl::enable_if_transparent<key_compare, K, iterator>::type
          lower_bound(const K& k)
    {  return this->priv_lower_bound(this->begin(), this->end(), k);  }
 
    template<class K>
-   BOOST_CONTAINER_FORCEINLINE 
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE 
       typename dtl::enable_if_transparent<key_compare, K, const_iterator>::type
          lower_bound(const K& k) const
    {  return this->priv_lower_bound(this->cbegin(), this->cend(), k);  }
 
-   BOOST_CONTAINER_FORCEINLINE iterator upper_bound(const key_type& k)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      iterator upper_bound(const key_type& k)
    {  return this->priv_upper_bound(this->begin(), this->end(), k);  }
 
-   BOOST_CONTAINER_FORCEINLINE const_iterator upper_bound(const key_type& k) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE 
+      const_iterator upper_bound(const key_type& k) const
    {  return this->priv_upper_bound(this->cbegin(), this->cend(), k);  }
 
    template<class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K,iterator>::type
    upper_bound(const K& k)
    {  return this->priv_upper_bound(this->begin(), this->end(), k);  }
 
    template<class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K,const_iterator>::type
          upper_bound(const K& k) const
    {  return this->priv_upper_bound(this->cbegin(), this->cend(), k);  }
 
-   BOOST_CONTAINER_FORCEINLINE std::pair<iterator,iterator> equal_range(const key_type& k)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      std::pair<iterator,iterator> equal_range(const key_type& k)
    {  return this->priv_equal_range(this->begin(), this->end(), k);  }
 
-   BOOST_CONTAINER_FORCEINLINE std::pair<const_iterator, const_iterator> equal_range(const key_type& k) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      std::pair<const_iterator, const_iterator> equal_range(const key_type& k) const
    {  return this->priv_equal_range(this->cbegin(), this->cend(), k);  }
 
    template<class K>
-   BOOST_CONTAINER_FORCEINLINE
-      typename dtl::enable_if_transparent<key_compare, K,std::pair<iterator,iterator> >::type
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      typename dtl::enable_if_transparent<key_compare, K, std::pair<iterator,iterator> >::type
          equal_range(const K& k)
    {  return this->priv_equal_range(this->begin(), this->end(), k);  }
 
    template<class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K,std::pair<const_iterator,const_iterator> >::type
          equal_range(const K& k) const
    {  return this->priv_equal_range(this->cbegin(), this->cend(), k);  }
 
 
-   BOOST_CONTAINER_FORCEINLINE std::pair<iterator, iterator> lower_bound_range(const key_type& k)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      std::pair<iterator, iterator> lower_bound_range(const key_type& k)
    {  return this->priv_lower_bound_range(this->begin(), this->end(), k);  }
 
-   BOOST_CONTAINER_FORCEINLINE std::pair<const_iterator, const_iterator> lower_bound_range(const key_type& k) const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      std::pair<const_iterator, const_iterator> lower_bound_range(const key_type& k) const
    {  return this->priv_lower_bound_range(this->cbegin(), this->cend(), k);  }
 
    template<class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K,std::pair<iterator,iterator> >::type
          lower_bound_range(const K& k)
    {  return this->priv_lower_bound_range(this->begin(), this->end(), k);  }
 
    template<class K>
-   BOOST_CONTAINER_FORCEINLINE
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
       typename dtl::enable_if_transparent<key_compare, K,std::pair<const_iterator,const_iterator> >::type
          lower_bound_range(const K& k) const
    {  return this->priv_lower_bound_range(this->cbegin(), this->cend(), k);  }
 
-   BOOST_CONTAINER_FORCEINLINE size_type capacity() const
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      size_type capacity() const
    {
       const bool value = boost::container::dtl::
          has_member_function_callable_with_capacity<container_type>::value;
       return (flat_tree_capacity)(this->m_data.m_seq, dtl::bool_<value>());
    }
 
-   BOOST_CONTAINER_FORCEINLINE void reserve(size_type cnt)
+   BOOST_CONTAINER_FORCEINLINE
+      void reserve(size_type cnt)
    {
       const bool value = boost::container::dtl::
          has_member_function_callable_with_reserve<container_type, size_type>::value;
       (flat_tree_reserve)(this->m_data.m_seq, cnt, dtl::bool_<value>());
    }
 
-   BOOST_CONTAINER_FORCEINLINE container_type extract_sequence()
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      container_type extract_sequence()
    {
       return boost::move(m_data.m_seq);
    }
 
-   BOOST_CONTAINER_FORCEINLINE container_type &get_sequence_ref()
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      container_type &get_sequence_ref()
    {
       return m_data.m_seq;
    }
@@ -1375,29 +1430,36 @@ class flat_tree
       m_data.m_seq = boost::move(seq);
    }
 
-   BOOST_CONTAINER_FORCEINLINE friend bool operator==(const flat_tree& x, const flat_tree& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator==(const flat_tree& x, const flat_tree& y)
    {
       return x.size() == y.size() && ::boost::container::algo_equal(x.begin(), x.end(), y.begin());
    }
 
-   BOOST_CONTAINER_FORCEINLINE friend bool operator<(const flat_tree& x, const flat_tree& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator<(const flat_tree& x, const flat_tree& y)
    {
       return ::boost::container::algo_lexicographical_compare(x.begin(), x.end(), y.begin(), y.end());
    }
 
-   BOOST_CONTAINER_FORCEINLINE friend bool operator!=(const flat_tree& x, const flat_tree& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator!=(const flat_tree& x, const flat_tree& y)
       {  return !(x == y); }
 
-   BOOST_CONTAINER_FORCEINLINE friend bool operator>(const flat_tree& x, const flat_tree& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator>(const flat_tree& x, const flat_tree& y)
       {  return y < x;  }
 
-   BOOST_CONTAINER_FORCEINLINE friend bool operator<=(const flat_tree& x, const flat_tree& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator<=(const flat_tree& x, const flat_tree& y)
       {  return !(y < x);  }
 
-   BOOST_CONTAINER_FORCEINLINE friend bool operator>=(const flat_tree& x, const flat_tree& y)
+   BOOST_CONTAINER_ATTRIBUTE_NODISCARD BOOST_CONTAINER_FORCEINLINE
+      friend bool operator>=(const flat_tree& x, const flat_tree& y)
       {  return !(x < y);  }
 
    BOOST_CONTAINER_FORCEINLINE friend void swap(flat_tree& x, flat_tree& y)
+          BOOST_NOEXCEPT_IF(BOOST_NOEXCEPT(x.swap(y)))
       {  x.swap(y);  }
 
    private:
@@ -1528,7 +1590,7 @@ class flat_tree
       while (len) {
          size_type step = len >> 1;
          middle = first;
-         middle += step;
+         middle += difference_type(step);
 
          if (key_cmp(key_extract(*middle), key)) {
             first = ++middle;
@@ -1553,7 +1615,7 @@ class flat_tree
       while (len) {
          size_type step = len >> 1;
          middle = first;
-         middle += step;
+         middle += difference_type(step);
 
          if (key_cmp(key, key_extract(*middle))) {
             len = step;
@@ -1578,7 +1640,7 @@ class flat_tree
       while (len) {
          size_type step = len >> 1;
          middle = first;
-         middle += step;
+         middle += difference_type(step);
 
          if (key_cmp(key_extract(*middle), key)){
             first = ++middle;
@@ -1590,7 +1652,7 @@ class flat_tree
          else {
             //Middle is equal to key
             last = first;
-            last += len;
+            last += difference_type(len);
             RanIt const first_ret = this->priv_lower_bound(first, middle, key);
             return std::pair<RanIt, RanIt>
                ( first_ret, this->priv_upper_bound(++middle, last, key));
@@ -1634,3 +1696,7 @@ struct has_trivial_destructor_after_move<boost::container::dtl::flat_tree<T, Key
 #include <boost/container/detail/config_end.hpp>
 
 #endif // BOOST_CONTAINER_FLAT_TREE_HPP
+
+/* flat_tree.hpp
+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
+*/

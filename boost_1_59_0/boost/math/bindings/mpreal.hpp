@@ -11,10 +11,9 @@
 #ifndef BOOST_MATH_MPREAL_BINDINGS_HPP
 #define BOOST_MATH_MPREAL_BINDINGS_HPP
 
-#include <boost/config.hpp>
-#include <boost/lexical_cast.hpp>
+#include <type_traits>
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 //
 // We get a lot of warnings from the gmp, mpfr and gmpfrxx headers, 
 // disable them here, so we only see warnings from *our* code:
@@ -25,7 +24,7 @@
 
 #include <mpreal.h>
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
@@ -36,6 +35,10 @@
 #include <boost/math/special_functions/math_fwd.hpp>
 #include <boost/math/bindings/detail/big_digamma.hpp>
 #include <boost/math/bindings/detail/big_lanczos.hpp>
+#include <boost/math/tools/config.hpp>
+#ifndef BOOST_MATH_STANDALONE
+#include <boost/lexical_cast.hpp>
+#endif
 
 namespace mpfr{
 
@@ -402,6 +405,10 @@ inline mpfr::mpreal skewness(const extreme_value_distribution<mpfr::mpreal, Poli
    // This is 12 * sqrt(6) * zeta(3) / pi^3:
    // See http://mathworld.wolfram.com/ExtremeValueDistribution.html
    //
+   #ifdef BOOST_MATH_STANDALONE
+   static_assert(sizeof(Policy) == 0, "mpreal skewness can not be calculated in standalone mode");
+   #endif
+
    return boost::lexical_cast<mpfr::mpreal>("1.1395470994046486574927930193898461120875997958366");
 }
 
@@ -409,6 +416,10 @@ template <class Policy>
 inline mpfr::mpreal skewness(const rayleigh_distribution<mpfr::mpreal, Policy>& /*dist*/)
 {
   // using namespace boost::math::constants;
+  #ifdef BOOST_MATH_STANDALONE
+  static_assert(sizeof(Policy) == 0, "mpreal skewness can not be calculated in standalone mode");
+  #endif
+
   return boost::lexical_cast<mpfr::mpreal>("0.63111065781893713819189935154422777984404221106391");
   // Computed using NTL at 150 bit, about 50 decimal digits.
   // return 2 * root_pi<RealType>() * pi_minus_three<RealType>() / pow23_four_minus_pi<RealType>();
@@ -418,6 +429,10 @@ template <class Policy>
 inline mpfr::mpreal kurtosis(const rayleigh_distribution<mpfr::mpreal, Policy>& /*dist*/)
 {
   // using namespace boost::math::constants;
+  #ifdef BOOST_MATH_STANDALONE
+  static_assert(sizeof(Policy) == 0, "mpreal kurtosis can not be calculated in standalone mode");
+  #endif
+
   return boost::lexical_cast<mpfr::mpreal>("3.2450893006876380628486604106197544154170667057995");
   // Computed using NTL at 150 bit, about 50 decimal digits.
   // return 3 - (6 * pi<RealType>() * pi<RealType>() - 24 * pi<RealType>() + 16) /
@@ -429,6 +444,10 @@ inline mpfr::mpreal kurtosis_excess(const rayleigh_distribution<mpfr::mpreal, Po
 {
   //using namespace boost::math::constants;
   // Computed using NTL at 150 bit, about 50 decimal digits.
+  #ifdef BOOST_MATH_STANDALONE
+  static_assert(sizeof(Policy) == 0, "mpreal excess kurtosis can not be calculated in standalone mode");
+  #endif
+
   return boost::lexical_cast<mpfr::mpreal>("0.2450893006876380628486604106197544154170667057995");
   // return -(6 * pi<RealType>() * pi<RealType>() - 24 * pi<RealType>() + 16) /
   //   (four_minus_pi<RealType>() * four_minus_pi<RealType>());
@@ -440,7 +459,7 @@ namespace detail{
 // Version of Digamma accurate to ~100 decimal digits.
 //
 template <class Policy>
-mpfr::mpreal digamma_imp(mpfr::mpreal x, const boost::integral_constant<int, 0>* , const Policy& pol)
+mpfr::mpreal digamma_imp(mpfr::mpreal x, const std::integral_constant<int, 0>* , const Policy& pol)
 {
    //
    // This handles reflection of negative arguments, and all our
@@ -480,7 +499,7 @@ mpfr::mpreal digamma_imp(mpfr::mpreal x, const boost::integral_constant<int, 0>*
 // starting guess for Halley iteration:
 //
 template <class Policy>
-mpfr::mpreal erf_inv_imp(const mpfr::mpreal& p, const mpfr::mpreal& q, const Policy&, const boost::integral_constant<int, 64>*)
+mpfr::mpreal erf_inv_imp(const mpfr::mpreal& p, const mpfr::mpreal& q, const Policy&, const std::integral_constant<int, 64>*)
 {
    BOOST_MATH_STD_USING // for ADL of std names.
 
@@ -738,6 +757,10 @@ mpfr::mpreal erf_inv_imp(const mpfr::mpreal& p, const mpfr::mpreal& q, const Pol
 
 inline mpfr::mpreal bessel_i0(mpfr::mpreal x)
 {
+   #ifdef BOOST_MATH_STANDALONE
+   static_assert(sizeof(x) == 0, "mpreal bessel_i0 can not be calculated in standalone mode");
+   #endif
+    
     static const mpfr::mpreal P1[] = {
         boost::lexical_cast<mpfr::mpreal>("-2.2335582639474375249e+15"),
         boost::lexical_cast<mpfr::mpreal>("-5.5050369673018427753e+14"),
@@ -896,3 +919,7 @@ inline mpfr::mpreal bessel_i1(mpfr::mpreal x)
 
 #endif // BOOST_MATH_MPLFR_BINDINGS_HPP
 
+
+/* mpreal.hpp
++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
+*/

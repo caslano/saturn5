@@ -147,10 +147,10 @@ public:
 };
 
 template<class NextLayer, bool deflateSupported>
-template<class Buffers, class Handler>
+template<class Handler, class Buffers>
 void
 stream<NextLayer, deflateSupported>::
-write_some_op<Buffers, Handler>::
+write_some_op<Handler, Buffers>::
 operator()(
     error_code ec,
     std::size_t bytes_transferred,
@@ -174,10 +174,28 @@ operator()(
         {
         do_suspend:
             BOOST_ASIO_CORO_YIELD
-            impl.op_wr.emplace(std::move(*this));
+            {
+                BOOST_ASIO_HANDLER_LOCATION((
+                    __FILE__, __LINE__,
+                    fin_ ?
+                        "websocket::async_write" :
+                        "websocket::async_write_some"
+                    ));
+
+                impl.op_wr.emplace(std::move(*this));
+            }
             impl.wr_block.lock(this);
             BOOST_ASIO_CORO_YIELD
-            net::post(std::move(*this));
+            {
+                BOOST_ASIO_HANDLER_LOCATION((
+                    __FILE__, __LINE__,
+                    fin_ ?
+                        "websocket::async_write" :
+                        "websocket::async_write_some"
+                    ));
+
+                net::post(std::move(*this));
+            }
             BOOST_ASSERT(impl.wr_block.is_locked(this));
         }
         if(impl.check_stop_now(ec))
@@ -195,9 +213,23 @@ operator()(
                 impl.wr_fb, fh_);
             impl.wr_cont = ! fin_;
             BOOST_ASIO_CORO_YIELD
-            net::async_write(impl.stream(),
-                buffers_cat(impl.wr_fb.data(), cb_),
-                    beast::detail::bind_continuation(std::move(*this)));
+            {
+                BOOST_ASIO_HANDLER_LOCATION((
+                    __FILE__, __LINE__,
+                    fin_ ?
+                        "websocket::async_write" :
+                        "websocket::async_write_some"
+                    ));
+
+                net::async_write(impl.stream(),
+                    buffers_cat(
+                        net::const_buffer(impl.wr_fb.data()),
+                        net::const_buffer(0, 0),
+                        cb_,
+                        buffers_prefix(0, cb_)
+                        ),
+                        beast::detail::bind_continuation(std::move(*this)));
+            }
             bytes_transferred_ += clamp(fh_.len);
             if(impl.check_stop_now(ec))
                 goto upcall;
@@ -221,10 +253,26 @@ operator()(
                 impl.wr_cont = ! fin_;
                 // Send frame
                 BOOST_ASIO_CORO_YIELD
-                net::async_write(impl.stream(), buffers_cat(
-                    impl.wr_fb.data(),
-                    buffers_prefix(clamp(fh_.len), cb_)),
-                        beast::detail::bind_continuation(std::move(*this)));
+                {
+                    BOOST_ASIO_HANDLER_LOCATION((
+                        __FILE__, __LINE__,
+                        fin_ ?
+                            "websocket::async_write" :
+                            "websocket::async_write_some"
+                        ));
+
+                    buffers_suffix<Buffers> empty_cb(cb_);
+                    empty_cb.consume(~std::size_t(0));
+
+                    net::async_write(impl.stream(),
+                        buffers_cat(
+                            net::const_buffer(impl.wr_fb.data()),
+                            net::const_buffer(0, 0),
+                            empty_cb,
+                            buffers_prefix(clamp(fh_.len), cb_)
+                            ),
+                            beast::detail::bind_continuation(std::move(*this)));
+                }
                 n = clamp(fh_.len); // restore `n` on yield
                 bytes_transferred_ += n;
                 if(impl.check_stop_now(ec))
@@ -272,10 +320,26 @@ operator()(
             impl.wr_cont = ! fin_;
             // write frame header and some payload
             BOOST_ASIO_CORO_YIELD
-            net::async_write(impl.stream(), buffers_cat(
-                impl.wr_fb.data(),
-                net::buffer(impl.wr_buf.get(), n)),
-                    beast::detail::bind_continuation(std::move(*this)));
+            {
+                BOOST_ASIO_HANDLER_LOCATION((
+                    __FILE__, __LINE__,
+                    fin_ ?
+                        "websocket::async_write" :
+                        "websocket::async_write_some"
+                    ));
+
+                buffers_suffix<Buffers> empty_cb(cb_);
+                empty_cb.consume(~std::size_t(0));
+
+                net::async_write(impl.stream(),
+                    buffers_cat(
+                        net::const_buffer(impl.wr_fb.data()),
+                        net::const_buffer(net::buffer(impl.wr_buf.get(), n)),
+                        empty_cb,
+                        buffers_prefix(0, empty_cb)
+                        ),
+                        beast::detail::bind_continuation(std::move(*this)));
+            }
             // VFALCO What about consuming the buffer on error?
             bytes_transferred_ +=
                 bytes_transferred - impl.wr_fb.size();
@@ -292,9 +356,26 @@ operator()(
                 remain_ -= n;
                 // write more payload
                 BOOST_ASIO_CORO_YIELD
-                net::async_write(impl.stream(),
-                    net::buffer(impl.wr_buf.get(), n),
-                        beast::detail::bind_continuation(std::move(*this)));
+                {
+                    BOOST_ASIO_HANDLER_LOCATION((
+                        __FILE__, __LINE__,
+                        fin_ ?
+                            "websocket::async_write" :
+                            "websocket::async_write_some"
+                        ));
+
+                    buffers_suffix<Buffers> empty_cb(cb_);
+                    empty_cb.consume(~std::size_t(0));
+
+                    net::async_write(impl.stream(),
+                        buffers_cat(
+                            net::const_buffer(0, 0),
+                            net::const_buffer(net::buffer(impl.wr_buf.get(), n)),
+                            empty_cb,
+                            buffers_prefix(0, empty_cb)
+                            ),
+                            beast::detail::bind_continuation(std::move(*this)));
+                }
                 bytes_transferred_ += bytes_transferred;
                 if(impl.check_stop_now(ec))
                     goto upcall;
@@ -325,10 +406,26 @@ operator()(
                 impl.wr_cont = ! fin_;
                 // Send frame
                 BOOST_ASIO_CORO_YIELD
-                net::async_write(impl.stream(), buffers_cat(
-                    impl.wr_fb.data(),
-                    net::buffer(impl.wr_buf.get(), n)),
-                        beast::detail::bind_continuation(std::move(*this)));
+                {
+                    BOOST_ASIO_HANDLER_LOCATION((
+                        __FILE__, __LINE__,
+                        fin_ ?
+                            "websocket::async_write" :
+                            "websocket::async_write_some"
+                        ));
+
+                    buffers_suffix<Buffers> empty_cb(cb_);
+                    empty_cb.consume(~std::size_t(0));
+
+                    net::async_write(impl.stream(),
+                        buffers_cat(
+                            net::const_buffer(impl.wr_fb.data()),
+                            net::const_buffer(net::buffer(impl.wr_buf.get(), n)),
+                            empty_cb,
+                            buffers_prefix(0, empty_cb)
+                            ),
+                            beast::detail::bind_continuation(std::move(*this)));
+                }
                 n = bytes_transferred - impl.wr_fb.size();
                 bytes_transferred_ += n;
                 if(impl.check_stop_now(ec))
@@ -389,9 +486,26 @@ operator()(
                 impl.wr_cont = ! fin_;
                 // Send frame
                 BOOST_ASIO_CORO_YIELD
-                net::async_write(impl.stream(), buffers_cat(
-                    impl.wr_fb.data(), b),
-                        beast::detail::bind_continuation(std::move(*this)));
+                {
+                    BOOST_ASIO_HANDLER_LOCATION((
+                        __FILE__, __LINE__,
+                        fin_ ?
+                            "websocket::async_write" :
+                            "websocket::async_write_some"
+                        ));
+
+                    buffers_suffix<Buffers> empty_cb(cb_);
+                    empty_cb.consume(~std::size_t(0));
+
+                    net::async_write(impl.stream(),
+                        buffers_cat(
+                            net::const_buffer(impl.wr_fb.data()),
+                            net::const_buffer(b),
+                            empty_cb,
+                            buffers_prefix(0, empty_cb)
+                            ),
+                            beast::detail::bind_continuation(std::move(*this)));
+                }
                 bytes_transferred_ += in_;
                 if(impl.check_stop_now(ec))
                     goto upcall;
@@ -700,7 +814,7 @@ write_some(bool fin,
 }
 
 template<class NextLayer, bool deflateSupported>
-template<class ConstBufferSequence, class WriteHandler>
+template<class ConstBufferSequence, BOOST_BEAST_ASYNC_TPARAM2 WriteHandler>
 BOOST_BEAST_ASYNC_RESULT2(WriteHandler)
 stream<NextLayer, deflateSupported>::
 async_write_some(bool fin,
@@ -756,7 +870,7 @@ write(ConstBufferSequence const& buffers, error_code& ec)
 }
 
 template<class NextLayer, bool deflateSupported>
-template<class ConstBufferSequence, class WriteHandler>
+template<class ConstBufferSequence, BOOST_BEAST_ASYNC_TPARAM2 WriteHandler>
 BOOST_BEAST_ASYNC_RESULT2(WriteHandler)
 stream<NextLayer, deflateSupported>::
 async_write(
@@ -782,3 +896,7 @@ async_write(
 } // boost
 
 #endif
+
+/* write.hpp
+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
+*/

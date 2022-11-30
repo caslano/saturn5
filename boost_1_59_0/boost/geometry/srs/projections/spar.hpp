@@ -1,6 +1,6 @@
 // Boost.Geometry
 
-// Copyright (c) 2017-2019, Oracle and/or its affiliates.
+// Copyright (c) 2017-2020, Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
@@ -11,7 +11,12 @@
 #define BOOST_GEOMETRY_SRS_PROJECTIONS_SPAR_HPP
 
 
+#include <string>
+#include <type_traits>
+#include <vector>
+
 #include <boost/geometry/core/radius.hpp>
+#include <boost/geometry/core/static_assert.hpp>
 #include <boost/geometry/core/tag.hpp>
 #include <boost/geometry/core/tags.hpp>
 
@@ -22,18 +27,11 @@
 #include <boost/geometry/srs/sphere.hpp>
 #include <boost/geometry/srs/spheroid.hpp>
 
+#include <boost/geometry/util/sequence.hpp>
 #include <boost/geometry/util/tuples.hpp>
 
-#include <boost/mpl/assert.hpp>
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/or.hpp>
-#include <boost/mpl/not.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/variant/variant.hpp>
-#include <boost/type_traits/is_same.hpp>
 
-#include <string>
-#include <vector>
 
 namespace boost { namespace geometry { namespace srs
 {
@@ -43,193 +41,104 @@ namespace spar
 
 // Static parameters holder
 
-#define BOOST_GEOMETRY_PROJECTIONS_DETAIL_TYPENAME_PX \
-typename P0, typename P1, typename P2, typename P3, typename P4, \
-typename P5, typename P6, typename P7, typename P8, typename P9, \
-typename P10, typename P11, typename P12, typename P13, typename P14
+template <typename ...>
+class parameters {};
 
-#define BOOST_GEOMETRY_PROJECTIONS_DETAIL_PX \
-P0, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14
-
-#ifndef DOXYGEN_NO_DETAIL
 namespace detail
 {
 
-template <BOOST_GEOMETRY_PROJECTIONS_DETAIL_TYPENAME_PX>
-struct map_params_to_cons
+// TODO: implement this as a sequence utility
+template <std::size_t I, typename ...>
+struct parameters_base
 {
-  typedef boost::tuples::cons
-    <
-        P0,
-        typename map_params_to_cons
-            <
-                P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13, P14,
-                boost::tuples::null_type
-            >::type
-    > type;
+    BOOST_GEOMETRY_STATIC_ASSERT_FALSE(
+        "I out of bounds.",
+        std::integral_constant<size_t, I>);
 };
 
-template <>
-struct map_params_to_cons
-<
-    boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type,
-    boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type,
-    boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type, boost::tuples::null_type
->
+template <std::size_t I, typename P, typename ...Ps>
+struct parameters_base<I, P, Ps...>
 {
-  typedef boost::tuples::null_type type;
+    typedef typename parameters_base<I - 1, Ps...>::type type;
+};
+
+template <typename P, typename ...Ps>
+struct parameters_base<0, P, Ps...>
+{
+    typedef parameters<P, Ps...> type;
 };
 
 } // namespace detail
-#endif // DOXYGEN_NO_DETAIL
 
-template
-<
-    // null_type -> void?
-    typename P0 = boost::tuples::null_type,
-    typename P1 = boost::tuples::null_type,
-    typename P2 = boost::tuples::null_type,
-    typename P3 = boost::tuples::null_type,
-    typename P4 = boost::tuples::null_type,
-    typename P5 = boost::tuples::null_type,
-    typename P6 = boost::tuples::null_type,
-    typename P7 = boost::tuples::null_type,
-    typename P8 = boost::tuples::null_type,
-    typename P9 = boost::tuples::null_type,
-    typename P10 = boost::tuples::null_type,
-    typename P11 = boost::tuples::null_type,
-    typename P12 = boost::tuples::null_type,
-    typename P13 = boost::tuples::null_type,
-    typename P14 = boost::tuples::null_type
->
-struct parameters
-    : detail::map_params_to_cons<BOOST_GEOMETRY_PROJECTIONS_DETAIL_PX>::type
+template <typename P, typename ...Ps>
+class parameters<P, Ps...>
+    : private parameters<Ps...>
 {
-private:
-    typedef typename detail::map_params_to_cons<BOOST_GEOMETRY_PROJECTIONS_DETAIL_PX>::type base_type;
-    
 public:
-    typedef typename base_type::tail_type tail_type;
+    parameters() = default;
+    parameters(parameters const&) = default;
+    parameters(parameters&&) = default;
+    parameters & operator=(parameters const&) = default;
+    parameters & operator=(parameters&&) = default;
 
-    parameters()
-        : base_type()
+    template
+    <
+        typename R, typename ...Rs,
+        std::enable_if_t<std::is_constructible<P, R>::value, int> = 0
+    >
+    explicit parameters(R&& r, Rs&&... rs)
+        : parameters<Ps...>(std::forward<Rs>(rs)...)
+        , m_p(std::forward<R>(r))
     {}
 
-    explicit parameters(P0 const& p0)
-        : base_type(p0, cnull(), cnull(), cnull(), cnull(), cnull(), cnull(), cnull(), cnull(), cnull())
-    {}
-
-    parameters(P0 const& p0, P1 const& p1)
-        : base_type(p0, p1, cnull(), cnull(), cnull(), cnull(), cnull(), cnull(), cnull(), cnull())
-    {}
-
-    parameters(P0 const& p0, P1 const& p1, P2 const& p2)
-        : base_type(p0, p1, p2, cnull(), cnull(), cnull(), cnull(), cnull(), cnull(), cnull())
-    {}
-
-    parameters(P0 const& p0, P1 const& p1, P2 const& p2, P3 const& p3)
-        : base_type(p0, p1, p2, p3, cnull(), cnull(), cnull(), cnull(), cnull(), cnull())
-    {}
-
-    parameters(P0 const& p0, P1 const& p1, P2 const& p2, P3 const& p3, P4 const& p4)
-        : base_type(p0, p1, p2, p3, p4, cnull(), cnull(), cnull(), cnull(), cnull())
-    {}
-
-    parameters(P0 const& p0, P1 const& p1, P2 const& p2, P3 const& p3, P4 const& p4, P5 const& p5)
-        : base_type(p0, p1, p2, p3, p4, p5, cnull(), cnull(), cnull(), cnull())
-    {}
-
-    parameters(P0 const& p0, P1 const& p1, P2 const& p2, P3 const& p3, P4 const& p4, P5 const& p5, P6 const& p6)
-        : base_type(p0, p1, p2, p3, p4, p5, p6, cnull(), cnull(), cnull())
-    {}
-
-    parameters(P0 const& p0, P1 const& p1, P2 const& p2, P3 const& p3, P4 const& p4, P5 const& p5, P6 const& p6, P7 const& p7)
-        : base_type(p0, p1, p2, p3, p4, p5, p6, p7, cnull(), cnull())
-    {}
-
-    parameters(P0 const& p0, P1 const& p1, P2 const& p2, P3 const& p3, P4 const& p4, P5 const& p5, P6 const& p6, P7 const& p7, P8 const& p8)
-        : base_type(p0, p1, p2, p3, p4, p5, p6, p7, p8, cnull())
-    {}
-
-    parameters(P0 const& p0, P1 const& p1, P2 const& p2, P3 const& p3, P4 const& p4, P5 const& p5, P6 const& p6, P7 const& p7, P8 const& p8, P9 const& p9)
-        : base_type(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9)
-    {}
-
-    parameters(P0 const& p0, P1 const& p1, P2 const& p2, P3 const& p3, P4 const& p4, P5 const& p5, P6 const& p6, P7 const& p7, P8 const& p8, P9 const& p9, P10 const& p10)
-        : base_type(p0,
-            tail_type(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10))
-    {}
-
-    parameters(P0 const& p0, P1 const& p1, P2 const& p2, P3 const& p3, P4 const& p4, P5 const& p5, P6 const& p6, P7 const& p7, P8 const& p8, P9 const& p9, P10 const& p10, P11 const& p11)
-        : base_type(p0,
-            tail_type(p1,
-                typename tail_type::tail_type(p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)))
-    {}
-
-    parameters(P0 const& p0, P1 const& p1, P2 const& p2, P3 const& p3, P4 const& p4, P5 const& p5, P6 const& p6, P7 const& p7, P8 const& p8, P9 const& p9, P10 const& p10, P11 const& p11, P12 const& p12)
-        : base_type(p0,
-            tail_type(p1,
-                typename tail_type::tail_type(p2,
-                    typename tail_type::tail_type::tail_type(p3, p4, p5, p6, p7, p8, p9, p10, p11, p12))))
-    {}
-
-    parameters(P0 const& p0, P1 const& p1, P2 const& p2, P3 const& p3, P4 const& p4, P5 const& p5, P6 const& p6, P7 const& p7, P8 const& p8, P9 const& p9, P10 const& p10, P11 const& p11, P12 const& p12, P13 const& p13)
-        : base_type(p0,
-            tail_type(p1,
-                typename tail_type::tail_type(p2,
-                    typename tail_type::tail_type::tail_type(p3,
-                        typename tail_type::tail_type::tail_type::tail_type(p4, p5, p6, p7, p8, p9, p10, p11, p12, p13)))))
-    {}
-
-    parameters(P0 const& p0, P1 const& p1, P2 const& p2, P3 const& p3, P4 const& p4, P5 const& p5, P6 const& p6, P7 const& p7, P8 const& p8, P9 const& p9, P10 const& p10, P11 const& p11, P12 const& p12, P13 const& p13, P14 const& p14)
-        : base_type(p0,
-            tail_type(p1,
-                typename tail_type::tail_type(p2,
-                    typename tail_type::tail_type::tail_type(p3,
-                        typename tail_type::tail_type::tail_type::tail_type(p4,
-                            typename tail_type::tail_type::tail_type::tail_type::tail_type(p5, p6, p7, p8, p9, p10, p11, p12, p13, p14))))))
-    {}
+    template <std::size_t I>
+    auto const& get() const
+    {
+        typedef typename detail::parameters_base<I, P, Ps...>::type base_t;
+        return static_cast<base_t const&>(*this).m_p;
+    }
 
 private:
-    static inline const boost::tuples::null_type cnull()
-    {
-        return boost::tuples::null_type();
-    }
+    P m_p;
+
+    template <typename ...>
+    friend class parameters;
 };
 
+} // namespace spar
 
-#ifndef DOXYGEN_NO_DETAIL
-namespace detail
+}}} // namespace boost::geometry::srs
+
+
+namespace boost { namespace geometry { namespace tuples
 {
 
-template <typename Parameters, typename Parameter>
-struct add_parameter
+template <std::size_t I, typename ...Ts>
+struct element<I, srs::spar::parameters<Ts...> >
+    : util::sequence_element<I, util::type_sequence<Ts...> >
+{};
+
+template <typename ...Ts>
+struct size<srs::spar::parameters<Ts...> >
+    : std::integral_constant<std::size_t, sizeof...(Ts)>
+{};
+
+template <int I, typename ...Ts>
+inline typename element<I, srs::spar::parameters<Ts...> >::type const&
+get(srs::spar::parameters<Ts...> const& tup)
 {
-    BOOST_MPL_ASSERT_MSG((false), INVALID_ARGUMENT, (Parameters));
-};
+    return tup.template get<I>();
+}
 
-// NOTE: parameters has to be convertible to tuples::cons
-template <BOOST_GEOMETRY_PROJECTIONS_DETAIL_TYPENAME_PX, typename Parameter>
-struct add_parameter<spar::parameters<BOOST_GEOMETRY_PROJECTIONS_DETAIL_PX>, Parameter>
-    : geometry::tuples::push_back
-        <
-            typename detail::map_params_to_cons<BOOST_GEOMETRY_PROJECTIONS_DETAIL_PX>::type,
-            Parameter
-        >
-{};
 
-template <typename Head, typename Tail, typename Parameter>
-struct add_parameter<boost::tuples::cons<Head, Tail>, Parameter>
-    : geometry::tuples::push_back
-        <
-            boost::tuples::cons<Head, Tail>,
-            Parameter
-        >
-{};
+}}} // namespace boost::geometry::tuples
 
-} // namespace detail
-#endif // DOXYGEN_NO_DETAIL
 
+namespace boost { namespace geometry { namespace srs
+{
+
+namespace spar
+{
 
 // Static parameters values
 
@@ -407,6 +316,7 @@ struct proj_vandg4 {};
 struct proj_wag2 {};
 struct proj_wag3 {};
 struct proj_wag7 {};
+struct proj_webmerc {};
 struct proj_wink1 {};
 struct proj_wink2 {};
 
@@ -950,6 +860,7 @@ BOOST_GEOMETRY_PROJECTIONS_DETAIL_REGISTER_PROJ(proj_vandg4)
 BOOST_GEOMETRY_PROJECTIONS_DETAIL_REGISTER_PROJ(proj_wag2)
 BOOST_GEOMETRY_PROJECTIONS_DETAIL_REGISTER_PROJ(proj_wag3)
 BOOST_GEOMETRY_PROJECTIONS_DETAIL_REGISTER_PROJ(proj_wag7)
+BOOST_GEOMETRY_PROJECTIONS_DETAIL_REGISTER_PROJ(proj_webmerc)
 BOOST_GEOMETRY_PROJECTIONS_DETAIL_REGISTER_PROJ(proj_wink1)
 BOOST_GEOMETRY_PROJECTIONS_DETAIL_REGISTER_PROJ(proj_wink2)
 
@@ -1011,30 +922,29 @@ BOOST_GEOMETRY_PROJECTIONS_DETAIL_REGISTER_UNITS(units_ind_ch)
 
 
 template <typename T, template <typename> class Param>
-struct is_same_t : boost::false_type {};
+struct is_same_t : std::false_type {};
 template <typename T, template <typename> class Param>
-struct is_same_t<Param<T>, Param> : boost::true_type {};
+struct is_same_t<Param<T>, Param> : std::true_type {};
 
 template <typename T, template <int> class Param>
-struct is_same_i : boost::false_type {};
+struct is_same_i : std::false_type {};
 template <int I, template <int> class Param>
-struct is_same_i<Param<I>, Param> : boost::true_type {};
+struct is_same_i<Param<I>, Param> : std::true_type {};
 
 template <typename T, template <typename> class Traits>
 struct it_traits_specialized
-    : boost::mpl::if_c
+    : std::integral_constant
         <
-            Traits<T>::is_specialized,
-            boost::true_type,
-            boost::false_type
-        >::type
+            bool,
+            Traits<T>::is_specialized
+        >
 {};
 
 template <typename Param>
 struct is_param
 {
     template <typename T>
-    struct pred : boost::is_same<T, Param> {};
+    struct pred : std::is_same<T, Param> {};
 };
 
 template <template <typename> class Param>
@@ -1058,13 +968,6 @@ struct is_param_tr
     struct pred : it_traits_specialized<T, Traits> {};
 };
 
-//template <typename IsParam1, typename IsParam2>
-//struct is_param_or
-//{
-//    template <typename T>
-//    struct pred : boost::mpl::or_<IsParam1::pred<T>, IsParam2::pred<T> > {};
-//};
-
 // pick proj static name
 
 template <typename Tuple>
@@ -1078,7 +981,7 @@ struct pick_proj_tag
 
     static const bool is_found = geometry::tuples::is_found<proj_type>::value;
 
-    BOOST_MPL_ASSERT_MSG((is_found), PROJECTION_NOT_NAMED, (Tuple));
+    BOOST_GEOMETRY_STATIC_ASSERT((is_found), "Projection not named.", Tuple);
 
     typedef proj_traits<proj_type> traits_type;
     typedef typename traits_type::type type;
@@ -1095,7 +998,7 @@ struct pick_o_proj_tag
 
     static const bool is_found = geometry::tuples::is_found<o_proj_type>::value;
 
-    BOOST_MPL_ASSERT_MSG((is_found), NO_O_PROJ_PARAMETER, (Tuple));
+    BOOST_GEOMETRY_STATIC_ASSERT((is_found), "Expected o_proj parameter.", Tuple);
 
     typedef proj_traits<typename o_proj_type::type> traits_type;
     typedef typename traits_type::type type;
@@ -1111,3 +1014,7 @@ struct pick_o_proj_tag
 
 
 #endif // BOOST_GEOMETRY_SRS_PROJECTIONS_SPAR_HPP
+
+/* spar.hpp
+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
+*/

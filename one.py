@@ -1,6 +1,6 @@
 import os
 
-for root, dirs, files in os.walk('.'):
+for root, dirs, files in os.walk('.', topdown=False):
     for file in files:
         if file.endswith("977.cpp"):
             raise Exception(file)
@@ -16,6 +16,12 @@ for root, dirs, files in os.walk('.'):
 
         if file.endswith(".bat"):
             new_file = file[:-4] + "977.cpp"
+            print(f"{root}\\{file}", end=" => ")
+            print(new_file)
+            os.rename(f"{root}\\{file}", f"{root}\\{new_file}")
+
+        if file.endswith(".jam"):
+            new_file = file[:-4] + "261.cpp"
             print(f"{root}\\{file}", end=" => ")
             print(new_file)
             os.rename(f"{root}\\{file}", f"{root}\\{new_file}")

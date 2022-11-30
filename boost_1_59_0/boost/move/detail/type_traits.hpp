@@ -65,6 +65,8 @@
 // BOOST_MOVE_HAS_NOTHROW_COPY(T) should evaluate to true if T(t) can not throw
 // BOOST_MOVE_HAS_NOTHROW_ASSIGN(T) should evaluate to true if t = u can not throw
 // BOOST_MOVE_IS_ENUM(T) should evaluate to true it t is a union type.
+// BOOST_MOVE_HAS_NOTHROW_MOVE_CONSTRUCTOR(T) should evaluate to true if T has a non-throwing move constructor.
+// BOOST_MOVE_HAS_NOTHROW_MOVE_ASSIGN(T) should evaluate to true if T has a non-throwing move assignment operator.
 //
 // The following can also be defined: when detected our implementation is greatly simplified.
 //
@@ -102,51 +104,123 @@
 #       define BOOST_MOVE_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T)   (__has_trivial_move_constructor(T) || ::boost::move_detail::is_pod<T>::value)
 #       define BOOST_MOVE_HAS_TRIVIAL_MOVE_ASSIGN(T)        (__has_trivial_move_assign(T) || ::boost::move_detail::is_pod<T>::value)
 #   endif
+#  if _MSC_FULL_VER >= 180020827
+#     define BOOST_MOVE_HAS_NOTHROW_MOVE_ASSIGN(T) (__is_nothrow_assignable(T&, T&&))
+#     define BOOST_MOVE_HAS_NOTHROW_MOVE_CONSTRUCTOR(T) (__is_nothrow_constructible(T, T&&))
+#  endif
 #endif
 
-#if defined(BOOST_CLANG) && defined(__has_feature)
+#if defined(BOOST_CLANG)
+//    BOOST_MOVE_HAS_TRAIT
+#   if defined __is_identifier
+#       define BOOST_MOVE_HAS_TRAIT(T) (__has_extension(T) || !__is_identifier(__##T))
+#   elif defined(__has_extension)
+#     define BOOST_MOVE_HAS_TRAIT(T) __has_extension(T)
+#   else
+#     define BOOST_MOVE_HAS_TRAIT(T) 0
+#   endif
 
-#   if __has_feature(is_union)
+//    BOOST_MOVE_IS_UNION
+#   if BOOST_MOVE_HAS_TRAIT(is_union)
 #     define BOOST_MOVE_IS_UNION(T) __is_union(T)
 #   endif
-#   if (!defined(__GLIBCXX__) || (__GLIBCXX__ >= 20080306 && __GLIBCXX__ != 20080519)) && __has_feature(is_pod)
-#     define BOOST_MOVE_IS_POD(T) __is_pod(T)
-#   endif
-#   if (!defined(__GLIBCXX__) || (__GLIBCXX__ >= 20080306 && __GLIBCXX__ != 20080519)) && __has_feature(is_empty)
-#     define BOOST_MOVE_IS_EMPTY(T) __is_empty(T)
-#   endif
-#   if __has_feature(has_trivial_constructor)
-#     define BOOST_MOVE_HAS_TRIVIAL_CONSTRUCTOR(T) __has_trivial_constructor(T)
-#   endif
-#   if __has_feature(has_trivial_copy)
-#     define BOOST_MOVE_HAS_TRIVIAL_COPY(T) __has_trivial_copy(T)
-#   endif
-#   if __has_feature(has_trivial_assign)
-#     define BOOST_MOVE_HAS_TRIVIAL_ASSIGN(T) (__has_trivial_assign(T) )
-#   endif
-#   if __has_feature(has_trivial_destructor)
-#     define BOOST_MOVE_HAS_TRIVIAL_DESTRUCTOR(T) __has_trivial_destructor(T)
-#   endif
-#   if __has_feature(has_nothrow_constructor)
-#     define BOOST_MOVE_HAS_NOTHROW_CONSTRUCTOR(T) __has_nothrow_constructor(T)
-#   endif
-#   if __has_feature(has_nothrow_copy)
-#     define BOOST_MOVE_HAS_NOTHROW_COPY(T) (__has_nothrow_copy(T))
-#   endif
-#   if __has_feature(is_nothrow_copy_assignable)
-#     define BOOST_MOVE_HAS_NOTHROW_ASSIGN(T) (__has_nothrow_assign(T))
-#   endif
-#   if __has_feature(is_enum)
+
+//    BOOST_MOVE_IS_ENUM
+#   if BOOST_MOVE_HAS_TRAIT(is_enum)
 #     define BOOST_MOVE_IS_ENUM(T) __is_enum(T)
 #   endif
-#   if __has_feature(has_trivial_move_constructor)
+
+//    BOOST_MOVE_IS_POD
+#   if (!defined(__GLIBCXX__) || (__GLIBCXX__ >= 20080306 && __GLIBCXX__ != 20080519)) && BOOST_MOVE_HAS_TRAIT(is_pod)
+#     define BOOST_MOVE_IS_POD(T) __is_pod(T)
+#   endif
+
+//    BOOST_MOVE_IS_EMPTY
+#   if (!defined(__GLIBCXX__) || (__GLIBCXX__ >= 20080306 && __GLIBCXX__ != 20080519)) && BOOST_MOVE_HAS_TRAIT(is_empty)
+#     define BOOST_MOVE_IS_EMPTY(T) __is_empty(T)
+#   endif
+
+//    BOOST_MOVE_HAS_TRIVIAL_CONSTRUCTOR
+#   if BOOST_MOVE_HAS_TRAIT(is_constructible) && BOOST_MOVE_HAS_TRAIT(is_trivially_constructible)
+#     define BOOST_MOVE_HAS_TRIVIAL_CONSTRUCTOR(T) __is_trivially_constructible(T)
+#   elif BOOST_MOVE_HAS_TRAIT(has_trivial_constructor)
+#     define BOOST_MOVE_HAS_TRIVIAL_CONSTRUCTOR(T) __has_trivial_constructor(T)
+#   endif
+
+//    BOOST_MOVE_HAS_TRIVIAL_COPY
+#   if BOOST_MOVE_HAS_TRAIT(is_constructible) && BOOST_MOVE_HAS_TRAIT(is_trivially_constructible)
+#     define BOOST_MOVE_HAS_TRIVIAL_COPY(T) (__is_constructible(T, const T &) && __is_trivially_constructible(T, const T &))
+#   elif BOOST_MOVE_HAS_TRAIT(has_trivial_copy)
+#     define BOOST_MOVE_HAS_TRIVIAL_COPY(T) __has_trivial_copy(T)
+#   endif
+
+//    BOOST_MOVE_HAS_TRIVIAL_ASSIGN
+#   if BOOST_MOVE_HAS_TRAIT(is_assignable) && BOOST_MOVE_HAS_TRAIT(is_trivially_assignable)
+#     define BOOST_MOVE_HAS_TRIVIAL_ASSIGN(T) (__is_assignable(T, const T &) && __is_trivially_assignable(T, const T &))
+#   elif BOOST_MOVE_HAS_TRAIT(has_trivial_copy)
+#     define BOOST_MOVE_HAS_TRIVIAL_ASSIGN(T) __has_trivial_assign(T)
+#   endif
+
+//    BOOST_MOVE_HAS_TRIVIAL_DESTRUCTOR
+#   if BOOST_MOVE_HAS_TRAIT(is_trivially_destructible)
+#     define BOOST_MOVE_HAS_TRIVIAL_DESTRUCTOR(T) __is_trivially_destructible(T)
+#   elif BOOST_MOVE_HAS_TRAIT(has_trivial_destructor)
+#     define BOOST_MOVE_HAS_TRIVIAL_DESTRUCTOR(T) __has_trivial_destructor(T)
+#   endif
+
+//    BOOST_MOVE_HAS_NOTHROW_CONSTRUCTOR
+#   if BOOST_MOVE_HAS_TRAIT(is_nothrow_constructible)
+#     define BOOST_MOVE_HAS_NOTHROW_CONSTRUCTOR(T) __is_nothrow_constructible(T)
+#   elif BOOST_MOVE_HAS_TRAIT(has_nothrow_constructor)
+#     define BOOST_MOVE_HAS_NOTHROW_CONSTRUCTOR(T) __has_nothrow_constructor(T)
+#   endif
+
+//    BOOST_MOVE_HAS_NOTHROW_COPY
+#   if BOOST_MOVE_HAS_TRAIT(is_constructible) && BOOST_MOVE_HAS_TRAIT(is_nothrow_constructible)
+#     define BOOST_MOVE_HAS_NOTHROW_COPY(T) (__is_constructible(T, const T &) && __is_nothrow_constructible(T, const T &))
+#   elif BOOST_MOVE_HAS_TRAIT(has_nothrow_copy)
+#     define BOOST_MOVE_HAS_NOTHROW_COPY(T) (__has_nothrow_copy(T))
+#   endif
+
+//    BOOST_MOVE_HAS_NOTHROW_ASSIGN
+#   if BOOST_MOVE_HAS_TRAIT(is_assignable) && BOOST_MOVE_HAS_TRAIT(is_nothrow_assignable)
+#     define BOOST_MOVE_HAS_NOTHROW_ASSIGN(T) (__is_assignable(T, const T &) && __is_nothrow_assignable(T, const T &))
+#   elif BOOST_MOVE_HAS_TRAIT(has_nothrow_assign)
+#     define BOOST_MOVE_HAS_NOTHROW_ASSIGN(T) (__has_nothrow_assign(T))
+#   endif
+
+//    BOOST_MOVE_HAS_TRIVIAL_MOVE_CONSTRUCTOR
+#   if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && BOOST_MOVE_HAS_TRAIT(is_constructible) && BOOST_MOVE_HAS_TRAIT(is_trivially_constructible)
+#     define BOOST_MOVE_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T) (__is_constructible(T, T&&) && __is_trivially_constructible(T, T&&))
+#   elif BOOST_MOVE_HAS_TRAIT(has_trivial_move_constructor)
 #     define BOOST_MOVE_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T) __has_trivial_move_constructor(T)
 #   endif
-#   if __has_feature(has_trivial_move_assign)
+
+//    BOOST_MOVE_HAS_TRIVIAL_MOVE_ASSIGN
+#   if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && BOOST_MOVE_HAS_TRAIT(is_assignable) && BOOST_MOVE_HAS_TRAIT(is_trivially_assignable)
+#     define BOOST_MOVE_HAS_TRIVIAL_MOVE_ASSIGN(T) (__is_assignable(T, T&&) && __is_trivially_assignable(T, T&&))
+#   elif BOOST_MOVE_HAS_TRAIT(has_trivial_move_assign)
 #     define BOOST_MOVE_HAS_TRIVIAL_MOVE_ASSIGN(T) __has_trivial_move_assign(T)
 #   endif
+
+//    BOOST_MOVE_HAS_NOTHROW_MOVE_CONSTRUCTOR
+#   if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && BOOST_MOVE_HAS_TRAIT(is_constructible) && BOOST_MOVE_HAS_TRAIT(is_nothrow_constructible)
+#     define BOOST_MOVE_HAS_NOTHROW_MOVE_CONSTRUCTOR(T) (__is_constructible(T, T&&) && __is_nothrow_constructible(T, T&&))
+#   elif BOOST_MOVE_HAS_TRAIT(has_nothrow_move_constructor)
+#     define BOOST_MOVE_HAS_NOTHROW_MOVE_CONSTRUCTOR(T) __has_nothrow_move_constructor(T)
+#   endif
+
+//    BOOST_MOVE_HAS_NOTHROW_MOVE_ASSIGN
+#   if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && BOOST_MOVE_HAS_TRAIT(is_assignable) && BOOST_MOVE_HAS_TRAIT(is_nothrow_assignable)
+#     define BOOST_MOVE_HAS_NOTHROW_MOVE_ASSIGN(T) (__is_assignable(T, T&&) && __is_nothrow_assignable(T, T&&))
+#   elif BOOST_MOVE_HAS_TRAIT(has_nothrow_move_assign)
+#     define BOOST_MOVE_HAS_NOTHROW_MOVE_ASSIGN(T) __has_nothrow_move_assign(T)
+#   endif
+
+//    BOOST_MOVE_ALIGNMENT_OF
 #   define BOOST_MOVE_ALIGNMENT_OF(T) __alignof(T)
-#endif
+
+#endif   //#if defined(BOOST_CLANG)
 
 #if defined(__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3) && !defined(__GCCXML__))) && !defined(BOOST_CLANG)
 
@@ -160,14 +234,106 @@
 #   define BOOST_MOVE_IS_POD(T) __is_pod(T)
 #   define BOOST_MOVE_IS_EMPTY(T) __is_empty(T)
 #   define BOOST_MOVE_HAS_TRIVIAL_CONSTRUCTOR(T) ((__has_trivial_constructor(T) BOOST_MOVE_INTEL_TT_OPTS))
-#   define BOOST_MOVE_HAS_TRIVIAL_COPY(T) ((__has_trivial_copy(T) BOOST_MOVE_INTEL_TT_OPTS))
-#   define BOOST_MOVE_HAS_TRIVIAL_ASSIGN(T) ((__has_trivial_assign(T) BOOST_MOVE_INTEL_TT_OPTS) )
+
+#   if defined(BOOST_GCC) && (BOOST_GCC > 50000)
+#     define BOOST_MOVE_HAS_TRIVIAL_COPY(T) (__is_trivially_constructible(T, const T &))
+#     define BOOST_MOVE_HAS_TRIVIAL_ASSIGN(T) (__is_trivially_assignable(T, const T &))
+#   else
+#     define BOOST_MOVE_HAS_TRIVIAL_COPY(T) ((__has_trivial_copy(T) BOOST_MOVE_INTEL_TT_OPTS))
+#     define BOOST_MOVE_HAS_TRIVIAL_ASSIGN(T) ((__has_trivial_assign(T) BOOST_MOVE_INTEL_TT_OPTS) )
+#   endif
+
 #   define BOOST_MOVE_HAS_TRIVIAL_DESTRUCTOR(T) (__has_trivial_destructor(T) BOOST_MOVE_INTEL_TT_OPTS)
 #   define BOOST_MOVE_HAS_NOTHROW_CONSTRUCTOR(T) (__has_nothrow_constructor(T) BOOST_MOVE_INTEL_TT_OPTS)
 #   define BOOST_MOVE_HAS_NOTHROW_COPY(T) ((__has_nothrow_copy(T) BOOST_MOVE_INTEL_TT_OPTS))
 #   define BOOST_MOVE_HAS_NOTHROW_ASSIGN(T) ((__has_nothrow_assign(T) BOOST_MOVE_INTEL_TT_OPTS))
 
+#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && !defined(BOOST_NO_CXX11_SFINAE_EXPR)
+
+   template <typename T>
+   T && boost_move_tt_declval() BOOST_NOEXCEPT;
+
+#  if defined(BOOST_GCC) && (BOOST_GCC >= 80000)
+// __is_assignable / __is_constructible implemented
+#     define BOOST_MOVE_IS_ASSIGNABLE(T, U)     __is_assignable(T, U)
+#     define BOOST_MOVE_IS_CONSTRUCTIBLE(T, U)  __is_constructible(T, U)
+#  else
+
+   template<typename Tt, typename Ut>
+   class boost_move_tt_is_assignable
+   {
+      struct twochar {  char dummy[2]; };
+      template < class T
+               , class U
+               , class = decltype(boost_move_tt_declval<T>() = boost_move_tt_declval<U>())
+               > static char test(int);
+
+      template<class, class> static twochar test(...);
+
+      public:
+      static const bool value = sizeof(test<Tt, Ut>(0)) == sizeof(char);
+   };
+
+   template<typename Tt, typename Ut>
+   class boost_move_tt_is_constructible
+   {
+      struct twochar {  char dummy[2]; };
+      template < class T
+               , class U
+               , class = decltype(T(boost_move_tt_declval<U>()))
+               > static char test(int);
+
+      template<class, class> static twochar test(...);
+
+      public:
+      static const bool value = sizeof(test<Tt, Ut>(0)) == sizeof(char);
+   };
+
+#     define BOOST_MOVE_IS_ASSIGNABLE(T, U)     boost_move_tt_is_assignable<T,U>::value
+#     define BOOST_MOVE_IS_CONSTRUCTIBLE(T, U)  boost_move_tt_is_constructible<T, U>::value
+
+#  endif
+
+   template <typename T, typename U, bool = BOOST_MOVE_IS_ASSIGNABLE(T, U)>
+   struct boost_move_tt_is_nothrow_assignable
+   {
+      static const bool value = false;
+   };
+
+   template <typename T, typename U>
+   struct boost_move_tt_is_nothrow_assignable<T, U, true>
+   {
+      #if !defined(BOOST_NO_CXX11_NOEXCEPT)
+      static const bool value = noexcept(boost_move_tt_declval<T>() = boost_move_tt_declval<U>());
+      #else
+      static const bool value = false;
+      #endif
+   };
+
+   template <typename T, typename U, bool = BOOST_MOVE_IS_CONSTRUCTIBLE(T, U)>
+   struct boost_move_tt_is_nothrow_constructible
+   {
+      static const bool value = false;
+   };
+
+   template <typename T, typename U>
+   struct boost_move_tt_is_nothrow_constructible<T, U, true>
+   {
+      #if !defined(BOOST_NO_CXX11_NOEXCEPT)
+      static const bool value = noexcept(T(boost_move_tt_declval<U>()));
+      #else
+      static const bool value = false;
+      #endif
+   };
+
+#     define BOOST_MOVE_HAS_NOTHROW_MOVE_ASSIGN(T)       boost_move_tt_is_nothrow_assignable<T, T&&>::value
+#     define BOOST_MOVE_HAS_NOTHROW_MOVE_CONSTRUCTOR(T)  boost_move_tt_is_nothrow_constructible<T, T&&>::value
+
+#  endif
+
 #   define BOOST_MOVE_IS_ENUM(T) __is_enum(T)
+
+// BOOST_MOVE_ALIGNMENT_OF
 #   if (!defined(unix) && !defined(__unix__)) || defined(__LP64__)
       // GCC sometimes lies about alignment requirements
       // of type double on 32-bit unix platforms, use the
@@ -193,7 +359,7 @@
 #   define BOOST_MOVE_ALIGNMENT_OF(T) __alignof__(T)
 #endif
 
-# if defined(__CODEGEARC__)
+# if defined(BOOST_CODEGEARC)
 #   define BOOST_MOVE_IS_UNION(T) __is_union(T)
 #   define BOOST_MOVE_IS_POD(T) __is_pod(T)
 #   define BOOST_MOVE_IS_EMPTY(T) __is_empty(T)
@@ -243,13 +409,13 @@
 #endif
 
 #ifdef BOOST_MOVE_HAS_TRIVIAL_CONSTRUCTOR
-   #define BOOST_MOVE_IS_TRIVIALLY_DEFAULT_CONSTRUCTIBLE(T)  BOOST_MOVE_HAS_TRIVIAL_CONSTRUCTOR(T)
+   #define BOOST_MOVE_IS_TRIVIALLY_DEFAULT_CONSTRUCTIBLE(T)  BOOST_MOVE_HAS_TRIVIAL_CONSTRUCTOR(T) || ::boost::move_detail::is_pod<T>::value
 #else
    #define BOOST_MOVE_IS_TRIVIALLY_DEFAULT_CONSTRUCTIBLE(T)  ::boost::move_detail::is_pod<T>::value
 #endif
 
 #ifdef BOOST_MOVE_HAS_TRIVIAL_MOVE_CONSTRUCTOR
-   #define BOOST_MOVE_IS_TRIVIALLY_MOVE_CONSTRUCTIBLE(T)   BOOST_MOVE_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T)
+   #define BOOST_MOVE_IS_TRIVIALLY_MOVE_CONSTRUCTIBLE(T)   BOOST_MOVE_HAS_TRIVIAL_MOVE_CONSTRUCTOR(T) || ::boost::move_detail::is_pod<T>::value
 #else
    #define BOOST_MOVE_IS_TRIVIALLY_MOVE_CONSTRUCTIBLE(T)   ::boost::move_detail::is_pod<T>::value
 #endif
@@ -263,45 +429,45 @@
 #endif
 
 #ifdef BOOST_MOVE_HAS_TRIVIAL_MOVE_ASSIGN
-   #define BOOST_MOVE_IS_TRIVIALLY_MOVE_ASSIGNABLE(T)  BOOST_MOVE_HAS_TRIVIAL_MOVE_ASSIGN(T)
+   #define BOOST_MOVE_IS_TRIVIALLY_MOVE_ASSIGNABLE(T)  BOOST_MOVE_HAS_TRIVIAL_MOVE_ASSIGN(T) || ::boost::move_detail::is_pod<T>::value
 #else
    #define BOOST_MOVE_IS_TRIVIALLY_MOVE_ASSIGNABLE(T)  ::boost::move_detail::is_pod<T>::value
 #endif
 
 #ifdef BOOST_MOVE_HAS_TRIVIAL_DESTRUCTOR
-   #define BOOST_MOVE_IS_TRIVIALLY_DESTRUCTIBLE(T)   BOOST_MOVE_HAS_TRIVIAL_DESTRUCTOR(T)
+   #define BOOST_MOVE_IS_TRIVIALLY_DESTRUCTIBLE(T)   BOOST_MOVE_HAS_TRIVIAL_DESTRUCTOR(T) || ::boost::move_detail::is_pod<T>::value
 #else
    #define BOOST_MOVE_IS_TRIVIALLY_DESTRUCTIBLE(T)   ::boost::move_detail::is_pod<T>::value
 #endif
 
 #ifdef BOOST_MOVE_HAS_NOTHROW_CONSTRUCTOR
-   #define BOOST_MOVE_IS_NOTHROW_DEFAULT_CONSTRUCTIBLE(T)  BOOST_MOVE_HAS_NOTHROW_CONSTRUCTOR(T)
+   #define BOOST_MOVE_IS_NOTHROW_DEFAULT_CONSTRUCTIBLE(T)  BOOST_MOVE_HAS_NOTHROW_CONSTRUCTOR(T) || ::boost::move_detail::is_pod<T>::value
 #else
    #define BOOST_MOVE_IS_NOTHROW_DEFAULT_CONSTRUCTIBLE(T)  ::boost::move_detail::is_pod<T>::value
 #endif
 
 #ifdef BOOST_MOVE_HAS_NOTHROW_COPY
-   #define BOOST_MOVE_IS_NOTHROW_COPY_CONSTRUCTIBLE(T)   BOOST_MOVE_HAS_NOTHROW_COPY(T)
+   #define BOOST_MOVE_IS_NOTHROW_COPY_CONSTRUCTIBLE(T)   BOOST_MOVE_HAS_NOTHROW_COPY(T) || ::boost::move_detail::is_pod<T>::value
 #else
-   #define BOOST_MOVE_IS_NOTHROW_COPY_CONSTRUCTIBLE(T)   ::boost::move_detail::is_pod<T>::value
-#endif
-
-#ifdef BOOST_MOVE_HAS_NOTHROW_MOVE
-   #define BOOST_MOVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE(T)   BOOST_MOVE_HAS_NOTHROW_MOVE(T)
-#else
-   #define BOOST_MOVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE(T)   ::boost::move_detail::is_pod<T>::value
+   #define BOOST_MOVE_IS_NOTHROW_COPY_CONSTRUCTIBLE(T)   BOOST_MOVE_IS_TRIVIALLY_COPY_ASSIGNABLE(T)
 #endif
 
 #ifdef BOOST_MOVE_HAS_NOTHROW_ASSIGN
-   #define BOOST_MOVE_IS_NOTHROW_COPY_ASSIGNABLE(T) BOOST_MOVE_HAS_NOTHROW_ASSIGN(T)
+   #define BOOST_MOVE_IS_NOTHROW_COPY_ASSIGNABLE(T) BOOST_MOVE_HAS_NOTHROW_ASSIGN(T) || ::boost::move_detail::is_pod<T>::value
 #else
-   #define BOOST_MOVE_IS_NOTHROW_COPY_ASSIGNABLE(T) ::boost::move_detail::is_pod<T>::value
+   #define BOOST_MOVE_IS_NOTHROW_COPY_ASSIGNABLE(T) BOOST_MOVE_IS_TRIVIALLY_COPY_ASSIGNABLE(T)
+#endif
+
+#ifdef BOOST_MOVE_HAS_NOTHROW_MOVE_CONSTRUCTOR
+   #define BOOST_MOVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE(T)   BOOST_MOVE_HAS_NOTHROW_MOVE_CONSTRUCTOR(T) || ::boost::move_detail::is_pod<T>::value
+#else
+   #define BOOST_MOVE_IS_NOTHROW_MOVE_CONSTRUCTIBLE(T)   BOOST_MOVE_IS_TRIVIALLY_MOVE_ASSIGNABLE(T)
 #endif
 
 #ifdef BOOST_MOVE_HAS_NOTHROW_MOVE_ASSIGN
-   #define BOOST_MOVE_IS_NOTHROW_MOVE_ASSIGNABLE(T) BOOST_MOVE_HAS_NOTHROW_MOVE_ASSIGN(T)
+   #define BOOST_MOVE_IS_NOTHROW_MOVE_ASSIGNABLE(T) BOOST_MOVE_HAS_NOTHROW_MOVE_ASSIGN(T) || ::boost::move_detail::is_pod<T>::value
 #else
-   #define BOOST_MOVE_IS_NOTHROW_MOVE_ASSIGNABLE(T) ::boost::move_detail::is_pod<T>::value
+   #define BOOST_MOVE_IS_NOTHROW_MOVE_ASSIGNABLE(T) BOOST_MOVE_IS_TRIVIALLY_MOVE_ASSIGNABLE(T)
 #endif
 
 #ifdef BOOST_MOVE_IS_ENUM
@@ -402,6 +568,15 @@ template<typename T> struct remove_cv                    {  typedef T type;   };
 template<typename T> struct remove_cv<const T>           {  typedef T type;   };
 template<typename T> struct remove_cv<const volatile T>  {  typedef T type;   };
 template<typename T> struct remove_cv<volatile T>        {  typedef T type;   };
+
+//////////////////////////
+//    remove_cvref
+//////////////////////////
+template<class T>
+struct remove_cvref
+   : remove_cv<typename remove_reference<T>::type>
+{
+};
 
 //////////////////////////
 //    make_unsigned
@@ -817,8 +992,6 @@ struct is_trivially_default_constructible
 template<class T>
 struct is_trivially_copy_constructible
 {
-   //In several compilers BOOST_MOVE_IS_TRIVIALLY_COPY_CONSTRUCTIBLE return true even with
-   //deleted copy constructors so make sure the type is copy constructible.
    static const bool value = BOOST_MOVE_IS_TRIVIALLY_COPY_CONSTRUCTIBLE(T);
 };
 
@@ -835,8 +1008,6 @@ struct is_trivially_move_constructible
 template<class T>
 struct is_trivially_copy_assignable
 {
-   //In several compilers BOOST_MOVE_IS_TRIVIALLY_COPY_CONSTRUCTIBLE return true even with
-   //deleted copy constructors so make sure the type is copy constructible.
    static const bool value = BOOST_MOVE_IS_TRIVIALLY_COPY_ASSIGNABLE(T);
 };                             
 
@@ -852,7 +1023,6 @@ struct is_trivially_move_assignable
 //////////////////////////////////////
 template<class T>
 struct is_nothrow_default_constructible
-   : is_pod<T>
 {  static const bool value = BOOST_MOVE_IS_NOTHROW_DEFAULT_CONSTRUCTIBLE(T);  };
 
 //////////////////////////////////////
@@ -902,6 +1072,7 @@ struct alignment_of_hack
    char c;
    T t2;
    alignment_of_hack();
+   ~alignment_of_hack();
 };
 
 template <unsigned A, unsigned S>
@@ -931,7 +1102,7 @@ struct alignment_of
 class alignment_dummy;
 typedef void (*function_ptr)();
 typedef int (alignment_dummy::*member_ptr);
-typedef int (alignment_dummy::*member_function_ptr)();
+
 struct alignment_struct
 {  long double dummy[4];  };
 
@@ -954,7 +1125,6 @@ union max_align
    long double long_double_[4];
    alignment_dummy *unknown_class_ptr_;
    function_ptr function_ptr_;
-   member_function_ptr member_function_ptr_;
    alignment_struct alignment_struct_;
 };
 
@@ -964,7 +1134,46 @@ typedef union max_align max_align_t;
 //    aligned_storage
 /////////////////////////////
 
-#if !defined(BOOST_NO_ALIGNMENT)
+#if defined(_MSC_VER) && defined(_M_IX86)
+
+// Special version for usual alignments on x86 MSVC because it might crash
+// when passsing aligned types by value even for 8 byte alignment.
+template<std::size_t Align>
+struct aligned_struct;
+
+template <> struct aligned_struct<1> { char data; };
+template <> struct aligned_struct<2> { short data; };
+template <> struct aligned_struct<4> { int data; };
+template <> struct aligned_struct<8> { double data; };
+
+#define BOOST_MOVE_ALIGNED_STRUCT(x) \
+  template <> struct aligned_struct<x> { \
+    __declspec(align(x)) char data; \
+  }
+BOOST_MOVE_ALIGNED_STRUCT(16);
+BOOST_MOVE_ALIGNED_STRUCT(32);
+BOOST_MOVE_ALIGNED_STRUCT(64);
+BOOST_MOVE_ALIGNED_STRUCT(128);
+BOOST_MOVE_ALIGNED_STRUCT(512);
+BOOST_MOVE_ALIGNED_STRUCT(1024);
+BOOST_MOVE_ALIGNED_STRUCT(2048);
+BOOST_MOVE_ALIGNED_STRUCT(4096);
+
+template<std::size_t Len, std::size_t Align>
+union aligned_union
+{
+   typedef aligned_struct<Align> aligner_t;
+   aligner_t aligner;
+   unsigned char data[Len > sizeof(aligner_t) ? Len : sizeof(aligner_t)];
+};
+
+template<std::size_t Len, std::size_t Align>
+struct aligned_storage_impl
+{
+   typedef aligned_union<Len, Align> type;
+};
+
+#elif !defined(BOOST_NO_ALIGNMENT)
 
 template<std::size_t Len, std::size_t Align>
 struct aligned_struct;
@@ -999,8 +1208,9 @@ BOOST_MOVE_ALIGNED_STORAGE_WITH_BOOST_ALIGNMENT(0x1000)
 template<std::size_t Len, std::size_t Align>
 union aligned_struct_wrapper
 {
+   typedef aligned_struct<Len, Align> aligner_t;
    aligned_struct<Len, Align> aligner;
-   unsigned char data[sizeof(aligned_struct<Len, Align>)];
+   unsigned char data[Len > sizeof(aligner_t) ? Len : sizeof(aligner_t)];
 };
 
 template<std::size_t Len, std::size_t Align>
@@ -1015,7 +1225,7 @@ template<class T, std::size_t Len>
 union aligned_union
 {   
    T aligner;
-   unsigned char data[Len];
+   unsigned char data[Len > sizeof(T) ? Len : sizeof(T)];
 };
 
 template<std::size_t Len, std::size_t Align, class T, bool Ok>
@@ -1084,3 +1294,7 @@ struct aligned_storage
 #include <boost/move/detail/config_end.hpp>
 
 #endif   //#ifndef BOOST_MOVE_DETAIL_TYPE_TRAITS_HPP
+
+/* type_traits.hpp
+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
+*/

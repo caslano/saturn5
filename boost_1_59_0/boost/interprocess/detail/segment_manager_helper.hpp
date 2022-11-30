@@ -35,6 +35,7 @@
 #include <boost/intrusive/pointer_traits.hpp>
 // move/detail
 #include <boost/move/detail/type_traits.hpp> //make_unsigned
+#include <boost/move/detail/force_ptr.hpp>
 // other boost
 #include <boost/assert.hpp>   //BOOST_ASSERT
 #include <boost/core/no_exceptions_support.hpp>
@@ -92,7 +93,7 @@ struct block_header
       :  m_value_bytes(val_bytes)
       ,  m_num_char((unsigned short)num_char)
       ,  m_value_alignment((unsigned char)val_alignment)
-      ,  m_alloc_type_sizeof_char( (al_type << 5u) | ((unsigned char)szof_char & 0x1F) )
+      ,  m_alloc_type_sizeof_char( (unsigned char)((al_type << 5u) | ((unsigned char)szof_char & 0x1F)) )
    {};
 
    template<class T>
@@ -102,7 +103,7 @@ struct block_header
    size_type total_size() const
    {
       if(alloc_type() != anonymous_type){
-         return name_offset() + (m_num_char+1)*sizeof_char();
+         return name_offset() + (m_num_char+1u)*sizeof_char();
       }
       else{
          return this->value_offset() + m_value_bytes;
@@ -130,7 +131,7 @@ struct block_header
    template<class CharType>
    CharType *name() const
    {
-      return const_cast<CharType*>(reinterpret_cast<const CharType*>
+      return const_cast<CharType*>(move_detail::force_ptr<const CharType*>
          (reinterpret_cast<const char*>(this) + name_offset()));
    }
 
@@ -175,7 +176,7 @@ struct block_header
    {
       block_header * hdr =
          const_cast<block_header*>
-            (reinterpret_cast<const block_header*>(reinterpret_cast<const char*>(value) -
+            (move_detail::force_ptr<const block_header*>(reinterpret_cast<const char*>(value) -
                get_rounded_size(sizeof(block_header), algn)));
       (void)sz;
       //Some sanity checks
@@ -188,7 +189,7 @@ struct block_header
    static block_header<size_type> *from_first_header(Header *header)
    {
       block_header<size_type> * hdr =
-         reinterpret_cast<block_header<size_type>*>(reinterpret_cast<char*>(header) +
+         move_detail::force_ptr<block_header<size_type>*>(reinterpret_cast<char*>(header) +
        get_rounded_size( size_type(sizeof(Header))
                        , size_type(::boost::container::dtl::alignment_of<block_header<size_type> >::value)));
       //Some sanity checks
@@ -199,7 +200,7 @@ struct block_header
    static Header *to_first_header(block_header<size_type> *bheader)
    {
       Header * hdr =
-         reinterpret_cast<Header*>(reinterpret_cast<char*>(bheader) -
+         move_detail::force_ptr<Header*>(reinterpret_cast<char*>(bheader) -
        get_rounded_size( size_type(sizeof(Header))
                        , size_type(::boost::container::dtl::alignment_of<block_header<size_type> >::value)));
       //Some sanity checks
@@ -219,8 +220,7 @@ inline void array_construct(void *mem, std::size_t num, in_place_interface &tabl
       std::size_t destroyed = 0;
       table.destroy_n(mem, constructed, destroyed);
       BOOST_RETHROW
-   }
-   BOOST_CATCH_END
+   } BOOST_CATCH_END
 }
 
 template<class CharT>
@@ -280,7 +280,7 @@ struct intrusive_value_type_impl
    block_header<size_type> *get_block_header() const
    {
       return const_cast<block_header<size_type>*>
-         (reinterpret_cast<const block_header<size_type> *>(reinterpret_cast<const char*>(this) +
+         (move_detail::force_ptr<const block_header<size_type> *>(reinterpret_cast<const char*>(this) +
             get_rounded_size(size_type(sizeof(*this)), size_type(BlockHdrAlignment))));
    }
 
@@ -292,7 +292,7 @@ struct intrusive_value_type_impl
 
    static intrusive_value_type_impl *get_intrusive_value_type(block_header<size_type> *hdr)
    {
-      return reinterpret_cast<intrusive_value_type_impl *>(reinterpret_cast<char*>(hdr) -
+      return move_detail::force_ptr<intrusive_value_type_impl*>(reinterpret_cast<char*>(hdr) -
          get_rounded_size(size_type(sizeof(intrusive_value_type_impl)), size_type(BlockHdrAlignment)));
    }
 
@@ -472,7 +472,7 @@ class segment_manager_iterator_value_adaptor<Iterator, false>
 
    const void *value() const
    {
-      return reinterpret_cast<block_header<size_type>*>
+      return move_detail::force_ptr<block_header<size_type>*>
          (to_raw_pointer(m_val->second.m_ptr))->value();
    }
 
@@ -516,3 +516,7 @@ struct dummy
 
 #endif //#ifndef BOOST_INTERPROCESS_SEGMENT_MANAGER_BASE_HPP
 
+
+/* segment_manager_helper.hpp
+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
+*/

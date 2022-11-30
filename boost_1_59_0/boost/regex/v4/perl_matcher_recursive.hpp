@@ -195,7 +195,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_startmark()
       {
       // conditional expression:
       const re_alt* alt = static_cast<const re_alt*>(pstate->next.p);
-      BOOST_ASSERT(alt->type == syntax_element_alt);
+      BOOST_REGEX_ASSERT(alt->type == syntax_element_alt);
       pstate = alt->next.p;
       if(pstate->type == syntax_element_assert_backref)
       {
@@ -206,7 +206,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_startmark()
       else
       {
          // zero width assertion, have to match this recursively:
-         BOOST_ASSERT(pstate->type == syntax_element_startmark);
+         BOOST_REGEX_ASSERT(pstate->type == syntax_element_startmark);
          bool negated = static_cast<const re_brace*>(pstate)->index == -2;
          BidiIterator saved_position = position;
          const re_syntax_base* next_pstate = static_cast<const re_jump*>(pstate->next.p)->alt.p->next.p;
@@ -235,7 +235,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_startmark()
       }
    default:
    {
-      BOOST_ASSERT(index > 0);
+      BOOST_REGEX_ASSERT(index > 0);
       if((m_match_flags & match_nosubs) == 0)
       {
          backup_subex<BidiIterator> sub(*m_presult, index);
@@ -548,11 +548,11 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_char_repeat()
 #pragma warning(disable:4127)
 #pragma warning(disable:4267)
 #endif
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option push -w-8008 -w-8066 -w-8004
 #endif
    const re_repeat* rep = static_cast<const re_repeat*>(pstate);
-   BOOST_ASSERT(1 == static_cast<const re_literal*>(rep->next.p)->length);
+   BOOST_REGEX_ASSERT(1 == static_cast<const re_literal*>(rep->next.p)->length);
    const char_type what = *reinterpret_cast<const char_type*>(static_cast<const re_literal*>(rep->next.p) + 1);
    //
    // start by working out how much we can skip:
@@ -637,7 +637,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_char_repeat()
          return false;
       }
    }while(true);
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option pop
 #endif
 #ifdef BOOST_MSVC
@@ -652,7 +652,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_set_repeat()
 #pragma warning(push)
 #pragma warning(disable:4127)
 #endif
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option push -w-8008 -w-8066 -w-8004
 #endif
    const re_repeat* rep = static_cast<const re_repeat*>(pstate);
@@ -732,7 +732,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_set_repeat()
          return false;
       }
    }while(true);
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option pop
 #endif
 #ifdef BOOST_MSVC
@@ -747,7 +747,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_long_set_repeat()
 #pragma warning(push)
 #pragma warning(disable:4127)
 #endif
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option push -w-8008 -w-8066 -w-8004
 #endif
    typedef typename traits::char_class_type char_class_type;
@@ -828,7 +828,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_long_set_repeat()
          return false;
       }
    }while(true);
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option pop
 #endif
 #ifdef BOOST_MSVC
@@ -892,7 +892,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::backtrack_till_match(std::si
 template <class BidiIterator, class Allocator, class traits>
 bool perl_matcher<BidiIterator, Allocator, traits>::match_recursion()
 {
-   BOOST_ASSERT(pstate->type == syntax_element_recurse);
+   BOOST_REGEX_ASSERT(pstate->type == syntax_element_recurse);
    //
    // Set new call stack:
    //
@@ -987,7 +987,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_match()
 {
    if(!recursion_stack.empty())
    {
-      BOOST_ASSERT(0 == recursion_stack.back().idx);
+      BOOST_REGEX_ASSERT(0 == recursion_stack.back().idx);
       const re_syntax_base* saved_state = pstate = recursion_stack.back().preturn_address;
       *m_presult = recursion_stack.back().results;
       recursion_stack.pop_back();
@@ -1129,3 +1129,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::skip_until_paren(int index, 
 
 #endif
 
+
+/* perl_matcher_recursive.hpp
+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
+*/

@@ -41,15 +41,15 @@ inline typename tools::promote_args<T>::type
 namespace detail{
 
 template <class T>
-inline T expint_1_rational(const T& z, const boost::integral_constant<int, 0>&)
+inline T expint_1_rational(const T& z, const std::integral_constant<int, 0>&)
 {
    // this function is never actually called
-   BOOST_ASSERT(0);
+   BOOST_MATH_ASSERT(0);
    return z;
 }
 
 template <class T>
-T expint_1_rational(const T& z, const boost::integral_constant<int, 53>&)
+T expint_1_rational(const T& z, const std::integral_constant<int, 53>&)
 {
    BOOST_MATH_STD_USING
    T result;
@@ -123,7 +123,7 @@ T expint_1_rational(const T& z, const boost::integral_constant<int, 53>&)
 }
 
 template <class T>
-T expint_1_rational(const T& z, const boost::integral_constant<int, 64>&)
+T expint_1_rational(const T& z, const std::integral_constant<int, 64>&)
 {
    BOOST_MATH_STD_USING
    T result;
@@ -204,7 +204,7 @@ T expint_1_rational(const T& z, const boost::integral_constant<int, 64>&)
 }
 
 template <class T>
-T expint_1_rational(const T& z, const boost::integral_constant<int, 113>&)
+T expint_1_rational(const T& z, const std::integral_constant<int, 113>&)
 {
    BOOST_MATH_STD_USING
    T result;
@@ -374,7 +374,7 @@ inline T expint_as_fraction(unsigned n, T z, const Policy& pol)
 {
    BOOST_MATH_STD_USING
    BOOST_MATH_INSTRUMENT_VARIABLE(z)
-   boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
+   std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
    expint_fraction<T> f(n, z);
    T result = tools::continued_fraction_b(
       f, 
@@ -413,7 +413,7 @@ template <class T, class Policy>
 inline T expint_as_series(unsigned n, T z, const Policy& pol)
 {
    BOOST_MATH_STD_USING
-   boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
+   std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
 
    BOOST_MATH_INSTRUMENT_VARIABLE(z)
 
@@ -431,7 +431,7 @@ inline T expint_as_series(unsigned n, T z, const Policy& pol)
    }
    BOOST_MATH_INSTRUMENT_VARIABLE(result)
    result += pow(-z, static_cast<T>(n - 1)) 
-      * (boost::math::digamma(static_cast<T>(n)) - log(z)) / fact;
+      * (boost::math::digamma(static_cast<T>(n), pol) - log(z)) / fact;
    BOOST_MATH_INSTRUMENT_VARIABLE(result)
 
    expint_series<T> s(k, z, x_k, denom, fact);
@@ -463,7 +463,7 @@ T expint_imp(unsigned n, T z, const Policy& pol, const Tag& tag)
    {
       f = z < (static_cast<T>(n - 2) / static_cast<T>(n - 1));
    }
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 #  pragma warning(push)
 #  pragma warning(disable:4127) // conditional expression is constant
 #endif
@@ -477,7 +477,7 @@ T expint_imp(unsigned n, T z, const Policy& pol, const Tag& tag)
       result = expint_as_series(n, z, pol);
    else
       result = expint_as_fraction(n, z, pol);
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 #  pragma warning(pop)
 #endif
 
@@ -507,7 +507,7 @@ T expint_i_as_series(T z, const Policy& pol)
    T result = log(z); // (log(z) - log(1 / z)) / 2;
    result += constants::euler<T>();
    expint_i_series<T> s(z);
-   boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
+   std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
    result = tools::sum_series(s, policies::get_epsilon<T, Policy>(), max_iter, result);
    policies::check_series_iterations<T>("boost::math::expint_i_series<%1%>(%1%)", max_iter, pol);
    return result;
@@ -525,7 +525,7 @@ T expint_i_imp(T z, const Policy& pol, const Tag& tag)
 }
 
 template <class T, class Policy>
-T expint_i_imp(T z, const Policy& pol, const boost::integral_constant<int, 53>& tag)
+T expint_i_imp(T z, const Policy& pol, const std::integral_constant<int, 53>& tag)
 {
    BOOST_MATH_STD_USING
    static const char* function = "boost::math::expint<%1%>(%1%)";
@@ -739,7 +739,7 @@ T expint_i_imp(T z, const Policy& pol, const boost::integral_constant<int, 53>& 
 }
 
 template <class T, class Policy>
-T expint_i_imp(T z, const Policy& pol, const boost::integral_constant<int, 64>& tag)
+T expint_i_imp(T z, const Policy& pol, const std::integral_constant<int, 64>& tag)
 {
    BOOST_MATH_STD_USING
    static const char* function = "boost::math::expint<%1%>(%1%)";
@@ -1383,7 +1383,7 @@ void expint_i_113h(T& result, const T& z)
 }
 
 template <class T, class Policy>
-T expint_i_imp(T z, const Policy& pol, const boost::integral_constant<int, 113>& tag)
+T expint_i_imp(T z, const Policy& pol, const std::integral_constant<int, 113>& tag)
 {
    BOOST_MATH_STD_USING
    static const char* function = "boost::math::expint<%1%>(%1%)";
@@ -1495,34 +1495,34 @@ struct expint_i_initializer
       {
          do_init(tag());
       }
-      static void do_init(const boost::integral_constant<int, 0>&){}
-      static void do_init(const boost::integral_constant<int, 53>&)
+      static void do_init(const std::integral_constant<int, 0>&){}
+      static void do_init(const std::integral_constant<int, 53>&)
       {
-         boost::math::expint(T(5));
-         boost::math::expint(T(7));
-         boost::math::expint(T(18));
-         boost::math::expint(T(38));
-         boost::math::expint(T(45));
+         boost::math::expint(T(5), Policy());
+         boost::math::expint(T(7), Policy());
+         boost::math::expint(T(18), Policy());
+         boost::math::expint(T(38), Policy());
+         boost::math::expint(T(45), Policy());
       }
-      static void do_init(const boost::integral_constant<int, 64>&)
+      static void do_init(const std::integral_constant<int, 64>&)
       {
-         boost::math::expint(T(5));
-         boost::math::expint(T(7));
-         boost::math::expint(T(18));
-         boost::math::expint(T(38));
-         boost::math::expint(T(45));
+         boost::math::expint(T(5), Policy());
+         boost::math::expint(T(7), Policy());
+         boost::math::expint(T(18), Policy());
+         boost::math::expint(T(38), Policy());
+         boost::math::expint(T(45), Policy());
       }
-      static void do_init(const boost::integral_constant<int, 113>&)
+      static void do_init(const std::integral_constant<int, 113>&)
       {
-         boost::math::expint(T(5));
-         boost::math::expint(T(7));
-         boost::math::expint(T(17));
-         boost::math::expint(T(25));
-         boost::math::expint(T(40));
-         boost::math::expint(T(50));
-         boost::math::expint(T(80));
-         boost::math::expint(T(200));
-         boost::math::expint(T(220));
+         boost::math::expint(T(5), Policy());
+         boost::math::expint(T(7), Policy());
+         boost::math::expint(T(17), Policy());
+         boost::math::expint(T(25), Policy());
+         boost::math::expint(T(40), Policy());
+         boost::math::expint(T(50), Policy());
+         boost::math::expint(T(80), Policy());
+         boost::math::expint(T(200), Policy());
+         boost::math::expint(T(220), Policy());
       }
       void force_instantiate()const{}
    };
@@ -1545,22 +1545,22 @@ struct expint_1_initializer
       {
          do_init(tag());
       }
-      static void do_init(const boost::integral_constant<int, 0>&){}
-      static void do_init(const boost::integral_constant<int, 53>&)
+      static void do_init(const std::integral_constant<int, 0>&){}
+      static void do_init(const std::integral_constant<int, 53>&)
       {
-         boost::math::expint(1, T(0.5));
-         boost::math::expint(1, T(2));
+         boost::math::expint(1, T(0.5), Policy());
+         boost::math::expint(1, T(2), Policy());
       }
-      static void do_init(const boost::integral_constant<int, 64>&)
+      static void do_init(const std::integral_constant<int, 64>&)
       {
-         boost::math::expint(1, T(0.5));
-         boost::math::expint(1, T(2));
+         boost::math::expint(1, T(0.5), Policy());
+         boost::math::expint(1, T(2), Policy());
       }
-      static void do_init(const boost::integral_constant<int, 113>&)
+      static void do_init(const std::integral_constant<int, 113>&)
       {
-         boost::math::expint(1, T(0.5));
-         boost::math::expint(1, T(2));
-         boost::math::expint(1, T(6));
+         boost::math::expint(1, T(0.5), Policy());
+         boost::math::expint(1, T(2), Policy());
+         boost::math::expint(1, T(6), Policy());
       }
       void force_instantiate()const{}
    };
@@ -1576,7 +1576,7 @@ const typename expint_1_initializer<T, Policy, tag>::init expint_1_initializer<T
 
 template <class T, class Policy>
 inline typename tools::promote_args<T>::type
-   expint_forwarder(T z, const Policy& /*pol*/, boost::true_type const&)
+   expint_forwarder(T z, const Policy& /*pol*/, std::true_type const&)
 {
    typedef typename tools::promote_args<T>::type result_type;
    typedef typename policies::evaluation<result_type, Policy>::type value_type;
@@ -1587,7 +1587,7 @@ inline typename tools::promote_args<T>::type
       policies::promote_double<false>, 
       policies::discrete_quantile<>,
       policies::assert_undefined<> >::type forwarding_policy;
-   typedef boost::integral_constant<int,
+   typedef std::integral_constant<int,
       precision_type::value <= 0 ? 0 :
       precision_type::value <= 53 ? 53 :
       precision_type::value <= 64 ? 64 :
@@ -1604,7 +1604,7 @@ inline typename tools::promote_args<T>::type
 
 template <class T>
 inline typename tools::promote_args<T>::type
-expint_forwarder(unsigned n, T z, const boost::false_type&)
+expint_forwarder(unsigned n, T z, const std::false_type&)
 {
    return boost::math::expint(n, z, policies::policy<>());
 }
@@ -1624,7 +1624,7 @@ inline typename tools::promote_args<T>::type
       policies::promote_double<false>, 
       policies::discrete_quantile<>,
       policies::assert_undefined<> >::type forwarding_policy;
-   typedef boost::integral_constant<int,
+   typedef std::integral_constant<int,
       precision_type::value <= 0 ? 0 :
       precision_type::value <= 53 ? 53 :
       precision_type::value <= 64 ? 64 :
@@ -1664,3 +1664,7 @@ inline typename tools::promote_args<T>::type
 #endif // BOOST_MATH_EXPINT_HPP
 
 
+
+/* expint.hpp
+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
+*/

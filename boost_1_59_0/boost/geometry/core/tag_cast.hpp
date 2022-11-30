@@ -4,6 +4,10 @@
 // Copyright (c) 2008-2012 Bruno Lalande, Paris, France.
 // Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 
+// This file was modified by Oracle on 2020.
+// Modifications copyright (c) 2020, Oracle and/or its affiliates.
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
+
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
 
@@ -15,8 +19,8 @@
 #define BOOST_GEOMETRY_CORE_TAG_CAST_HPP
 
 
-#include <boost/mpl/if.hpp>
-#include <boost/type_traits/is_base_of.hpp>
+#include <type_traits>
+
 
 namespace boost { namespace geometry
 {
@@ -30,50 +34,30 @@ namespace boost { namespace geometry
     can be casted to a more basic tag, and then dispatched by that tag.
 \ingroup core
 \tparam Tag The tag to be casted to one of the base tags
-\tparam BaseTag First base tag
-\tparam BaseTag2 Optional second base tag
-\tparam BaseTag3 Optional third base tag
-\tparam BaseTag4 Optional fourth base tag
-\tparam BaseTag5 Optional fifth base tag
-\tparam BaseTag6 Optional sixth base tag
-\tparam BaseTag7 Optional seventh base tag
+\tparam BaseTags Base tags
 
 \qbk{[include reference/core/tag_cast.qbk]}
 */
-template
-<
-    typename Tag,
-    typename BaseTag,
-    typename BaseTag2 = void,
-    typename BaseTag3 = void,
-    typename BaseTag4 = void,
-    typename BaseTag5 = void,
-    typename BaseTag6 = void,
-    typename BaseTag7 = void
->
+template <typename Tag, typename ...BaseTags>
 struct tag_cast
 {
-    typedef typename boost::mpl::if_
-        <
-          typename boost::is_base_of<BaseTag, Tag>::type,
-          BaseTag,
-          // Try next one in line:
-          typename tag_cast
-            <
-                Tag, BaseTag2, BaseTag3, BaseTag4,
-                BaseTag5, BaseTag6, BaseTag7, void
-            >::type
-        >::type type;
+    typedef Tag type;
 };
 
 #ifndef DOXYGEN_NO_SPECIALIZATIONS
 
-// Specialization for last one
-template <typename Tag>
-struct tag_cast<Tag, void, void, void, void, void, void, void>
+template <typename Tag, typename BaseTag, typename ...BaseTags>
+struct tag_cast<Tag, BaseTag, BaseTags...>
 {
-    // If not found, take specified tag, so do not cast
-    typedef Tag type;
+    typedef std::conditional_t
+        <
+          std::is_base_of<BaseTag, Tag>::value,
+          BaseTag,
+          typename tag_cast
+            <
+                Tag, BaseTags...
+            >::type
+        > type;
 };
 
 #endif // DOXYGEN_NO_SPECIALIZATIONS
@@ -82,3 +66,7 @@ struct tag_cast<Tag, void, void, void, void, void, void, void>
 }} // namespace boost::geometry
 
 #endif // BOOST_GEOMETRY_CORE_TAG_CAST_HPP
+
+/* tag_cast.hpp
+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
+*/

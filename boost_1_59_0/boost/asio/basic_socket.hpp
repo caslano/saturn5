@@ -2,7 +2,7 @@
 // basic_socket.hpp
 // ~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2022 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -15,6 +15,7 @@
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
+#include <boost/asio/any_io_executor.hpp>
 #include <boost/asio/detail/config.hpp>
 #include <boost/asio/async_result.hpp>
 #include <boost/asio/detail/handler_type_requirements.hpp>
@@ -24,7 +25,6 @@
 #include <boost/asio/detail/type_traits.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/asio/execution_context.hpp>
-#include <boost/asio/executor.hpp>
 #include <boost/asio/post.hpp>
 #include <boost/asio/socket_base.hpp>
 
@@ -32,6 +32,8 @@
 # include <boost/asio/detail/null_socket_service.hpp>
 #elif defined(BOOST_ASIO_HAS_IOCP)
 # include <boost/asio/detail/win_iocp_socket_service.hpp>
+#elif defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+# include <boost/asio/detail/io_uring_socket_service.hpp>
 #else
 # include <boost/asio/detail/reactive_socket_service.hpp>
 #endif
@@ -49,7 +51,7 @@ namespace asio {
 #define BOOST_ASIO_BASIC_SOCKET_FWD_DECL
 
 // Forward declaration with defaulted arguments.
-template <typename Protocol, typename Executor = executor>
+template <typename Protocol, typename Executor = any_io_executor>
 class basic_socket;
 
 #endif // !defined(BOOST_ASIO_BASIC_SOCKET_FWD_DECL)
@@ -88,6 +90,9 @@ public:
 #elif defined(BOOST_ASIO_HAS_IOCP)
   typedef typename detail::win_iocp_socket_service<
     Protocol>::native_handle_type native_handle_type;
+#elif defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+  typedef typename detail::io_uring_socket_service<
+    Protocol>::native_handle_type native_handle_type;
 #else
   typedef typename detail::reactive_socket_service<
     Protocol>::native_handle_type native_handle_type;
@@ -112,7 +117,7 @@ public:
    * dispatch handlers for any asynchronous operations performed on the socket.
    */
   explicit basic_socket(const executor_type& ex)
-    : impl_(ex)
+    : impl_(0, ex)
   {
   }
 
@@ -126,10 +131,10 @@ public:
    */
   template <typename ExecutionContext>
   explicit basic_socket(ExecutionContext& context,
-      typename enable_if<
+      typename constraint<
         is_convertible<ExecutionContext&, execution_context&>::value
-      >::type* = 0)
-    : impl_(context)
+      >::type = 0)
+    : impl_(0, 0, context)
   {
   }
 
@@ -145,7 +150,7 @@ public:
    * @throws boost::system::system_error Thrown on failure.
    */
   basic_socket(const executor_type& ex, const protocol_type& protocol)
-    : impl_(ex)
+    : impl_(0, ex)
   {
     boost::system::error_code ec;
     impl_.get_service().open(impl_.get_implementation(), protocol, ec);
@@ -166,10 +171,11 @@ public:
    */
   template <typename ExecutionContext>
   basic_socket(ExecutionContext& context, const protocol_type& protocol,
-      typename enable_if<
-        is_convertible<ExecutionContext&, execution_context&>::value
-      >::type* = 0)
-    : impl_(context)
+      typename constraint<
+        is_convertible<ExecutionContext&, execution_context&>::value,
+        defaulted_constraint
+      >::type = defaulted_constraint())
+    : impl_(0, 0, context)
   {
     boost::system::error_code ec;
     impl_.get_service().open(impl_.get_implementation(), protocol, ec);
@@ -192,7 +198,7 @@ public:
    * @throws boost::system::system_error Thrown on failure.
    */
   basic_socket(const executor_type& ex, const endpoint_type& endpoint)
-    : impl_(ex)
+    : impl_(0, ex)
   {
     boost::system::error_code ec;
     const protocol_type protocol = endpoint.protocol();
@@ -220,10 +226,10 @@ public:
    */
   template <typename ExecutionContext>
   basic_socket(ExecutionContext& context, const endpoint_type& endpoint,
-      typename enable_if<
+      typename constraint<
         is_convertible<ExecutionContext&, execution_context&>::value
-      >::type* = 0)
-    : impl_(context)
+      >::type = 0)
+    : impl_(0, 0, context)
   {
     boost::system::error_code ec;
     const protocol_type protocol = endpoint.protocol();
@@ -248,7 +254,7 @@ public:
    */
   basic_socket(const executor_type& ex, const protocol_type& protocol,
       const native_handle_type& native_socket)
-    : impl_(ex)
+    : impl_(0, ex)
   {
     boost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(),
@@ -273,10 +279,10 @@ public:
   template <typename ExecutionContext>
   basic_socket(ExecutionContext& context, const protocol_type& protocol,
       const native_handle_type& native_socket,
-      typename enable_if<
+      typename constraint<
         is_convertible<ExecutionContext&, execution_context&>::value
-      >::type* = 0)
-    : impl_(context)
+      >::type = 0)
+    : impl_(0, 0, context)
   {
     boost::system::error_code ec;
     impl_.get_service().assign(impl_.get_implementation(),
@@ -332,10 +338,10 @@ public:
    */
   template <typename Protocol1, typename Executor1>
   basic_socket(basic_socket<Protocol1, Executor1>&& other,
-      typename enable_if<
+      typename constraint<
         is_convertible<Protocol1, Protocol>::value
           && is_convertible<Executor1, Executor>::value
-      >::type* = 0)
+      >::type = 0)
     : impl_(std::move(other.impl_))
   {
   }
@@ -351,7 +357,7 @@ public:
    * constructed using the @c basic_socket(const executor_type&) constructor.
    */
   template <typename Protocol1, typename Executor1>
-  typename enable_if<
+  typename constraint<
     is_convertible<Protocol1, Protocol>::value
       && is_convertible<Executor1, Executor>::value,
     basic_socket&
@@ -902,7 +908,8 @@ public:
   /// Start an asynchronous connect.
   /**
    * This function is used to asynchronously connect a socket to the specified
-   * remote endpoint. The function call always returns immediately.
+   * remote endpoint. It is an initiating function for an @ref
+   * asynchronous_operation, and always returns immediately.
    *
    * The socket is automatically opened if it is not already open. If the
    * connect fails, and the socket was automatically opened, the socket is
@@ -911,16 +918,21 @@ public:
    * @param peer_endpoint The remote endpoint to which the socket will be
    * connected. Copies will be made of the endpoint object as required.
    *
-   * @param handler The handler to be called when the connection operation
-   * completes. Copies will be made of the handler as required. The function
-   * signature of the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the connect completes.
+   * Potential completion tokens include @ref use_future, @ref use_awaitable,
+   * @ref yield_context, or a function object with the correct completion
+   * signature. The function signature of the completion handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error // Result of operation
+   *   const boost::system::error_code& error // Result of operation.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
-   * not, the handler will not be invoked from within this function. On
-   * immediate completion, invocation of the handler will be performed in a
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
    * manner equivalent to using boost::asio::post().
+   *
+   * @par Completion Signature
+   * @code void(boost::system::error_code) @endcode
    *
    * @par Example
    * @code
@@ -939,14 +951,24 @@ public:
    *     boost::asio::ip::address::from_string("1.2.3.4"), 12345);
    * socket.async_connect(endpoint, connect_handler);
    * @endcode
+   *
+   * @par Per-Operation Cancellation
+   * On POSIX or Windows operating systems, this asynchronous operation supports
+   * cancellation for the following boost::asio::cancellation_type values:
+   *
+   * @li @c cancellation_type::terminal
+   *
+   * @li @c cancellation_type::partial
+   *
+   * @li @c cancellation_type::total
    */
   template <
       BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code))
-        ConnectHandler BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ConnectHandler,
+        ConnectToken BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
+  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ConnectToken,
       void (boost::system::error_code))
   async_connect(const endpoint_type& peer_endpoint,
-      BOOST_ASIO_MOVE_ARG(ConnectHandler) handler
+      BOOST_ASIO_MOVE_ARG(ConnectToken) token
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
     boost::system::error_code open_ec;
@@ -956,8 +978,8 @@ public:
       impl_.get_service().open(impl_.get_implementation(), protocol, open_ec);
     }
 
-    return async_initiate<ConnectHandler, void (boost::system::error_code)>(
-        initiate_async_connect(this), handler, peer_endpoint, open_ec);
+    return async_initiate<ConnectToken, void (boost::system::error_code)>(
+        initiate_async_connect(this), token, peer_endpoint, open_ec);
   }
 
   /// Set an option on the socket.
@@ -1741,20 +1763,27 @@ public:
   /// write, or to have pending error conditions.
   /**
    * This function is used to perform an asynchronous wait for a socket to enter
-   * a ready to read, write or error condition state.
+   * a ready to read, write or error condition state. It is an initiating
+   * function for an @ref asynchronous_operation, and always returns
+   * immediately.
    *
    * @param w Specifies the desired socket state.
    *
-   * @param handler The handler to be called when the wait operation completes.
-   * Copies will be made of the handler as required. The function signature of
-   * the handler must be:
+   * @param token The @ref completion_token that will be used to produce a
+   * completion handler, which will be called when the wait completes. Potential
+   * completion tokens include @ref use_future, @ref use_awaitable, @ref
+   * yield_context, or a function object with the correct completion signature.
+   * The function signature of the completion handler must be:
    * @code void handler(
-   *   const boost::system::error_code& error // Result of operation
+   *   const boost::system::error_code& error // Result of operation.
    * ); @endcode
    * Regardless of whether the asynchronous operation completes immediately or
-   * not, the handler will not be invoked from within this function. On
-   * immediate completion, invocation of the handler will be performed in a
+   * not, the completion handler will not be invoked from within this function.
+   * On immediate completion, invocation of the handler will be performed in a
    * manner equivalent to using boost::asio::post().
+   *
+   * @par Completion Signature
+   * @code void(boost::system::error_code) @endcode
    *
    * @par Example
    * @code
@@ -1772,18 +1801,28 @@ public:
    * ...
    * socket.async_wait(boost::asio::ip::tcp::socket::wait_read, wait_handler);
    * @endcode
+   *
+   * @par Per-Operation Cancellation
+   * On POSIX or Windows operating systems, this asynchronous operation supports
+   * cancellation for the following boost::asio::cancellation_type values:
+   *
+   * @li @c cancellation_type::terminal
+   *
+   * @li @c cancellation_type::partial
+   *
+   * @li @c cancellation_type::total
    */
   template <
       BOOST_ASIO_COMPLETION_TOKEN_FOR(void (boost::system::error_code))
-        WaitHandler BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
-  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WaitHandler,
+        WaitToken BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
+  BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(WaitToken,
       void (boost::system::error_code))
   async_wait(wait_type w,
-      BOOST_ASIO_MOVE_ARG(WaitHandler) handler
+      BOOST_ASIO_MOVE_ARG(WaitToken) token
         BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type))
   {
-    return async_initiate<WaitHandler, void (boost::system::error_code)>(
-        initiate_async_wait(this), handler, w);
+    return async_initiate<WaitToken, void (boost::system::error_code)>(
+        initiate_async_wait(this), token, w);
   }
 
 protected:
@@ -1802,6 +1841,9 @@ protected:
 #elif defined(BOOST_ASIO_HAS_IOCP)
   detail::io_object_impl<
     detail::win_iocp_socket_service<Protocol>, Executor> impl_;
+#elif defined(BOOST_ASIO_HAS_IO_URING_AS_DEFAULT)
+  detail::io_object_impl<
+    detail::io_uring_socket_service<Protocol>, Executor> impl_;
 #else
   detail::io_object_impl<
     detail::reactive_socket_service<Protocol>, Executor> impl_;
@@ -1847,7 +1889,7 @@ private:
         detail::non_const_lvalue<ConnectHandler> handler2(handler);
         self_->impl_.get_service().async_connect(
             self_->impl_.get_implementation(), peer_endpoint,
-            handler2.value, self_->impl_.get_implementation_executor());
+            handler2.value, self_->impl_.get_executor());
       }
     }
 
@@ -1879,8 +1921,8 @@ private:
 
       detail::non_const_lvalue<WaitHandler> handler2(handler);
       self_->impl_.get_service().async_wait(
-          self_->impl_.get_implementation(), w, handler2.value,
-          self_->impl_.get_implementation_executor());
+          self_->impl_.get_implementation(), w,
+          handler2.value, self_->impl_.get_executor());
     }
 
   private:
@@ -1894,3 +1936,7 @@ private:
 #include <boost/asio/detail/pop_options.hpp>
 
 #endif // BOOST_ASIO_BASIC_SOCKET_HPP
+
+/* basic_socket.hpp
+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
+*/

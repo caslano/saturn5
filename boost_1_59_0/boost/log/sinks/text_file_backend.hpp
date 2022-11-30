@@ -20,6 +20,7 @@
 #include <ostream>
 #include <boost/limits.hpp>
 #include <boost/cstdint.hpp>
+#include <boost/optional/optional.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/date_time/date_defs.hpp>
 #include <boost/date_time/special_defs.hpp>
@@ -66,6 +67,20 @@ enum scan_method
     scan_all        //!< Scan for all files in the directory
 };
 
+//! The structure contains filesystem scanning results
+struct scan_result
+{
+    //! The number of found files
+    uintmax_t found_count;
+    //! If populated, the largest file counter that was used in the found file names
+    boost::optional< unsigned int > last_file_counter;
+
+    scan_result() BOOST_NOEXCEPT :
+        found_count(0u)
+    {
+    }
+};
+
 /*!
  * \brief Base class for file collectors
  *
@@ -81,7 +96,11 @@ struct BOOST_LOG_NO_VTABLE collector
     /*!
      * Virtual destructor
      */
+#if !defined(BOOST_LOG_NO_CXX11_DEFAULTED_VIRTUAL_FUNCTIONS)
+    BOOST_DEFAULTED_FUNCTION(virtual ~collector(), {})
+#else
     virtual ~collector() {}
+#endif
 
     /*!
      * The function stores the specified file in the storage. May lead to an older file
@@ -90,6 +109,13 @@ struct BOOST_LOG_NO_VTABLE collector
      * \param src_path The name of the file to be stored
      */
     virtual void store_file(filesystem::path const& src_path) = 0;
+
+    /*!
+     * The function checks if the specified path refers to an existing file in the storage.
+     *
+     * \param src_path The path to be checked
+     */
+    virtual bool is_in_storage(filesystem::path const& src_path) const = 0;
 
     /*!
      * Scans the target directory for the files that have already been stored. The found
@@ -110,19 +136,17 @@ struct BOOST_LOG_NO_VTABLE collector
      * \param method The method of scanning. If \c no_scan is specified, the call has no effect.
      * \param pattern The file name pattern if \a method is \c scan_matching. Otherwise the parameter
      *                is not used.
-     * \param counter If not \c NULL and \a method is \c scan_matching, the method suggests initial value
-     *                of a file counter that may be used in the file name pattern. The parameter
-     *                is not used otherwise.
-     * \return The number of found files.
+     * \return The result of filesystem scanning. The last file counter is only populated if
+     *         \a method is \c scan_matching, the \a pattern contains %N placeholder, and at least
+     *         one file matching the pattern is found.
      *
      * \note In case if \a method is \c scan_matching the effect of this function is highly dependent
      *       on the \a pattern definition. It is recommended to choose patterns with easily
      *       distinguished placeholders (i.e. having delimiters between them). Otherwise
      *       either some files can be mistakenly found or not found, which in turn may lead
-     *       to an incorrect file deletion.
+     *       to deletion of an unintended file.
      */
-    virtual uintmax_t scan_for_files(
-        scan_method method, filesystem::path const& pattern = filesystem::path(), unsigned int* counter = 0) = 0;
+    virtual scan_result scan_for_files(scan_method method, filesystem::path const& pattern = filesystem::path()) = 0;
 
     BOOST_DELETED_FUNCTION(collector(collector const&))
     BOOST_DELETED_FUNCTION(collector& operator= (collector const&))
@@ -612,3 +636,7 @@ BOOST_LOG_CLOSE_NAMESPACE // namespace log
 #include <boost/log/detail/footer.hpp>
 
 #endif // BOOST_LOG_SINKS_TEXT_FILE_BACKEND_HPP_INCLUDED_
+
+/* text_file_backend.hpp
+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
+*/

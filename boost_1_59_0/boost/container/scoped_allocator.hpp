@@ -79,10 +79,10 @@ struct outermost_allocator_imp
 {
    typedef MaybeScopedAlloc type;
 
-   static type &get(MaybeScopedAlloc &a)
+   BOOST_CONTAINER_FORCEINLINE static type &get(MaybeScopedAlloc &a)
    {  return a;  }
 
-   static const type &get(const MaybeScopedAlloc &a)
+   BOOST_CONTAINER_FORCEINLINE static const type &get(const MaybeScopedAlloc &a)
    {  return a;  }
 };
 
@@ -92,10 +92,10 @@ struct outermost_allocator_imp<MaybeScopedAlloc, true>
    typedef typename MaybeScopedAlloc::outer_allocator_type outer_type;
    typedef typename outermost_allocator_type_impl<outer_type>::type type;
 
-   static type &get(MaybeScopedAlloc &a)
+   BOOST_CONTAINER_FORCEINLINE static type &get(MaybeScopedAlloc &a)
    {  return outermost_allocator_imp<outer_type>::get(a.outer_allocator());  }
 
-   static const type &get(const MaybeScopedAlloc &a)
+   BOOST_CONTAINER_FORCEINLINE static const type &get(const MaybeScopedAlloc &a)
    {  return outermost_allocator_imp<outer_type>::get(a.outer_allocator());  }
 };
 
@@ -112,12 +112,12 @@ struct outermost_allocator
 {};
 
 template <typename Allocator>
-typename outermost_allocator<Allocator>::type &
+BOOST_CONTAINER_FORCEINLINE typename outermost_allocator<Allocator>::type &
    get_outermost_allocator(Allocator &a)
 {  return outermost_allocator<Allocator>::get(a);   }
 
 template <typename Allocator>
-const typename outermost_allocator<Allocator>::type &
+BOOST_CONTAINER_FORCEINLINE const typename outermost_allocator<Allocator>::type &
    get_outermost_allocator(const Allocator &a)
 {  return outermost_allocator<Allocator>::get(a);   }
 
@@ -161,34 +161,34 @@ class scoped_allocator_adaptor_base
       inner_allocator_type::is_always_equal::value
       > is_always_equal;
 
-   scoped_allocator_adaptor_base()
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base()
       {}
 
    template <class OuterA2>
-   scoped_allocator_adaptor_base(BOOST_FWD_REF(OuterA2) outerAlloc, const InnerAllocs &...args)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base(BOOST_FWD_REF(OuterA2) outerAlloc, const InnerAllocs &...args)
       : outer_allocator_type(::boost::forward<OuterA2>(outerAlloc))
       , m_inner(args...)
       {}
 
-   scoped_allocator_adaptor_base(const scoped_allocator_adaptor_base& other)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base(const scoped_allocator_adaptor_base& other)
       : outer_allocator_type(other.outer_allocator())
       , m_inner(other.inner_allocator())
       {}
 
-   scoped_allocator_adaptor_base(BOOST_RV_REF(scoped_allocator_adaptor_base) other)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base(BOOST_RV_REF(scoped_allocator_adaptor_base) other)
       : outer_allocator_type(::boost::move(other.outer_allocator()))
       , m_inner(::boost::move(other.inner_allocator()))
       {}
 
    template <class OuterA2>
-   scoped_allocator_adaptor_base
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base
       (const scoped_allocator_adaptor_base<OuterA2, InnerAllocs...>& other)
       : outer_allocator_type(other.outer_allocator())
       , m_inner(other.inner_allocator())
       {}
 
    template <class OuterA2>
-   scoped_allocator_adaptor_base
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base
       (BOOST_RV_REF_BEG scoped_allocator_adaptor_base
          <OuterA2, InnerAllocs...> BOOST_RV_REF_END other)
       : outer_allocator_type(other.outer_allocator())
@@ -199,7 +199,7 @@ class scoped_allocator_adaptor_base
    struct internal_type_t{};
 
    template <class OuterA2>
-   scoped_allocator_adaptor_base
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base
       ( internal_type_t
       , BOOST_FWD_REF(OuterA2) outerAlloc
       , const inner_allocator_type &inner)
@@ -209,7 +209,7 @@ class scoped_allocator_adaptor_base
 
    public:
 
-   scoped_allocator_adaptor_base &operator=
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base &operator=
       (BOOST_COPY_ASSIGN_REF(scoped_allocator_adaptor_base) other)
    {
       outer_allocator_type::operator=(other.outer_allocator());
@@ -217,35 +217,35 @@ class scoped_allocator_adaptor_base
       return *this;
    }
 
-   scoped_allocator_adaptor_base &operator=(BOOST_RV_REF(scoped_allocator_adaptor_base) other)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base &operator=(BOOST_RV_REF(scoped_allocator_adaptor_base) other)
    {
       outer_allocator_type::operator=(boost::move(other.outer_allocator()));
       m_inner = ::boost::move(other.inner_allocator());
       return *this;
    }
 
-   void swap(scoped_allocator_adaptor_base &r)
+   BOOST_CONTAINER_FORCEINLINE void swap(scoped_allocator_adaptor_base &r)
    {
       boost::adl_move_swap(this->outer_allocator(), r.outer_allocator());
       boost::adl_move_swap(this->m_inner, r.inner_allocator());
    }
 
-   friend void swap(scoped_allocator_adaptor_base &l, scoped_allocator_adaptor_base &r)
+   BOOST_CONTAINER_FORCEINLINE friend void swap(scoped_allocator_adaptor_base &l, scoped_allocator_adaptor_base &r)
    {  l.swap(r);  }
 
-   inner_allocator_type&       inner_allocator() BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_FORCEINLINE inner_allocator_type&       inner_allocator() BOOST_NOEXCEPT_OR_NOTHROW
       { return m_inner; }
 
-   inner_allocator_type const& inner_allocator() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_FORCEINLINE inner_allocator_type const& inner_allocator() const BOOST_NOEXCEPT_OR_NOTHROW
       { return m_inner; }
 
-   outer_allocator_type      & outer_allocator() BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_FORCEINLINE outer_allocator_type      & outer_allocator() BOOST_NOEXCEPT_OR_NOTHROW
       { return static_cast<outer_allocator_type&>(*this); }
 
-   const outer_allocator_type &outer_allocator() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_FORCEINLINE const outer_allocator_type &outer_allocator() const BOOST_NOEXCEPT_OR_NOTHROW
       { return static_cast<const outer_allocator_type&>(*this); }
 
-   scoped_allocator_type select_on_container_copy_construction() const
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_type select_on_container_copy_construction() const
    {
       return scoped_allocator_type
          (internal_type_t()
@@ -304,33 +304,33 @@ class scoped_allocator_adaptor_base<OuterAlloc, true, BOOST_MOVE_TARG##N>\
       inner_allocator_type::is_always_equal::value\
       > is_always_equal;\
    \
-   scoped_allocator_adaptor_base(){}\
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base(){}\
    \
    template <class OuterA2>\
-   scoped_allocator_adaptor_base(BOOST_FWD_REF(OuterA2) outerAlloc, BOOST_MOVE_CREF##N)\
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base(BOOST_FWD_REF(OuterA2) outerAlloc, BOOST_MOVE_CREF##N)\
       : outer_allocator_type(::boost::forward<OuterA2>(outerAlloc))\
       , m_inner(BOOST_MOVE_ARG##N)\
       {}\
    \
-   scoped_allocator_adaptor_base(const scoped_allocator_adaptor_base& other)\
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base(const scoped_allocator_adaptor_base& other)\
       : outer_allocator_type(other.outer_allocator())\
       , m_inner(other.inner_allocator())\
       {}\
    \
-   scoped_allocator_adaptor_base(BOOST_RV_REF(scoped_allocator_adaptor_base) other)\
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base(BOOST_RV_REF(scoped_allocator_adaptor_base) other)\
       : outer_allocator_type(::boost::move(other.outer_allocator()))\
       , m_inner(::boost::move(other.inner_allocator()))\
       {}\
    \
    template <class OuterA2>\
-   scoped_allocator_adaptor_base\
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base\
       (const scoped_allocator_adaptor_base<OuterA2, true, BOOST_MOVE_TARG##N>& other)\
       : outer_allocator_type(other.outer_allocator())\
       , m_inner(other.inner_allocator())\
       {}\
    \
    template <class OuterA2>\
-   scoped_allocator_adaptor_base\
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base\
       (BOOST_RV_REF_BEG scoped_allocator_adaptor_base<OuterA2, true, BOOST_MOVE_TARG##N> BOOST_RV_REF_END other)\
       : outer_allocator_type(other.outer_allocator())\
       , m_inner(other.inner_allocator())\
@@ -340,14 +340,14 @@ class scoped_allocator_adaptor_base<OuterAlloc, true, BOOST_MOVE_TARG##N>\
    struct internal_type_t{};\
    \
    template <class OuterA2>\
-   scoped_allocator_adaptor_base\
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base\
       ( internal_type_t, BOOST_FWD_REF(OuterA2) outerAlloc, const inner_allocator_type &inner)\
       : outer_allocator_type(::boost::forward<OuterA2>(outerAlloc))\
       , m_inner(inner)\
    {}\
    \
    public:\
-   scoped_allocator_adaptor_base &operator=\
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base &operator=\
       (BOOST_COPY_ASSIGN_REF(scoped_allocator_adaptor_base) other)\
    {\
       outer_allocator_type::operator=(other.outer_allocator());\
@@ -355,35 +355,35 @@ class scoped_allocator_adaptor_base<OuterAlloc, true, BOOST_MOVE_TARG##N>\
       return *this;\
    }\
    \
-   scoped_allocator_adaptor_base &operator=(BOOST_RV_REF(scoped_allocator_adaptor_base) other)\
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base &operator=(BOOST_RV_REF(scoped_allocator_adaptor_base) other)\
    {\
       outer_allocator_type::operator=(boost::move(other.outer_allocator()));\
       m_inner = ::boost::move(other.inner_allocator());\
       return *this;\
    }\
    \
-   void swap(scoped_allocator_adaptor_base &r)\
+   BOOST_CONTAINER_FORCEINLINE void swap(scoped_allocator_adaptor_base &r)\
    {\
       boost::adl_move_swap(this->outer_allocator(), r.outer_allocator());\
       boost::adl_move_swap(this->m_inner, r.inner_allocator());\
    }\
    \
-   friend void swap(scoped_allocator_adaptor_base &l, scoped_allocator_adaptor_base &r)\
+   BOOST_CONTAINER_FORCEINLINE friend void swap(scoped_allocator_adaptor_base &l, scoped_allocator_adaptor_base &r)\
    {  l.swap(r);  }\
    \
-   inner_allocator_type&       inner_allocator()\
+   BOOST_CONTAINER_FORCEINLINE inner_allocator_type&       inner_allocator()\
       { return m_inner; }\
    \
-   inner_allocator_type const& inner_allocator() const\
+   BOOST_CONTAINER_FORCEINLINE inner_allocator_type const& inner_allocator() const\
       { return m_inner; }\
    \
-   outer_allocator_type      & outer_allocator()\
+   BOOST_CONTAINER_FORCEINLINE outer_allocator_type      & outer_allocator()\
       { return static_cast<outer_allocator_type&>(*this); }\
    \
-   const outer_allocator_type &outer_allocator() const\
+   BOOST_CONTAINER_FORCEINLINE const outer_allocator_type &outer_allocator() const\
       { return static_cast<const outer_allocator_type&>(*this); }\
    \
-   scoped_allocator_type select_on_container_copy_construction() const\
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_type select_on_container_copy_construction() const\
    {\
       return scoped_allocator_type\
          (internal_type_t()\
@@ -440,30 +440,30 @@ class scoped_allocator_adaptor_base< OuterAlloc BOOST_CONTAINER_SCOPEDALLOC_DUMM
    typedef typename outer_traits_type::
       is_always_equal                           is_always_equal;
 
-   scoped_allocator_adaptor_base()
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base()
       {}
 
    template <class OuterA2>
-   scoped_allocator_adaptor_base(BOOST_FWD_REF(OuterA2) outerAlloc)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base(BOOST_FWD_REF(OuterA2) outerAlloc)
       : outer_allocator_type(::boost::forward<OuterA2>(outerAlloc))
       {}
 
-   scoped_allocator_adaptor_base(const scoped_allocator_adaptor_base& other)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base(const scoped_allocator_adaptor_base& other)
       : outer_allocator_type(other.outer_allocator())
       {}
 
-   scoped_allocator_adaptor_base(BOOST_RV_REF(scoped_allocator_adaptor_base) other)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base(BOOST_RV_REF(scoped_allocator_adaptor_base) other)
       : outer_allocator_type(::boost::move(other.outer_allocator()))
       {}
 
    template <class OuterA2>
-   scoped_allocator_adaptor_base
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base
       (const scoped_allocator_adaptor_base<OuterA2 BOOST_CONTAINER_SCOPEDALLOC_DUMMYTRUE>& other)
       : outer_allocator_type(other.outer_allocator())
       {}
 
    template <class OuterA2>
-   scoped_allocator_adaptor_base
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base
       (BOOST_RV_REF_BEG scoped_allocator_adaptor_base<OuterA2 BOOST_CONTAINER_SCOPEDALLOC_DUMMYTRUE> BOOST_RV_REF_END other)
       : outer_allocator_type(other.outer_allocator())
       {}
@@ -472,44 +472,44 @@ class scoped_allocator_adaptor_base< OuterAlloc BOOST_CONTAINER_SCOPEDALLOC_DUMM
    struct internal_type_t{};
 
    template <class OuterA2>
-   scoped_allocator_adaptor_base(internal_type_t, BOOST_FWD_REF(OuterA2) outerAlloc, const inner_allocator_type &)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base(internal_type_t, BOOST_FWD_REF(OuterA2) outerAlloc, const inner_allocator_type &)
       : outer_allocator_type(::boost::forward<OuterA2>(outerAlloc))
       {}
 
    public:
-   scoped_allocator_adaptor_base &operator=(BOOST_COPY_ASSIGN_REF(scoped_allocator_adaptor_base) other)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base &operator=(BOOST_COPY_ASSIGN_REF(scoped_allocator_adaptor_base) other)
    {
       outer_allocator_type::operator=(other.outer_allocator());
       return *this;
    }
 
-   scoped_allocator_adaptor_base &operator=(BOOST_RV_REF(scoped_allocator_adaptor_base) other)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor_base &operator=(BOOST_RV_REF(scoped_allocator_adaptor_base) other)
    {
       outer_allocator_type::operator=(boost::move(other.outer_allocator()));
       return *this;
    }
 
-   void swap(scoped_allocator_adaptor_base &r)
+   BOOST_CONTAINER_FORCEINLINE void swap(scoped_allocator_adaptor_base &r)
    {
       boost::adl_move_swap(this->outer_allocator(), r.outer_allocator());
    }
 
-   friend void swap(scoped_allocator_adaptor_base &l, scoped_allocator_adaptor_base &r)
+   BOOST_CONTAINER_FORCEINLINE friend void swap(scoped_allocator_adaptor_base &l, scoped_allocator_adaptor_base &r)
    {  l.swap(r);  }
 
-   inner_allocator_type&       inner_allocator()
+   BOOST_CONTAINER_FORCEINLINE inner_allocator_type&       inner_allocator()
       { return static_cast<inner_allocator_type&>(*this); }
 
-   inner_allocator_type const& inner_allocator() const
+   BOOST_CONTAINER_FORCEINLINE inner_allocator_type const& inner_allocator() const
       { return static_cast<const inner_allocator_type&>(*this); }
 
-   outer_allocator_type      & outer_allocator()
+   BOOST_CONTAINER_FORCEINLINE outer_allocator_type      & outer_allocator()
       { return static_cast<outer_allocator_type&>(*this); }
 
-   const outer_allocator_type &outer_allocator() const
+   BOOST_CONTAINER_FORCEINLINE const outer_allocator_type &outer_allocator() const
       { return static_cast<const outer_allocator_type&>(*this); }
 
-   scoped_allocator_type select_on_container_copy_construction() const
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_type select_on_container_copy_construction() const
    {
       return scoped_allocator_type
          (internal_type_t()
@@ -641,21 +641,21 @@ class scoped_allocator_adaptor
 
    //! <b>Effects</b>: value-initializes the OuterAlloc base class
    //! and the inner allocator object.
-   scoped_allocator_adaptor()
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor()
       {}
 
-   ~scoped_allocator_adaptor()
+   BOOST_CONTAINER_FORCEINLINE ~scoped_allocator_adaptor()
       {}
 
    //! <b>Effects</b>: initializes each allocator within the adaptor with
    //! the corresponding allocator from other.
-   scoped_allocator_adaptor(const scoped_allocator_adaptor& other)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor(const scoped_allocator_adaptor& other)
       : base_type(other.base())
       {}
 
    //! <b>Effects</b>: move constructs each allocator within the adaptor with
    //! the corresponding allocator from other.
-   scoped_allocator_adaptor(BOOST_RV_REF(scoped_allocator_adaptor) other)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor(BOOST_RV_REF(scoped_allocator_adaptor) other)
       : base_type(::boost::move(other.base()))
       {}
 
@@ -667,14 +667,14 @@ class scoped_allocator_adaptor
    //! with innerAllocs...(hence recursively initializing each allocator within the adaptor with the
    //! corresponding allocator from the argument list).
    template <class OuterA2>
-   scoped_allocator_adaptor(BOOST_FWD_REF(OuterA2) outerAlloc, const InnerAllocs & ...innerAllocs)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor(BOOST_FWD_REF(OuterA2) outerAlloc, const InnerAllocs & ...innerAllocs)
       : base_type(::boost::forward<OuterA2>(outerAlloc), innerAllocs...)
       {}
    #else // #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) || defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
 
    #define BOOST_CONTAINER_SCOPED_ALLOCATOR_ADAPTOR_RELATED_ALLOCATOR_CONSTRUCTOR_CODE(N)\
    template <class OuterA2>\
-   scoped_allocator_adaptor(BOOST_FWD_REF(OuterA2) outerAlloc BOOST_MOVE_I##N BOOST_MOVE_CREF##N)\
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor(BOOST_FWD_REF(OuterA2) outerAlloc BOOST_MOVE_I##N BOOST_MOVE_CREF##N)\
       : base_type(::boost::forward<OuterA2>(outerAlloc) BOOST_MOVE_I##N BOOST_MOVE_ARG##N)\
       {}\
    //
@@ -687,7 +687,7 @@ class scoped_allocator_adaptor
    //!
    //! <b>Effects</b>: initializes each allocator within the adaptor with the corresponding allocator from other.
    template <class OuterA2>
-   scoped_allocator_adaptor(const scoped_allocator_adaptor<OuterA2, BOOST_CONTAINER_SCOPEDALLOC_ALLINNER> &other)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor(const scoped_allocator_adaptor<OuterA2, BOOST_CONTAINER_SCOPEDALLOC_ALLINNER> &other)
       : base_type(other.base())
       {}
 
@@ -696,15 +696,15 @@ class scoped_allocator_adaptor
    //! <b>Effects</b>: initializes each allocator within the adaptor with the corresponding allocator
    //! rvalue from other.
    template <class OuterA2>
-   scoped_allocator_adaptor(BOOST_RV_REF_BEG scoped_allocator_adaptor
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor(BOOST_RV_REF_BEG scoped_allocator_adaptor
       <OuterA2, BOOST_CONTAINER_SCOPEDALLOC_ALLINNER> BOOST_RV_REF_END other)
       : base_type(::boost::move(other.base()))
       {}
 
-   scoped_allocator_adaptor &operator=(BOOST_COPY_ASSIGN_REF(scoped_allocator_adaptor) other)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor &operator=(BOOST_COPY_ASSIGN_REF(scoped_allocator_adaptor) other)
    {  return static_cast<scoped_allocator_adaptor&>(base_type::operator=(static_cast<const base_type &>(other))); }
 
-   scoped_allocator_adaptor &operator=(BOOST_RV_REF(scoped_allocator_adaptor) other)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor &operator=(BOOST_RV_REF(scoped_allocator_adaptor) other)
    {  return static_cast<scoped_allocator_adaptor&>(base_type::operator=(boost::move(other.base()))); }
 
    #ifdef BOOST_CONTAINER_DOXYGEN_INVOKED
@@ -736,13 +736,13 @@ class scoped_allocator_adaptor
 
    //! <b>Returns</b>:
    //!   <code>allocator_traits<OuterAlloc>:: max_size(outer_allocator())</code>.
-   size_type max_size() const BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_FORCEINLINE size_type max_size() const BOOST_NOEXCEPT_OR_NOTHROW
    {  return outer_traits_type::max_size(this->outer_allocator());   }
 
    //! <b>Effects</b>:
    //!   calls <code>OUTERMOST_ALLOC_TRAITS(*this):: destroy(OUTERMOST(*this), p)</code>.
    template <class T>
-   void destroy(T* p) BOOST_NOEXCEPT_OR_NOTHROW
+   BOOST_CONTAINER_FORCEINLINE void destroy(T* p) BOOST_NOEXCEPT_OR_NOTHROW
    {
       allocator_traits<typename outermost_allocator<OuterAlloc>::type>
          ::destroy(get_outermost_allocator(this->outer_allocator()), p);
@@ -750,17 +750,17 @@ class scoped_allocator_adaptor
 
    //! <b>Returns</b>:
    //! <code>allocator_traits<OuterAlloc>::allocate(outer_allocator(), n)</code>.
-   pointer allocate(size_type n)
+   BOOST_CONTAINER_FORCEINLINE pointer allocate(size_type n)
    {  return outer_traits_type::allocate(this->outer_allocator(), n);   }
 
    //! <b>Returns</b>:
    //! <code>allocator_traits<OuterAlloc>::allocate(outer_allocator(), n, hint)</code>.
-   pointer allocate(size_type n, const_void_pointer hint)
+   BOOST_CONTAINER_FORCEINLINE pointer allocate(size_type n, const_void_pointer hint)
    {  return outer_traits_type::allocate(this->outer_allocator(), n, hint);   }
 
    //! <b>Effects</b>:
    //! <code>allocator_traits<OuterAlloc>::deallocate(outer_allocator(), p, n)</code>.
-   void deallocate(pointer p, size_type n)
+   BOOST_CONTAINER_FORCEINLINE void deallocate(pointer p, size_type n)
    {  outer_traits_type::deallocate(this->outer_allocator(), p, n);  }
 
    #ifdef BOOST_CONTAINER_DOXYGEN_INVOKED
@@ -772,9 +772,9 @@ class scoped_allocator_adaptor
    #endif   //BOOST_CONTAINER_DOXYGEN_INVOKED
 
    #ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
-   base_type &base()             { return *this; }
+   BOOST_CONTAINER_FORCEINLINE base_type &base()             { return *this; }
 
-   const base_type &base() const { return *this; }
+   BOOST_CONTAINER_FORCEINLINE const base_type &base() const { return *this; }
    #endif   //#ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
 
    #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) || defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
@@ -808,7 +808,7 @@ class scoped_allocator_adaptor
    //! to true but the specific constructor does not take an allocator. This definition prevents a silent
    //! failure to pass an inner allocator to a contained element. -end note]
    template < typename T, class ...Args>
-   void construct(T* p, BOOST_FWD_REF(Args)...args)
+   BOOST_CONTAINER_FORCEINLINE void construct(T* p, BOOST_FWD_REF(Args)...args)
    {
       dtl::dispatch_uses_allocator
          ( (get_outermost_allocator)(this->outer_allocator())
@@ -821,7 +821,7 @@ class scoped_allocator_adaptor
    //overload selection problems when the first parameter is a pair.
    #define BOOST_CONTAINER_SCOPED_ALLOCATOR_CONSTRUCT_CODE(N) \
    template < typename T BOOST_MOVE_I##N BOOST_MOVE_CLASSQ##N >\
-   void construct(T* p BOOST_MOVE_I##N BOOST_MOVE_UREFQ##N)\
+   BOOST_CONTAINER_FORCEINLINE void construct(T* p BOOST_MOVE_I##N BOOST_MOVE_UREFQ##N)\
    {\
       dtl::dispatch_uses_allocator\
          ( (get_outermost_allocator)(this->outer_allocator())\
@@ -838,7 +838,7 @@ class scoped_allocator_adaptor
    public:
    //Internal function
    template <class OuterA2>
-   scoped_allocator_adaptor(internal_type_t, BOOST_FWD_REF(OuterA2) outer, const inner_allocator_type& inner)
+   BOOST_CONTAINER_FORCEINLINE scoped_allocator_adaptor(internal_type_t, BOOST_FWD_REF(OuterA2) outer, const inner_allocator_type& inner)
       : base_type(internal_type_t(), ::boost::forward<OuterA2>(outer), inner)
    {}
 
@@ -853,17 +853,17 @@ struct scoped_allocator_operator_equal
    //Optimize equal outer allocator types with 
    //allocator_traits::equal which uses is_always_equal
    template<class IA>
-   static bool equal_outer(const IA &l, const IA &r)
+   BOOST_CONTAINER_FORCEINLINE static bool equal_outer(const IA &l, const IA &r)
    {  return allocator_traits<IA>::equal(l, r);  }
 
    //Otherwise compare it normally
    template<class IA1, class IA2>
-   static bool equal_outer(const IA1 &l, const IA2 &r)
+   BOOST_CONTAINER_FORCEINLINE static bool equal_outer(const IA1 &l, const IA2 &r)
    {  return l == r;  }
 
    //Otherwise compare it normally
    template<class IA>
-   static bool equal_inner(const IA &l, const IA &r)
+   BOOST_CONTAINER_FORCEINLINE static bool equal_inner(const IA &l, const IA &r)
    {  return allocator_traits<IA>::equal(l, r);  }
 };
 
@@ -875,14 +875,14 @@ struct scoped_allocator_operator_equal<true>
    //inner_allocator_type is the same as outer_allocator_type
    //so both types can be different in operator==
    template<class IA1, class IA2>
-   static bool equal_inner(const IA1 &, const IA2 &)
+   BOOST_CONTAINER_FORCEINLINE static bool equal_inner(const IA1 &, const IA2 &)
    {  return true;  }
 };
 
 /// @endcond
 
 template <typename OuterA1, typename OuterA2, BOOST_CONTAINER_SCOPEDALLOC_ALLINNERCLASS>
-inline bool operator==(const scoped_allocator_adaptor<OuterA1, BOOST_CONTAINER_SCOPEDALLOC_ALLINNER>& a
+BOOST_CONTAINER_FORCEINLINE bool operator==(const scoped_allocator_adaptor<OuterA1, BOOST_CONTAINER_SCOPEDALLOC_ALLINNER>& a
                       ,const scoped_allocator_adaptor<OuterA2, BOOST_CONTAINER_SCOPEDALLOC_ALLINNER>& b)
 {
    #if !defined(BOOST_NO_CXX11_VARIADIC_TEMPLATES) || defined(BOOST_CONTAINER_DOXYGEN_INVOKED)
@@ -896,7 +896,7 @@ inline bool operator==(const scoped_allocator_adaptor<OuterA1, BOOST_CONTAINER_S
 }
 
 template <typename OuterA1, typename OuterA2, BOOST_CONTAINER_SCOPEDALLOC_ALLINNERCLASS>
-inline bool operator!=(const scoped_allocator_adaptor<OuterA1, BOOST_CONTAINER_SCOPEDALLOC_ALLINNER>& a
+BOOST_CONTAINER_FORCEINLINE bool operator!=(const scoped_allocator_adaptor<OuterA1, BOOST_CONTAINER_SCOPEDALLOC_ALLINNER>& a
                       ,const scoped_allocator_adaptor<OuterA2, BOOST_CONTAINER_SCOPEDALLOC_ALLINNER>& b)
 {  return !(a == b);   }
 
@@ -905,3 +905,7 @@ inline bool operator!=(const scoped_allocator_adaptor<OuterA1, BOOST_CONTAINER_S
 #include <boost/container/detail/config_end.hpp>
 
 #endif //  BOOST_CONTAINER_ALLOCATOR_SCOPED_ALLOCATOR_HPP
+
+/* scoped_allocator.hpp
+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
+*/

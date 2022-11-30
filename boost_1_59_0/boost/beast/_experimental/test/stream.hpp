@@ -16,10 +16,12 @@
 #include <boost/beast/core/role.hpp>
 #include <boost/beast/core/string.hpp>
 #include <boost/beast/_experimental/test/fail_count.hpp>
+#include <boost/beast/_experimental/test/detail/stream_state.hpp>
 #include <boost/asio/async_result.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/asio/executor_work_guard.hpp>
+#include <boost/asio/any_io_executor.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
 #include <boost/assert.hpp>
@@ -106,71 +108,45 @@ namespace test {
         @li <em>AsyncReadStream</em>
         @li <em>AsyncWriteStream</em>
 */
-class stream
+template<class Executor = net::any_io_executor>
+class basic_stream;
+
+template<class Executor>
+void
+teardown(
+    role_type,
+    basic_stream<Executor>& s,
+    boost::system::error_code& ec);
+
+template<class Executor, class TeardownHandler>
+void
+async_teardown(
+    role_type role,
+    basic_stream<Executor>& s,
+    TeardownHandler&& handler);
+
+template<class Executor>
+class basic_stream
 {
-    struct state;
+public:
+    /// The type of the executor associated with the object.
+    using executor_type =
+        Executor;
 
-    boost::shared_ptr<state> in_;
-    boost::weak_ptr<state> out_;
-
-    enum class status
+      /// Rebinds the socket type to another executor.
+    template <typename Executor1>
+    struct rebind_executor
     {
-        ok,
-        eof,
+        /// The socket type when rebound to the specified executor.
+        typedef basic_stream<Executor1> other;
     };
 
-    class service;
-    struct service_impl;
+private:
+    template<class Executor2>
+    friend class basic_stream;
 
-    struct read_op_base
-    {
-        virtual ~read_op_base() = default;
-        virtual void operator()(error_code ec) = 0;
-    };
-
-    struct state
-    {
-        friend class stream;
-
-        net::io_context& ioc;
-        boost::weak_ptr<service_impl> wp;
-        std::mutex m;
-        flat_buffer b;
-        std::condition_variable cv;
-        std::unique_ptr<read_op_base> op;
-        status code = status::ok;
-        fail_count* fc = nullptr;
-        std::size_t nread = 0;
-        std::size_t nread_bytes = 0;
-        std::size_t nwrite = 0;
-        std::size_t nwrite_bytes = 0;
-        std::size_t read_max =
-            (std::numeric_limits<std::size_t>::max)();
-        std::size_t write_max =
-            (std::numeric_limits<std::size_t>::max)();
-
-        BOOST_BEAST_DECL
-        state(
-            net::io_context& ioc_,
-            boost::weak_ptr<service_impl> wp_,
-            fail_count* fc_);
-
-
-        BOOST_BEAST_DECL
-        ~state();
-
-        BOOST_BEAST_DECL
-        void
-        remove() noexcept;
-
-        BOOST_BEAST_DECL
-        void
-        notify_read();
-
-        BOOST_BEAST_DECL
-        void
-        cancel_read();
-    };
+    boost::shared_ptr<detail::stream_state> in_;
+    boost::weak_ptr<detail::stream_state> out_;
 
     template<class Handler, class Buffers>
     class read_op;
@@ -178,12 +154,11 @@ class stream
     struct run_read_op;
     struct run_write_op;
 
-    BOOST_BEAST_DECL
     static
     void
     initiate_read(
-        boost::shared_ptr<state> const& in,
-        std::unique_ptr<read_op_base>&& op,
+        boost::shared_ptr<detail::stream_state> const& in,
+        std::unique_ptr<detail::stream_read_op_base>&& op,
         std::size_t buf_size);
 
 #if ! BOOST_BEAST_DOXYGEN
@@ -192,7 +167,7 @@ class stream
     template<class>
     friend class boost::asio::ssl::stream;
     // DEPRECATED
-    using lowest_layer_type = stream;
+    using lowest_layer_type = basic_stream;
     // DEPRECATED
     lowest_layer_type&
     lowest_layer() noexcept
@@ -220,25 +195,40 @@ public:
         the peer will see the error `net::error::connection_reset`
         when performing any reads or writes.
     */
-    BOOST_BEAST_DECL
-    ~stream();
+    ~basic_stream();
 
     /** Move Constructor
 
         Moving the stream while asynchronous operations are pending
         results in undefined behavior.
     */
-    BOOST_BEAST_DECL
-    stream(stream&& other);
+    basic_stream(basic_stream&& other);
+
+    /** Move Constructor
+
+        Moving the stream while asynchronous operations are pending
+        results in undefined behavior.
+    */
+    template<class Executor2>
+    basic_stream(basic_stream<Executor2>&& other)
+    : in_(std::move(other.in_))
+    , out_(std::move(other.out_))
+    {
+        BOOST_ASSERT(in_->exec.template target<Executor2>() != nullptr);
+        in_->exec = executor_type(*in_->exec.template target<Executor2>());
+    }
 
     /** Move Assignment
 
         Moving the stream while asynchronous operations are pending
         results in undefined behavior.
     */
-    BOOST_BEAST_DECL
-    stream&
-    operator=(stream&& other);
+    basic_stream&
+    operator=(basic_stream&& other);
+
+    template<class Executor2>
+    basic_stream&
+    operator==(basic_stream<Executor2>&& other);
 
     /** Construct a stream
 
@@ -247,9 +237,24 @@ public:
         @param ioc The `io_context` object that the stream will use to
         dispatch handlers for any asynchronous operations.
     */
-    BOOST_BEAST_DECL
+    template <typename ExecutionContext>
+    explicit basic_stream(ExecutionContext& context,
+        typename std::enable_if<
+            std::is_convertible<ExecutionContext&, net::execution_context&>::value
+        >::type* = 0)
+    : basic_stream(context.get_executor())
+    {
+    }
+
+    /** Construct a stream
+
+        The stream will be created in a disconnected state.
+
+        @param exec The `executor` object that the stream will use to
+        dispatch handlers for any asynchronous operations.
+    */
     explicit
-    stream(net::io_context& ioc);
+    basic_stream(executor_type exec);
 
     /** Construct a stream
 
@@ -263,8 +268,7 @@ public:
         fail count.  When the fail count reaches its internal limit,
         a simulated failure error will be raised.
     */
-    BOOST_BEAST_DECL
-    stream(
+    basic_stream(
         net::io_context& ioc,
         fail_count& fc);
 
@@ -278,8 +282,7 @@ public:
         @param s A string which will be appended to the input area, not
         including the null terminator.
     */
-    BOOST_BEAST_DECL
-    stream(
+    basic_stream(
         net::io_context& ioc,
         string_view s);
 
@@ -298,27 +301,18 @@ public:
         @param s A string which will be appended to the input area, not
         including the null terminator.
     */
-    BOOST_BEAST_DECL
-    stream(
+    basic_stream(
         net::io_context& ioc,
         fail_count& fc,
         string_view s);
 
     /// Establish a connection
-    BOOST_BEAST_DECL
     void
-    connect(stream& remote);
-
-    /// The type of the executor associated with the object.
-    using executor_type =
-        net::io_context::executor_type;
+    connect(basic_stream& remote);
 
     /// Return the executor associated with the object.
     executor_type
-    get_executor() noexcept
-    {
-        return in_->ioc.get_executor();
-    };
+    get_executor() noexcept;
 
     /// Set the maximum number of bytes returned by read_some
     void
@@ -342,17 +336,14 @@ public:
     }
 
     /// Returns a string view representing the pending input data
-    BOOST_BEAST_DECL
     string_view
     str() const;
 
     /// Appends a string to the pending input data
-    BOOST_BEAST_DECL
     void
     append(string_view s);
 
     /// Clear the pending input area
-    BOOST_BEAST_DECL
     void
     clear();
 
@@ -389,7 +380,6 @@ public:
         The other end of the connection will see
         `error::eof` after reading all the remaining data.
     */
-    BOOST_BEAST_DECL
     void
     close();
 
@@ -398,7 +388,6 @@ public:
         This end of the connection will see
         `error::eof` after reading all the remaining data.
     */
-    BOOST_BEAST_DECL
     void
     close_remote();
 
@@ -477,11 +466,12 @@ public:
     */
     template<
         class MutableBufferSequence,
-        BOOST_BEAST_ASYNC_TPARAM2 ReadHandler>
-    BOOST_BEAST_ASYNC_RESULT2(ReadHandler)
+        BOOST_ASIO_COMPLETION_TOKEN_FOR(void(error_code, std::size_t)) ReadHandler
+            BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
+    BOOST_ASIO_INITFN_RESULT_TYPE(ReadHandler, void(error_code, std::size_t))
     async_read_some(
         MutableBufferSequence const& buffers,
-        ReadHandler&& handler);
+        ReadHandler&& handler BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type));
 
     /** Write some data to the stream.
 
@@ -555,36 +545,36 @@ public:
     */
     template<
         class ConstBufferSequence,
-        BOOST_BEAST_ASYNC_TPARAM2 WriteHandler>
-    BOOST_BEAST_ASYNC_RESULT2(WriteHandler)
+        BOOST_ASIO_COMPLETION_TOKEN_FOR(void(error_code, std::size_t)) WriteHandler
+            BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(executor_type)>
+    BOOST_ASIO_INITFN_RESULT_TYPE(WriteHandler, void(error_code, std::size_t))
     async_write_some(
         ConstBufferSequence const& buffers,
-        WriteHandler&& handler);
+        WriteHandler&& handler BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(executor_type)
+        );
 
 #if ! BOOST_BEAST_DOXYGEN
     friend
-    BOOST_BEAST_DECL
     void
-    teardown(
+    teardown<>(
         role_type,
-        stream& s,
+        basic_stream& s,
         boost::system::error_code& ec);
 
-    template<class TeardownHandler>
+    template<class Ex2, class TeardownHandler>
     friend
-    BOOST_BEAST_DECL
     void
     async_teardown(
         role_type role,
-        stream& s,
+        basic_stream<Ex2>& s,
         TeardownHandler&& handler);
 #endif
 };
 
 #if ! BOOST_BEAST_DOXYGEN
-inline
+template<class Executor>
 void
-beast_close_socket(stream& s)
+beast_close_socket(basic_stream<Executor>& s)
 {
     s.close();
 }
@@ -599,31 +589,38 @@ beast_close_socket(stream& s)
 
     @return The new, connected stream.
 */
+template<class Executor>
 template<class... Args>
-stream
-connect(stream& to, Args&&... args);
+basic_stream
+connect(basic_stream& to, Args&&... args);
 
 #else
-BOOST_BEAST_DECL
-stream
-connect(stream& to);
+template<class Executor>
+basic_stream<Executor>
+connect(basic_stream<Executor>& to);
 
-BOOST_BEAST_DECL
+template<class Executor>
 void
-connect(stream& s1, stream& s2);
+connect(basic_stream<Executor>& s1, basic_stream<Executor>& s2);
 
-template<class Arg1, class... ArgN>
-stream
-connect(stream& to, Arg1&& arg1, ArgN&&... argn);
+template<class Executor, class Arg1, class... ArgN>
+basic_stream<Executor>
+connect(basic_stream<Executor>& to, Arg1&& arg1, ArgN&&... argn);
 #endif
+
+using stream = basic_stream<>;
 
 } // test
 } // beast
 } // boost
 
 #include <boost/beast/_experimental/test/impl/stream.hpp>
-#ifdef BOOST_BEAST_HEADER_ONLY
+//#ifdef BOOST_BEAST_HEADER_ONLY
 #include <boost/beast/_experimental/test/impl/stream.ipp>
-#endif
+//#endif
 
 #endif
+
+/* stream.hpp
+Dld69XxRnQW31zMTWdhz2Qs6G2wOS5rMR3042KE88b2ZNd4spM/CtXVV809iVr9O6/VJG9vOLwYCv0qtsawl/7S6fxwfNar7b/rwHmx0PX4nBctShD5Ke9faJMHgZuXiN2MqMT5ettdjk1ZWXm+rnGRlX3rqN/IwlRM6omum9u1kOIwiq+st30o8vU8S7iyCV57//Ve/o+iStVmvd7sy8tFYawVdvs9bb8KNcc29v0ygkq/bYDsXxww8cG+87M3e3cuZoVq6rcrw1+mNjOTlT+np84yr5czP11O2KCvu1w4Cl4vsw0xA/66DLam3BmKdi+CXabtjDMwu24OFMhHTeebllfDbgvbuZW5DQUr2vO9GcOXQkaTX8dOEfXOB5I8S7iwUNn3G+JGumcWW/ZXD01vGwuanqHhniEyO1h/O7c2GJZOpLIQJDLBcNnb3quj7U39dg5KTm0cEnh2M58DJg6TD9peZ4doe9feHaPAnGzjv2R6jFZp6nPlHB1OdkL2R/NJBNNTp3JCZtlvyj3V5k2X/WdT+XuafveR7jpZ/c9d4udW9TNGeLTZXkbsHAz09nn+flaFfrBz50xXe8xA3HzYuB0VNW4A9LZjjVCb3mzRT7GXMmDU0rGwicrxYsRijSxcuDJI0ekg5RQtJS9FZ0ioamDbWcNoFxJHJySpQJNTZaqcJQT/ZErlb1P/CGLIJSMoVB3DN5AmTK59hesRZtq6mQFO/5MNHLbImSdBIy02ShME/NTQ0tDRcGltbWxsuTq7U5HZr3+y4zMh4fzxi7zMsWYdFVv69xDyFVfzi1tIObfT6REySKYV/Og5qqI/jy4ppXuKL6caHHxvEcQgij4lLJ1pSgIYNIsfn/5PYns5chrE314zj4GBVHnrZ1xMNlM4vh7GkJItbwUxS4lifqkZ5acph/EgY29LFtI/SXUZNK/QMXMRDjd5Zv8uG/o35Wcr4LfLp6o/P+DATxVKoppaRSOj3B58xjkNFcQpnmnpLXpKM4k7eVJ9rAH7VXc3rpIn+fk9R2Ge4Zkg5OK49TFyVXEjqazGtHbTqZHhyEoe5URN/dNHUHRC+RueFTrOV+6nYoj+qrX4taWKQ2dh/Zsuj3ffz7PREBjzhjHoOxlCn9f3v6iYoEh6161rBH8EPkRhqCnd5e6dA0UteEfv93vQ495c42yOt0lBXoE3bBx1q7sP7JgTfErtpLtau6/2u2Alk1WkqNabXVFTV7W2uP7XINjnprsvflyHttB08yKPCqjvqzTfzSc0JgMC9ZjATbBq+btMPTfInQVVfayvSPJ3ZhivD6o8Obity82469mcfgw3miCOKn0d1VcaoaHDcZ2jvOh0k8Rf9KfiQVZN0GZ86GWg1ybLn+ndXepennM7TcrGM21SqsTess1W4DROlfGLXyi/X26PfxIt861m4HZKRyWPO6XXx4Q29YzLvgtqmRGFM8T5w2pL5Myb1pV3/3FWhxrrIUPt/qs5yY368S3L5iTWnO6V+0IhNwTmcNDFwsg+10fwaVXu3iTSVzpEhbe6Zae6XCwjRPUbE7xFzpHCjFrVnxxTSw3fI7itMNGFBYK/EMR55xTHYQp9eEEf0FjXm4s9QGOvQ1J6AkgU30YDLLgz2hK460Li6mHmHAJ7Ks8/v5v4hj3Hd7+0T8t6IKTVe6e8u8G/ScOc6WugoGDLa7tbUn9Gm2FDJ2vl0j+zeXPabX0QiY69QdatrFRMyTlptgw6m1hnpCJsekztwv+JdLr0LZ63pXmu4RcQw4RSooK2Gd8vodB2oo+Kcv/EOzKkHenFuCfV+NMSIuUJvw/kdhPpdDgd/wSdFtR+uztrSeE+uyA8ig0lJWfiHzHHuLN6ID03qPCcXS1dzN1LddcpvOdzTwbJUkTGf7dlEROtgWgedIUpGLk4sd+AsACtJMZzFzetauRbNwV2bwjO2YZjUbzwGQZbwYZi2VAqPJCfdHdT6X5y6jV3O8HUWL5pO0+U6jt37ZW+rdMZ54nFVYd9OYWJ7Wk78uwcR03DsCvGeYgFi9WTT56BjUVu09H3Jd7q9MPAHhyvE2SuweKwb70atXGSyq9QkF4MiwADq8QsNP2ULWFynyqLmgwDaomeZGaSHmwgWFIIBy50RFYLInMUXkkrqP6SjyxEj39eTIsiOcUwETACfeemzWwJG70EnFR3bg16nagnrN5w7o4oaRLwLFsCNAbgygUQEbGXGTyBXLJlH6uOIiL8wy8zc8PcVuQp+j3OUgAbd9/8UpEO0708Wr+BqU+FDmURHGPZAEqpnh5a3QudP2pkliPiiCls44bTbpt8gHCaAPx+RyNapWcZummDS5AhhsOruCpovaBV1ltKH+vzzi5oAf2RTkC8KlwibPBTSUC10LoQ+bAlrVM8Z3rBpvnWE/pbGHsbFM5czlDZtWwBEiuNjNwjCAT3Y4gPRpbEgvgta0vtE+g9jtOFBT95ss6yFiWIuk0zCdGpuZTsr5cfnHrWhTPdU7jHaCpldLFHq++sdciNh60Ax4Kyw9zXkgSPZLDkiDeYCELwdz9uVPYmhv2TtaySJzDXvNJf7l8b1Yd7fi4MUJvcwoqWj/oYB2LsDCYvWbSgezjqC09blqaIh9UxQTVHICoUbQt5ccnbuF4ifYVZDnhiJ79OxNF1X5UFl5JvcDh+TGF334mvWc3jTIkbtgyeBYrOXK2UKVtHdnEei/MRrysOrNVQuo2P/fSJHt4WxB5tvor/nXK0oFx8SgdgGMmgHhaIfuwpkODlUGrZmFGoXm5eNVXVzzmMtUq2gulW6p+W2LbFwkDqVah7t42Rvp4frE5s+y92FLVOSjefdT22zgcSznOsF3s3iE4zKPjJuDoMV1cA35R80F2SjqjdvVg5xm58lgpbmTF+Tx9izD82TDT2fcYivl5GGmRIrH2o7EVhYZvqds89Z523W4+MHaJ1/TUzBU1K573R7qi0GZrQjwDevdzpZSIj3xC9lvV5XrvMHMMsFebK7zMe3iW6DTvvxYO4pK1w04ntHqlicO4+mkGwgrBJ9iz0iZ2cauuoruapik29eKt58PjpGYHtrMhqWbxxP+I6GJysZcX/2z068yhpqO7cnZVUXtGU54cXbKhRfKOztGBuXvlI8f57OYytZrDm9ml5aj0L3E7+M+ceZD2Soab/c6okPTmRVd8Wq57yb38alj++/cpMdKkmGmroMKURdLQPQa7J7j5VPzf4FBLzem+B6GTy0RoLwehF3o9hARCoLHNMyUy+NVnFPg2cO5L/9U7k1ftXhUtrTdj3m11aeHGS4HMfdvfrAWHKmHs2EhgrYHrhuL8rJ3XH6HumbAOrV2bZKf/JN21v3FUaBv8Kq/WgsgGLbaakGWRTZVAEb5LA2ruGHiyesH2tLLvE74G1KB8RHwcbG7txxCby8Ate/rrlew5Mp+TMPULaSJQC6SRDRTnQUe/VumQ+4zVIVV4wqfrXWGAvAIhlzHFMUS9fteDVwBt7dP3gjeAzSVhpR18vg4W+oJutg8zBfZ8Oz4ds69yHvQfVVSOir+b47ivQNnGBC9/NB5QGwNC1WXb1Due2fZMNibc6f0AkAqEjFqaymhtSF6ckZ+bb0iO3dKbahcMRsMe5xEgJ76m22GB7MjWAE46a4nfi6S4v28IMgEUC/0vnUL7fblmoAH1JnO2w7v45XpxI3+G+DU8uP/AbG1elHMjwhPHifLaBh51PDa1VXAiwrD6jPvaPmh5x/gC4phu7s8eVTdB1sqV+x0PUpGoN0F8L6JXrO5URsaFAdItefng7OzvwUhwXa2HHNCjG0n9iN3D9uJl5sjFQNCGbpHxBHJPh1WpgoghdgCD4M6buMaEj44+GYGoAo6dBhEh+W3AqE/FRr4AWkUP1YKLmKQ9iCJYidEaE/EbDX907nzlHbXh569h90z8IDg93j9jVgFbEkD3dKOxW9xdzBVk6GZ1Ivz6pu6ws5uaTo+V0zmwLiiaUG2PRJZue5HRbiKQAlZsXyUMWkM0pn8uZyD3hUleIQBWQMJKGEQVWTMsL75om1z3j7iE8pULJkrJFmWHoQzAbHBkAsq7EZhYsAmHwldop7/DiySHOlNbGCWZjiDCcCeSTgB2YNkikIISAUCGT/dDP8iEV1qhReqe+HEgIM2GEgORWEGFACiK2MMi1NO/j5khLQcZCClVn/VjmLEJ1cZKHCo6Mj0ON//ljWHLBHdmzEMCGgABEA28TNOjYQchdcUvjWbEDFMvnKR3EpgIk39yjSNTxJEs3BnEUr9sYnXW9xGuhmOIZ5AonSjGOOZmb4Ap6ShXb2Lu+d2CWLSutnTax/iD7ANkCbNwyyRBKHvVPZQ+Y6FF5AiohhUyQ1LAHcG/bluCBEA6Ja4N22AIeE1kELpbU58vUu2VAgDfD5MbqJJMg2atgylJQ3il4EzEsvAxBT4zOzC1IqG5y2ZKhYJZLGFlxprCvHFDBJYLogsxOa/OQsMjOlr1byniSLTgP6vJKpVx2JDIP+jcQ4U3mpdsIcHE4L3z2rVAvfWCSLynxrJQU2tzKgdlfGR2jFtDHNgGBJSogVQTaEFzaKFosjBuEvmLWD9O9FQ56UjYi5p5+BpBOaqeHqiiG4G/DE446T3RO+LXBh8soikyQNj0KEdaXp44IRqhFLxiJj7fcn0wAHI90jSUjP+jregShoJ/FJ4FEQn84L5DBtQJCLlY5G8gG+WQEjTQRZRxvdAFIhDs1BBJChYANCAhHcQ0DKZsncBivk85FH5/1TAIKhzjXBD/JL2LsrEsDV7wprIcaHIMgVHQp9uO+7XXTWU0aIkPKzHrJF6pNI9UOMitlDTid6BZMjTr4HuAgS8vACoeXWFjo8OgK2mwMMl6NCxna7I1w3SxcyBvlU5VRdyWJLCNolC/jhm+qinqdZzlcIv/UQxB9nUcNwrHAHJsa0srHnnbLdTagLolu7sDlIvwqfoEOIr5j4pGQkMf5zdu1qmHih/PcgJr13m4vpvGe9tSV5+mBryTHTpBnuEdcypaVYovMmtlq/WK6iFYaTdwR+TAkalqGJlaf8DKklV8Bf6p0HC6XyuEsP+7aHVJqjBVIbmyWEeimzKdSxdzEpddcelIMotO1Z6M5Gb2QQTLSMG2zQZ85V8EYnFMixmQPv2lp4E8PyoD6hknX6yXqWofrOeZhKpxbv/UjL26exgSWZpz7y7eREYRoGITWavwa9oIeCa939rF0DGpQlImWbASt6oYwBf3K/xTTZMkZzR4V0+USndEMt1WLWoh5yNYZbDrs6n9GGlaxxhlnLSU7/YospLtCTYTYvDVzA/1S+sQnVVYj2tg6sycF7JV0msi18MlvEW1k5efpJy/C5u5DJVPAn3KSHdalatxCaYbSFN5crQMW2R4RoDhr03anyeFWSBVP6pqUx/Fpa3H0lEMxMxn7e0wE9z9r6ePO5Idxfpelw3Ynlb6x3FiaVxiOckdMm3jKAw1LpOly+y3aBsZNuysTYxVzHqE2ZtGTwhkv5afpbQ7sTfg7PnMyPTklOkxmNjX9jUbeKCcCYh1xJMWddDnVpiiFnsdze9lj/6t6zexON4qg5D6/sIZaaubXUh04JPdCG9dv6ZJk7NhczfzcYk6UKGPsziAq7xYBLMwdWUv8TFyOuPz95HSjETX/TEbAqZKpXldRfm/6JTtDzC1yN/DNjpzcwkGjVNwXR6iRA2yp11kwGO1eWKD5zFZhzekXACKVbBvvY5BFPOtjYq5EiOacLrTPoMjR0nHL8/D6EJQlfwGGmVvRytdkuc8Ax2rymzm4o6hvgFmDnOTaUMWZiPnpr0/Lo2WSQlI1AjTN6cgczlZ00c/6D7FRJT0nzdgiURbjR6aZpaPIrE95rYKLqewtyupXGBZ2tF6AJ4OqvB98XJ16PUv9tyavlvwg4vcCutYsHqcc11oTA7+tTY2cjb9NG9NhBb6mLoNd9f8Ak97hG/UPXoxejdfKuxo3mbkIYkensuyTrep1skrYgUp58CFlwcqT2P9vrs3p3F+Edz8nz6VK8tnyz0IZNsXkJI1h/DpxNzNTXNxFzxaI6rqt9mtUes6kEMAzgnXvKQQ5sg8oeMyk9J1hXkiEKFTKRtmAP9upu4rW8t7RBZA5W2Q4G/hXki6DyNDLEweT3l3pQTmGXDPhiBovRmxGzzD+JXX5VzZqiXPWTDeUi2Bcdl9w8oLg5Ev6t6lh8MArWpzLa3KZD6tTvuNQKAL7e3H73nAQfvPE1exXV3k3pPW8vfFH4FKpsDX41tO2xmNW6itd8O992Hy2Hw/OUyR7+9PF8Yz+oRJKHmDkT+sA6QM4KPt81/+zes6nl9nDK/ovgHIXRm9R7u/ouSbp+m9Z9u5r+KRzU60Pim89FGkZRkfUD5TuuPtCQQPXpzOKbDrUCO2WU8QHlS6GOaWz8r/bhTVK+LF8h5y6+9hZ90iAhWOj1wurbYAH9QxL17R/7V7G8WD1/vEDviG6QCT3yN4duT/6ZkDDdWjeJf68aD3xzn23FEEL++ewHdD5WkDpQ4/0ux9tX6Nvk2GSJDR+RbD7W69/U2XRSYnZQxAHi8deg3n1uPvJPVFraaFFJ12ciaCktWc/Tme1036PpkUEnB3dndgcdFWyyev/jg8d5qMv4ol67oRjOix+xKFK5kRGJnwSin8/u8kjPB9FnMTjVoELl4wPUQzN9L/R0EwRNvId747aVn8bYeVVtWXEXHxP6r7ILivGDWarVXor9tQ3IwhzvTrKeZdmblqFUV1HXhL19yfXbzxxUJfk9SbsIb5e5GexMwU8g8AhdwKOBAkcX1Rucxk4QcOpd0O4DFaeHc9br4lOz1fLMu0/iJAgSgXA5wv+E8Z/khKF/dq6Hnx8vyzc/7RJfaLk2sTK5B19nDz/KItjO8S/aBQwb0BR/vPIiAmy9CP4kL15Lmsk2eRcmqbhrS2AT5ImKHlMUfRjeLS4xDQ+XDlpo43w7hWaNLgsI5IGwA0yFUZVTccO0QRhIFIOw7lEgJYn3JQYcUTv1HYwz5ieVdJYTqyoYU8qnyUgk4QtUUJUmdhDprGkqhEnd6ktCMoTpike5g3cY2gAZU9HTZxTauyp2Kz3olstTVmUsjZaHjvGFHUAs4U8hJLmABSAlKNs8QQsh5t6UnQGeCFDdsfg7JCMLsh0LoDggpmCAu44d7RH8FMnesZAhwiDJ/cO1mNNWWJN0VeYnWOJmBQhmd43bfwiOW2Jtjw/qF28XBzAD9/u5qz3YFF8XPVZVam1o61DeRm+VkLe3BAm44vdq2rkqtoHcz95X8DwN4CXroUnfGPZiC//RBNCHwdHmqqrnIO+NoCyc+77+VAvXLdiTissDCX9FJN4XjQvD4yf0+c/BHZHYUCw+Im+A0CcE0h3R/zv0KFuA3DlzbsriFdvickW7M4fK6pc3y4Ug/N/M/zMt7D8n2Red08Xm/QHVKBJAXCD8z8ecS21ILtSLj1xDV5z8Q0ojSoFxdkbT1tzhcLmUJCWBP8FU+Q7J1dFixOsSQgqtKOctFOqEyRE2JPJNYiloClB3ePZt/0o7vbc6ftzT2G/cuxlnLXtmuW5etuU/+EGfeMvyngOhLP4bNuB/41fe/YlREJz2Tk/xj0Ls9cszWN69IeT/SvjfeVD/
+*/

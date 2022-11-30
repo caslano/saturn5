@@ -27,6 +27,8 @@
 #include <boost/type.hpp>
 #include <boost/is_placeholder.hpp>
 #include <boost/bind/arg.hpp>
+#include <boost/bind/detail/result_traits.hpp>
+#include <boost/bind/std_placeholders.hpp>
 #include <boost/detail/workaround.hpp>
 #include <boost/visit_each.hpp>
 #include <boost/core/enable_if.hpp>
@@ -38,7 +40,7 @@
 
 // Borland-specific bug, visit_each() silently fails to produce code
 
-#if defined(__BORLANDC__)
+#if defined(BOOST_BORLANDC)
 #  define BOOST_BIND_VISIT_EACH boost::visit_each
 #else
 #  define BOOST_BIND_VISIT_EACH visit_each
@@ -58,29 +60,6 @@ template<class T> class weak_ptr;
 
 namespace _bi // implementation details
 {
-
-// result_traits
-
-template<class R, class F> struct result_traits
-{
-    typedef R type;
-};
-
-#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) && !defined(BOOST_NO_FUNCTION_TEMPLATE_ORDERING)
-
-struct unspecified {};
-
-template<class F> struct result_traits<unspecified, F>
-{
-    typedef typename F::result_type type;
-};
-
-template<class F> struct result_traits< unspecified, reference_wrapper<F> >
-{
-    typedef typename F::result_type type;
-};
-
-#endif
 
 // ref_compare
 
@@ -865,7 +844,7 @@ public:
 
 // bind_t
 
-#if !defined( BOOST_NO_CXX11_RVALUE_REFERENCES )
+#if !defined(BOOST_NO_CXX11_RVALUE_REFERENCES) && !(defined(BOOST_GCC) && BOOST_GCC < 40600)
 
 template< class A1 > class rrlist1
 {
@@ -1422,7 +1401,7 @@ public:
 
     template<class V> void accept( V & v ) const
     {
-#if !defined( BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP ) && !defined( __BORLANDC__ )
+#if !defined( BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP ) && !defined( BOOST_BORLANDC )
         using boost::visit_each;
 #endif
 
@@ -1559,7 +1538,7 @@ namespace _bi
 
 #if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) || (__SUNPRO_CC >= 0x530)
 
-#if defined( __BORLANDC__ ) && BOOST_WORKAROUND( __BORLANDC__, BOOST_TESTED_AT(0x582) )
+#if defined( BOOST_BORLANDC ) && BOOST_WORKAROUND( BOOST_BORLANDC, BOOST_TESTED_AT(0x582) )
 
 template<class T> struct add_value
 {
@@ -1811,7 +1790,7 @@ BOOST_BIND_OPERATOR( >=, greater_equal )
 
 // visit_each, ADL
 
-#if !defined( BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP ) && !defined( __BORLANDC__ ) \
+#if !defined( BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP ) && !defined( BOOST_BORLANDC ) \
    && !(defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ <= 3)
 
 template<class V, class T> void visit_each( V & v, value<T> const & t, int )
@@ -1831,7 +1810,7 @@ template<class V, class R, class F, class L> void visit_each( V & v, bind_t<R, F
 
 // visit_each, no ADL
 
-#if defined( BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP ) || defined( __BORLANDC__ ) \
+#if defined( BOOST_NO_ARGUMENT_DEPENDENT_LOOKUP ) || defined( BOOST_BORLANDC ) \
   || (defined(__GNUC__) && __GNUC__ == 3 && __GNUC_MINOR__ <= 3)
 
 template<class V, class T> void visit_each( V & v, _bi::value<T> const & t, int )
@@ -2191,6 +2170,7 @@ template<class F, class A1, class A2, class A3, class A4, class A5, class A6, cl
 #   undef BOOST_BIND_MF_NOEXCEPT
 #   define BOOST_BIND_MF_NOEXCEPT noexcept
 #   include <boost/bind/bind_mf_cc.hpp>
+#   include <boost/bind/bind_mf2_cc.hpp>
 # endif
 
 #undef BOOST_BIND_MF_NAME
@@ -2245,7 +2225,7 @@ template<class F, class A1, class A2, class A3, class A4, class A5, class A6, cl
 // data member pointers
 
 #if defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION) || defined(BOOST_NO_FUNCTION_TEMPLATE_ORDERING) \
-    || ( defined(__BORLANDC__) && BOOST_WORKAROUND( __BORLANDC__, BOOST_TESTED_AT( 0x620 ) ) )
+    || ( defined(BOOST_BORLANDC) && BOOST_WORKAROUND( BOOST_BORLANDC, BOOST_TESTED_AT( 0x620 ) ) )
 
 template<class R, class T, class A1>
 _bi::bind_t< R, _mfi::dm<R, T>, typename _bi::list_av_1<A1>::type >
@@ -2363,3 +2343,7 @@ BOOST_BIND( M T::*f, A1 a1 )
 #endif
 
 #endif // #ifndef BOOST_BIND_BIND_HPP_INCLUDED
+
+/* bind.hpp
+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
+*/

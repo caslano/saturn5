@@ -15,16 +15,16 @@
 
 #ifdef __cplusplus
 
-#include <boost/config.hpp>
-#include <boost/static_assert.hpp>
+#include <boost/math/tools/is_standalone.hpp>
+#include <boost/math/tools/assert.hpp>
 
 namespace boost{ namespace math{ namespace tr1{ extern "C"{
 
-#else
-
-#define BOOST_PREVENT_MACRO_SUBSTITUTION /**/
-
 #endif // __cplusplus
+
+#ifndef BOOST_PREVENT_MACRO_SUBSTITUTION
+#define BOOST_PREVENT_MACRO_SUBSTITUTION /**/
+#endif
 
 // we need to import/export our code only if the user has specifically
 // asked for it by defining either BOOST_ALL_DYN_LINK if they want all boost
@@ -52,7 +52,10 @@ namespace boost{ namespace math{ namespace tr1{ extern "C"{
 
 //
 // Now set up the libraries to link against:
+// Not compatible with standalone mode
 //
+#ifndef BOOST_MATH_STANDALONE
+#include <boost/config.hpp>
 #if !defined(BOOST_MATH_TR1_NO_LIB) && !defined(BOOST_MATH_TR1_SOURCE) \
    && !defined(BOOST_ALL_NO_LIB) && defined(__cplusplus)
 #  define BOOST_LIB_NAME boost_math_c99
@@ -103,8 +106,13 @@ namespace boost{ namespace math{ namespace tr1{ extern "C"{
 #  endif
 #  include <boost/config/auto_link.hpp>
 #endif
+#else // Standalone mode
+#  if defined(_MSC_VER) && !defined(BOOST_ALL_NO_LIB)
+#    pragma message("Auto linking of TR1 is not supported in standalone mode")
+#  endif
+#endif // BOOST_MATH_STANDALONE
 
-#if !(defined(BOOST_INTEL) && defined(__APPLE__)) && !(defined(__FLT_EVAL_METHOD__) && !defined(__cplusplus))
+#if !(defined(__INTEL_COMPILER) && defined(__APPLE__)) && !(defined(__FLT_EVAL_METHOD__) && !defined(__cplusplus))
 #if !defined(FLT_EVAL_METHOD)
 typedef float float_t;
 typedef double double_t;
@@ -186,16 +194,11 @@ int BOOST_MATH_TR1_DECL boost_ilogbl BOOST_PREVENT_MACRO_SUBSTITUTION(long doubl
 double BOOST_MATH_TR1_DECL boost_lgamma BOOST_PREVENT_MACRO_SUBSTITUTION(double x) BOOST_MATH_C99_THROW_SPEC;
 float BOOST_MATH_TR1_DECL boost_lgammaf BOOST_PREVENT_MACRO_SUBSTITUTION(float x) BOOST_MATH_C99_THROW_SPEC;
 long double BOOST_MATH_TR1_DECL boost_lgammal BOOST_PREVENT_MACRO_SUBSTITUTION(long double x) BOOST_MATH_C99_THROW_SPEC;
-#ifdef BOOST_HAS_LONG_LONG
-#if 0
-::boost::long_long_type BOOST_MATH_TR1_DECL boost_llrint BOOST_PREVENT_MACRO_SUBSTITUTION(double x) BOOST_MATH_C99_THROW_SPEC;
-::boost::long_long_type BOOST_MATH_TR1_DECL boost_llrintf BOOST_PREVENT_MACRO_SUBSTITUTION(float x) BOOST_MATH_C99_THROW_SPEC;
-::boost::long_long_type BOOST_MATH_TR1_DECL boost_llrintl BOOST_PREVENT_MACRO_SUBSTITUTION(long double x) BOOST_MATH_C99_THROW_SPEC;
-#endif
-::boost::long_long_type BOOST_MATH_TR1_DECL boost_llround BOOST_PREVENT_MACRO_SUBSTITUTION(double x) BOOST_MATH_C99_THROW_SPEC;
-::boost::long_long_type BOOST_MATH_TR1_DECL boost_llroundf BOOST_PREVENT_MACRO_SUBSTITUTION(float x) BOOST_MATH_C99_THROW_SPEC;
-::boost::long_long_type BOOST_MATH_TR1_DECL boost_llroundl BOOST_PREVENT_MACRO_SUBSTITUTION(long double x) BOOST_MATH_C99_THROW_SPEC;
-#endif
+
+long long BOOST_MATH_TR1_DECL boost_llround BOOST_PREVENT_MACRO_SUBSTITUTION(double x) BOOST_MATH_C99_THROW_SPEC;
+long long BOOST_MATH_TR1_DECL boost_llroundf BOOST_PREVENT_MACRO_SUBSTITUTION(float x) BOOST_MATH_C99_THROW_SPEC;
+long long BOOST_MATH_TR1_DECL boost_llroundl BOOST_PREVENT_MACRO_SUBSTITUTION(long double x) BOOST_MATH_C99_THROW_SPEC;
+
 double BOOST_MATH_TR1_DECL boost_log1p BOOST_PREVENT_MACRO_SUBSTITUTION(double x) BOOST_MATH_C99_THROW_SPEC;
 float BOOST_MATH_TR1_DECL boost_log1pf BOOST_PREVENT_MACRO_SUBSTITUTION(float x) BOOST_MATH_C99_THROW_SPEC;
 long double BOOST_MATH_TR1_DECL boost_log1pl BOOST_PREVENT_MACRO_SUBSTITUTION(long double x) BOOST_MATH_C99_THROW_SPEC;
@@ -581,23 +584,23 @@ inline typename tools::promote_args<T>::type lgamma BOOST_PREVENT_MACRO_SUBSTITU
 
 #ifdef BOOST_HAS_LONG_LONG
 #if 0
-::boost::long_long_type llrint BOOST_PREVENT_MACRO_SUBSTITUTION(double x);
-::boost::long_long_type llrintf BOOST_PREVENT_MACRO_SUBSTITUTION(float x);
-::boost::long_long_type llrintl BOOST_PREVENT_MACRO_SUBSTITUTION(long double x);
+long long llrint BOOST_PREVENT_MACRO_SUBSTITUTION(double x);
+long long llrintf BOOST_PREVENT_MACRO_SUBSTITUTION(float x);
+long long llrintl BOOST_PREVENT_MACRO_SUBSTITUTION(long double x);
 #endif
 
-inline ::boost::long_long_type llroundf BOOST_PREVENT_MACRO_SUBSTITUTION(float x)
+inline long long llroundf BOOST_PREVENT_MACRO_SUBSTITUTION(float x)
 { return boost::math::tr1::boost_llroundf BOOST_PREVENT_MACRO_SUBSTITUTION(x); }
-inline ::boost::long_long_type llround BOOST_PREVENT_MACRO_SUBSTITUTION(double x)
+inline long long llround BOOST_PREVENT_MACRO_SUBSTITUTION(double x)
 { return boost::math::tr1::boost_llround BOOST_PREVENT_MACRO_SUBSTITUTION(x); }
-inline ::boost::long_long_type llroundl BOOST_PREVENT_MACRO_SUBSTITUTION(long double x)
+inline long long llroundl BOOST_PREVENT_MACRO_SUBSTITUTION(long double x)
 { return boost::math::tr1::boost_llroundl BOOST_PREVENT_MACRO_SUBSTITUTION(x); }
-inline ::boost::long_long_type llround BOOST_PREVENT_MACRO_SUBSTITUTION(float x)
+inline long long llround BOOST_PREVENT_MACRO_SUBSTITUTION(float x)
 { return boost::math::tr1::llroundf BOOST_PREVENT_MACRO_SUBSTITUTION(x); }
-inline ::boost::long_long_type llround BOOST_PREVENT_MACRO_SUBSTITUTION(long double x)
+inline long long llround BOOST_PREVENT_MACRO_SUBSTITUTION(long double x)
 { return boost::math::tr1::llroundl BOOST_PREVENT_MACRO_SUBSTITUTION(x); }
 template <class T>
-inline ::boost::long_long_type llround BOOST_PREVENT_MACRO_SUBSTITUTION(T x)
+inline long long llround BOOST_PREVENT_MACRO_SUBSTITUTION(T x)
 { return llround BOOST_PREVENT_MACRO_SUBSTITUTION(static_cast<double>(x)); }
 #endif
 
@@ -737,37 +740,37 @@ inline typename tools::promote_args<T>::type trunc BOOST_PREVENT_MACRO_SUBSTITUT
 # define NO_MACRO_EXPAND /**/
 // C99 macros defined as C++ templates
 template<class T> bool signbit NO_MACRO_EXPAND(T x)
-{ BOOST_STATIC_ASSERT(sizeof(T) == 0); return false; } // must not be instantiated
+{ static_assert(sizeof(T) == 0, "Undefined behavior; this template should never be instantiated"); return false; } // must not be instantiated
 template<> bool BOOST_MATH_TR1_DECL signbit<float> NO_MACRO_EXPAND(float x);
 template<> bool BOOST_MATH_TR1_DECL signbit<double> NO_MACRO_EXPAND(double x);
 template<> bool BOOST_MATH_TR1_DECL signbit<long double> NO_MACRO_EXPAND(long double x);
 
 template<class T> int fpclassify NO_MACRO_EXPAND(T x)
-{ BOOST_STATIC_ASSERT(sizeof(T) == 0); return false; } // must not be instantiated
+{ static_assert(sizeof(T) == 0, "Undefined behavior; this template should never be instantiated"); return false; } // must not be instantiated
 template<> int BOOST_MATH_TR1_DECL fpclassify<float> NO_MACRO_EXPAND(float x);
 template<> int BOOST_MATH_TR1_DECL fpclassify<double> NO_MACRO_EXPAND(double x);
 template<> int BOOST_MATH_TR1_DECL fpclassify<long double> NO_MACRO_EXPAND(long double x);
 
 template<class T> bool isfinite NO_MACRO_EXPAND(T x)
-{ BOOST_STATIC_ASSERT(sizeof(T) == 0); return false; } // must not be instantiated
+{ static_assert(sizeof(T) == 0, "Undefined behavior; this template should never be instantiated"); return false; } // must not be instantiated
 template<> bool BOOST_MATH_TR1_DECL isfinite<float> NO_MACRO_EXPAND(float x);
 template<> bool BOOST_MATH_TR1_DECL isfinite<double> NO_MACRO_EXPAND(double x);
 template<> bool BOOST_MATH_TR1_DECL isfinite<long double> NO_MACRO_EXPAND(long double x);
 
 template<class T> bool isinf NO_MACRO_EXPAND(T x)
-{ BOOST_STATIC_ASSERT(sizeof(T) == 0); return false; } // must not be instantiated
+{ static_assert(sizeof(T) == 0, "Undefined behavior; this template should never be instantiated"); return false; } // must not be instantiated
 template<> bool BOOST_MATH_TR1_DECL isinf<float> NO_MACRO_EXPAND(float x);
 template<> bool BOOST_MATH_TR1_DECL isinf<double> NO_MACRO_EXPAND(double x);
 template<> bool BOOST_MATH_TR1_DECL isinf<long double> NO_MACRO_EXPAND(long double x);
 
 template<class T> bool isnan NO_MACRO_EXPAND(T x)
-{ BOOST_STATIC_ASSERT(sizeof(T) == 0); return false; } // must not be instantiated
+{ static_assert(sizeof(T) == 0, "Undefined behavior; this template should never be instantiated"); return false; } // must not be instantiated
 template<> bool BOOST_MATH_TR1_DECL isnan<float> NO_MACRO_EXPAND(float x);
 template<> bool BOOST_MATH_TR1_DECL isnan<double> NO_MACRO_EXPAND(double x);
 template<> bool BOOST_MATH_TR1_DECL isnan<long double> NO_MACRO_EXPAND(long double x);
 
 template<class T> bool isnormal NO_MACRO_EXPAND(T x)
-{ BOOST_STATIC_ASSERT(sizeof(T) == 0); return false; } // must not be instantiated
+{ static_assert(sizeof(T) == 0, "Undefined behavior; this template should never be instantiated"); return false; } // must not be instantiated
 template<> bool BOOST_MATH_TR1_DECL isnormal<float> NO_MACRO_EXPAND(float x);
 template<> bool BOOST_MATH_TR1_DECL isnormal<double> NO_MACRO_EXPAND(double x);
 template<> bool BOOST_MATH_TR1_DECL isnormal<long double> NO_MACRO_EXPAND(long double x);
@@ -1116,3 +1119,7 @@ inline typename tools::promote_args<T>::type sph_neumann BOOST_PREVENT_MACRO_SUB
 
 #endif // BOOST_MATH_TR1_HPP
 
+
+/* tr1.hpp
+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
+*/

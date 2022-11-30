@@ -34,8 +34,17 @@
 #include <boost/regex/v4/primary_transform.hpp>
 #endif
 #ifndef BOOST_REGEX_OBJECT_CACHE_HPP
-#include <boost/regex/pending/object_cache.hpp>
+#include <boost/regex/v4/object_cache.hpp>
 #endif
+
+#define VC_EXTRALEAN
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+#if defined(_MSC_VER) && !defined(_WIN32_WCE) && !defined(UNDER_CE)
+#pragma comment(lib, "user32.lib")
+#endif
+
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -75,53 +84,35 @@ typedef ::boost::shared_ptr<void> cat_type; // placeholder for dll HANDLE.
 //
 // then add wrappers around the actual Win32 API's (ie implementation hiding):
 //
-BOOST_REGEX_DECL lcid_type BOOST_REGEX_CALL w32_get_default_locale();
-BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is_lower(char, lcid_type);
+lcid_type BOOST_REGEX_CALL w32_get_default_locale();
+bool BOOST_REGEX_CALL w32_is_lower(char, lcid_type);
 #ifndef BOOST_NO_WREGEX
-BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is_lower(wchar_t, lcid_type);
-#ifdef BOOST_REGEX_HAS_OTHER_WCHAR_T
-BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is_lower(unsigned short ca, lcid_type state_id);
+bool BOOST_REGEX_CALL w32_is_lower(wchar_t, lcid_type);
 #endif
-#endif
-BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is_upper(char, lcid_type);
+bool BOOST_REGEX_CALL w32_is_upper(char, lcid_type);
 #ifndef BOOST_NO_WREGEX
-BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is_upper(wchar_t, lcid_type);
-#ifdef BOOST_REGEX_HAS_OTHER_WCHAR_T
-BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is_upper(unsigned short ca, lcid_type state_id);
+bool BOOST_REGEX_CALL w32_is_upper(wchar_t, lcid_type);
 #endif
-#endif
-BOOST_REGEX_DECL cat_type BOOST_REGEX_CALL w32_cat_open(const std::string& name);
-BOOST_REGEX_DECL std::string BOOST_REGEX_CALL w32_cat_get(const cat_type& cat, lcid_type state_id, int i, const std::string& def);
+cat_type BOOST_REGEX_CALL w32_cat_open(const std::string& name);
+std::string BOOST_REGEX_CALL w32_cat_get(const cat_type& cat, lcid_type state_id, int i, const std::string& def);
 #ifndef BOOST_NO_WREGEX
-BOOST_REGEX_DECL std::wstring BOOST_REGEX_CALL w32_cat_get(const cat_type& cat, lcid_type state_id, int i, const std::wstring& def);
-#ifdef BOOST_REGEX_HAS_OTHER_WCHAR_T
-BOOST_REGEX_DECL std::basic_string<unsigned short> BOOST_REGEX_CALL w32_cat_get(const cat_type& cat, lcid_type, int i, const std::basic_string<unsigned short>& def);
+std::wstring BOOST_REGEX_CALL w32_cat_get(const cat_type& cat, lcid_type state_id, int i, const std::wstring& def);
 #endif
-#endif
-BOOST_REGEX_DECL std::string BOOST_REGEX_CALL w32_transform(lcid_type state_id, const char* p1, const char* p2);
+std::string BOOST_REGEX_CALL w32_transform(lcid_type state_id, const char* p1, const char* p2);
 #ifndef BOOST_NO_WREGEX
-BOOST_REGEX_DECL std::wstring BOOST_REGEX_CALL w32_transform(lcid_type state_id, const wchar_t* p1, const wchar_t* p2);
-#ifdef BOOST_REGEX_HAS_OTHER_WCHAR_T
-BOOST_REGEX_DECL std::basic_string<unsigned short> BOOST_REGEX_CALL w32_transform(lcid_type state_id, const unsigned short* p1, const unsigned short* p2);
+std::wstring BOOST_REGEX_CALL w32_transform(lcid_type state_id, const wchar_t* p1, const wchar_t* p2);
 #endif
-#endif
-BOOST_REGEX_DECL char BOOST_REGEX_CALL w32_tolower(char c, lcid_type);
+char BOOST_REGEX_CALL w32_tolower(char c, lcid_type);
 #ifndef BOOST_NO_WREGEX
-BOOST_REGEX_DECL wchar_t BOOST_REGEX_CALL w32_tolower(wchar_t c, lcid_type);
-#ifdef BOOST_REGEX_HAS_OTHER_WCHAR_T
-BOOST_REGEX_DECL unsigned short BOOST_REGEX_CALL w32_tolower(unsigned short c, lcid_type state_id);
+wchar_t BOOST_REGEX_CALL w32_tolower(wchar_t c, lcid_type);
 #endif
-#endif
-BOOST_REGEX_DECL char BOOST_REGEX_CALL w32_toupper(char c, lcid_type);
+char BOOST_REGEX_CALL w32_toupper(char c, lcid_type);
 #ifndef BOOST_NO_WREGEX
-BOOST_REGEX_DECL wchar_t BOOST_REGEX_CALL w32_toupper(wchar_t c, lcid_type);
+wchar_t BOOST_REGEX_CALL w32_toupper(wchar_t c, lcid_type);
 #endif
-BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is(lcid_type, boost::uint32_t mask, char c);
+bool BOOST_REGEX_CALL w32_is(lcid_type, boost::uint32_t mask, char c);
 #ifndef BOOST_NO_WREGEX
-BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is(lcid_type, boost::uint32_t mask, wchar_t c);
-#ifdef BOOST_REGEX_HAS_OTHER_WCHAR_T
-BOOST_REGEX_DECL bool BOOST_REGEX_CALL w32_is(lcid_type state_id, boost::uint32_t m, unsigned short c);
-#endif
+bool BOOST_REGEX_CALL w32_is(lcid_type, boost::uint32_t mask, wchar_t c);
 #endif
 //
 // class w32_regex_traits_base:
@@ -253,14 +244,14 @@ typename w32_regex_traits_char_layer<charT>::string_type
 // specialised version for narrow characters:
 //
 template <>
-class BOOST_REGEX_DECL w32_regex_traits_char_layer<char> : public w32_regex_traits_base<char>
+class w32_regex_traits_char_layer<char> : public w32_regex_traits_base<char>
 {
    typedef std::string string_type;
 public:
    w32_regex_traits_char_layer(::boost::BOOST_REGEX_DETAIL_NS::lcid_type l)
    : w32_regex_traits_base<char>(l)
    {
-      init();
+      init<char>();
    }
 
    regex_constants::syntax_type syntax_type(char c)const
@@ -284,6 +275,7 @@ private:
    regex_constants::syntax_type m_char_map[1u << CHAR_BIT];
    char m_lower_map[1u << CHAR_BIT];
    boost::uint16_t m_type_map[1u << CHAR_BIT];
+   template <class U>
    void init();
 };
 
@@ -403,7 +395,7 @@ typename w32_regex_traits_implementation<charT>::string_type
          return pos->second;
    }
 #if !defined(BOOST_NO_TEMPLATED_ITERATOR_CONSTRUCTORS)\
-               && !BOOST_WORKAROUND(__BORLANDC__, <= 0x0551)
+               && !BOOST_WORKAROUND(BOOST_BORLANDC, <= 0x0551)
    std::string name(p1, p2);
 #else
    std::string name;
@@ -413,7 +405,7 @@ typename w32_regex_traits_implementation<charT>::string_type
 #endif
    name = lookup_default_collate_name(name);
 #if !defined(BOOST_NO_TEMPLATED_ITERATOR_CONSTRUCTORS)\
-               && !BOOST_WORKAROUND(__BORLANDC__, <= 0x0551)
+               && !BOOST_WORKAROUND(BOOST_BORLANDC, <= 0x0551)
    if(name.size())
       return string_type(name.begin(), name.end());
 #else
@@ -546,7 +538,7 @@ typename w32_regex_traits_implementation<charT>::char_class_type
       if(pos != m_custom_class_names.end())
          return pos->second;
    }
-   std::size_t state_id = 1 + BOOST_REGEX_DETAIL_NS::get_default_class_id(p1, p2);
+   std::size_t state_id = 1u + (std::size_t)BOOST_REGEX_DETAIL_NS::get_default_class_id(p1, p2);
    if(state_id < sizeof(masks) / sizeof(masks[0]))
       return masks[state_id];
    return masks[0];
@@ -722,6 +714,498 @@ static_mutex& w32_regex_traits<charT>::get_mutex_inst()
 }
 #endif
 
+namespace BOOST_REGEX_DETAIL_NS {
+
+#ifdef BOOST_NO_ANSI_APIS
+   inline UINT get_code_page_for_locale_id(lcid_type idx)
+   {
+      WCHAR code_page_string[7];
+      if (::GetLocaleInfoW(idx, LOCALE_IDEFAULTANSICODEPAGE, code_page_string, 7) == 0)
+         return 0;
+
+      return static_cast<UINT>(_wtol(code_page_string));
+}
+#endif
+
+   template <class U>
+   inline void w32_regex_traits_char_layer<char>::init()
+   {
+      // we need to start by initialising our syntax map so we know which
+      // character is used for which purpose:
+      std::memset(m_char_map, 0, sizeof(m_char_map));
+      cat_type cat;
+      std::string cat_name(w32_regex_traits<char>::get_catalog_name());
+      if (cat_name.size())
+      {
+         cat = ::boost::BOOST_REGEX_DETAIL_NS::w32_cat_open(cat_name);
+         if (!cat)
+         {
+            std::string m("Unable to open message catalog: ");
+            std::runtime_error err(m + cat_name);
+            ::boost::BOOST_REGEX_DETAIL_NS::raise_runtime_error(err);
+         }
+      }
+      //
+      // if we have a valid catalog then load our messages:
+      //
+      if (cat)
+      {
+         for (regex_constants::syntax_type i = 1; i < regex_constants::syntax_max; ++i)
+         {
+            string_type mss = ::boost::BOOST_REGEX_DETAIL_NS::w32_cat_get(cat, this->m_locale, i, get_default_syntax(i));
+            for (string_type::size_type j = 0; j < mss.size(); ++j)
+            {
+               m_char_map[static_cast<unsigned char>(mss[j])] = i;
+            }
+         }
+      }
+      else
+      {
+         for (regex_constants::syntax_type i = 1; i < regex_constants::syntax_max; ++i)
+         {
+            const char* ptr = get_default_syntax(i);
+            while (ptr && *ptr)
+            {
+               m_char_map[static_cast<unsigned char>(*ptr)] = i;
+               ++ptr;
+            }
+         }
+      }
+      //
+      // finish off by calculating our escape types:
+      //
+      unsigned char i = 'A';
+      do
+      {
+         if (m_char_map[i] == 0)
+         {
+            if (::boost::BOOST_REGEX_DETAIL_NS::w32_is(this->m_locale, 0x0002u, (char)i))
+               m_char_map[i] = regex_constants::escape_type_class;
+            else if (::boost::BOOST_REGEX_DETAIL_NS::w32_is(this->m_locale, 0x0001u, (char)i))
+               m_char_map[i] = regex_constants::escape_type_not_class;
+         }
+      } while (0xFF != i++);
+
+      //
+      // fill in lower case map:
+      //
+      char char_map[1 << CHAR_BIT];
+      for (int ii = 0; ii < (1 << CHAR_BIT); ++ii)
+         char_map[ii] = static_cast<char>(ii);
+#ifndef BOOST_NO_ANSI_APIS
+      int r = ::LCMapStringA(this->m_locale, LCMAP_LOWERCASE, char_map, 1 << CHAR_BIT, this->m_lower_map, 1 << CHAR_BIT);
+      BOOST_REGEX_ASSERT(r != 0);
+#else
+      UINT code_page = get_code_page_for_locale_id(this->m_locale);
+      BOOST_REGEX_ASSERT(code_page != 0);
+
+      WCHAR wide_char_map[1 << CHAR_BIT];
+      int conv_r = ::MultiByteToWideChar(code_page, 0, char_map, 1 << CHAR_BIT, wide_char_map, 1 << CHAR_BIT);
+      BOOST_REGEX_ASSERT(conv_r != 0);
+
+      WCHAR wide_lower_map[1 << CHAR_BIT];
+      int r = ::LCMapStringW(this->m_locale, LCMAP_LOWERCASE, wide_char_map, 1 << CHAR_BIT, wide_lower_map, 1 << CHAR_BIT);
+      BOOST_REGEX_ASSERT(r != 0);
+
+      conv_r = ::WideCharToMultiByte(code_page, 0, wide_lower_map, r, this->m_lower_map, 1 << CHAR_BIT, NULL, NULL);
+      BOOST_REGEX_ASSERT(conv_r != 0);
+#endif
+      if (r < (1 << CHAR_BIT))
+      {
+         // if we have multibyte characters then not all may have been given
+         // a lower case mapping:
+         for (int jj = r; jj < (1 << CHAR_BIT); ++jj)
+            this->m_lower_map[jj] = static_cast<char>(jj);
+      }
+
+#ifndef BOOST_NO_ANSI_APIS
+      r = ::GetStringTypeExA(this->m_locale, CT_CTYPE1, char_map, 1 << CHAR_BIT, this->m_type_map);
+#else
+      r = ::GetStringTypeExW(this->m_locale, CT_CTYPE1, wide_char_map, 1 << CHAR_BIT, this->m_type_map);
+#endif
+      BOOST_REGEX_ASSERT(0 != r);
+   }
+
+   inline lcid_type BOOST_REGEX_CALL w32_get_default_locale()
+   {
+      return ::GetUserDefaultLCID();
+   }
+
+   inline bool BOOST_REGEX_CALL w32_is_lower(char c, lcid_type idx)
+   {
+#ifndef BOOST_NO_ANSI_APIS
+      WORD mask;
+      if (::GetStringTypeExA(idx, CT_CTYPE1, &c, 1, &mask) && (mask & C1_LOWER))
+         return true;
+      return false;
+#else
+      UINT code_page = get_code_page_for_locale_id(idx);
+      if (code_page == 0)
+         return false;
+
+      WCHAR wide_c;
+      if (::MultiByteToWideChar(code_page, 0, &c, 1, &wide_c, 1) == 0)
+         return false;
+
+      WORD mask;
+      if (::GetStringTypeExW(idx, CT_CTYPE1, &wide_c, 1, &mask) && (mask & C1_LOWER))
+         return true;
+      return false;
+#endif
+   }
+
+   inline bool BOOST_REGEX_CALL w32_is_lower(wchar_t c, lcid_type idx)
+   {
+      WORD mask;
+      if (::GetStringTypeExW(idx, CT_CTYPE1, &c, 1, &mask) && (mask & C1_LOWER))
+         return true;
+      return false;
+   }
+
+   inline bool BOOST_REGEX_CALL w32_is_upper(char c, lcid_type idx)
+   {
+#ifndef BOOST_NO_ANSI_APIS
+      WORD mask;
+      if (::GetStringTypeExA(idx, CT_CTYPE1, &c, 1, &mask) && (mask & C1_UPPER))
+         return true;
+      return false;
+#else
+      UINT code_page = get_code_page_for_locale_id(idx);
+      if (code_page == 0)
+         return false;
+
+      WCHAR wide_c;
+      if (::MultiByteToWideChar(code_page, 0, &c, 1, &wide_c, 1) == 0)
+         return false;
+
+      WORD mask;
+      if (::GetStringTypeExW(idx, CT_CTYPE1, &wide_c, 1, &mask) && (mask & C1_UPPER))
+         return true;
+      return false;
+#endif
+   }
+
+   inline bool BOOST_REGEX_CALL w32_is_upper(wchar_t c, lcid_type idx)
+   {
+      WORD mask;
+      if (::GetStringTypeExW(idx, CT_CTYPE1, &c, 1, &mask) && (mask & C1_UPPER))
+         return true;
+      return false;
+   }
+
+   inline void free_module(void* mod)
+   {
+      ::FreeLibrary(static_cast<HMODULE>(mod));
+   }
+
+   inline cat_type BOOST_REGEX_CALL w32_cat_open(const std::string& name)
+   {
+#ifndef BOOST_NO_ANSI_APIS
+      cat_type result(::LoadLibraryA(name.c_str()), &free_module);
+      return result;
+#else
+      LPWSTR wide_name = (LPWSTR)_alloca((name.size() + 1) * sizeof(WCHAR));
+      if (::MultiByteToWideChar(CP_ACP, 0, name.c_str(), name.size(), wide_name, name.size() + 1) == 0)
+         return cat_type();
+
+      cat_type result(::LoadLibraryW(wide_name), &free_module);
+      return result;
+#endif
+   }
+
+   inline std::string BOOST_REGEX_CALL w32_cat_get(const cat_type& cat, lcid_type, int i, const std::string& def)
+   {
+#ifndef BOOST_NO_ANSI_APIS
+      char buf[256];
+      if (0 == ::LoadStringA(
+         static_cast<HMODULE>(cat.get()),
+         i,
+         buf,
+         256
+      ))
+      {
+         return def;
+      }
+#else
+      WCHAR wbuf[256];
+      int r = ::LoadStringW(
+         static_cast<HMODULE>(cat.get()),
+         i,
+         wbuf,
+         256
+      );
+      if (r == 0)
+         return def;
+
+
+      int buf_size = 1 + ::WideCharToMultiByte(CP_ACP, 0, wbuf, r, NULL, 0, NULL, NULL);
+      LPSTR buf = (LPSTR)_alloca(buf_size);
+      if (::WideCharToMultiByte(CP_ACP, 0, wbuf, r, buf, buf_size, NULL, NULL) == 0)
+         return def; // failed conversion.
+#endif
+      return std::string(buf);
+   }
+
+#ifndef BOOST_NO_WREGEX
+   inline std::wstring BOOST_REGEX_CALL w32_cat_get(const cat_type& cat, lcid_type, int i, const std::wstring& def)
+   {
+      wchar_t buf[256];
+      if (0 == ::LoadStringW(
+         static_cast<HMODULE>(cat.get()),
+         i,
+         buf,
+         256
+      ))
+      {
+         return def;
+      }
+      return std::wstring(buf);
+   }
+#endif
+   inline std::string BOOST_REGEX_CALL w32_transform(lcid_type idx, const char* p1, const char* p2)
+   {
+#ifndef BOOST_NO_ANSI_APIS
+      int bytes = ::LCMapStringA(
+         idx,       // locale identifier
+         LCMAP_SORTKEY,  // mapping transformation type
+         p1,  // source string
+         static_cast<int>(p2 - p1),        // number of characters in source string
+         0,  // destination buffer
+         0        // size of destination buffer
+      );
+      if (!bytes)
+         return std::string(p1, p2);
+      std::string result(++bytes, '\0');
+      bytes = ::LCMapStringA(
+         idx,       // locale identifier
+         LCMAP_SORTKEY,  // mapping transformation type
+         p1,  // source string
+         static_cast<int>(p2 - p1),        // number of characters in source string
+         &*result.begin(),  // destination buffer
+         bytes        // size of destination buffer
+      );
+#else
+      UINT code_page = get_code_page_for_locale_id(idx);
+      if (code_page == 0)
+         return std::string(p1, p2);
+
+      int src_len = static_cast<int>(p2 - p1);
+      LPWSTR wide_p1 = (LPWSTR)_alloca((src_len + 1) * 2);
+      if (::MultiByteToWideChar(code_page, 0, p1, src_len, wide_p1, src_len + 1) == 0)
+         return std::string(p1, p2);
+
+      int bytes = ::LCMapStringW(
+         idx,       // locale identifier
+         LCMAP_SORTKEY,  // mapping transformation type
+         wide_p1,  // source string
+         src_len,        // number of characters in source string
+         0,  // destination buffer
+         0        // size of destination buffer
+      );
+      if (!bytes)
+         return std::string(p1, p2);
+      std::string result(++bytes, '\0');
+      bytes = ::LCMapStringW(
+         idx,       // locale identifier
+         LCMAP_SORTKEY,  // mapping transformation type
+         wide_p1,  // source string
+         src_len,        // number of characters in source string
+         (LPWSTR) & *result.begin(),  // destination buffer
+         bytes        // size of destination buffer
+      );
+#endif
+      if (bytes > static_cast<int>(result.size()))
+         return std::string(p1, p2);
+      while (result.size() && result[result.size() - 1] == '\0')
+      {
+         result.erase(result.size() - 1);
+      }
+      return result;
+   }
+
+#ifndef BOOST_NO_WREGEX
+   inline std::wstring BOOST_REGEX_CALL w32_transform(lcid_type idx, const wchar_t* p1, const wchar_t* p2)
+   {
+      int bytes = ::LCMapStringW(
+         idx,       // locale identifier
+         LCMAP_SORTKEY,  // mapping transformation type
+         p1,  // source string
+         static_cast<int>(p2 - p1),        // number of characters in source string
+         0,  // destination buffer
+         0        // size of destination buffer
+      );
+      if (!bytes)
+         return std::wstring(p1, p2);
+      std::string result(++bytes, '\0');
+      bytes = ::LCMapStringW(
+         idx,       // locale identifier
+         LCMAP_SORTKEY,  // mapping transformation type
+         p1,  // source string
+         static_cast<int>(p2 - p1),        // number of characters in source string
+         reinterpret_cast<wchar_t*>(&*result.begin()),  // destination buffer *of bytes*
+         bytes        // size of destination buffer
+      );
+      if (bytes > static_cast<int>(result.size()))
+         return std::wstring(p1, p2);
+      while (result.size() && result[result.size() - 1] == L'\0')
+      {
+         result.erase(result.size() - 1);
+      }
+      std::wstring r2;
+      for (std::string::size_type i = 0; i < result.size(); ++i)
+         r2.append(1, static_cast<wchar_t>(static_cast<unsigned char>(result[i])));
+      return r2;
+   }
+#endif
+   inline char BOOST_REGEX_CALL w32_tolower(char c, lcid_type idx)
+   {
+      char result[2];
+#ifndef BOOST_NO_ANSI_APIS
+      int b = ::LCMapStringA(
+         idx,       // locale identifier
+         LCMAP_LOWERCASE,  // mapping transformation type
+         &c,  // source string
+         1,        // number of characters in source string
+         result,  // destination buffer
+         1);        // size of destination buffer
+      if (b == 0)
+         return c;
+#else
+      UINT code_page = get_code_page_for_locale_id(idx);
+      if (code_page == 0)
+         return c;
+
+      WCHAR wide_c;
+      if (::MultiByteToWideChar(code_page, 0, &c, 1, &wide_c, 1) == 0)
+         return c;
+
+      WCHAR wide_result;
+      int b = ::LCMapStringW(
+         idx,       // locale identifier
+         LCMAP_LOWERCASE,  // mapping transformation type
+         &wide_c,  // source string
+         1,        // number of characters in source string
+         &wide_result,  // destination buffer
+         1);        // size of destination buffer
+      if (b == 0)
+         return c;
+
+      if (::WideCharToMultiByte(code_page, 0, &wide_result, 1, result, 2, NULL, NULL) == 0)
+         return c;  // No single byte lower case equivalent available
+#endif
+      return result[0];
+   }
+
+#ifndef BOOST_NO_WREGEX
+   inline wchar_t BOOST_REGEX_CALL w32_tolower(wchar_t c, lcid_type idx)
+   {
+      wchar_t result[2];
+      int b = ::LCMapStringW(
+         idx,       // locale identifier
+         LCMAP_LOWERCASE,  // mapping transformation type
+         &c,  // source string
+         1,        // number of characters in source string
+         result,  // destination buffer
+         1);        // size of destination buffer
+      if (b == 0)
+         return c;
+      return result[0];
+   }
+#endif
+   inline char BOOST_REGEX_CALL w32_toupper(char c, lcid_type idx)
+   {
+      char result[2];
+#ifndef BOOST_NO_ANSI_APIS
+      int b = ::LCMapStringA(
+         idx,       // locale identifier
+         LCMAP_UPPERCASE,  // mapping transformation type
+         &c,  // source string
+         1,        // number of characters in source string
+         result,  // destination buffer
+         1);        // size of destination buffer
+      if (b == 0)
+         return c;
+#else
+      UINT code_page = get_code_page_for_locale_id(idx);
+      if (code_page == 0)
+         return c;
+
+      WCHAR wide_c;
+      if (::MultiByteToWideChar(code_page, 0, &c, 1, &wide_c, 1) == 0)
+         return c;
+
+      WCHAR wide_result;
+      int b = ::LCMapStringW(
+         idx,       // locale identifier
+         LCMAP_UPPERCASE,  // mapping transformation type
+         &wide_c,  // source string
+         1,        // number of characters in source string
+         &wide_result,  // destination buffer
+         1);        // size of destination buffer
+      if (b == 0)
+         return c;
+
+      if (::WideCharToMultiByte(code_page, 0, &wide_result, 1, result, 2, NULL, NULL) == 0)
+         return c;  // No single byte upper case equivalent available.
+#endif
+      return result[0];
+   }
+
+#ifndef BOOST_NO_WREGEX
+   inline wchar_t BOOST_REGEX_CALL w32_toupper(wchar_t c, lcid_type idx)
+   {
+      wchar_t result[2];
+      int b = ::LCMapStringW(
+         idx,       // locale identifier
+         LCMAP_UPPERCASE,  // mapping transformation type
+         &c,  // source string
+         1,        // number of characters in source string
+         result,  // destination buffer
+         1);        // size of destination buffer
+      if (b == 0)
+         return c;
+      return result[0];
+   }
+#endif
+   inline bool BOOST_REGEX_CALL w32_is(lcid_type idx, boost::uint32_t m, char c)
+   {
+      WORD mask;
+#ifndef BOOST_NO_ANSI_APIS
+      if (::GetStringTypeExA(idx, CT_CTYPE1, &c, 1, &mask) && (mask & m & w32_regex_traits_implementation<char>::mask_base))
+         return true;
+#else
+      UINT code_page = get_code_page_for_locale_id(idx);
+      if (code_page == 0)
+         return false;
+
+      WCHAR wide_c;
+      if (::MultiByteToWideChar(code_page, 0, &c, 1, &wide_c, 1) == 0)
+         return false;
+
+      if (::GetStringTypeExW(idx, CT_CTYPE1, &wide_c, 1, &mask) && (mask & m & w32_regex_traits_implementation<char>::mask_base))
+         return true;
+#endif
+      if ((m & w32_regex_traits_implementation<char>::mask_word) && (c == '_'))
+         return true;
+      return false;
+   }
+
+#ifndef BOOST_NO_WREGEX
+   inline bool BOOST_REGEX_CALL w32_is(lcid_type idx, boost::uint32_t m, wchar_t c)
+   {
+      WORD mask;
+      if (::GetStringTypeExW(idx, CT_CTYPE1, &c, 1, &mask) && (mask & m & w32_regex_traits_implementation<wchar_t>::mask_base))
+         return true;
+      if ((m & w32_regex_traits_implementation<wchar_t>::mask_word) && (c == '_'))
+         return true;
+      if ((m & w32_regex_traits_implementation<wchar_t>::mask_unicode) && (c > 0xff))
+         return true;
+      return false;
+   }
+#endif
+
+} // BOOST_REGEX_DETAIL_NS
+
 
 } // boost
 
@@ -743,3 +1227,7 @@ static_mutex& w32_regex_traits<charT>::get_mutex_inst()
 #endif // BOOST_REGEX_NO_WIN32_LOCALE
 
 #endif
+
+/* w32_regex_traits.hpp
+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
+*/

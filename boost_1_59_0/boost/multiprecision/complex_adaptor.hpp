@@ -7,10 +7,10 @@
 #define BOOST_MULTIPRECISION_COMPLEX_ADAPTOR_HPP
 
 #include <boost/multiprecision/number.hpp>
-#include <boost/cstdint.hpp>
+#include <cstdint>
 #include <boost/multiprecision/detail/digits.hpp>
-#include <boost/functional/hash_fwd.hpp>
-#include <boost/type_traits/is_complex.hpp>
+#include <boost/multiprecision/detail/hash.hpp>
+#include <boost/multiprecision/detail/no_exceptions_support.hpp>
 #include <cmath>
 #include <algorithm>
 #include <complex>
@@ -18,6 +18,12 @@
 namespace boost {
 namespace multiprecision {
 namespace backends {
+
+template <class Backend>
+struct debug_adaptor;
+
+template <class Backend>
+struct logged_adaptor;
 
 template <class Backend>
 struct complex_adaptor
@@ -43,19 +49,23 @@ struct complex_adaptor
       return m_imag;
    }
 
-   typedef typename Backend::signed_types   signed_types;
-   typedef typename Backend::unsigned_types unsigned_types;
-   typedef typename Backend::float_types    float_types;
-   typedef typename Backend::exponent_type  exponent_type;
+   using signed_types = typename Backend::signed_types  ;
+   using unsigned_types = typename Backend::unsigned_types;
+   using float_types = typename Backend::float_types   ;
+   using exponent_type = typename Backend::exponent_type ;
 
    complex_adaptor() {}
    complex_adaptor(const complex_adaptor& o) : m_real(o.real_data()), m_imag(o.imag_data()) {}
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
+   // Rvalue construct:
    complex_adaptor(complex_adaptor&& o) : m_real(std::move(o.real_data())), m_imag(std::move(o.imag_data()))
    {}
-#endif
    complex_adaptor(const Backend& val)
        : m_real(val)
+   {}
+
+   template <class T>
+   complex_adaptor(const T& val, const typename std::enable_if<std::is_convertible<T, Backend>::value>::type* = nullptr)
+       : m_real(val) 
    {}
 
    complex_adaptor(const std::complex<float>& val)
@@ -73,6 +83,18 @@ struct complex_adaptor
       m_real = val.real();
       m_imag = val.imag();
    }
+   template <class T, class U>
+   complex_adaptor(const T& a, const U& b, typename std::enable_if<std::is_constructible<Backend, T const&>::value&& std::is_constructible<Backend, U const&>::value>::type const* = nullptr)
+      : m_real(a), m_imag(b) {}
+   template <class T, class U>
+   complex_adaptor(T&& a, const U& b, typename std::enable_if<std::is_constructible<Backend, T>::value&& std::is_constructible<Backend, U>::value>::type const* = nullptr)
+      : m_real(static_cast<T&&>(a)), m_imag(b) {}
+   template <class T, class U>
+   complex_adaptor(T&& a, U&& b, typename std::enable_if<std::is_constructible<Backend, T>::value&& std::is_constructible<Backend, U>::value>::type const* = nullptr)
+      : m_real(static_cast<T&&>(a)), m_imag(static_cast<U&&>(b)) {}
+   template <class T, class U>
+   complex_adaptor(const T& a, U&& b, typename std::enable_if<std::is_constructible<Backend, T>::value&& std::is_constructible<Backend, U>::value>::type const* = nullptr)
+      : m_real(a), m_imag(static_cast<U&&>(b)) {}
 
    complex_adaptor& operator=(const complex_adaptor& o)
    {
@@ -80,18 +102,17 @@ struct complex_adaptor
       m_imag = o.imag_data();
       return *this;
    }
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
-   complex_adaptor& operator=(complex_adaptor&& o) BOOST_NOEXCEPT
+   // rvalue assign:
+   complex_adaptor& operator=(complex_adaptor&& o) noexcept
    {
       m_real = std::move(o.real_data());
       m_imag = std::move(o.imag_data());
       return *this;
    }
-#endif
    template <class V>
-   complex_adaptor& operator=(const V& v)
+   typename std::enable_if<std::is_assignable<Backend, V>::value, complex_adaptor&>::type operator=(const V& v)
    {
-      typedef typename mpl::front<unsigned_types>::type ui_type;
+      using ui_type = typename std::tuple_element<0, unsigned_types>::type;
       m_real = v;
       m_imag = ui_type(0u);
       return *this;
@@ -105,7 +126,7 @@ struct complex_adaptor
    }
    complex_adaptor& operator=(const char* s)
    {
-      typedef typename mpl::front<unsigned_types>::type ui_type;
+      using ui_type = typename std::tuple_element<0, unsigned_types>::type;
       ui_type                                           zero = 0u;
 
       using default_ops::eval_fpclassify;
@@ -136,7 +157,7 @@ struct complex_adaptor
          else
             imag_data() = zero;
 
-         if (eval_fpclassify(imag_data()) == (int)FP_NAN)
+         if (eval_fpclassify(imag_data()) == static_cast<int>(FP_NAN))
          {
             real_data() = imag_data();
          }
@@ -180,7 +201,7 @@ struct complex_adaptor
 };
 
 template <class Backend, class T>
-inline typename enable_if<is_arithmetic<T>, bool>::type eval_eq(const complex_adaptor<Backend>& a, const T& b) BOOST_NOEXCEPT
+inline typename std::enable_if<boost::multiprecision::detail::is_arithmetic<T>::value, bool>::type eval_eq(const complex_adaptor<Backend>& a, const T& b) noexcept
 {
    return a.compare(b) == 0;
 }
@@ -207,8 +228,8 @@ inline void eval_multiply(complex_adaptor<Backend>& result, const complex_adapto
    eval_multiply(t1, result.real_data(), o.imag_data());
    eval_multiply(t2, result.imag_data(), o.real_data());
    eval_add(t1, t2);
-   result.real_data() = BOOST_MP_MOVE(t3);
-   result.imag_data() = BOOST_MP_MOVE(t1);
+   result.real_data() = std::move(t3);
+   result.imag_data() = std::move(t1);
 }
 template <class Backend>
 inline void eval_divide(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& z)
@@ -222,71 +243,106 @@ inline void eval_divide(complex_adaptor<Backend>& result, const complex_adaptor<
    using default_ops::eval_subtract;
    Backend t1, t2;
 
+   //
+   // Backup sign bits for later, so we can fix up
+   // signed zeros at the end:
+   //
+   int a_sign = eval_signbit(result.real_data());
+   int b_sign = eval_signbit(result.imag_data());
+   int c_sign = eval_signbit(z.real_data());
+   int d_sign = eval_signbit(z.imag_data());
+
    if (eval_is_zero(z.imag_data()))
    {
       eval_divide(result.real_data(), z.real_data());
       eval_divide(result.imag_data(), z.real_data());
-      return;
-   }
-
-   eval_fabs(t1, z.real_data());
-   eval_fabs(t2, z.imag_data());
-   if (t1.compare(t2) < 0)
-   {
-      eval_divide(t1, z.real_data(), z.imag_data()); // t1 = c/d
-      eval_multiply(t2, z.real_data(), t1);
-      eval_add(t2, z.imag_data()); // denom = c * (c/d) + d
-      Backend t_real(result.real_data());
-      // real = (a * (c/d) + b) / (denom)
-      eval_multiply(result.real_data(), t1);
-      eval_add(result.real_data(), result.imag_data());
-      eval_divide(result.real_data(), t2);
-      // imag = (b * c/d - a) / denom
-      eval_multiply(result.imag_data(), t1);
-      eval_subtract(result.imag_data(), t_real);
-      eval_divide(result.imag_data(), t2);
    }
    else
    {
-      eval_divide(t1, z.imag_data(), z.real_data()); // t1 = d/c
-      eval_multiply(t2, z.imag_data(), t1);
-      eval_add(t2, z.real_data()); // denom = d * d/c + c
+      eval_fabs(t1, z.real_data());
+      eval_fabs(t2, z.imag_data());
+      if (t1.compare(t2) < 0)
+      {
+         eval_divide(t1, z.real_data(), z.imag_data()); // t1 = c/d
+         eval_multiply(t2, z.real_data(), t1);
+         eval_add(t2, z.imag_data()); // denom = c * (c/d) + d
+         Backend t_real(result.real_data());
+         // real = (a * (c/d) + b) / (denom)
+         eval_multiply(result.real_data(), t1);
+         eval_add(result.real_data(), result.imag_data());
+         eval_divide(result.real_data(), t2);
+         // imag = (b * c/d - a) / denom
+         eval_multiply(result.imag_data(), t1);
+         eval_subtract(result.imag_data(), t_real);
+         eval_divide(result.imag_data(), t2);
+      }
+      else
+      {
+         eval_divide(t1, z.imag_data(), z.real_data()); // t1 = d/c
+         eval_multiply(t2, z.imag_data(), t1);
+         eval_add(t2, z.real_data()); // denom = d * d/c + c
 
-      Backend r_t(result.real_data());
-      Backend i_t(result.imag_data());
+         Backend r_t(result.real_data());
+         Backend i_t(result.imag_data());
 
-      // real = (b * d/c + a) / denom
-      eval_multiply(result.real_data(), result.imag_data(), t1);
-      eval_add(result.real_data(), r_t);
-      eval_divide(result.real_data(), t2);
-      // imag = (-a * d/c + b) / denom
-      eval_multiply(result.imag_data(), r_t, t1);
-      result.imag_data().negate();
-      eval_add(result.imag_data(), i_t);
-      eval_divide(result.imag_data(), t2);
+         // real = (b * d/c + a) / denom
+         eval_multiply(result.real_data(), result.imag_data(), t1);
+         eval_add(result.real_data(), r_t);
+         eval_divide(result.real_data(), t2);
+         // imag = (-a * d/c + b) / denom
+         eval_multiply(result.imag_data(), r_t, t1);
+         result.imag_data().negate();
+         eval_add(result.imag_data(), i_t);
+         eval_divide(result.imag_data(), t2);
+      }
+   }
+   //
+   // Finish off by fixing up signed zeros.
+   // 
+   // This sets the signs "as if" we had evaluated the result using:
+   // 
+   // real = (ac + bd) / (c^2 + d^2)
+   // imag = (bc - ad) / (c^2 + d^2)
+   // 
+   // ie a zero is negative only if the two parts of the numerator
+   // are both negative and zero.
+   //
+   if (eval_is_zero(result.real_data()))
+   {
+      int r_sign = eval_signbit(result.real_data());
+      int r_required = (a_sign != c_sign) && (b_sign != d_sign);
+      if (r_required != r_sign)
+         result.real_data().negate();
+   }
+   if (eval_is_zero(result.imag_data()))
+   {
+      int i_sign = eval_signbit(result.imag_data());
+      int i_required = (b_sign != c_sign) && (a_sign == d_sign);
+      if (i_required != i_sign)
+         result.imag_data().negate();
    }
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_add(complex_adaptor<Backend>& result, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_add(complex_adaptor<Backend>& result, const T& scalar)
 {
    using default_ops::eval_add;
    eval_add(result.real_data(), scalar);
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_subtract(complex_adaptor<Backend>& result, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_subtract(complex_adaptor<Backend>& result, const T& scalar)
 {
    using default_ops::eval_subtract;
    eval_subtract(result.real_data(), scalar);
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_multiply(complex_adaptor<Backend>& result, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_multiply(complex_adaptor<Backend>& result, const T& scalar)
 {
    using default_ops::eval_multiply;
    eval_multiply(result.real_data(), scalar);
    eval_multiply(result.imag_data(), scalar);
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_divide(complex_adaptor<Backend>& result, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_divide(complex_adaptor<Backend>& result, const T& scalar)
 {
    using default_ops::eval_divide;
    eval_divide(result.real_data(), scalar);
@@ -294,28 +350,28 @@ inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>:
 }
 // Optimised 3 arg versions:
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_add(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_add(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
 {
    using default_ops::eval_add;
    eval_add(result.real_data(), a.real_data(), scalar);
    result.imag_data() = a.imag_data();
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_subtract(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_subtract(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
 {
    using default_ops::eval_subtract;
    eval_subtract(result.real_data(), a.real_data(), scalar);
    result.imag_data() = a.imag_data();
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_multiply(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_multiply(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
 {
    using default_ops::eval_multiply;
    eval_multiply(result.real_data(), a.real_data(), scalar);
    eval_multiply(result.imag_data(), a.imag_data(), scalar);
 }
 template <class Backend, class T>
-inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>::value>::type eval_divide(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
+inline typename std::enable_if< !std::is_same<complex_adaptor<Backend>, T>::value>::type eval_divide(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& a, const T& scalar)
 {
    using default_ops::eval_divide;
    eval_divide(result.real_data(), a.real_data(), scalar);
@@ -323,7 +379,7 @@ inline typename boost::disable_if_c<boost::is_same<complex_adaptor<Backend>, T>:
 }
 
 template <class Backend>
-inline bool eval_is_zero(const complex_adaptor<Backend>& val) BOOST_NOEXCEPT
+inline bool eval_is_zero(const complex_adaptor<Backend>& val) noexcept
 {
    using default_ops::eval_is_zero;
    return eval_is_zero(val.real_data()) && eval_is_zero(val.imag_data());
@@ -331,18 +387,18 @@ inline bool eval_is_zero(const complex_adaptor<Backend>& val) BOOST_NOEXCEPT
 template <class Backend>
 inline int eval_get_sign(const complex_adaptor<Backend>&)
 {
-   BOOST_STATIC_ASSERT_MSG(sizeof(Backend) == UINT_MAX, "Complex numbers have no sign bit."); // designed to always fail
+   static_assert(sizeof(Backend) == UINT_MAX, "Complex numbers have no sign bit."); // designed to always fail
    return 0;
 }
 
 template <class Result, class Backend>
-inline typename disable_if_c<boost::is_complex<Result>::value>::type eval_convert_to(Result* result, const complex_adaptor<Backend>& val)
+inline typename std::enable_if< !boost::multiprecision::detail::is_complex<Result>::value>::type eval_convert_to(Result* result, const complex_adaptor<Backend>& val)
 {
    using default_ops::eval_convert_to;
    using default_ops::eval_is_zero;
    if (!eval_is_zero(val.imag_data()))
    {
-      BOOST_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
+      BOOST_MP_THROW_EXCEPTION(std::runtime_error("Could not convert imaginary number to scalar."));
    }
    eval_convert_to(result, val.real_data());
 }
@@ -373,7 +429,7 @@ inline void eval_sqrt(complex_adaptor<Backend>& result, const complex_adaptor<Ba
 
    if (eval_is_zero(val.imag_data()) && (eval_get_sign(val.real_data()) >= 0))
    {
-      static const typename mpl::front<typename Backend::unsigned_types>::type zero = 0u;
+      constexpr const typename std::tuple_element<0, typename Backend::unsigned_types>::type zero = 0u;
       eval_sqrt(result.real_data(), val.real_data());
       result.imag_data() = zero;
       return;
@@ -436,7 +492,7 @@ inline void eval_pow(complex_adaptor<Backend>& result, const complex_adaptor<Bac
 
    if (eval_is_zero(e))
    {
-      typename mpl::front<typename Backend::unsigned_types>::type one(1);
+      typename std::tuple_element<0, typename Backend::unsigned_types>::type one(1);
       result = one;
       return;
    }
@@ -452,7 +508,7 @@ inline void eval_pow(complex_adaptor<Backend>& result, const complex_adaptor<Bac
       {
          Backend n          = std::numeric_limits<number<Backend> >::infinity().backend();
          result.real_data() = n;
-         typename mpl::front<typename Backend::unsigned_types>::type zero(0);
+         typename std::tuple_element<0, typename Backend::unsigned_types>::type zero(0);
          if (eval_is_zero(e.imag_data()))
             result.imag_data() = zero;
          else
@@ -460,7 +516,7 @@ inline void eval_pow(complex_adaptor<Backend>& result, const complex_adaptor<Bac
       }
       else
       {
-         typename mpl::front<typename Backend::unsigned_types>::type zero(0);
+         typename std::tuple_element<0, typename Backend::unsigned_types>::type zero(0);
          result = zero;
       }
       return;
@@ -483,7 +539,7 @@ inline void eval_exp(complex_adaptor<Backend>& result, const complex_adaptor<Bac
    if (eval_is_zero(arg.imag_data()))
    {
       eval_exp(result.real_data(), arg.real_data());
-      typename mpl::front<typename Backend::unsigned_types>::type zero(0);
+      typename std::tuple_element<0, typename Backend::unsigned_types>::type zero(0);
       result.imag_data() = zero;
       return;
    }
@@ -512,7 +568,7 @@ inline void eval_log(complex_adaptor<Backend>& result, const complex_adaptor<Bac
    if (eval_is_zero(arg.imag_data()) && (eval_get_sign(arg.real_data()) >= 0))
    {
       eval_log(result.real_data(), arg.real_data());
-      typename mpl::front<typename Backend::unsigned_types>::type zero(0);
+      typename std::tuple_element<0, typename Backend::unsigned_types>::type zero(0);
       result.imag_data() = zero;
       return;
    }
@@ -532,7 +588,7 @@ inline void eval_log10(complex_adaptor<Backend>& result, const complex_adaptor<B
    using default_ops::eval_divide;
    using default_ops::eval_log;
 
-   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+   using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
 
    Backend ten;
    ten = ui_type(10);
@@ -550,14 +606,15 @@ inline void eval_sin(complex_adaptor<Backend>& result, const complex_adaptor<Bac
    using default_ops::eval_sin;
    using default_ops::eval_sinh;
 
-   Backend t1, t2;
+   Backend t1, t2, t3;
    eval_sin(t1, arg.real_data());
    eval_cosh(t2, arg.imag_data());
-   eval_multiply(result.real_data(), t1, t2);
+   eval_multiply(t3, t1, t2);
 
    eval_cos(t1, arg.real_data());
    eval_sinh(t2, arg.imag_data());
    eval_multiply(result.imag_data(), t1, t2);
+   result.real_data() = t3;
 }
 
 template <class Backend>
@@ -568,24 +625,85 @@ inline void eval_cos(complex_adaptor<Backend>& result, const complex_adaptor<Bac
    using default_ops::eval_sin;
    using default_ops::eval_sinh;
 
-   Backend t1, t2;
+   Backend t1, t2, t3;
    eval_cos(t1, arg.real_data());
    eval_cosh(t2, arg.imag_data());
-   eval_multiply(result.real_data(), t1, t2);
+   eval_multiply(t3, t1, t2);
 
    eval_sin(t1, arg.real_data());
    eval_sinh(t2, arg.imag_data());
    eval_multiply(result.imag_data(), t1, t2);
    result.imag_data().negate();
+   result.real_data() = t3;
+}
+
+template <class T>
+void tanh_imp(const T& r, const T& i, T& r_result, T& i_result)
+{
+   using default_ops::eval_tan;
+   using default_ops::eval_sinh;
+   using default_ops::eval_add;
+   using default_ops::eval_fpclassify;
+   using default_ops::eval_get_sign;
+
+   using ui_type = typename std::tuple_element<0, typename T::unsigned_types>::type;
+   ui_type one(1);
+   //
+   // Set:
+   // t = tan(i);
+   // s = sinh(r);
+   // b = s * (1 + t^2);
+   // d = 1 + b * s;
+   //
+   T t, s, b, d;
+   eval_tan(t, i);
+   eval_sinh(s, r);
+   eval_multiply(d, t, t);
+   eval_add(d, one);
+   eval_multiply(b, d, s);
+   eval_multiply(d, b, s);
+   eval_add(d, one);
+
+   if (eval_fpclassify(d) == FP_INFINITE)
+   {
+      r_result = one;
+      if (eval_get_sign(s) < 0)
+         r_result.negate();
+      //
+      // Imaginary part is a signed zero:
+      //
+      ui_type zero(0);
+      i_result = zero;
+      if (eval_get_sign(t) < 0)
+         i_result.negate();
+   }
+   //
+   // Real part is sqrt(1 + s^2) * b / d;
+   // Imaginary part is t / d;
+   //
+   eval_divide(i_result, t, d);
+   //
+   // variable t is now spare, as is r_result.
+   //
+   eval_multiply(t, s, s);
+   eval_add(t, one);
+   eval_sqrt(r_result, t);
+   eval_multiply(t, r_result, b);
+   eval_divide(r_result, t, d);
 }
 
 template <class Backend>
+inline void eval_tanh(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& arg)
+{
+   tanh_imp(arg.real_data(), arg.imag_data(), result.real_data(), result.imag_data());
+}
+template <class Backend>
 inline void eval_tan(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& arg)
 {
-   complex_adaptor<Backend> c;
-   eval_cos(c, arg);
-   eval_sin(result, arg);
-   eval_divide(result, c);
+   Backend t(arg.imag_data());
+   t.negate();
+   tanh_imp(t, arg.real_data(), result.imag_data(), result.real_data());
+   result.imag_data().negate();
 }
 
 template <class Backend>
@@ -612,7 +730,7 @@ inline void eval_asin(complex_adaptor<Backend>& result, const complex_adaptor<Ba
 template <class Backend>
 inline void eval_acos(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& arg)
 {
-   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+   using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
 
    using default_ops::eval_asin;
 
@@ -627,7 +745,7 @@ inline void eval_acos(complex_adaptor<Backend>& result, const complex_adaptor<Ba
 template <class Backend>
 inline void eval_atan(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& arg)
 {
-   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+   using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
    ui_type                                                             one = (ui_type)1u;
 
    using default_ops::eval_add;
@@ -659,14 +777,15 @@ inline void eval_sinh(complex_adaptor<Backend>& result, const complex_adaptor<Ba
    using default_ops::eval_sin;
    using default_ops::eval_sinh;
 
-   Backend t1, t2;
+   Backend t1, t2, t3;
    eval_cos(t1, arg.imag_data());
    eval_sinh(t2, arg.real_data());
-   eval_multiply(result.real_data(), t1, t2);
+   eval_multiply(t3, t1, t2);
 
    eval_cosh(t1, arg.real_data());
    eval_sin(t2, arg.imag_data());
    eval_multiply(result.imag_data(), t1, t2);
+   result.real_data() = t3;
 }
 
 template <class Backend>
@@ -677,30 +796,21 @@ inline void eval_cosh(complex_adaptor<Backend>& result, const complex_adaptor<Ba
    using default_ops::eval_sin;
    using default_ops::eval_sinh;
 
-   Backend t1, t2;
+   Backend t1, t2, t3;
    eval_cos(t1, arg.imag_data());
    eval_cosh(t2, arg.real_data());
-   eval_multiply(result.real_data(), t1, t2);
+   eval_multiply(t3, t1, t2);
 
    eval_sin(t1, arg.imag_data());
    eval_sinh(t2, arg.real_data());
    eval_multiply(result.imag_data(), t1, t2);
-}
-
-template <class Backend>
-inline void eval_tanh(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& arg)
-{
-   using default_ops::eval_divide;
-   complex_adaptor<Backend> s, c;
-   eval_sinh(s, arg);
-   eval_cosh(c, arg);
-   eval_divide(result, s, c);
+   result.real_data() = t3;
 }
 
 template <class Backend>
 inline void eval_asinh(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& arg)
 {
-   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+   using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
    ui_type                                                             one = (ui_type)1u;
 
    using default_ops::eval_add;
@@ -718,7 +828,7 @@ inline void eval_asinh(complex_adaptor<Backend>& result, const complex_adaptor<B
 template <class Backend>
 inline void eval_acosh(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& arg)
 {
-   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+   using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
    ui_type                                                             one = (ui_type)1u;
 
    using default_ops::eval_add;
@@ -743,7 +853,7 @@ inline void eval_acosh(complex_adaptor<Backend>& result, const complex_adaptor<B
 template <class Backend>
 inline void eval_atanh(complex_adaptor<Backend>& result, const complex_adaptor<Backend>& arg)
 {
-   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+   using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
    ui_type                                                             one = (ui_type)1u;
 
    using default_ops::eval_add;
@@ -775,7 +885,7 @@ inline void eval_proj(complex_adaptor<Backend>& result, const complex_adaptor<Ba
 {
    using default_ops::eval_get_sign;
 
-   typedef typename mpl::front<typename Backend::unsigned_types>::type ui_type;
+   using ui_type = typename std::tuple_element<0, typename Backend::unsigned_types>::type;
    ui_type                                                             zero = (ui_type)0u;
 
    int c1 = eval_fpclassify(arg.real_data());
@@ -830,7 +940,7 @@ inline std::size_t hash_value(const complex_adaptor<Backend>& val)
 {
    std::size_t result  = hash_value(val.real_data());
    std::size_t result2 = hash_value(val.imag_data());
-   boost::hash_combine(result, result2);
+   boost::multiprecision::detail::hash_combine(result, result2);
    return result;
 }
 
@@ -839,19 +949,52 @@ inline std::size_t hash_value(const complex_adaptor<Backend>& val)
 using boost::multiprecision::backends::complex_adaptor;
 
 template <class Backend>
-struct number_category<complex_adaptor<Backend> > : public boost::mpl::int_<boost::multiprecision::number_kind_complex>
+struct number_category<complex_adaptor<Backend> > : public std::integral_constant<int, boost::multiprecision::number_kind_complex>
 {};
 
 template <class Backend, expression_template_option ExpressionTemplates>
 struct component_type<number<complex_adaptor<Backend>, ExpressionTemplates> >
 {
-   typedef number<Backend, ExpressionTemplates> type;
+   using type = number<Backend, ExpressionTemplates>;
 };
 
 template <class Backend, expression_template_option ExpressionTemplates>
 struct complex_result_from_scalar<number<Backend, ExpressionTemplates> >
 {
-   typedef number<complex_adaptor<Backend>, ExpressionTemplates> type;
+   using type = number<complex_adaptor<Backend>, ExpressionTemplates>;
+};
+
+namespace detail {
+   template <class Backend>
+   struct is_variable_precision<complex_adaptor<Backend> > : public is_variable_precision<Backend>
+   {};
+#ifdef BOOST_HAS_INT128
+   template <class Backend>
+   struct is_convertible_arithmetic<int128_type, complex_adaptor<Backend> > : is_convertible_arithmetic<int128_type, Backend>
+   {};
+   template <class Backend>
+   struct is_convertible_arithmetic<uint128_type, complex_adaptor<Backend> > : is_convertible_arithmetic<uint128_type, Backend>
+   {};
+#endif
+#ifdef BOOST_HAS_FLOAT128
+   template <class Backend>
+   struct is_convertible_arithmetic<float128_type, complex_adaptor<Backend> > : is_convertible_arithmetic<float128_type, Backend>
+   {};
+#endif
+   } // namespace detail
+
+
+
+template <class Backend, expression_template_option ExpressionTemplates>
+struct complex_result_from_scalar<number<backends::debug_adaptor<Backend>, ExpressionTemplates> >
+{
+   using type = number<backends::debug_adaptor<complex_adaptor<Backend> >, ExpressionTemplates>;
+};
+
+template <class Backend, expression_template_option ExpressionTemplates>
+struct complex_result_from_scalar<number<backends::logged_adaptor<Backend>, ExpressionTemplates> >
+{
+   using type = number<backends::logged_adaptor<complex_adaptor<Backend> >, ExpressionTemplates>;
 };
 
 }
@@ -859,3 +1002,7 @@ struct complex_result_from_scalar<number<Backend, ExpressionTemplates> >
 } // namespace boost::multiprecision
 
 #endif
+
+/* complex_adaptor.hpp
+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
+*/

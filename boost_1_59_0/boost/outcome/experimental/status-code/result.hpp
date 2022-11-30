@@ -1,5 +1,5 @@
 /* A partial result based on std::variant and proposed std::error
-(C) 2020 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
+(C) 2020-2022 Niall Douglas <http://www.nedproductions.biz/> (11 commits)
 File Created: Jan 2020
 
 
@@ -153,26 +153,26 @@ public:
   ~result() = default;
 
   //! Implicit result converting move constructor
-  template <class U, std::enable_if_t<std::is_convertible_v<U, T>, bool> = true>
-  constexpr result(result<U> &&o, _implicit_converting_constructor_tag = {}) noexcept(std::is_nothrow_constructible_v<T, U>)
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class U)
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(std::is_convertible_v<U, T>)) constexpr result(result<U> &&o, _implicit_converting_constructor_tag = {}) noexcept(std::is_nothrow_constructible_v<T, U>)
       : _base(std::move(o))
   {
   }
   //! Implicit result converting copy constructor
-  template <class U, std::enable_if_t<std::is_convertible_v<U, T>, bool> = true>
-  constexpr result(const result<U> &o, _implicit_converting_constructor_tag = {}) noexcept(std::is_nothrow_constructible_v<T, U>)
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class U)
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(std::is_convertible_v<U, T>)) constexpr result(const result<U> &o, _implicit_converting_constructor_tag = {}) noexcept(std::is_nothrow_constructible_v<T, U>)
       : _base(o)
   {
   }
   //! Explicit result converting move constructor
-  template <class U, std::enable_if_t<std::is_constructible_v<T, U>, bool> = true>
-  constexpr explicit result(result<U> &&o, _explicit_converting_constructor_tag = {}) noexcept(std::is_nothrow_constructible_v<T, U>)
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class U)
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(std::is_constructible_v<T, U>)) constexpr explicit result(result<U> &&o, _explicit_converting_constructor_tag = {}) noexcept(std::is_nothrow_constructible_v<T, U>)
       : _base(std::move(o))
   {
   }
   //! Explicit result converting copy constructor
-  template <class U, std::enable_if_t<std::is_constructible_v<T, U>, bool> = true>
-  constexpr explicit result(const result<U> &o, _explicit_converting_constructor_tag = {}) noexcept(std::is_nothrow_constructible_v<T, U>)
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class U)
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(std::is_constructible_v<T, U>)) constexpr explicit result(const result<U> &o, _explicit_converting_constructor_tag = {}) noexcept(std::is_nothrow_constructible_v<T, U>)
       : _base(o)
   {
   }
@@ -187,36 +187,31 @@ public:
   }
 
   //! Implicit in-place converting error constructor
-  template <class Arg1, class Arg2, class... Args,                                                                                                    //
-            std::enable_if_t<!(std::is_constructible_v<value_type, Arg1, Arg2, Args...> && std::is_constructible_v<error_type, Arg1, Arg2, Args...>)  //
-                             &&std::is_constructible_v<error_type, Arg1, Arg2, Args...>,
-                             bool> = true,
-            long = 5>
-  constexpr result(Arg1 &&arg1, Arg2 &&arg2, Args &&... args) noexcept(std::is_nothrow_constructible_v<error_type, Arg1, Arg2, Args...>)
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class Arg1, class Arg2, class... Args, long = 5)                                                                                              //
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(!(std::is_constructible_v<value_type, Arg1, Arg2, Args...> && std::is_constructible_v<error_type, Arg1, Arg2, Args...>)  //
+                                              &&std::is_constructible_v<error_type, Arg1, Arg2, Args...>))
+  constexpr result(Arg1 &&arg1, Arg2 &&arg2, Args &&...args) noexcept(std::is_nothrow_constructible_v<error_type, Arg1, Arg2, Args...>)
       : _base(std::in_place_index<0>, std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Args>(args)...)
   {
   }
 
   //! Implicit in-place converting value constructor
-  template <class Arg1, class Arg2, class... Args,                                                                                                    //
-            std::enable_if_t<!(std::is_constructible_v<value_type, Arg1, Arg2, Args...> && std::is_constructible_v<error_type, Arg1, Arg2, Args...>)  //
-                             &&std::is_constructible_v<value_type, Arg1, Arg2, Args...>,
-                             bool> = true,
-            int = 5>
-  constexpr result(Arg1 &&arg1, Arg2 &&arg2, Args &&... args) noexcept(std::is_nothrow_constructible_v<value_type, Arg1, Arg2, Args...>)
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class Arg1, class Arg2, class... Args, int = 5)                                                                                               //
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(!(std::is_constructible_v<value_type, Arg1, Arg2, Args...> && std::is_constructible_v<error_type, Arg1, Arg2, Args...>)  //
+                                              &&std::is_constructible_v<value_type, Arg1, Arg2, Args...>))
+  constexpr result(Arg1 &&arg1, Arg2 &&arg2, Args &&...args) noexcept(std::is_nothrow_constructible_v<value_type, Arg1, Arg2, Args...>)
       : _base(std::in_place_index<1>, std::forward<Arg1>(arg1), std::forward<Arg2>(arg2), std::forward<Args>(args)...)
   {
   }
 
   //! Implicit construction from any type where an ADL discovered `make_status_code(T, Args ...)` returns a `status_code`.
-  template <class U, class... Args,                                                                            //
-            class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<U, Args...>::type,  // Safe ADL lookup of make_status_code(), returns void if not found
-            typename std::enable_if<!std::is_same<typename std::decay<U>::type, result>::value                 // not copy/move of self
-                                    && !std::is_same<typename std::decay<U>::type, value_type>::value          // not copy/move of value type
-                                    && is_status_code<MakeStatusCodeResult>::value                             // ADL makes a status code
-                                    && std::is_constructible<error_type, MakeStatusCodeResult>::value,         // ADLed status code is compatible
-                                    bool>::type = true>
-  constexpr result(U &&v, Args &&... args) noexcept(noexcept(make_status_code(std::declval<U>(), std::declval<Args>()...)))  // NOLINT
+  BOOST_OUTCOME_SYSTEM_ERROR2_TEMPLATE(class U, class... Args,                                                                            //
+                         class MakeStatusCodeResult = typename detail::safe_get_make_status_code_result<U, Args...>::type)  // Safe ADL lookup of make_status_code(), returns void if not found
+  BOOST_OUTCOME_SYSTEM_ERROR2_TREQUIRES(BOOST_OUTCOME_SYSTEM_ERROR2_TPRED(!std::is_same<typename std::decay<U>::type, result>::value                    // not copy/move of self
+                                              && !std::is_same<typename std::decay<U>::type, value_type>::value             // not copy/move of value type
+                                              && is_status_code<MakeStatusCodeResult>::value                                // ADL makes a status code
+                                              && std::is_constructible<error_type, MakeStatusCodeResult>::value))           // ADLed status code is compatible
+  constexpr result(U &&v, Args &&...args) noexcept(noexcept(make_status_code(std::declval<U>(), std::declval<Args>()...)))  // NOLINT
       : _base(std::in_place_index<0>, make_status_code(static_cast<U &&>(v), static_cast<Args &&>(args)...))
   {
   }
@@ -313,7 +308,7 @@ public:
   }
 
   //! Accesses the value, being UB if none exists
-  constexpr value_type_if_enabled &assume_value() & noexcept
+  constexpr value_type_if_enabled &assume_value() &noexcept
   {
     if(!has_value())
     {
@@ -331,7 +326,7 @@ public:
     return *std::get_if<1>(this);
   }
   //! Accesses the error, being UB if none exists
-  constexpr value_type_if_enabled &&assume_value() && noexcept
+  constexpr value_type_if_enabled &&assume_value() &&noexcept
   {
     if(!has_value())
     {
@@ -350,7 +345,7 @@ public:
   }
 
   //! Accesses the error, being UB if none exists
-  constexpr error_type &assume_error() & noexcept
+  constexpr error_type &assume_error() &noexcept
   {
     if(!has_error())
     {
@@ -368,7 +363,7 @@ public:
     return *std::get_if<0>(this);
   }
   //! Accesses the error, being UB if none exists
-  constexpr error_type &&assume_error() && noexcept
+  constexpr error_type &&assume_error() &&noexcept
   {
     if(!has_error())
     {
@@ -405,3 +400,7 @@ BOOST_OUTCOME_SYSTEM_ERROR2_NAMESPACE_END
 #endif
 #endif
 #endif
+
+/* result.hpp
+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
+*/

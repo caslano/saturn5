@@ -127,6 +127,20 @@ class segment_manager_base
    void * allocate (size_type nbytes, const std::nothrow_t &)
    {  return MemoryAlgorithm::allocate(nbytes);   }
 
+   //!Returns a reference to the internal memory algorithm.
+   //!This function is useful for custom memory algorithms that
+   //!need additional configuration options after construction. Never throws.
+   //!This function should be only used by advanced users.
+   MemoryAlgorithm &get_memory_algorithm()
+   {  return static_cast<MemoryAlgorithm&>(*this);   }
+
+   //!Returns a const reference to the internal memory algorithm.
+   //!This function is useful for custom memory algorithms that
+   //!need additional configuration options after construction. Never throws.
+   //!This function should be only used by advanced users.
+   const MemoryAlgorithm &get_memory_algorithm() const
+   {  return static_cast<const MemoryAlgorithm&>(*this);   }
+
    #if !defined(BOOST_INTERPROCESS_DOXYGEN_INVOKED)
 
    //Experimental. Dont' use.
@@ -424,6 +438,8 @@ class segment_manager
       const void *const segm_addr  = static_cast<segment_manager_base_t*>(this);
       (void)this_addr;  (void)segm_addr;
       BOOST_ASSERT( this_addr == segm_addr);
+      const std::size_t void_ptr_alignment = boost::move_detail::alignment_of<void_pointer>::value; (void)void_ptr_alignment;
+      BOOST_ASSERT((0 == (std::size_t)this_addr % boost::move_detail::alignment_of<segment_manager>::value));
    }
 
    //!Tries to find a previous named/unique allocation. Returns the address
@@ -837,8 +853,8 @@ class segment_manager
        size_type &length, ipcdetail::true_ is_intrusive, bool use_lock)
    {
       (void)is_intrusive;
-      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >         index_type;
-      typedef typename index_type::iterator           index_it;
+      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >         index_type_t;
+      typedef typename index_type_t::iterator           index_it;
 
       //-------------------------------
       scoped_lock<rmutex> guard(priv_get_lock(use_lock));
@@ -874,9 +890,9 @@ class segment_manager
        size_type &length, ipcdetail::false_ is_intrusive, bool use_lock)
    {
       (void)is_intrusive;
-      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >      index_type;
-      typedef typename index_type::key_type        key_type;
-      typedef typename index_type::iterator        index_it;
+      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >      char_aware_index_type;
+      typedef typename char_aware_index_type::key_type        key_type;
+      typedef typename char_aware_index_type::iterator        index_it;
 
       //-------------------------------
       scoped_lock<rmutex> guard(priv_get_lock(use_lock));
@@ -934,9 +950,9 @@ class segment_manager
                                    ipcdetail::in_place_interface &table, ipcdetail::true_ is_intrusive_index)
    {
       (void)is_intrusive_index;
-      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >         index_type;
-      typedef typename index_type::iterator           index_it;
-      typedef typename index_type::value_type         intrusive_value_type;
+      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >         index_type_t;
+      typedef typename index_type_t::iterator           index_it;
+      typedef typename index_type_t::value_type         intrusive_value_type;
 
       //-------------------------------
       scoped_lock<rmutex> guard(m_header);
@@ -984,9 +1000,9 @@ class segment_manager
                                    ipcdetail::false_ is_intrusive_index)
    {
       (void)is_intrusive_index;
-      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >            index_type;
-      typedef typename index_type::iterator              index_it;
-      typedef typename index_type::key_type              key_type;
+      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >            char_aware_index_type;
+      typedef typename char_aware_index_type::iterator              index_it;
+      typedef typename char_aware_index_type::key_type              key_type;
 
       //-------------------------------
       scoped_lock<rmutex> guard(m_header);
@@ -1010,8 +1026,8 @@ class segment_manager
       IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> > &index,
       ipcdetail::in_place_interface &table)
    {
-      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >      index_type;
-      typedef typename index_type::iterator        index_it;
+      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >      char_aware_index_type;
+      typedef typename char_aware_index_type::iterator        index_it;
 
       //Get allocation parameters
       block_header_t *ctrl_data = reinterpret_cast<block_header_t*>
@@ -1068,8 +1084,8 @@ class segment_manager
                                  , sizeof(CharT)
                                  , namelen);
 
-      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >            index_type;
-      typedef typename index_type::iterator              index_it;
+      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >            index_type_t;
+      typedef typename index_type_t::iterator              index_it;
       typedef std::pair<index_it, bool>                  index_ib;
 
       //-------------------------------
@@ -1088,8 +1104,8 @@ class segment_manager
       //the key (which is a smart pointer) to an equivalent one
       index_ib insert_ret;
 
-      typename index_type::insert_commit_data   commit_data;
-      typedef typename index_type::value_type   intrusive_value_type;
+      typename index_type_t::insert_commit_data   commit_data;
+      typedef typename index_type_t::value_type   intrusive_value_type;
 
       BOOST_TRY{
          ipcdetail::intrusive_compare_key<CharT> key(name, namelen);
@@ -1165,7 +1181,7 @@ class segment_manager
       //if something goes wrong. This will be executed *before*
       //the memory allocation as the intrusive value is built in that
       //memory
-      value_eraser<index_type> v_eraser(index, it);
+      value_eraser<index_type_t> v_eraser(index, it);
 
       //Construct array, this can throw
       ipcdetail::array_construct(ptr, num, table);
@@ -1193,11 +1209,11 @@ class segment_manager
                                  , sizeof(CharT)
                                  , namelen);
 
-      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >            index_type;
-      typedef typename index_type::key_type              key_type;
-      typedef typename index_type::mapped_type           mapped_type;
-      typedef typename index_type::value_type            value_type;
-      typedef typename index_type::iterator              index_it;
+      typedef IndexType<ipcdetail::index_config<CharT, MemoryAlgorithm> >            index_type_t;
+      typedef typename index_type_t::key_type              key_type;
+      typedef typename index_type_t::mapped_type           mapped_type;
+      typedef typename index_type_t::value_type            value_type;
+      typedef typename index_type_t::iterator              index_it;
       typedef std::pair<index_it, bool>                  index_ib;
 
       //-------------------------------
@@ -1240,7 +1256,7 @@ class segment_manager
       }
       //Initialize the node value_eraser to erase inserted node
       //if something goes wrong
-      value_eraser<index_type> v_eraser(index, it);
+      value_eraser<index_type_t> v_eraser(index, it);
 
       //Allocates buffer for name + data, this can throw (it hurts)
       void *buffer_ptr;
@@ -1341,3 +1357,7 @@ class segment_manager
 
 #endif //#ifndef BOOST_INTERPROCESS_SEGMENT_MANAGER_HPP
 
+
+/* segment_manager.hpp
+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
+*/

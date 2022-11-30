@@ -19,12 +19,16 @@
 #include <map>
 #include <vector>
 
+#include <boost/geometry/algorithms/detail/overlay/approximately_equals.hpp>
 #include <boost/geometry/algorithms/detail/overlay/copy_segment_point.hpp>
 #include <boost/geometry/algorithms/detail/overlay/get_ring.hpp>
 #include <boost/geometry/algorithms/detail/direction_code.hpp>
 #include <boost/geometry/algorithms/detail/overlay/turn_info.hpp>
 
 #include <boost/geometry/util/condition.hpp>
+#include <boost/geometry/util/math.hpp>
+#include <boost/geometry/util/select_coordinate_type.hpp>
+#include <boost/geometry/util/select_most_precise.hpp>
 
 namespace boost { namespace geometry
 {
@@ -65,6 +69,8 @@ struct ranked_point
         , operation(op)
         , seg_id(si)
     {}
+
+    using point_type = Point;
 
     Point point;
     rank_type rank;
@@ -186,7 +192,14 @@ struct less_by_side
             return on_same(first, second);
         }
 
-        int const side_first_wrt_second = -side_second_wrt_first;
+        int const side_first_wrt_second = m_strategy.apply(m_turn_point, second.point, first.point);
+        if (side_second_wrt_first != -side_first_wrt_second)
+        {
+            // (FP) accuracy error in side calculation, the sides are not opposite.
+            // In that case they can be handled as collinear.
+            // If not, then the sort-order might not be stable.
+            return on_same(first, second);
+        }
 
         // Both are on same side, and not collinear
         // Union: return true if second is right w.r.t. first, so -1,
@@ -245,12 +258,14 @@ public :
         , m_strategy(strategy)
     {}
 
+    template <typename Operation>
     void add_segment_from(signed_size_type turn_index, int op_index,
             Point const& point_from,
-            operation_type op, segment_identifier const& si,
+            Operation const& op,
             bool is_origin)
     {
-        m_ranked_points.push_back(rp(point_from, turn_index, op_index, dir_from, op, si));
+        m_ranked_points.push_back(rp(point_from, turn_index, op_index,
+                                     dir_from, op.operation, op.seg_id));
         if (is_origin)
         {
             m_origin = point_from;
@@ -258,46 +273,89 @@ public :
         }
     }
 
+    template <typename Operation>
     void add_segment_to(signed_size_type turn_index, int op_index,
             Point const& point_to,
-            operation_type op, segment_identifier const& si)
+            Operation const& op)
     {
-        m_ranked_points.push_back(rp(point_to, turn_index, op_index, dir_to, op, si));
+        m_ranked_points.push_back(rp(point_to, turn_index, op_index,
+                                     dir_to, op.operation, op.seg_id));
     }
 
+    template <typename Operation>
     void add_segment(signed_size_type turn_index, int op_index,
             Point const& point_from, Point const& point_to,
-            operation_type op, segment_identifier const& si,
-            bool is_origin)
+            Operation const& op, bool is_origin)
     {
-        add_segment_from(turn_index, op_index, point_from, op, si, is_origin);
-        add_segment_to(turn_index, op_index, point_to, op, si);
+        add_segment_from(turn_index, op_index, point_from, op, is_origin);
+        add_segment_to(turn_index, op_index, point_to, op);
     }
 
     template <typename Operation, typename Geometry1, typename Geometry2>
-    Point add(Operation const& op, signed_size_type turn_index, int op_index,
+    static Point walk_over_ring(Operation const& op, int offset,
+            Geometry1 const& geometry1,
+            Geometry2 const& geometry2)
+    {
+        Point point;
+        geometry::copy_segment_point<Reverse1, Reverse2>(geometry1, geometry2, op.seg_id, offset, point);
+        return point;
+    }
+
+    template <typename Turn, typename Operation, typename Geometry1, typename Geometry2>
+    Point add(Turn const& turn, Operation const& op, signed_size_type turn_index, int op_index,
             Geometry1 const& geometry1,
             Geometry2 const& geometry2,
             bool is_origin)
     {
-        Point point1, point2, point3;
+        Point point_from, point2, point3;
         geometry::copy_segment_points<Reverse1, Reverse2>(geometry1, geometry2,
-                op.seg_id, point1, point2, point3);
-        Point const& point_to = op.fraction.is_one() ? point3 : point2;
-        add_segment(turn_index, op_index, point1, point_to, op.operation, op.seg_id, is_origin);
-        return point1;
+                op.seg_id, point_from, point2, point3);
+        Point point_to = op.fraction.is_one() ? point3 : point2;
+
+        // If the point is in the neighbourhood (the limit is arbitrary),
+        // then take a point (or more) further back.
+        // The limit of offset avoids theoretical infinite loops.
+        // In practice it currently walks max 1 point back in all cases.
+        // Use the coordinate type, but if it is too small (e.g. std::int16), use a double
+        using ct_type = typename geometry::select_most_precise
+            <
+                typename geometry::coordinate_type<Point>::type,
+                double
+            >::type;
+
+        ct_type const tolerance = 1000000000;
+
+        int offset = 0;
+        while (approximately_equals(point_from, turn.point, tolerance)
+               && offset > -10)
+        {
+            point_from = walk_over_ring(op, --offset, geometry1, geometry2);
+        }
+
+        // Similarly for the point_to, walk forward
+        offset = 0;
+        while (approximately_equals(point_to, turn.point, tolerance)
+               && offset < 10)
+        {
+            point_to = walk_over_ring(op, ++offset, geometry1, geometry2);
+        }
+
+        add_segment(turn_index, op_index, point_from, point_to, op, is_origin);
+
+        return point_from;
     }
 
-    template <typename Operation, typename Geometry1, typename Geometry2>
-    void add(Operation const& op, signed_size_type turn_index, int op_index,
+    template <typename Turn, typename Operation, typename Geometry1, typename Geometry2>
+    void add(Turn const& turn,
+             Operation const& op, signed_size_type turn_index, int op_index,
             segment_identifier const& departure_seg_id,
             Geometry1 const& geometry1,
             Geometry2 const& geometry2,
-            bool check_origin)
+            bool is_departure)
     {
-        Point const point1 = add(op, turn_index, op_index, geometry1, geometry2, false);
+        Point potential_origin = add(turn, op, turn_index, op_index, geometry1, geometry2, false);
 
-        if (check_origin)
+        if (is_departure)
         {
             bool const is_origin
                     = op.seg_id.source_index == departure_seg_id.source_index
@@ -306,37 +364,19 @@ public :
 
             if (is_origin)
             {
-                signed_size_type const segment_distance = calculate_segment_distance(op, departure_seg_id, geometry1, geometry2);
-                if (m_origin_count == 0 ||
-                        segment_distance < m_origin_segment_distance)
+                signed_size_type const sd
+                        = departure_seg_id.source_index == 0
+                          ? segment_distance(geometry1, departure_seg_id, op.seg_id)
+                          : segment_distance(geometry2, departure_seg_id, op.seg_id);
+
+                if (m_origin_count == 0 || sd < m_origin_segment_distance)
                 {
-                    m_origin = point1;
-                    m_origin_segment_distance = segment_distance;
+                    m_origin = potential_origin;
+                    m_origin_segment_distance = sd;
                 }
                 m_origin_count++;
             }
         }
-    }
-
-    template <typename Operation, typename Geometry1, typename Geometry2>
-    static signed_size_type calculate_segment_distance(Operation const& op,
-            segment_identifier const& departure_seg_id,
-            Geometry1 const& geometry1,
-            Geometry2 const& geometry2)
-    {
-        if (op.seg_id.segment_index >= departure_seg_id.segment_index)
-        {
-            // dep.seg_id=5, op.seg_id=7, distance=2, being segments 5,6
-            return op.seg_id.segment_index - departure_seg_id.segment_index;
-        }
-        // Take wrap into account
-        // Suppose point_count=10 (10 points, 9 segments), dep.seg_id=7, op.seg_id=2,
-        // then distance=9-7+2=4, being segments 7,8,0,1
-        std::size_t const segment_count
-                    = op.seg_id.source_index == 0
-                    ? segment_count_on_ring(geometry1, op.seg_id)
-                    : segment_count_on_ring(geometry2, op.seg_id);
-        return segment_count - departure_seg_id.segment_index + op.seg_id.segment_index;
     }
 
     void apply(Point const& turn_point)
@@ -367,9 +407,11 @@ public :
         }
     }
 
-    template <signed_size_type segment_identifier::*Member, typename Map>
-    void find_open_generic(Map& handled, bool check)
+    void find_open_by_piece_index()
     {
+        // For buffers, use piece index
+        std::set<signed_size_type> handled;
+
         for (std::size_t i = 0; i < m_ranked_points.size(); i++)
         {
             const rp& ranked = m_ranked_points[i];
@@ -378,17 +420,35 @@ public :
                 continue;
             }
 
-            signed_size_type const& index = ranked.seg_id.*Member;
-            if (check && (index < 0 || index > 1))
+            signed_size_type const& index = ranked.seg_id.piece_index;
+            if (handled.count(index) > 0)
             {
-                // Should not occur
                 continue;
             }
-            if (! handled[index])
+            find_polygons_for_source<&segment_identifier::piece_index>(index, i);
+            handled.insert(index);
+        }
+    }
+
+    void find_open_by_source_index()
+    {
+        // Check for source index 0 and 1
+        bool handled[2] = {false, false};
+        for (std::size_t i = 0; i < m_ranked_points.size(); i++)
+        {
+            const rp& ranked = m_ranked_points[i];
+            if (ranked.direction != dir_from)
             {
-                find_polygons_for_source<Member>(index, i);
-                handled[index] = true;
+                continue;
             }
+
+            signed_size_type const& index = ranked.seg_id.source_index;
+            if (index < 0 || index > 1 || handled[index])
+            {
+                continue;
+            }
+            find_polygons_for_source<&segment_identifier::source_index>(index, i);
+            handled[index] = true;
         }
     }
 
@@ -396,21 +456,11 @@ public :
     {
         if (BOOST_GEOMETRY_CONDITION(OverlayType == overlay_buffer))
         {
-            // For buffers, use piece index
-            std::map<signed_size_type, bool> handled;
-            find_open_generic
-                <
-                    &segment_identifier::piece_index
-                >(handled, false);
+            find_open_by_piece_index();
         }
         else
         {
-            // For other operations, by source (there should only source 0,1)
-            bool handled[2] = {false, false};
-            find_open_generic
-                <
-                    &segment_identifier::source_index
-                >(handled, true);
+            find_open_by_source_index();
         }
     }
 
@@ -688,3 +738,7 @@ struct side_compare<operation_intersection>
 }} // namespace boost::geometry
 
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_OVERLAY_SORT_BY_SIDE_HPP
+
+/* sort_by_side.hpp
+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
+*/

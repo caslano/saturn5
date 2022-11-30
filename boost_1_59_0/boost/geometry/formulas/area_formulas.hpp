@@ -1,6 +1,6 @@
 // Boost.Geometry
 
-// Copyright (c) 2015-2018 Oracle and/or its affiliates.
+// Copyright (c) 2015-2021 Oracle and/or its affiliates.
 
 // Contributed and/or modified by Vissarion Fysikopoulos, on behalf of Oracle
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
@@ -14,6 +14,8 @@
 
 #include <boost/geometry/core/radian_access.hpp>
 #include <boost/geometry/formulas/flattening.hpp>
+#include <boost/geometry/formulas/mean_radius.hpp>
+#include <boost/geometry/formulas/karney_inverse.hpp>
 #include <boost/geometry/util/math.hpp>
 #include <boost/math/special_functions/hypot.hpp>
 
@@ -31,10 +33,11 @@ namespace boost { namespace geometry { namespace formula
 https://arxiv.org/pdf/1109.4448.pdf
 */
 
-template <
-        typename CT,
-        std::size_t SeriesOrder = 2,
-        bool ExpandEpsN = true
+template
+<
+    typename CT,
+    std::size_t SeriesOrder = 2,
+    bool ExpandEpsN = true
 >
 class area_formulas
 {
@@ -170,7 +173,6 @@ public:
 
     static inline void evaluate_coeffs_n(CT const& n, CT coeffs_n[])
     {
-
         switch (SeriesOrder) {
         case 0:
             coeffs_n[0] = CT(2)/CT(3);
@@ -325,9 +327,9 @@ public:
         Given the set of coefficients coeffs1[] evaluate on var2 and return
         the set of coefficients coeffs2[]
     */
-
+    template <typename CoeffsType>
     static inline void evaluate_coeffs_var2(CT const& var2,
-                                            CT const coeffs1[],
+                                            CoeffsType const coeffs1[],
                                             CT coeffs2[])
     {
         std::size_t begin(0), end(0);
@@ -344,16 +346,17 @@ public:
     /*
         Compute the spherical excess of a geodesic (or shperical) segment
     */
-    template <
-                bool LongSegment,
-                typename PointOfSegment
-             >
+    template
+    <
+        bool LongSegment,
+        typename PointOfSegment
+    >
     static inline CT spherical(PointOfSegment const& p1,
                                PointOfSegment const& p2)
     {
         CT excess;
 
-        if(LongSegment) // not for segments parallel to equator
+        if (LongSegment) // not for segments parallel to equator
         {
             CT cbet1 = cos(geometry::get_as_radian<1>(p1));
             CT sbet1 = sin(geometry::get_as_radian<1>(p1));
@@ -407,93 +410,106 @@ public:
     /*
         Compute the ellipsoidal correction of a geodesic (or shperical) segment
     */
-    template <
-                template <typename, bool, bool, bool, bool, bool> class Inverse,
-                typename PointOfSegment,
-                typename SpheroidConst
-             >
-    static inline return_type_ellipsoidal ellipsoidal(PointOfSegment const& p1,
-                                                      PointOfSegment const& p2,
-                                                      SpheroidConst const& spheroid_const)
+    template
+    <
+        template <typename, bool, bool, bool, bool, bool> class Inverse,
+        typename PointOfSegment,
+        typename SpheroidConst
+    >
+    static inline auto ellipsoidal(PointOfSegment const& p1,
+                                   PointOfSegment const& p2,
+                                   SpheroidConst const& spheroid_const)
     {
         return_type_ellipsoidal result;
 
+        CT const lon1r = get_as_radian<0>(p1);
+        CT const lat1r = get_as_radian<1>(p1);
+        CT const lon2r = get_as_radian<0>(p2);
+        CT const lat2r = get_as_radian<1>(p2);
+
         // Azimuth Approximation
 
-        typedef Inverse<CT, false, true, true, false, false> inverse_type;
-        typedef typename inverse_type::result_type inverse_result;
+        using inverse_type = Inverse<CT, true, true, true, false, false>;
+        auto i_res = inverse_type::apply(lon1r, lat1r, lon2r, lat2r, spheroid_const.m_spheroid);
 
-        inverse_result i_res = inverse_type::apply(get_as_radian<0>(p1),
-                                                   get_as_radian<1>(p1),
-                                                   get_as_radian<0>(p2),
-                                                   get_as_radian<1>(p2),
-                                                   spheroid_const.m_spheroid);
-
-        CT alp1 = i_res.azimuth;
-        CT alp2 = i_res.reverse_azimuth;
+        CT const alp1 = i_res.azimuth;
+        CT const alp2 = i_res.reverse_azimuth;
 
         // Constants
 
         CT const ep = spheroid_const.m_ep;
-        CT const f = formula::flattening<CT>(spheroid_const.m_spheroid);
-        CT const one_minus_f = CT(1) - f;
-        std::size_t const series_order_plus_one = SeriesOrder + 1;
-        std::size_t const series_order_plus_two = SeriesOrder + 2;
+        CT const one_minus_f = CT(1) - spheroid_const.m_f;
 
         // Basic trigonometric computations
+        // the compiler could optimize here using sincos function
+        // TODO: optimization: those quantities are already computed in inverse formula
+        // at least in some inverse formulas, so do not compute them again here
+        /*
+        CT sin_bet1 = sin(lat1r);
+        CT cos_bet1 = cos(lat1r);
+        CT sin_bet2 = sin(lat2r);
+        CT cos_bet2 = cos(lat2r);
 
-        CT tan_bet1 = tan(get_as_radian<1>(p1)) * one_minus_f;
-        CT tan_bet2 = tan(get_as_radian<1>(p2)) * one_minus_f;
-        CT cos_bet1 = cos(atan(tan_bet1));
-        CT cos_bet2 = cos(atan(tan_bet2));
-        CT sin_bet1 = tan_bet1 * cos_bet1;
-        CT sin_bet2 = tan_bet2 * cos_bet2;
-        CT sin_alp1 = sin(alp1);
-        CT cos_alp1 = cos(alp1);
-        CT cos_alp2 = cos(alp2);
-        CT sin_alp0 = sin_alp1 * cos_bet1;
+        sin_bet1 *= one_minus_f;
+        sin_bet2 *= one_minus_f;
+        normalize(sin_bet1, cos_bet1);
+        normalize(sin_bet2, cos_bet2);
+        */
+
+        CT const tan_bet1 = tan(lat1r) * one_minus_f;
+        CT const tan_bet2 = tan(lat2r) * one_minus_f;
+        CT const cos_bet1 = cos(atan(tan_bet1));
+        CT const cos_bet2 = cos(atan(tan_bet2));
+        CT const sin_bet1 = tan_bet1 * cos_bet1;
+        CT const sin_bet2 = tan_bet2 * cos_bet2;
+
+        CT const sin_alp1 = sin(alp1);
+        CT const cos_alp1 = cos(alp1);
+        CT const cos_alp2 = cos(alp2);
+        CT const sin_alp0 = sin_alp1 * cos_bet1;
 
         // Spherical term computation
 
-        CT sin_omg1 = sin_alp0 * sin_bet1;
-        CT cos_omg1 = cos_alp1 * cos_bet1;
-        CT sin_omg2 = sin_alp0 * sin_bet2;
-        CT cos_omg2 = cos_alp2 * cos_bet2;
-        CT cos_omg12 =  cos_omg1 * cos_omg2 + sin_omg1 * sin_omg2;
         CT excess;
 
-        bool meridian = get<0>(p2) - get<0>(p1) == CT(0)
-              || get<1>(p1) == CT(90) || get<1>(p1) == -CT(90)
-              || get<1>(p2) == CT(90) || get<1>(p2) == -CT(90);
+        auto const half_pi = math::pi<CT>() / 2;
+        bool meridian = lon2r - lon1r == CT(0)
+            || lat1r == half_pi || lat1r == -half_pi
+            || lat2r == half_pi || lat2r == -half_pi;
 
-        if (!meridian && cos_omg12 > -CT(0.7)
-                      && sin_bet2 - sin_bet1 < CT(1.75)) // short segment
+        if (!meridian && (i_res.distance)
+            < mean_radius<CT>(spheroid_const.m_spheroid) / CT(638))  // short segment
         {
-            CT sin_omg12 =  cos_omg1 * sin_omg2 - sin_omg1 * cos_omg2;
+            CT tan_lat1 = tan(lat1r / 2.0);
+            CT tan_lat2 = tan(lat2r / 2.0);
+
+            excess = CT(2.0)
+                * atan(((tan_lat1 + tan_lat2) / (CT(1) + tan_lat1 * tan_lat2))
+                * tan((lon2r - lon1r) / 2));
+        }
+        else
+        {
+            /* in some cases this formula gives more accurate results
+             *
+             *             CT sin_omg12 =  cos_omg1 * sin_omg2 - sin_omg1 * cos_omg2;
             normalize(sin_omg12, cos_omg12);
 
             CT cos_omg12p1 = CT(1) + cos_omg12;
             CT cos_bet1p1 = CT(1) + cos_bet1;
             CT cos_bet2p1 = CT(1) + cos_bet2;
             excess = CT(2) * atan2(sin_omg12 * (sin_bet1 * cos_bet2p1 + sin_bet2 * cos_bet1p1),
-                                cos_omg12p1 * (sin_bet1 * sin_bet2 + cos_bet1p1 * cos_bet2p1));
-        }
-        else
-        {
-            /*
-                    CT sin_alp2 = sin(alp2);
-                    CT sin_alp12 = sin_alp2 * cos_alp1 - cos_alp2 * sin_alp1;
-                    CT cos_alp12 = cos_alp2 * cos_alp1 + sin_alp2 * sin_alp1;
-                    excess = atan2(sin_alp12, cos_alp12);
+                                   cos_omg12p1 * (sin_bet1 * sin_bet2 + cos_bet1p1 * cos_bet2p1));
             */
-                    excess = alp2 - alp1;
+
+            excess = alp2 - alp1;
         }
 
         result.spherical_term = excess;
 
         // Ellipsoidal term computation (uses integral approximation)
 
-        CT cos_alp0 = math::sqrt(CT(1) - math::sqr(sin_alp0));
+        CT const cos_alp0 = math::sqrt(CT(1) - math::sqr(sin_alp0));
+        //CT const cos_alp0 = hypot(cos_alp1, sin_alp1 * sin_bet1);
         CT cos_sig1 = cos_alp1 * cos_bet1;
         CT cos_sig2 = cos_alp2 * cos_bet2;
         CT sin_sig1 = sin_bet1;
@@ -503,41 +519,36 @@ public:
         normalize(sin_sig2, cos_sig2);
 
         CT coeffs[SeriesOrder + 1];
-        const std::size_t coeffs_var_size = (series_order_plus_two
-                                            * series_order_plus_one) / 2;
-        CT coeffs_var[coeffs_var_size];
 
-        if(ExpandEpsN){ // expand by eps and n
-
-            CT k2 = math::sqr(ep * cos_alp0);
-            CT sqrt_k2_plus_one = math::sqrt(CT(1) + k2);
-            CT eps = (sqrt_k2_plus_one - CT(1)) / (sqrt_k2_plus_one + CT(1));
-            CT n = f / (CT(2) - f);
-
-            // Generate and evaluate the polynomials on n
-            // to get the series coefficients (that depend on eps)
-            evaluate_coeffs_n(n, coeffs_var);
+        if (ExpandEpsN) // expand by eps and n
+        {
+            CT const k2 = math::sqr(ep * cos_alp0);
+            CT const sqrt_k2_plus_one = math::sqrt(CT(1) + k2);
+            CT const eps = (sqrt_k2_plus_one - CT(1)) / (sqrt_k2_plus_one + CT(1));
 
             // Generate and evaluate the polynomials on eps (i.e. var2 = eps)
             // to get the final series coefficients
-            evaluate_coeffs_var2(eps, coeffs_var, coeffs);
+            evaluate_coeffs_var2(eps, spheroid_const.m_coeffs_var, coeffs);
+        }
+        else
+        { // expand by k2 and ep
 
-        }else{ // expand by k2 and ep
+            CT const k2 = math::sqr(ep * cos_alp0);
+            CT const ep2 = math::sqr(ep);
 
-            CT k2 = math::sqr(ep * cos_alp0);
-            CT ep2 = math::sqr(ep);
+            CT coeffs_var[((SeriesOrder+2)*(SeriesOrder+1))/2];
 
             // Generate and evaluate the polynomials on ep2
             evaluate_coeffs_ep(ep2, coeffs_var);
 
             // Generate and evaluate the polynomials on k2 (i.e. var2 = k2)
             evaluate_coeffs_var2(k2, coeffs_var, coeffs);
-
         }
 
         // Evaluate the trigonometric sum
-        CT I12 = clenshaw_sum(cos_sig2, coeffs, coeffs + series_order_plus_one)
-               - clenshaw_sum(cos_sig1, coeffs, coeffs + series_order_plus_one);
+        constexpr auto series_order_plus_one = SeriesOrder + 1;
+        CT const I12 = clenshaw_sum(cos_sig2, coeffs, coeffs + series_order_plus_one)
+            - clenshaw_sum(cos_sig1, coeffs, coeffs + series_order_plus_one);
 
         // The part of the ellipsodal correction that depends on
         // point coordinates
@@ -576,3 +587,7 @@ public:
 
 
 #endif // BOOST_GEOMETRY_FORMULAS_AREA_FORMULAS_HPP
+
+/* area_formulas.hpp
+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
+*/

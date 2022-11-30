@@ -11,10 +11,9 @@
 #ifndef BOOST_MATH_MPLFR_BINDINGS_HPP
 #define BOOST_MATH_MPLFR_BINDINGS_HPP
 
-#include <boost/config.hpp>
-#include <boost/lexical_cast.hpp>
+#include <type_traits>
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 //
 // We get a lot of warnings from the gmp, mpfr and gmpfrxx headers, 
 // disable them here, so we only see warnings from *our* code:
@@ -25,7 +24,7 @@
 
 #include <gmpfrxx.h>
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
@@ -37,6 +36,7 @@
 #include <boost/math/bindings/detail/big_digamma.hpp>
 #include <boost/math/bindings/detail/big_lanczos.hpp>
 #include <boost/math/tools/big_constant.hpp>
+#include <boost/math/tools/config.hpp>
 
 inline mpfr_class fabs(const mpfr_class& v)
 {
@@ -184,9 +184,9 @@ inline long long lltrunc(__gmp_expr<T,U> const& x, const Policy& pol)
 namespace boost{ 
 
 #ifdef BOOST_MATH_USE_FLOAT128
-   template<> struct is_convertible<BOOST_MATH_FLOAT128_TYPE, mpfr_class> : public boost::integral_constant<bool, false>{};
+   template<> struct std::is_convertible<BOOST_MATH_FLOAT128_TYPE, mpfr_class> : public std::integral_constant<bool, false>{};
 #endif
-   template<> struct is_convertible<long long, mpfr_class> : public boost::integral_constant<bool, false>{};
+   template<> struct std::is_convertible<long long, mpfr_class> : public std::integral_constant<bool, false>{};
 
 namespace math{
 
@@ -282,7 +282,7 @@ struct construction_traits;
 template <class Policy>
 struct construction_traits<mpfr_class, Policy>
 {
-   typedef boost::integral_constant<int, 0> type;
+   typedef std::integral_constant<int, 0> type;
 };
 
 }
@@ -297,7 +297,7 @@ struct promote_arg<__gmp_expr<T,U> >
 };
 
 template<>
-inline int digits<mpfr_class>(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC(mpfr_class)) BOOST_NOEXCEPT
+inline int digits<mpfr_class>(BOOST_MATH_EXPLICIT_TEMPLATE_TYPE_SPEC(mpfr_class)) noexcept
 {
    return mpfr_class::get_dprec();
 }
@@ -455,14 +455,22 @@ inline mpfr_class skewness(const extreme_value_distribution<mpfr_class, Policy>&
    // This is 12 * sqrt(6) * zeta(3) / pi^3:
    // See http://mathworld.wolfram.com/ExtremeValueDistribution.html
    //
-   return boost::lexical_cast<mpfr_class>("1.1395470994046486574927930193898461120875997958366");
+   #ifdef BOOST_MATH_STANDALONE
+   static_assert(sizeof(Policy) == 0, "mpfr skewness can not be calculated in standalone mode");
+   #endif
+
+   return static_cast<mpfr_class>("1.1395470994046486574927930193898461120875997958366");
 }
 
 template <class Policy>
 inline mpfr_class skewness(const rayleigh_distribution<mpfr_class, Policy>& /*dist*/)
 {
   // using namespace boost::math::constants;
-  return boost::lexical_cast<mpfr_class>("0.63111065781893713819189935154422777984404221106391");
+  #ifdef BOOST_MATH_STANDALONE
+  static_assert(sizeof(Policy) == 0, "mpfr skewness can not be calculated in standalone mode");
+  #endif
+
+  return static_cast<mpfr_class>("0.63111065781893713819189935154422777984404221106391");
   // Computed using NTL at 150 bit, about 50 decimal digits.
   // return 2 * root_pi<RealType>() * pi_minus_three<RealType>() / pow23_four_minus_pi<RealType>();
 }
@@ -471,7 +479,11 @@ template <class Policy>
 inline mpfr_class kurtosis(const rayleigh_distribution<mpfr_class, Policy>& /*dist*/)
 {
   // using namespace boost::math::constants;
-  return boost::lexical_cast<mpfr_class>("3.2450893006876380628486604106197544154170667057995");
+  #ifdef BOOST_MATH_STANDALONE
+  static_assert(sizeof(Policy) == 0, "mpfr kurtosis can not be calculated in standalone mode");
+  #endif
+
+  return static_cast<mpfr_class>("3.2450893006876380628486604106197544154170667057995");
   // Computed using NTL at 150 bit, about 50 decimal digits.
   // return 3 - (6 * pi<RealType>() * pi<RealType>() - 24 * pi<RealType>() + 16) /
   // (four_minus_pi<RealType>() * four_minus_pi<RealType>());
@@ -482,7 +494,11 @@ inline mpfr_class kurtosis_excess(const rayleigh_distribution<mpfr_class, Policy
 {
   //using namespace boost::math::constants;
   // Computed using NTL at 150 bit, about 50 decimal digits.
-  return boost::lexical_cast<mpfr_class>("0.2450893006876380628486604106197544154170667057995");
+  #ifdef BOOST_MATH_STANDALONE
+  static_assert(sizeof(Policy) == 0, "mpfr excess kurtosis can not be calculated in standalone mode");
+  #endif
+
+  return static_cast<mpfr_class>("0.2450893006876380628486604106197544154170667057995");
   // return -(6 * pi<RealType>() * pi<RealType>() - 24 * pi<RealType>() + 16) /
   //   (four_minus_pi<RealType>() * four_minus_pi<RealType>());
 } // kurtosis
@@ -493,7 +509,7 @@ namespace detail{
 // Version of Digamma accurate to ~100 decimal digits.
 //
 template <class Policy>
-mpfr_class digamma_imp(mpfr_class x, const boost::integral_constant<int, 0>* , const Policy& pol)
+mpfr_class digamma_imp(mpfr_class x, const std::integral_constant<int, 0>* , const Policy& pol)
 {
    //
    // This handles reflection of negative arguments, and all our
@@ -533,7 +549,7 @@ mpfr_class digamma_imp(mpfr_class x, const boost::integral_constant<int, 0>* , c
 // starting guess for Halley iteration:
 //
 template <class Policy>
-inline mpfr_class erf_inv_imp(const mpfr_class& p, const mpfr_class& q, const Policy&, const boost::integral_constant<int, 64>*)
+inline mpfr_class erf_inv_imp(const mpfr_class& p, const mpfr_class& q, const Policy&, const std::integral_constant<int, 64>*)
 {
    BOOST_MATH_STD_USING // for ADL of std names.
 
@@ -791,49 +807,53 @@ inline mpfr_class erf_inv_imp(const mpfr_class& p, const mpfr_class& q, const Po
 
 inline mpfr_class bessel_i0(mpfr_class x)
 {
+   #ifdef BOOST_MATH_STANDALONE
+   static_assert(sizeof(x) == 0, "mpfr bessel_i0 can not be calculated in standalone mode");
+   #endif
+    
     static const mpfr_class P1[] = {
-        boost::lexical_cast<mpfr_class>("-2.2335582639474375249e+15"),
-        boost::lexical_cast<mpfr_class>("-5.5050369673018427753e+14"),
-        boost::lexical_cast<mpfr_class>("-3.2940087627407749166e+13"),
-        boost::lexical_cast<mpfr_class>("-8.4925101247114157499e+11"),
-        boost::lexical_cast<mpfr_class>("-1.1912746104985237192e+10"),
-        boost::lexical_cast<mpfr_class>("-1.0313066708737980747e+08"),
-        boost::lexical_cast<mpfr_class>("-5.9545626019847898221e+05"),
-        boost::lexical_cast<mpfr_class>("-2.4125195876041896775e+03"),
-        boost::lexical_cast<mpfr_class>("-7.0935347449210549190e+00"),
-        boost::lexical_cast<mpfr_class>("-1.5453977791786851041e-02"),
-        boost::lexical_cast<mpfr_class>("-2.5172644670688975051e-05"),
-        boost::lexical_cast<mpfr_class>("-3.0517226450451067446e-08"),
-        boost::lexical_cast<mpfr_class>("-2.6843448573468483278e-11"),
-        boost::lexical_cast<mpfr_class>("-1.5982226675653184646e-14"),
-        boost::lexical_cast<mpfr_class>("-5.2487866627945699800e-18"),
+        static_cast<mpfr_class>("-2.2335582639474375249e+15"),
+        static_cast<mpfr_class>("-5.5050369673018427753e+14"),
+        static_cast<mpfr_class>("-3.2940087627407749166e+13"),
+        static_cast<mpfr_class>("-8.4925101247114157499e+11"),
+        static_cast<mpfr_class>("-1.1912746104985237192e+10"),
+        static_cast<mpfr_class>("-1.0313066708737980747e+08"),
+        static_cast<mpfr_class>("-5.9545626019847898221e+05"),
+        static_cast<mpfr_class>("-2.4125195876041896775e+03"),
+        static_cast<mpfr_class>("-7.0935347449210549190e+00"),
+        static_cast<mpfr_class>("-1.5453977791786851041e-02"),
+        static_cast<mpfr_class>("-2.5172644670688975051e-05"),
+        static_cast<mpfr_class>("-3.0517226450451067446e-08"),
+        static_cast<mpfr_class>("-2.6843448573468483278e-11"),
+        static_cast<mpfr_class>("-1.5982226675653184646e-14"),
+        static_cast<mpfr_class>("-5.2487866627945699800e-18"),
     };
     static const mpfr_class Q1[] = {
-        boost::lexical_cast<mpfr_class>("-2.2335582639474375245e+15"),
-        boost::lexical_cast<mpfr_class>("7.8858692566751002988e+12"),
-        boost::lexical_cast<mpfr_class>("-1.2207067397808979846e+10"),
-        boost::lexical_cast<mpfr_class>("1.0377081058062166144e+07"),
-        boost::lexical_cast<mpfr_class>("-4.8527560179962773045e+03"),
-        boost::lexical_cast<mpfr_class>("1.0"),
+        static_cast<mpfr_class>("-2.2335582639474375245e+15"),
+        static_cast<mpfr_class>("7.8858692566751002988e+12"),
+        static_cast<mpfr_class>("-1.2207067397808979846e+10"),
+        static_cast<mpfr_class>("1.0377081058062166144e+07"),
+        static_cast<mpfr_class>("-4.8527560179962773045e+03"),
+        static_cast<mpfr_class>("1.0"),
     };
     static const mpfr_class P2[] = {
-        boost::lexical_cast<mpfr_class>("-2.2210262233306573296e-04"),
-        boost::lexical_cast<mpfr_class>("1.3067392038106924055e-02"),
-        boost::lexical_cast<mpfr_class>("-4.4700805721174453923e-01"),
-        boost::lexical_cast<mpfr_class>("5.5674518371240761397e+00"),
-        boost::lexical_cast<mpfr_class>("-2.3517945679239481621e+01"),
-        boost::lexical_cast<mpfr_class>("3.1611322818701131207e+01"),
-        boost::lexical_cast<mpfr_class>("-9.6090021968656180000e+00"),
+        static_cast<mpfr_class>("-2.2210262233306573296e-04"),
+        static_cast<mpfr_class>("1.3067392038106924055e-02"),
+        static_cast<mpfr_class>("-4.4700805721174453923e-01"),
+        static_cast<mpfr_class>("5.5674518371240761397e+00"),
+        static_cast<mpfr_class>("-2.3517945679239481621e+01"),
+        static_cast<mpfr_class>("3.1611322818701131207e+01"),
+        static_cast<mpfr_class>("-9.6090021968656180000e+00"),
     };
     static const mpfr_class Q2[] = {
-        boost::lexical_cast<mpfr_class>("-5.5194330231005480228e-04"),
-        boost::lexical_cast<mpfr_class>("3.2547697594819615062e-02"),
-        boost::lexical_cast<mpfr_class>("-1.1151759188741312645e+00"),
-        boost::lexical_cast<mpfr_class>("1.3982595353892851542e+01"),
-        boost::lexical_cast<mpfr_class>("-6.0228002066743340583e+01"),
-        boost::lexical_cast<mpfr_class>("8.5539563258012929600e+01"),
-        boost::lexical_cast<mpfr_class>("-3.1446690275135491500e+01"),
-        boost::lexical_cast<mpfr_class>("1.0"),
+        static_cast<mpfr_class>("-5.5194330231005480228e-04"),
+        static_cast<mpfr_class>("3.2547697594819615062e-02"),
+        static_cast<mpfr_class>("-1.1151759188741312645e+00"),
+        static_cast<mpfr_class>("1.3982595353892851542e+01"),
+        static_cast<mpfr_class>("-6.0228002066743340583e+01"),
+        static_cast<mpfr_class>("8.5539563258012929600e+01"),
+        static_cast<mpfr_class>("-3.1446690275135491500e+01"),
+        static_cast<mpfr_class>("1.0"),
     };
     mpfr_class value, factor, r;
 
@@ -946,9 +966,13 @@ inline mpfr_class bessel_i1(mpfr_class x)
 
 }
 
-template<> struct is_convertible<long double, mpfr_class> : public boost::false_type{};
+template<> struct std::is_convertible<long double, mpfr_class> : public std::false_type{};
 
 }
 
 #endif // BOOST_MATH_MPLFR_BINDINGS_HPP
 
+
+/* mpfr.hpp
+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
+*/

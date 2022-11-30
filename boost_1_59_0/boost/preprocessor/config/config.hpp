@@ -1,7 +1,7 @@
 # /* **************************************************************************
 #  *                                                                          *
 #  *     (C) Copyright Paul Mensonides 2002-2011.                             *
-#  *     (C) Copyright Edward Diener 2011.                                    *
+#  *     (C) Copyright Edward Diener 2011-2020.                               *
 #  *     Distributed under the Boost Software License, Version 1.0. (See      *
 #  *     accompanying file LICENSE_1_0.txt or copy at                         *
 #  *     http://www.boost.org/LICENSE_1_0.txt)                                *
@@ -76,40 +76,27 @@
 #
 # /* BOOST_PP_VARIADICS */
 #
-# define BOOST_PP_VARIADICS_MSVC 0
-# if !defined BOOST_PP_VARIADICS
-#    /* variadic support explicitly disabled for all untested compilers */
-
-#    if defined __GCCXML__ || (defined __NVCC__ && defined __CUDACC__) || defined __PATHSCALE__ || defined __DMC__ || (defined __CODEGEARC__ && !defined(__clang__)) || (defined __BORLANDC__ && !defined(__clang__)) || defined __MWERKS__ || ( defined __SUNPRO_CC && __SUNPRO_CC < 0x5120 ) || (defined __HP_aCC && !defined __EDG__) || defined __MRC__ || defined __SC__ || (defined(__PGI) && !defined(__EDG__))
-#        define BOOST_PP_VARIADICS 0
-#    elif defined(_MSC_VER) && defined(__clang__)
-#        define BOOST_PP_VARIADICS 1
-#    /* VC++ (C/C++) and Intel C++ Compiler >= 17.0 with MSVC */
-#    elif defined _MSC_VER && _MSC_VER >= 1400 && (!defined __EDG__ || defined(__INTELLISENSE__) || defined(__INTEL_COMPILER) && __INTEL_COMPILER >= 1700)
-#        define BOOST_PP_VARIADICS 1
-#        if !defined(_MSVC_TRADITIONAL) || _MSVC_TRADITIONAL
-#           undef BOOST_PP_VARIADICS_MSVC
-#           define BOOST_PP_VARIADICS_MSVC 1
-#        endif
-#    /* Wave (C/C++), GCC (C++) */
-#    elif defined __WAVE__ && __WAVE_HAS_VARIADICS__ || defined __GNUC__ && defined __GXX_EXPERIMENTAL_CXX0X__ && __GXX_EXPERIMENTAL_CXX0X__
-#        define BOOST_PP_VARIADICS 1
-#    /* EDG-based (C/C++), GCC (C), and unknown (C/C++) */
-#    elif !defined __cplusplus && __STDC_VERSION__ >= 199901L || __cplusplus >= 201103L
-#        define BOOST_PP_VARIADICS 1
-#    else
-#        define BOOST_PP_VARIADICS 0
-#    endif
-# elif !BOOST_PP_VARIADICS + 1 < 2
+# if defined BOOST_PP_VARIADICS
 #    undef BOOST_PP_VARIADICS
-#    define BOOST_PP_VARIADICS 1
-#    if defined _MSC_VER && _MSC_VER >= 1400 && !defined(__clang__) && (defined(__INTELLISENSE__) || (defined(__INTEL_COMPILER) && __INTEL_COMPILER >= 1700) || !(defined __EDG__ || defined __GCCXML__ || (defined __NVCC__ && defined __CUDACC__) || defined __PATHSCALE__ || defined __DMC__ || defined __CODEGEARC__ || defined __BORLANDC__ || defined __MWERKS__ || defined __SUNPRO_CC || defined __HP_aCC || defined __MRC__ || defined __SC__ || defined __IBMCPP__ || defined __PGI)) && (!defined(_MSVC_TRADITIONAL) || _MSVC_TRADITIONAL)
-#        undef BOOST_PP_VARIADICS_MSVC
-#        define BOOST_PP_VARIADICS_MSVC 1
-#    endif
+# endif
+# if defined BOOST_PP_VARIADICS_MSVC
+#    undef BOOST_PP_VARIADICS_MSVC
+# endif
+# define BOOST_PP_VARIADICS 1
+# if defined _MSC_VER && _MSC_VER >= 1400 && !defined(__clang__) && (defined(__INTELLISENSE__) || (defined(__INTEL_COMPILER) && __INTEL_COMPILER >= 1700) || !(defined __EDG__ || defined __GCCXML__ || defined __PATHSCALE__ || defined __DMC__ || defined __CODEGEARC__ || defined __BORLANDC__ || defined __MWERKS__ || defined __SUNPRO_CC || defined __HP_aCC || defined __MRC__ || defined __SC__ || defined __IBMCPP__ || defined __PGI)) && (!defined(_MSVC_TRADITIONAL) || _MSVC_TRADITIONAL)
+#     define BOOST_PP_VARIADICS_MSVC 1
 # else
-#    undef BOOST_PP_VARIADICS
-#    define BOOST_PP_VARIADICS 0
+#     define BOOST_PP_VARIADICS_MSVC 0
+# endif
+#
+# if BOOST_PP_CONFIG_FLAGS() & BOOST_PP_CONFIG_STRICT()
+# define BOOST_PP_IS_STANDARD() 1
+# else
+# define BOOST_PP_IS_STANDARD() 0
 # endif
 #
 # endif
+
+/* config.hpp
+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
+*/

@@ -82,7 +82,7 @@ class frame_test;
     To declare the @ref stream object with a @ref tcp_stream in a
     multi-threaded asynchronous program using a strand, you may write:
     @code
-    websocket::stream<tcp_stream> ws{net::io_context::strand(ioc)};
+    websocket::stream<tcp_stream> ws{net::make_strand(ioc)};
     @endcode
     Alternatively, for a single-threaded or synchronous application
     you may write:
@@ -675,7 +675,11 @@ public:
 
         @param res The HTTP Upgrade response returned by the remote
         endpoint. The caller may use the response to access any
-        additional information sent by the server.
+        additional information sent by the server. Note that the response object
+        referenced by this parameter will be updated as long as the stream has
+        received a valid HTTP response. If not (for example because of a communications
+        error), the response contents will be undefined except for the result() which
+        will bet set to 500, Internal Server Error.
 
         @param host The name of the remote host. This is required by
         the HTTP protocol to set the "Host" header field.
@@ -2537,134 +2541,6 @@ public:
             net::default_completion_token_t<
                 executor_type>{});
 
-    //
-    // Deprecated
-    //
-
-#if ! BOOST_BEAST_DOXYGEN
-    template<class RequestDecorator>
-    void
-    handshake_ex(
-        string_view host,
-        string_view target,
-        RequestDecorator const& decorator);
-
-    template<class RequestDecorator>
-    void
-    handshake_ex(
-        response_type& res,
-        string_view host,
-        string_view target,
-        RequestDecorator const& decorator);
-
-    template<class RequestDecorator>
-    void
-    handshake_ex(
-        string_view host,
-        string_view target,
-        RequestDecorator const& decorator,
-        error_code& ec);
-
-    template<class RequestDecorator>
-    void
-    handshake_ex(
-        response_type& res,
-        string_view host,
-        string_view target,
-        RequestDecorator const& decorator,
-        error_code& ec);
-
-    template<class RequestDecorator, class HandshakeHandler>
-    BOOST_BEAST_ASYNC_RESULT1(HandshakeHandler)
-    async_handshake_ex(
-        string_view host,
-        string_view target,
-        RequestDecorator const& decorator,
-        HandshakeHandler&& handler);
-
-    template<class RequestDecorator, class HandshakeHandler>
-    BOOST_BEAST_ASYNC_RESULT1(HandshakeHandler)
-    async_handshake_ex(
-        response_type& res,
-        string_view host,
-        string_view target,
-        RequestDecorator const& decorator,
-        HandshakeHandler&& handler);
-
-    template<class ResponseDecorator>
-    void
-    accept_ex(ResponseDecorator const& decorator);
-
-    template<class ResponseDecorator>
-    void
-    accept_ex(
-        ResponseDecorator const& decorator,
-        error_code& ec);
-
-    template<class ConstBufferSequence,
-        class ResponseDecorator>
-    typename std::enable_if<! http::detail::is_header<
-        ConstBufferSequence>::value>::type
-    accept_ex(
-        ConstBufferSequence const& buffers,
-        ResponseDecorator const& decorator);
-
-    template<class ConstBufferSequence, class ResponseDecorator>
-    typename std::enable_if<! http::detail::is_header<
-        ConstBufferSequence>::value>::type
-    accept_ex(
-        ConstBufferSequence const& buffers,
-        ResponseDecorator const& decorator,
-        error_code& ec);
-
-    template<class Body, class Allocator,
-        class ResponseDecorator>
-    void
-    accept_ex(http::request<Body,
-        http::basic_fields<Allocator>> const& req,
-            ResponseDecorator const& decorator);
-
-    template<class Body, class Allocator,
-        class ResponseDecorator>
-    void
-    accept_ex(http::request<Body,
-        http::basic_fields<Allocator>> const& req,
-            ResponseDecorator const& decorator,
-                error_code& ec);
-
-    template<
-        class ResponseDecorator,
-        class AcceptHandler>
-    BOOST_BEAST_ASYNC_RESULT1(AcceptHandler)
-    async_accept_ex(
-        ResponseDecorator const& decorator,
-        AcceptHandler&& handler);
-
-    template<
-        class ConstBufferSequence,
-        class ResponseDecorator,
-        class AcceptHandler>
-    BOOST_BEAST_ASYNC_RESULT1(AcceptHandler)
-    async_accept_ex(
-        ConstBufferSequence const& buffers,
-        ResponseDecorator const& decorator,
-        AcceptHandler&& handler,
-        typename std::enable_if<
-            ! http::detail::is_header<
-            ConstBufferSequence>::value>::type* = 0);
-
-    template<
-        class Body, class Allocator,
-        class ResponseDecorator,
-        class AcceptHandler>
-    BOOST_BEAST_ASYNC_RESULT1(AcceptHandler)
-    async_accept_ex(
-        http::request<Body,
-            http::basic_fields<Allocator>> const& req,
-        ResponseDecorator const& decorator,
-        AcceptHandler&& handler);
-#endif
-
 private:
     template<class, class>  class accept_op;
     template<class>         class close_op;
@@ -2774,3 +2650,7 @@ seed_prng(std::seed_seq& ss)
 #include <boost/beast/websocket/impl/write.hpp>
 
 #endif
+
+/* stream.hpp
+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
+*/

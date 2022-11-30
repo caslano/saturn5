@@ -88,7 +88,7 @@ class basic_bufferbuf
       :  basic_streambuf_t(), m_mode(mode), m_buffer(buf), m_length(length)
       {  this->set_pointers();   }
 
-   virtual ~basic_bufferbuf(){}
+   virtual ~basic_bufferbuf() BOOST_OVERRIDE {}
 
    public:
    //!Returns the pointer and size of the internal buffer.
@@ -115,14 +115,14 @@ class basic_bufferbuf
    }
 
    protected:
-   virtual int_type underflow()
+   virtual int_type underflow() BOOST_OVERRIDE
    {
       // Precondition: gptr() >= egptr(). Returns a character, if available.
       return this->gptr() != this->egptr() ?
          CharTraits::to_int_type(*this->gptr()) : CharTraits::eof();
    }
 
-   virtual int_type pbackfail(int_type c = CharTraits::eof())
+   virtual int_type pbackfail(int_type c = CharTraits::eof()) BOOST_OVERRIDE
    {
       if(this->gptr() != this->eback()) {
          if(!CharTraits::eq_int_type(c, CharTraits::eof())) {
@@ -132,7 +132,7 @@ class basic_bufferbuf
             }
             else if(m_mode & std::ios_base::out) {
                this->gbump(-1);
-               *this->gptr() = c;
+               *this->gptr() = CharTraits::to_char_type(c);
                return c;
             }
             else
@@ -147,7 +147,7 @@ class basic_bufferbuf
          return CharTraits::eof();
    }
 
-   virtual int_type overflow(int_type c = CharTraits::eof())
+   virtual int_type overflow(int_type c = CharTraits::eof()) BOOST_OVERRIDE
    {
       if(m_mode & std::ios_base::out) {
          if(!CharTraits::eq_int_type(c, CharTraits::eof())) {
@@ -181,7 +181,7 @@ class basic_bufferbuf
 
    virtual pos_type seekoff(off_type off, std::ios_base::seekdir dir,
                               std::ios_base::openmode mode
-                                 = std::ios_base::in | std::ios_base::out)
+                                 = std::ios_base::in | std::ios_base::out) BOOST_OVERRIDE
    {
       bool in  = false;
       bool out = false;
@@ -246,7 +246,7 @@ class basic_bufferbuf
    }
 
    virtual pos_type seekpos(pos_type pos, std::ios_base::openmode mode
-                                 = std::ios_base::in | std::ios_base::out)
+                                 = std::ios_base::in | std::ios_base::out) BOOST_OVERRIDE
    {  return seekoff(pos - pos_type(off_type(0)), std::ios_base::beg, mode);  }
 
    private:
@@ -489,3 +489,7 @@ typedef basic_obufferstream<wchar_t> wobufferstream;
 #include <boost/interprocess/detail/config_end.hpp>
 
 #endif /* BOOST_INTERPROCESS_BUFFERSTREAM_HPP */
+
+/* bufferstream.hpp
+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
+*/

@@ -27,6 +27,14 @@
 #include <boost/interprocess/detail/workaround.hpp>
 #include <boost/cstdint.hpp>
 
+#if !defined(_AIX)
+#define BOOST_INTERPROCESS_DETAIL_PPC_ASM_LABEL(label) label ":\n\t"
+#define BOOST_INTERPROCESS_DETAIL_PPC_ASM_JUMP(insn, label, offset) insn " " label "\n\t"
+#else
+#define BOOST_INTERPROCESS_DETAIL_PPC_ASM_LABEL(label)
+#define BOOST_INTERPROCESS_DETAIL_PPC_ASM_JUMP(insn, label, offset) insn " $" offset "\n\t"
+#endif
+
 namespace boost{
 namespace interprocess{
 namespace ipcdetail{
@@ -64,7 +72,12 @@ inline boost::uint32_t atomic_cas32
 #if defined( _MSC_VER )
    extern "C" void _ReadWriteBarrier(void);
    #pragma intrinsic(_ReadWriteBarrier)
-   #define BOOST_INTERPROCESS_READ_WRITE_BARRIER _ReadWriteBarrier()
+
+#define BOOST_INTERPROCESS_READ_WRITE_BARRIER \
+            BOOST_INTERPROCESS_DISABLE_DEPRECATED_WARNING \
+            _ReadWriteBarrier() \
+            BOOST_INTERPROCESS_RESTORE_WARNING
+
 #elif defined(__GNUC__)
    #if (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__) > 40100
       #define BOOST_INTERPROCESS_READ_WRITE_BARRIER __sync_synchronize()
@@ -81,13 +94,13 @@ namespace ipcdetail{
 //! "mem": pointer to the atomic value
 //! Returns the old value pointed to by mem
 inline boost::uint32_t atomic_dec32(volatile boost::uint32_t *mem)
-{  return winapi::interlocked_decrement(reinterpret_cast<volatile long*>(mem)) + 1;  }
+{  return (boost::uint32_t)winapi::interlocked_decrement(reinterpret_cast<volatile long*>(mem)) + 1;  }
 
 //! Atomically increment an apr_uint32_t by 1
 //! "mem": pointer to the object
 //! Returns the old value pointed to by mem
 inline boost::uint32_t atomic_inc32(volatile boost::uint32_t *mem)
-{  return winapi::interlocked_increment(reinterpret_cast<volatile long*>(mem))-1;  }
+{  return (boost::uint32_t)winapi::interlocked_increment(reinterpret_cast<volatile long*>(mem))-1;  }
 
 //! Atomically read an boost::uint32_t from memory
 inline boost::uint32_t atomic_read32(volatile boost::uint32_t *mem)
@@ -101,7 +114,7 @@ inline boost::uint32_t atomic_read32(volatile boost::uint32_t *mem)
 //! "mem": pointer to the object
 //! "param": val value that the object will assume
 inline void atomic_write32(volatile boost::uint32_t *mem, boost::uint32_t val)
-{  winapi::interlocked_exchange(reinterpret_cast<volatile long*>(mem), val);  }
+{  winapi::interlocked_exchange(reinterpret_cast<volatile long*>(mem), (long)val);  }
 
 //! Compare an boost::uint32_t's value with "cmp".
 //! If they are the same swap the value with "with"
@@ -111,7 +124,7 @@ inline void atomic_write32(volatile boost::uint32_t *mem, boost::uint32_t val)
 //! Returns the old value of *mem
 inline boost::uint32_t atomic_cas32
    (volatile boost::uint32_t *mem, boost::uint32_t with, boost::uint32_t cmp)
-{  return winapi::interlocked_compare_exchange(reinterpret_cast<volatile long*>(mem), with, cmp);  }
+{  return (boost::uint32_t)winapi::interlocked_compare_exchange(reinterpret_cast<volatile long*>(mem), (long)with, (long)cmp);  }
 
 }  //namespace ipcdetail{
 }  //namespace interprocess{
@@ -153,7 +166,7 @@ inline boost::uint32_t atomic_add32
    // int r = *pw;
    // *mem += val;
    // return r;
-   int r;
+   boost::uint32_t r;
 
    asm volatile
    (
@@ -218,14 +231,17 @@ inline boost::uint32_t atomic_add32(volatile boost::uint32_t *mem, boost::uint32
 {
    boost::uint32_t prev, temp;
 
-   asm volatile ("1:\n\t"
-                 "lwarx  %0,0,%2\n\t"
-                 "add    %1,%0,%3\n\t"
-                 "stwcx. %1,0,%2\n\t"
-                 "bne-   1b"
-                 : "=&r" (prev), "=&r" (temp)
-                 : "b" (mem), "r" (val)
-                 : "cc", "memory");
+   asm volatile
+     (
+         BOOST_INTERPROCESS_DETAIL_PPC_ASM_LABEL("1")
+         "lwarx  %0,0,%2\n\t"
+         "add    %1,%0,%3\n\t"
+         "stwcx. %1,0,%2\n\t"
+         BOOST_INTERPROCESS_DETAIL_PPC_ASM_JUMP("bne-", "1b", "-12")
+         : "=&r" (prev), "=&r" (temp)
+         : "b" (mem), "r" (val)
+         : "cc", "memory"
+      );
    return prev;
 }
 
@@ -240,16 +256,19 @@ inline boost::uint32_t atomic_cas32
 {
    boost::uint32_t prev;
 
-   asm volatile ("1:\n\t"
-                 "lwarx  %0,0,%1\n\t"
-                 "cmpw   %0,%3\n\t"
-                 "bne-   2f\n\t"
-                 "stwcx. %2,0,%1\n\t"
-                 "bne-   1b\n\t"
-                 "2:"
-                 : "=&r"(prev)
-                 : "b" (mem), "r" (with), "r" (cmp)
-                 : "cc", "memory");
+   asm volatile
+     (
+         BOOST_INTERPROCESS_DETAIL_PPC_ASM_LABEL("1")
+         "lwarx  %0,0,%1\n\t"
+         "cmpw   %0,%3\n\t"
+         BOOST_INTERPROCESS_DETAIL_PPC_ASM_JUMP("bne-", "2f", "+12")
+         "stwcx. %2,0,%1\n\t"
+         BOOST_INTERPROCESS_DETAIL_PPC_ASM_JUMP("bne-", "1b", "-16")
+         BOOST_INTERPROCESS_DETAIL_PPC_ASM_LABEL("2")
+         : "=&r"(prev)
+	 : "b" (mem), "r" (with), "r" (cmp)
+	 : "cc", "memory"
+      );
    return prev;
 }
 
@@ -653,3 +672,7 @@ inline bool atomic_add_unless32
 #include <boost/interprocess/detail/config_end.hpp>
 
 #endif   //BOOST_INTERPROCESS_DETAIL_ATOMIC_HPP
+
+/* atomic.hpp
+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
+*/

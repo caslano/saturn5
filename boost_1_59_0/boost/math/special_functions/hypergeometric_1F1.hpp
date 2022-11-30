@@ -10,12 +10,7 @@
 #ifndef BOOST_MATH_HYPERGEOMETRIC_1F1_HPP
 #define BOOST_MATH_HYPERGEOMETRIC_1F1_HPP
 
-#include <boost/config.hpp>
-
-#if defined(BOOST_NO_CXX11_AUTO_DECLARATIONS) || defined(BOOST_NO_CXX11_LAMBDAS) || defined(BOOST_NO_CXX11_UNIFIED_INITIALIZATION_SYNTAX)
-# error "hypergeometric_1F1 requires a C++11 compiler"
-#endif
-
+#include <boost/math/tools/config.hpp>
 #include <boost/math/policies/policy.hpp>
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/math/special_functions/detail/hypergeometric_series.hpp>
@@ -50,7 +45,7 @@ namespace boost { namespace math { namespace detail {
    }
 
    template <class T, class Policy>
-   T hypergeometric_1F1_divergent_fallback(const T& a, const T& b, const T& z, const Policy& pol, int& log_scaling)
+   T hypergeometric_1F1_divergent_fallback(const T& a, const T& b, const T& z, const Policy& pol, long long& log_scaling)
    {
       BOOST_MATH_STD_USING
       const char* function = "hypergeometric_1F1_divergent_fallback<%1%>(%1%,%1%,%1%)";
@@ -303,7 +298,7 @@ namespace boost { namespace math { namespace detail {
 
       
    template <class T, class Policy>
-   T hypergeometric_1F1_imp(const T& a, const T& b, const T& z, const Policy& pol, int& log_scaling)
+   T hypergeometric_1F1_imp(const T& a, const T& b, const T& z, const Policy& pol, long long& log_scaling)
    {
       BOOST_MATH_STD_USING // exp, fabs, sqrt
 
@@ -329,7 +324,7 @@ namespace boost { namespace math { namespace detail {
       // 0f0 a == b case;
       if (b_minus_a == 0)
       {
-         int scale = itrunc(z, pol);
+         long long scale = lltrunc(z, pol);
          log_scaling += scale;
          return exp(z - scale);
       }
@@ -358,7 +353,7 @@ namespace boost { namespace math { namespace detail {
             // a is tiny compared to b, and z < 0
             // 13.3.6 appears to be the most efficient and often the most accurate method.
             T r = boost::math::detail::hypergeometric_1F1_AS_13_3_6(b_minus_a, b, T(-z), a, pol, log_scaling);
-            int scale = itrunc(z, pol);
+            long long scale = lltrunc(z, pol);
             log_scaling += scale;
             return r * exp(z - scale);
          }
@@ -371,7 +366,7 @@ namespace boost { namespace math { namespace detail {
             {
                // Fractional parts of a and b are genuinely equal, we might as well
                // apply Kummer's relation and get a truncated series:
-               int scaling = itrunc(z);
+               long long scaling = lltrunc(z);
                T r = exp(z - scaling) * detail::hypergeometric_1F1_imp<T>(b_minus_a, b, -z, pol, log_scaling);
                log_scaling += scaling;
                return r;
@@ -389,7 +384,7 @@ namespace boost { namespace math { namespace detail {
             // We've got nothing left but 13.3.6, even though it may be initially divergent:
             //
             T r = boost::math::detail::hypergeometric_1F1_AS_13_3_6(b_minus_a, b, T(-z), a, pol, log_scaling);
-            int scale = itrunc(z, pol);
+            long long scale = lltrunc(z, pol);
             log_scaling += scale;
             return r * exp(z - scale);
          }
@@ -401,7 +396,7 @@ namespace boost { namespace math { namespace detail {
       //
       if (detail::hypergeometric_1F1_asym_region(a, b, z, pol))
       {
-         int saved_scale = log_scaling;
+         long long saved_scale = log_scaling;
          try
          {
             return hypergeometric_1F1_asym_large_z_series(a, b, z, pol, log_scaling);
@@ -444,7 +439,7 @@ namespace boost { namespace math { namespace detail {
          // Let's otherwise make z positive (almost always)
          // by Kummer's transformation
          // (we also don't transform if z belongs to [-1,0])
-         int scaling = itrunc(z);
+         long long scaling = lltrunc(z);
          T r = exp(z - scaling) * detail::hypergeometric_1F1_imp<T>(b_minus_a, b, -z, pol, log_scaling);
          log_scaling += scaling;
          return r;
@@ -564,7 +559,7 @@ namespace boost { namespace math { namespace detail {
          //
          if (is_convergent_negative_z_series(b_minus_a, b, T(-z), b_minus_a))
          {
-            int scaling = itrunc(z);
+            long long scaling = lltrunc(z);
             T r = exp(z - scaling) * detail::hypergeometric_1F1_checked_series_impl(b_minus_a, b, T(-z), pol, log_scaling);
             log_scaling += scaling;
             return r;
@@ -585,18 +580,13 @@ namespace boost { namespace math { namespace detail {
    inline T hypergeometric_1F1_imp(const T& a, const T& b, const T& z, const Policy& pol)
    {
       BOOST_MATH_STD_USING // exp, fabs, sqrt
-      int log_scaling = 0;
+      long long log_scaling = 0;
       T result = hypergeometric_1F1_imp(a, b, z, pol, log_scaling);
       //
       // Actual result will be result * e^log_scaling.
       //
-#ifndef BOOST_NO_CXX11_THREAD_LOCAL
-    static const thread_local int max_scaling = itrunc(boost::math::tools::log_max_value<T>()) - 2;
-    static const thread_local T max_scale_factor = exp(T(max_scaling));
-#else
-    int max_scaling = itrunc(boost::math::tools::log_max_value<T>()) - 2;
-      T max_scale_factor = exp(T(max_scaling));
-#endif
+      static const thread_local long long max_scaling = lltrunc(boost::math::tools::log_max_value<T>()) - 2;
+      static const thread_local T max_scale_factor = exp(T(max_scaling));
 
       while (log_scaling > max_scaling)
       {
@@ -617,7 +607,7 @@ namespace boost { namespace math { namespace detail {
    inline T log_hypergeometric_1F1_imp(const T& a, const T& b, const T& z, int* sign, const Policy& pol)
    {
       BOOST_MATH_STD_USING // exp, fabs, sqrt
-      int log_scaling = 0;
+      long long log_scaling = 0;
       T result = hypergeometric_1F1_imp(a, b, z, pol, log_scaling);
       if (sign)
       *sign = result < 0 ? -1 : 1;
@@ -629,20 +619,16 @@ namespace boost { namespace math { namespace detail {
    inline T hypergeometric_1F1_regularized_imp(const T& a, const T& b, const T& z, const Policy& pol)
    {
       BOOST_MATH_STD_USING // exp, fabs, sqrt
-      int log_scaling = 0;
+      long long log_scaling = 0;
       T result = hypergeometric_1F1_imp(a, b, z, pol, log_scaling);
       //
       // Actual result will be result * e^log_scaling / tgamma(b).
       //
-    int result_sign = 1;
-    T scale = log_scaling - boost::math::lgamma(b, &result_sign, pol);
-#ifndef BOOST_NO_CXX11_THREAD_LOCAL
+      int result_sign = 1;
+      T scale = log_scaling - boost::math::lgamma(b, &result_sign, pol);
+
       static const thread_local T max_scaling = boost::math::tools::log_max_value<T>() - 2;
-    static const thread_local T max_scale_factor = exp(max_scaling);
-#else
-    T max_scaling = boost::math::tools::log_max_value<T>() - 2;
-    T max_scale_factor = exp(max_scaling);
-#endif
+      static const thread_local T max_scale_factor = exp(max_scaling);
 
       while (scale > max_scaling)
       {
@@ -775,3 +761,7 @@ inline typename tools::promote_args<T1, T2, T3>::type log_hypergeometric_1F1(T1 
   } } // namespace boost::math
 
 #endif // BOOST_MATH_HYPERGEOMETRIC_HPP
+
+/* hypergeometric_1F1.hpp
+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
+*/

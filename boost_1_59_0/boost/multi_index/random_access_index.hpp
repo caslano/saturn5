@@ -1,4 +1,4 @@
-/* Copyright 2003-2020 Joaquin M Lopez Munoz.
+/* Copyright 2003-2021 Joaquin M Lopez Munoz.
  * Distributed under the Boost Software License, Version 1.0.
  * (See accompanying file LICENSE_1_0.txt or copy at
  * http://www.boost.org/LICENSE_1_0.txt)
@@ -18,7 +18,7 @@
 #include <boost/bind/bind.hpp>
 #include <boost/call_traits.hpp>
 #include <boost/core/addressof.hpp>
-#include <boost/detail/no_exceptions_support.hpp>
+#include <boost/core/no_exceptions_support.hpp>
 #include <boost/detail/workaround.hpp>
 #include <boost/foreach_fwd.hpp>
 #include <boost/iterator/reverse_iterator.hpp>
@@ -31,6 +31,7 @@
 #include <boost/multi_index/detail/allocator_traits.hpp>
 #include <boost/multi_index/detail/do_not_copy_elements_tag.hpp>
 #include <boost/multi_index/detail/index_node_base.hpp>
+#include <boost/multi_index/detail/node_handle.hpp>
 #include <boost/multi_index/detail/rnd_node_iterator.hpp>
 #include <boost/multi_index/detail/rnd_index_node.hpp>
 #include <boost/multi_index/detail/rnd_index_ops.hpp>
@@ -41,6 +42,7 @@
 #include <boost/multi_index/random_access_index_fwd.hpp>
 #include <boost/throw_exception.hpp> 
 #include <boost/tuple/tuple.hpp>
+#include <boost/type_traits/is_copy_constructible.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <functional>
 #include <stdexcept> 
@@ -76,15 +78,14 @@ namespace detail{
  * to a given Super
  */
 
+#if defined(BOOST_MSVC)
+#pragma warning(push)
+#pragma warning(disable:4355) /* this used in base member initializer list */
+#endif
+
 template<typename SuperMeta,typename TagList>
 class random_access_index:
   BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS SuperMeta::type
-
-#if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-  ,public safe_mode::safe_container<
-    random_access_index<SuperMeta,TagList> >
-#endif
-
 { 
 #if defined(BOOST_MULTI_INDEX_ENABLE_INVARIANT_CHECKING)&&\
     BOOST_WORKAROUND(__MWERKS__,<=0x3003)
@@ -96,14 +97,20 @@ class random_access_index:
 #pragma parse_mfunc_templ off
 #endif
 
+#if !defined(BOOST_NO_MEMBER_TEMPLATE_FRIENDS)
+  /* cross-index access */
+
+  template <typename,typename,typename> friend class index_base;
+#endif
+
   typedef typename SuperMeta::type               super;
 
 protected:
   typedef random_access_index_node<
-    typename super::node_type>                   node_type;
+    typename super::index_node_type>             index_node_type;
 
 private:
-  typedef typename node_type::impl_type          node_impl_type;
+  typedef typename index_node_type::impl_type    node_impl_type;
   typedef random_access_index_ptr_array<
     typename super::final_allocator_type>        ptr_array;
   typedef typename ptr_array::pointer            node_impl_ptr_pointer;
@@ -111,7 +118,7 @@ private:
 public:
   /* types */
 
-  typedef typename node_type::value_type         value_type;
+  typedef typename index_node_type::value_type   value_type;
   typedef tuples::null_type                      ctor_args;
   typedef typename super::final_allocator_type   allocator_type;
   typedef value_type&                            reference;
@@ -119,10 +126,9 @@ public:
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
   typedef safe_mode::safe_iterator<
-    rnd_node_iterator<node_type>,
-    random_access_index>                         iterator;
+    rnd_node_iterator<index_node_type> >        iterator;
 #else
-  typedef rnd_node_iterator<node_type>           iterator;
+  typedef rnd_node_iterator<index_node_type>    iterator;
 #endif
 
   typedef iterator                               const_iterator;
@@ -139,6 +145,9 @@ public:
     boost::reverse_iterator<iterator>            reverse_iterator;
   typedef typename
     boost::reverse_iterator<const_iterator>      const_reverse_iterator;
+  typedef typename super::final_node_handle_type node_type;
+  typedef detail::insert_return_type<
+    iterator,node_type>                          insert_return_type;
   typedef TagList                                tag_list;
 
 protected:
@@ -164,18 +173,15 @@ protected:
 
 private:
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-  typedef safe_mode::safe_container<
-    random_access_index>                      safe_super;
+  typedef safe_mode::safe_container<iterator> safe_container;
 #endif
 
   typedef typename call_traits<
     value_type>::param_type                   value_param_type;
 
-  /* Needed to avoid commas in BOOST_MULTI_INDEX_OVERLOADS_TO_VARTEMPL
-   * expansion.
-   */
+  /* needed to avoid commas in some macros */
 
-  typedef std::pair<iterator,bool>            emplace_return_type;
+  typedef std::pair<iterator,bool>            pair_return_type;
 
 public:
 
@@ -228,9 +234,9 @@ public:
   /* iterators */
 
   iterator begin()BOOST_NOEXCEPT
-    {return make_iterator(node_type::from_impl(*ptrs.begin()));}
+    {return make_iterator(index_node_type::from_impl(*ptrs.begin()));}
   const_iterator begin()const BOOST_NOEXCEPT
-    {return make_iterator(node_type::from_impl(*ptrs.begin()));}
+    {return make_iterator(index_node_type::from_impl(*ptrs.begin()));}
   iterator
     end()BOOST_NOEXCEPT{return make_iterator(header());}
   const_iterator
@@ -254,12 +260,14 @@ public:
 
   iterator iterator_to(const value_type& x)
   {
-    return make_iterator(node_from_value<node_type>(boost::addressof(x)));
+    return make_iterator(
+      node_from_value<index_node_type>(boost::addressof(x)));
   }
 
   const_iterator iterator_to(const value_type& x)const
   {
-    return make_iterator(node_from_value<node_type>(boost::addressof(x)));
+    return make_iterator(
+      node_from_value<index_node_type>(boost::addressof(x)));
   }
 
   /* capacity */
@@ -304,13 +312,13 @@ public:
   const_reference operator[](size_type n)const
   {
     BOOST_MULTI_INDEX_SAFE_MODE_ASSERT(n<size(),safe_mode::out_of_bounds);
-    return node_type::from_impl(*ptrs.at(n))->value();
+    return index_node_type::from_impl(*ptrs.at(n))->value();
   }
 
   const_reference at(size_type n)const
   {
     if(n>=size())throw_exception(std::out_of_range("random access index"));
-    return node_type::from_impl(*ptrs.at(n))->value();
+    return index_node_type::from_impl(*ptrs.at(n))->value();
   }
 
   const_reference front()const{return operator[](0);}
@@ -319,7 +327,7 @@ public:
   /* modifiers */
 
   BOOST_MULTI_INDEX_OVERLOADS_TO_VARTEMPL(
-    emplace_return_type,emplace_front,emplace_front_impl)
+    pair_return_type,emplace_front,emplace_front_impl)
     
   std::pair<iterator,bool> push_front(const value_type& x)
                              {return insert(begin(),x);}
@@ -328,7 +336,7 @@ public:
   void                     pop_front(){erase(begin());}
 
   BOOST_MULTI_INDEX_OVERLOADS_TO_VARTEMPL(
-    emplace_return_type,emplace_back,emplace_back_impl)
+    pair_return_type,emplace_back,emplace_back_impl)
 
   std::pair<iterator,bool> push_back(const value_type& x)
                              {return insert(end(),x);}
@@ -337,7 +345,7 @@ public:
   void                     pop_back(){erase(--end());}
 
   BOOST_MULTI_INDEX_OVERLOADS_TO_VARTEMPL_EXTRA_ARG(
-    emplace_return_type,emplace,emplace_impl,iterator,position)
+    pair_return_type,emplace,emplace_impl,iterator,position)
     
   std::pair<iterator,bool> insert(iterator position,const value_type& x)
   {
@@ -394,6 +402,29 @@ public:
     insert(position,list.begin(),list.end());
   }
 #endif
+
+  insert_return_type insert(const_iterator position,BOOST_RV_REF(node_type) nh)
+  {
+    BOOST_MULTI_INDEX_CHECK_VALID_ITERATOR(position);
+    BOOST_MULTI_INDEX_CHECK_IS_OWNER(position,*this);
+    if(nh)BOOST_MULTI_INDEX_CHECK_EQUAL_ALLOCATORS(*this,nh);
+    BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
+    std::pair<final_node_type*,bool> p=this->final_insert_nh_(nh);
+    if(p.second&&position.get_node()!=header()){
+      relocate(position.get_node(),p.first);
+    }
+    return insert_return_type(make_iterator(p.first),p.second,boost::move(nh));
+  }
+
+  node_type extract(const_iterator position)
+  {
+    BOOST_MULTI_INDEX_CHECK_VALID_ITERATOR(position);
+    BOOST_MULTI_INDEX_CHECK_DEREFERENCEABLE_ITERATOR(position);
+    BOOST_MULTI_INDEX_CHECK_IS_OWNER(position,*this);
+    BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
+    return this->final_extract_(
+      static_cast<final_node_type*>(position.get_node()));
+  }
 
   iterator erase(iterator position)
   {
@@ -496,33 +527,36 @@ public:
 
   /* list operations */
 
-  void splice(iterator position,random_access_index<SuperMeta,TagList>& x)
+  template<typename Index>
+  BOOST_MULTI_INDEX_ENABLE_IF_MERGEABLE(random_access_index,Index,void)
+  splice(iterator position,Index& x)
   {
     BOOST_MULTI_INDEX_CHECK_VALID_ITERATOR(position);
     BOOST_MULTI_INDEX_CHECK_IS_OWNER(position,*this);
-    BOOST_MULTI_INDEX_CHECK_DIFFERENT_CONTAINER(*this,x);
     BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
-    iterator  first=x.begin(),last=x.end();
-    size_type n=0;
-    BOOST_TRY{
-      while(first!=last){
-        if(push_back(*first).second){
-          first=x.erase(first);
-          ++n;
-        }
-        else ++first;
-      }
+    if(x.end().get_node()==this->header()){ /* same container */
+      BOOST_MULTI_INDEX_SAFE_MODE_ASSERT(
+        position==end(),safe_mode::inside_range);
     }
-    BOOST_CATCH(...){
-      relocate(position,end()-n,end());
-      BOOST_RETHROW;
+    else{
+      external_splice(
+        position,x,x.begin(),x.end(),
+        boost::is_copy_constructible<value_type>());
     }
-    BOOST_CATCH_END
-    relocate(position,end()-n,end());
   }
 
-  void splice(
-    iterator position,random_access_index<SuperMeta,TagList>& x,iterator i)
+  template<typename Index>
+  BOOST_MULTI_INDEX_ENABLE_IF_MERGEABLE(random_access_index,Index,void)
+  splice(iterator position,BOOST_RV_REF(Index) x)
+  {
+    splice(position,static_cast<Index&>(x));
+  }
+
+  template<typename Index>
+  BOOST_MULTI_INDEX_ENABLE_IF_MERGEABLE(
+    random_access_index,Index,pair_return_type)
+  splice(
+    iterator position,Index& x,BOOST_DEDUCED_TYPENAME Index::iterator i)
   {
     BOOST_MULTI_INDEX_CHECK_VALID_ITERATOR(position);
     BOOST_MULTI_INDEX_CHECK_IS_OWNER(position,*this);
@@ -530,28 +564,36 @@ public:
     BOOST_MULTI_INDEX_CHECK_DEREFERENCEABLE_ITERATOR(i);
     BOOST_MULTI_INDEX_CHECK_IS_OWNER(i,x);
     BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
-    if(&x==this)relocate(position,i);
+    if(x.end().get_node()==this->header()){ /* same container */
+      index_node_type* pn=position.get_node();
+      index_node_type* in=static_cast<index_node_type*>(i.get_node());
+      if(pn!=in)relocate(pn,in);
+      return std::pair<iterator,bool>(make_iterator(in),true);
+    }
     else{
-      if(insert(position,*i).second){
-
-#if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-    /* MSVC++ 6.0 optimizer has a hard time with safe mode, and the following
-     * workaround is needed. Left it for all compilers as it does no
-     * harm.
-     */
-        i.detach();
-        x.erase(x.make_iterator(i.get_node()));
-#else
-        x.erase(i);
-#endif
-
-      }
+      std::pair<final_node_type*,bool> p=
+        external_splice(
+          position,x,i,boost::is_copy_constructible<value_type>());
+      return std::pair<iterator,bool>(make_iterator(p.first),p.second);
     }
   }
 
-  void splice(
-    iterator position,random_access_index<SuperMeta,TagList>& x,
-    iterator first,iterator last)
+  template<typename Index>
+  BOOST_MULTI_INDEX_ENABLE_IF_MERGEABLE(
+    random_access_index,Index,pair_return_type)
+  splice(
+    iterator position,BOOST_RV_REF(Index) x,
+    BOOST_DEDUCED_TYPENAME Index::iterator i)
+  {
+    return splice(position,static_cast<Index&>(x),i);
+  }
+
+  template<typename Index>
+  BOOST_MULTI_INDEX_ENABLE_IF_MERGEABLE(random_access_index,Index,void)
+  splice(
+    iterator position,Index& x,
+    BOOST_DEDUCED_TYPENAME Index::iterator first,
+    BOOST_DEDUCED_TYPENAME Index::iterator last)
   {
     BOOST_MULTI_INDEX_CHECK_VALID_ITERATOR(position);
     BOOST_MULTI_INDEX_CHECK_IS_OWNER(position,*this);
@@ -561,25 +603,24 @@ public:
     BOOST_MULTI_INDEX_CHECK_IS_OWNER(last,x);
     BOOST_MULTI_INDEX_CHECK_VALID_RANGE(first,last);
     BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
-    if(&x==this)relocate(position,first,last);
-    else{
-      size_type n=0;
-      BOOST_TRY{
-        while(first!=last){
-          if(push_back(*first).second){
-            first=x.erase(first);
-            ++n;
-          }
-          else ++first;
-        }
-      }
-      BOOST_CATCH(...){
-        relocate(position,end()-n,end());
-        BOOST_RETHROW;
-      }
-      BOOST_CATCH_END
-      relocate(position,end()-n,end());
+    if(x.end().get_node()==this->header()){ /* same container */
+      BOOST_MULTI_INDEX_CHECK_OUTSIDE_RANGE(position,first,last);
+      internal_splice(position,first,last);
     }
+    else{
+      external_splice(
+        position,x,first,last,boost::is_copy_constructible<value_type>());
+    }
+  }
+
+  template<typename Index>
+  BOOST_MULTI_INDEX_ENABLE_IF_MERGEABLE(random_access_index,Index,void)
+  splice(
+    iterator position,BOOST_RV_REF(Index) x,
+    BOOST_DEDUCED_TYPENAME Index::iterator first,
+    BOOST_DEDUCED_TYPENAME Index::iterator last)
+  {
+    splice(position,static_cast<Index&>(x),first,last);
   }
 
   void remove(value_param_type value)
@@ -587,9 +628,10 @@ public:
     BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
     difference_type n=
       end()-make_iterator(
-        random_access_index_remove<node_type>(
+        random_access_index_remove<index_node_type>(
           ptrs,
-          ::boost::bind(std::equal_to<value_type>(),::boost::arg<1>(),value)));
+          ::boost::bind<bool>(
+            std::equal_to<value_type>(),::boost::arg<1>(),value)));
     while(n--)pop_back();
   }
 
@@ -598,7 +640,8 @@ public:
   {
     BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
     difference_type n=
-      end()-make_iterator(random_access_index_remove<node_type>(ptrs,pred));
+      end()-make_iterator(
+        random_access_index_remove<index_node_type>(ptrs,pred));
     while(n--)pop_back();
   }
 
@@ -607,7 +650,7 @@ public:
     BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
     difference_type n=
       end()-make_iterator(
-        random_access_index_unique<node_type>(
+        random_access_index_unique<index_node_type>(
           ptrs,std::equal_to<value_type>()));
     while(n--)pop_back();
   }
@@ -618,7 +661,7 @@ public:
     BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
     difference_type n=
       end()-make_iterator(
-        random_access_index_unique<node_type>(ptrs,binary_pred));
+        random_access_index_unique<index_node_type>(ptrs,binary_pred));
     while(n--)pop_back();
   }
 
@@ -628,7 +671,7 @@ public:
       BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
       size_type s=size();
       splice(end(),x);
-      random_access_index_inplace_merge<node_type>(
+      random_access_index_inplace_merge<index_node_type>(
         get_allocator(),ptrs,ptrs.at(s),std::less<value_type>());
     }
   }
@@ -640,7 +683,7 @@ public:
       BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
       size_type s=size();
       splice(end(),x);
-      random_access_index_inplace_merge<node_type>(
+      random_access_index_inplace_merge<index_node_type>(
         get_allocator(),ptrs,ptrs.at(s),comp);
     }
   }
@@ -648,7 +691,7 @@ public:
   void sort()
   {
     BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
-    random_access_index_sort<node_type>(
+    random_access_index_sort<index_node_type>(
       get_allocator(),ptrs,std::less<value_type>());
   }
 
@@ -656,7 +699,7 @@ public:
   void sort(Compare comp)
   {
     BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT;
-    random_access_index_sort<node_type>(
+    random_access_index_sort<index_node_type>(
       get_allocator(),ptrs,comp);
   }
 
@@ -701,7 +744,7 @@ public:
     for(node_impl_ptr_pointer p0=ptrs.begin(),p0_end=ptrs.end();
         p0!=p0_end;++first,++p0){
       const value_type& v1=*first;
-      node_impl_ptr_pointer p1=node_from_value<node_type>(&v1)->up();
+      node_impl_ptr_pointer p1=node_from_value<index_node_type>(&v1)->up();
 
       std::swap(*p0,*p1);
       (*p0)->up()=p0;
@@ -714,17 +757,22 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
     const ctor_args_list& args_list,const allocator_type& al):
     super(args_list.get_tail(),al),
     ptrs(al,header()->impl(),0)
+
+#if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
+    ,safe(*this)
+#endif
+    
   {
   }
 
   random_access_index(const random_access_index<SuperMeta,TagList>& x):
     super(x),
+    ptrs(x.get_allocator(),header()->impl(),x.size())
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-    safe_super(),
+    ,safe(*this)
 #endif
 
-    ptrs(x.get_allocator(),header()->impl(),x.size())
   {
     /* The actual copying takes place in subsequent call to copy_().
      */
@@ -733,12 +781,12 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
   random_access_index(
     const random_access_index<SuperMeta,TagList>& x,do_not_copy_elements_tag):
     super(x,do_not_copy_elements_tag()),
+    ptrs(x.get_allocator(),header()->impl(),0)
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-    safe_super(),
+    ,safe(*this)
 #endif
 
-    ptrs(x.get_allocator(),header()->impl(),0)
   {
   }
 
@@ -748,12 +796,13 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
   }
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-  iterator       make_iterator(node_type* node){return iterator(node,this);}
-  const_iterator make_iterator(node_type* node)const
-    {return const_iterator(node,const_cast<random_access_index*>(this));}
+  iterator       make_iterator(index_node_type* node)
+    {return iterator(node,&safe);}
+  const_iterator make_iterator(index_node_type* node)const
+    {return const_iterator(node,const_cast<safe_container*>(&safe));}
 #else
-  iterator       make_iterator(node_type* node){return iterator(node);}
-  const_iterator make_iterator(node_type* node)const
+  iterator       make_iterator(index_node_type* node){return iterator(node);}
+  const_iterator make_iterator(index_node_type* node)const
                    {return const_iterator(node);}
 #endif
 
@@ -765,10 +814,10 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
                               end_org=x.ptrs.end();
         begin_org!=end_org;++begin_org,++begin_cpy){
       *begin_cpy=
-         static_cast<node_type*>(
+         static_cast<index_node_type*>(
            map.find(
              static_cast<final_node_type*>(
-               node_type::from_impl(*begin_org))))->impl();
+               index_node_type::from_impl(*begin_org))))->impl();
       (*begin_cpy)->up()=begin_cpy;
     }
 
@@ -781,27 +830,29 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
   {
     ptrs.room_for_one();
     final_node_type* res=super::insert_(v,x,variant);
-    if(res==x)ptrs.push_back(static_cast<node_type*>(x)->impl());
+    if(res==x)ptrs.push_back(static_cast<index_node_type*>(x)->impl());
     return res;
   }
 
   template<typename Variant>
   final_node_type* insert_(
-    value_param_type v,node_type* position,final_node_type*& x,Variant variant)
+    value_param_type v,index_node_type* position,
+    final_node_type*& x,Variant variant)
   {
     ptrs.room_for_one();
     final_node_type* res=super::insert_(v,position,x,variant);
-    if(res==x)ptrs.push_back(static_cast<node_type*>(x)->impl());
+    if(res==x)ptrs.push_back(static_cast<index_node_type*>(x)->impl());
     return res;
   }
 
-  void erase_(node_type* x)
+  template<typename Dst>
+  void extract_(index_node_type* x,Dst dst)
   {
     ptrs.erase(x->impl());
-    super::erase_(x);
+    super::extract_(x,dst.next());
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-    detach_iterators(x);
+    transfer_iterators(dst.get(),x);
 #endif
   }
 
@@ -809,7 +860,7 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
   {
     for(node_impl_ptr_pointer x=ptrs.begin(),x_end=ptrs.end();x!=x_end;++x){
       this->final_delete_node_(
-        static_cast<final_node_type*>(node_type::from_impl(*x)));
+        static_cast<final_node_type*>(index_node_type::from_impl(*x)));
     }
   }
 
@@ -819,7 +870,7 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
     ptrs.clear();
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-    safe_super::detach_dereferenceable_iterators();
+    safe.detach_dereferenceable_iterators();
 #endif
   }
 
@@ -830,7 +881,7 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
     ptrs.swap(x.ptrs,swap_allocators);
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-    safe_super::swap(x);
+    safe.swap(x.safe);
 #endif
 
     super::swap_(x,swap_allocators);
@@ -841,19 +892,19 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
     ptrs.swap(x.ptrs);
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-    safe_super::swap(x);
+    safe.swap(x.safe);
 #endif
 
     super::swap_elements_(x);
   }
 
   template<typename Variant>
-  bool replace_(value_param_type v,node_type* x,Variant variant)
+  bool replace_(value_param_type v,index_node_type* x,Variant variant)
   {
     return super::replace_(v,x,variant);
   }
 
-  bool modify_(node_type* x)
+  bool modify_(index_node_type* x)
   {
     BOOST_TRY{
       if(!super::modify_(x)){
@@ -879,12 +930,12 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
     BOOST_CATCH_END
   }
 
-  bool modify_rollback_(node_type* x)
+  bool modify_rollback_(index_node_type* x)
   {
     return super::modify_rollback_(x);
   }
 
-  bool check_rollback_(node_type* x)const
+  bool check_rollback_(index_node_type* x)const
   {
     return super::check_rollback_(x);
   }
@@ -905,7 +956,8 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
     Archive& ar,const unsigned int version,const index_loader_type& lm)
   {
     {
-      typedef random_access_index_loader<node_type,allocator_type> loader;
+      typedef random_access_index_loader<
+        index_node_type,allocator_type> loader;
 
       loader ld(get_allocator(),ptrs);
       lm.load(
@@ -946,24 +998,32 @@ BOOST_MULTI_INDEX_PROTECTED_IF_MEMBER_TEMPLATE_FRIENDS:
 #endif
 
 private:
-  node_type* header()const{return this->final_header();}
+  index_node_type* header()const{return this->final_header();}
 
-  static void relocate(node_type* position,node_type* x)
+  static void relocate(index_node_type* position,index_node_type* x)
   {
     node_impl_type::relocate(position->up(),x->up());
   }
 
-  static void relocate(node_type* position,node_type* first,node_type* last)
+  static void relocate(
+    index_node_type* position,index_node_type* first,index_node_type* last)
   {
     node_impl_type::relocate(
       position->up(),first->up(),last->up());
   }
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
-  void detach_iterators(node_type* x)
+  void detach_iterators(index_node_type* x)
   {
     iterator it=make_iterator(x);
     safe_mode::detach_equivalent_iterators(it);
+  }
+
+  template<typename Dst>
+  void transfer_iterators(Dst& dst,index_node_type* x)
+  {
+    iterator it=make_iterator(x);
+    safe_mode::transfer_equivalent_iterators(dst,it);
   }
 #endif
 
@@ -1050,13 +1110,131 @@ private:
     return std::pair<iterator,bool>(make_iterator(p.first),p.second);
   }
 
-  ptr_array ptrs;
+  template<typename Index>
+  std::pair<final_node_type*,bool> external_splice(
+    iterator position,Index& x,BOOST_DEDUCED_TYPENAME Index::iterator i,
+    boost::true_type /* copy-constructible value */)
+  {
+    if(get_allocator()==x.get_allocator()){
+      return external_splice(position,x,i,boost::false_type());
+    }
+    else{
+      /* backwards compatibility with old, non-transfer-based splice */
+
+      std::pair<iterator,bool> p=insert(position,*i);
+      if(p.second)x.erase(i);
+      return std::pair<final_node_type*,bool>(
+        static_cast<final_node_type*>(p.first.get_node()),p.second);
+    }
+  }
+
+  template<typename Index>
+  std::pair<final_node_type*,bool> external_splice(
+    iterator position,Index& x,BOOST_DEDUCED_TYPENAME Index::iterator i,
+    boost::false_type /* copy-constructible value */)
+  {
+    BOOST_MULTI_INDEX_CHECK_EQUAL_ALLOCATORS(*this,x);
+    std::pair<final_node_type*,bool> p=this->final_transfer_(
+      x,static_cast<final_node_type*>(i.get_node()));
+    if(p.second&&position.get_node()!=header()){
+      relocate(position.get_node(),p.first);
+    }
+    return p;
+  }
+
+  template<typename Iterator>
+  void internal_splice(iterator position,Iterator first,Iterator last)
+  {
+    /* null out [first, last) positions in ptrs array */
+
+    for(Iterator it=first;it!=last;++it){ 
+      *(static_cast<index_node_type*>(it.get_node())->up())=0;
+    }
+
+    node_impl_ptr_pointer pp=node_impl_type::gather_nulls(
+      ptrs.begin(),ptrs.end(),
+      static_cast<index_node_type*>(position.get_node())->up());
+
+    /* relink [first, last) */
+
+    for(Iterator it=first;it!=last;++it,++pp){
+      *pp=static_cast<index_node_type*>(it.get_node());
+      (*pp)->up()=pp;
+    }
+  }
+
+  void internal_splice(iterator position,iterator first,iterator last)
+  {
+    index_node_type* pn=position.get_node();
+    index_node_type* fn=static_cast<index_node_type*>(first.get_node());
+    index_node_type* ln=static_cast<index_node_type*>(last.get_node());
+    if(pn!=ln)relocate(pn,fn,ln);
+  }
+
+  template<typename Index>
+  void external_splice(
+    iterator position,Index& x,
+    BOOST_DEDUCED_TYPENAME Index::iterator first,
+    BOOST_DEDUCED_TYPENAME Index::iterator last,
+    boost::true_type /* copy-constructible value */)
+  {
+    if(get_allocator()==x.get_allocator()){
+      external_splice(position,x,first,last,boost::false_type());
+    }
+    else{
+      /* backwards compatibility with old, non-transfer-based splice */
+
+      size_type n=size();
+      BOOST_TRY{
+        while(first!=last){
+          if(push_back(*first).second)first=x.erase(first);
+          else ++first;
+        }
+      }
+      BOOST_CATCH(...){
+        relocate(position,begin()+n,end());
+        BOOST_RETHROW;
+      }
+      BOOST_CATCH_END
+      relocate(position,begin()+n,end());
+    }
+  }
+
+  template<typename Index>
+  void external_splice(
+    iterator position,Index& x,
+    BOOST_DEDUCED_TYPENAME Index::iterator first,
+    BOOST_DEDUCED_TYPENAME Index::iterator last,
+    boost::false_type /* copy-constructible value */)
+  {
+    BOOST_MULTI_INDEX_CHECK_EQUAL_ALLOCATORS(*this,x);
+    size_type n=size();
+    BOOST_TRY{
+      this->final_transfer_range_(x,first,last);
+    }
+    BOOST_CATCH(...){
+      relocate(position,begin()+n,end());
+      BOOST_RETHROW;
+    }
+    BOOST_CATCH_END
+    relocate(position,begin()+n,end());
+  }
+
+  ptr_array      ptrs;
+
+#if defined(BOOST_MULTI_INDEX_ENABLE_SAFE_MODE)
+  safe_container safe;
+#endif
 
 #if defined(BOOST_MULTI_INDEX_ENABLE_INVARIANT_CHECKING)&&\
     BOOST_WORKAROUND(__MWERKS__,<=0x3003)
 #pragma parse_mfunc_templ reset
 #endif
 };
+
+#if defined(BOOST_MSVC)
+#pragma warning(pop) /* C4355 */
+#endif
 
 /* comparison */
 
@@ -1177,3 +1355,7 @@ inline boost::mpl::true_* boost_foreach_is_noncopyable(
 #undef BOOST_MULTI_INDEX_RND_INDEX_CHECK_INVARIANT_OF
 
 #endif
+
+/* random_access_index.hpp
+rEt8nWxdZSRo7GQSSWsbSIrbSvLbGNwo1WwOfWBOHEwpDOZ0usFMVgdzOnEwNZrByMVTiaG4pMad8s8B70LrzIpsy1FPfG02fZfQ9zxUUrQ44Xs5KQ98dL0Evmn1Wx6ia4ySh6cAxdcoDOJry+h7OSEvCZEKIhOBdbRLNc+7nYB8qBw4OBflPuwSA1MNYDwoCZtnNc+BpMgadzq5t7PL7XVKrIfYi4TjkZ9gUPclqlv5HOuUfwQ8z/AaFoVegGYICbjMTvVFanakOfKZ/Q3mM1CKo6L5nA/cxKQSksSxU/vRwBgbdRYYRQJxNowSfvhz5V+9Cph3jdyK/6z2o+bmfsysTKHfXPiu5BehhMHGcS8WHqVCHE1OC47s31COCBiL3wtnEgGTArsw8FzjLrFxt7wE3pPtNZycP59txYWAjT0gmlNBNHq3ttdw3v6vqUu/u2EF7sLOUEwakdY4nKWsNS2m/aj/Ovt5/zX2D/xX48Z0I4bXNXSIDtjXOfFnl+jYDQCPRbS7AYCXUFtR1GnoUBUaFajOKMNMxszRSjnNnIgY3eI2QoypKKdU7lS2MbS9UYYAOxxpmmZvA9vJG2s2KwYv2IzRtpFvFhE0uuXHgcIHCTSAsrSZm9+iCDvm5gMaR5GWl6g67ewPuXBfWs3Oyy+ZsQZt8v0FbCOxso3IykC2beEBEZfx1aH/isIykHs9HrgMHhJ4Mdu2FBdBMtELfWoJqhvYNiepyZ9aRFc1+wGuEdrg514nD0rphD23i++f3XALx1+9vptwwMtew6WQM5/ge9WavW7YqHKX/dCLOf8T8L8MuFe2Iy1xKeCeeRfMayuB+6nANTZqMjBBAXMzB3wC9qtyEGgJ/mgkACpi5W4FMic2rHA25PAwnwpg4pugdqGiAp438CcBNhtMiXWpIjvEqE37Kf/X2RfmV4435LrZZ6xXjeHkqTa/crRB71KCOAHvsrOtNL7vD/gtDRaXs0Hv9vLCcCHbWkKTMjcvH43aFo6N8HLa3fLylzTYWDr6Mtjo0GDjg2t1XL+0G/CKvxcCacCna4CzXw34NAGQxkBAYSBUEit3peLSVgWXDqi4tKCoY015y3H/3LSo9MGYr4BKgEfQVc2TN1ZqUGkbodK2OCrNGJOISvsUVNqjRaV/TYdKDab/Q1Sq3Av/Y8hTrfAMjjwq7twjJuJOwepXdSGMdtC2Qk1MruLLrBGwht4gD4tMTJEHRxZfW0rfK5KYSQXdXfSX4tg/2xMhTGzcT0AGAl/tfpXXmFsoGFMCvzG3fCsDqT+O1dzizSB2Y26pJpVuu+03veQgty4btwG7KFVcO2vFmyCF7cVrCftH54ll2Xyr+Q9Y6kUU2o7p1wADgGnfhYXPxlGbIzXAK8ZjrtztH8e2ofG2YUW1ylN6oSRISK3zT2S0cuypM1THqUiArFYBe8du8VnawEVa3vMXtrT7C4KN+1EapbfNXiF2c1iUsI4hwlGkyKGwmzizcRS1YI01dwK/saVFkt/kpiIJDCKB09xYeyncsOaivN2Gmq/jiA6Nu2F5D2kRY59O4YV8tB4DOscCblSN0uLGNsKNbf9nuFG5S0UMIFFleMKyBneBiA8GWntAjxAqwWDo8RsY7UD+7W4Y1WSUYrLl0G5VfLkpk3QZKtWUP92tIZiWTNT5kZCC4brlf1+FUnoFSSZIMhhFP7ZfCBTYD8P037L3rM2Ah+kuG+JYFDZBmcCO8rs2wkDkD07OH7wKDPWIXOLhz/Ins7gUZCNM9U9lWzlPie08ODSme45j+Faaf8tkHOM7/qn2Tv8Nttr9/mtRWt1DZPvP7GkCyh7xJaq7FesCJEMFx64fno/iwbvdPzw/hA4WLUgpAKgbGKPtzpA+MA2t6YR55l+dFB39EgWalNBD4IxY09ftkOlA8L4rsnTh4pY3A7dEg3Tklb7Rr4qiVaITPQBtH3fQQM8CR79IrYJQwQ6Zf3XExvuQfqrnFPxHeq6T/QE1loxG+zgazVfQ6C5AIzugEWxpCJPEp99W8alLXpmjxaRnaEuTKLC9z2gZUWrbp6JTkNApSOj00uSYWN85OsZw2KC5OYzoRPRbsUMopyrNLcfIPLWTt8yOGI66DD2waWBnZYyWH9ynYleQsCt4Cezalx67CK/Y00sJnxjHrqc5drEUIW4rxXJX5biWCkJJWnFFwFvC7zj5ndg2x+t2ru9EZKyWbXhwnSiFHhaTUJLEu6MUXHpH8Tl1A/I8kvVNbXpVi3dQo8Vrvj6mdbhe0VgVStLBBLWNYwuJaC+j2qEgSe0wnnaPqCw4Ig+iAjES2kSxj5LqjfWSVrmmvfhNuYfqhb/tm5FUyeuSHDs0yhRV3X2DonvaH9M9neA72K+T7qlkVszgPEXd4p4YQfH0xUXihs2UPvKi9BL6MMsf7OLGUWjgRsX0dkSrdtkBTwMSrkGtYM0ukLU3cBMbt/gp59wBRDcRiG4iEG1EKy4ex8J4QYqLButF7N1luACUdKfhlLvaK/sxjQKZgl1Ks9VeJ7fboUy304CC4U6uteLarSUajdYSjaZrSUwLFqsTTTC6K5ozxVgYzmAXmKQjRQLqY8jWb35yMnpJOHbayEQEO77KVhchMHHCbrJuEXnZRUydtDOplu3nisqM8KRYamQt6OUgUuN2sk+ZpdXkesINWT2G44bj4lZq5xW0cLFnZ1Aag9jxU5Jr23mavutYoJWNj+9O9QZ2NXq4Pp7BOhk1IgKOYl8lwQMFvFfeOO977T/FXCO468oWbR7D5zVOLaQb5+HQeOGOpNAKren8XGS/6uey+cKgS1c45NLNhs9S+Pjh8+7F+Of+Cy7dGvhsgc+v4PMWfP4In2H4TBhOrKt+boX7VfBZ/KUL1tqle1jv1kXhU5fh1n3D4NZNz3LrHhrl1pktbt37Y9wAkxmC8mcwZmZla/39pKqSeKRebaA55c/LBinrDiHDfCNmU1osiFUC85pEj4nNt4jlFrY4T6zKY16rNL/AKVUViB5F6c0WF4pVhcw7WfRMZvOniOVT2OJpYtU05p0ueqaz+TPE8hls8Syxahbzzpbml8DDJaJntvrwPLFqHvNWiJ4KNn+RWL6ILXaKVU7mXSJ6lrD5S8XypWzxMrFqGfMuFz3L2fwVYvkKttgnVvmY9yHR8xCbvzLY7fdKVX6xfKXSaFd9unyZ8tva/KZx5yOvNggHZwzfjMUZ5JE/WI1F8RQSK3u54lt0nGCOPIo8WHNadJxRuuZq7md2UQ1Zep1b8U8A85VPzlViqCZ7TnF42v4whycLz1fYLziRzI4xKU5xw4q+2SO/eEVyAEU+v/ekZ+P+VWgESpfC9ZxIMRhQ/A8I5uZfkvHeWGRuE1tbW/nZ8izFF9nvBzkEh08bY+nuVreMbYiBYVY2W3pktlMlMgpBnyDRVkN+8UvMR1GKMYb7eeaexLTtUuVe9cfmVGolLZytsrL+NFHJoVhuLNGlT+ed6M/+zXi+oXS+7EMsIHjV+MVqOMm/BPidaujbvxYBlAYy/uZI4EwOtJgU050nfeR5v6rZ19DBwgt7rXfYM+iBpogWrLzkCRhP1TzpdYxSImY/Ue5sfQYtDMyz1N26AcORiJsopknVImkDD1zibN30kl4TlcSrRCXZxANXiBsoKsk70jPkIsGHsUENYEHBRKr87JmEyBfly9SnlRAXsACxRzAORv19afJNAUlj61WjwSz2jz6yOAke9ms6KXnAHmnKYF3ievJjWo/GgTr7AWAtB0S6YN31uF4A1Z8zsrVW+G+t8BdUBD7klYvWY4NF9LiB19UWJN1awY0NxwbV+5tpZF/oA+PYZqxiPwldnxTpN+vobDkeGGKbsdsF/usW+MctCHzM6xVtptGflIyjO9k6utNl6Ij95H10dNL8G4WW449nEj9XjtcGVgTbVB+VVnoBrdRhTlErSvgedjv3PhXN6i1pN7kJ5rJWclTh1Vspr8vs/ySePsRayVdl9qvExM/+rI5Rreg64v+/eku/0Mg2Y1tueRy2ZahPmz+hmvWyoPq+StnT6+iMrBSk/hmd/2X76buNdhgH6TfuJtZ3Uvh7QX7ZTq/4PuXFDbAgucg8baIYUKozjVea8YS0b68a9AJkjj0W2uTQwes9Aj9ramlYgRHiSe6gMQT3cX+xScF93F8snwUPxUKtsCNFbC8FdnKHc7jwroRyJxmJ9jEVfmtF4JaiPViv3kAdsa46Gi3rKqJO6vkLpP2WUuIQ6vmv1PXytLwXMEhL9ex2ViOwJyZTg0X/gA/DhrLluD+76C0DvMyFyMBaJ9PrOKw3pzbH+U1etbf4vepqNuQUyR1LdYAT2Ebc7rl4LGyxdlCsjYi1/aJjgLsMy6//CwhedUZxItuGNWz3DvirpfnGbvKLIjJdYWQWjPkkuJzy5rt0lIba45W3vgRb74mBMbY6Y8Ckhtom0k96mpaoP8s2pylDnBPNipYbNTkAabyFgMv4SPFxm2fAfwcGh/pHykrya/KArxkQawbxcEIfHU6Q1b1vv1TTB0zfDYzA6ZKvhCGMlO9ijf9Hl8qvEdxHOcK5ryO7c92qV3U+8XEKn3ZKpHwW6APBndaUEPo+dMSnL20I9XU3YSrkcdPzfopp3LAuZsXxzftYyURHrseOCFQ5reYFGN/Q4ImeAjjFfBkVa17V8Q6VPACXTc/H5zd0avsl8mcnpEf0LeeDiY0Zx+Tr1Y7QtzKsvRL6tVfPJ1yV/El71ZtwtfIT7ZXlU+3VzoSrwYQrZ0R71ZZwZf1Me/VQwtWOhKuezxLXHKDfKd+s011qSdNk1OLr67uoiVdXkPY83ZDYeJptXJ5BOAIYhoHW5RdXfBrlNzERD/+hU28IlA1Q/MkKSgMSuMor33IxIYF57GSfJhReDYD7U5gSRJNINBbLX+Y7nymqMOIA7BbIIWiBXjmvKwUETB7zHxO4Uug6MjwI/KyOb/qfY0fijuIOy8UuUnDs8+TPIZhfGbSfNW/6M9Lz4w+iDeUjHREqPKVR2cdTAygRtfq1EbX64js0VtPPXefoxHC00G+sEgNq/7Ni/UsOjDud6ZTo2FuGHJiAPORB+yGQZGPDnQ3Vy2Lrgm7rbqpcwYdrP9u0gD9Txk4WveOu5qdH4mOUNZ7rlWc0Y6yUYZguVnnaLZv03MIvYFS+lcr5jdhKpyTcvCS+3jcifL36SJw+pY0OnhRJUIhhLzqx88iCy9RA39++HZ54mSARwP6wvct/PVtpuVzobqPucnG7jfH8upkXE+M3ppXJLzvkV5bxkI7A72fCE2/QkGsjUqXJ/oH/KsyQwR92Sgst8RDn4XJM3qyWACMCFrQnw40KpU8XYLgzU4PiRGmQ65ZQwow+PJM298FPoxhJEiveMPAn+G3SvjfhMu9N0O5Hplw2vn3xOWgf9lfK2QaHyQbA04xxd7W5NxLxFT3JAzK/3mPAI8KVJtv3AHut8Fg4m/B3j0EKyFKjSTbkcQz+EyqiArKCEiVxDMa49ka31EjnXm/LU/DH3LzfoDlg2uek+PoapM2MIW1MDae03ffkv6nYSdiShUvJjkq1JvnDcTo1J20CQik6Gl/Fn1/g81b2lwUYFq7KiC6rETeIPHIgG706jaFrMGDusqTakwCOuR8zmscQdFilJdihRKoIhSlZRdIzE1ijBbZ9bikQkadggtT5ptABrPhkSkUYSjmAqiMi12PFciH0Q6z4XLoWF89zYYtd1OK80EqK4Ju26xXUtWTEiitC8zNivrjxijYgK4ov7gQPDqOpECYnv4vPlBeGxmbE3XFbfoGcwSKWFoZw2+U7ndRnteJLG9H60kbQlxZ1HsE2rvk2M4eluwTVGroQBa7EPifji+sun0V+prXU9+TQNuxEdzaxkzEMQyHWRuRTAjSA7rW+wrPp5l5Bc9fTIlWEFlKc36SK5fG5F/C5T8G5/x6Bswf23aJnWuhKfXwBml+gBUD/8CnMQ8WUYWNZYrvm5t26mIu05i4lHVqdNIYZONj5i5w42IFRONhFWBf9ZtnR4BonCIRP4e9j3XOdtGaUYWNLUitWgmUfQDHCkFN+gZbQF/b6nkuq6eDBEJ0EwVUPyeuo5kNhDOPIai3sMSetG+YHEMuc8ECmWLYobA4+tkgXGMU6u0sWcU2JiZTisvnJTy8gLzqtPdQXGZExmb5qvEff3rP8oBwftr+YZVF4ziLKZ6MpGOM7mFAzYCZVDnIKzI5FW55khudhkeT2H1Tar6OsOprmRrXhIZQ6aMF34mxSCZ4aoJK+5BI08mMJmwky9ArSXRjxum2znhck818lw01sPLOV8cxQ8txo2lanp6S70Uw8Y4SJY/u7Etu/X2n/XiWrTaygRMl8E7txi5IdJ9aPkTqXE29eHes8Nj6KZZT2DeB4BhLX36OMp8qnGxhpvnnJJWqXvikDSSthuCQIcP55sOTHl5F3MFU7xtQwN2Mc2urY8b/rFINgbnDNQLa55TqiLQOIZ4qk0ZDRkMkTmZCErHA2JUVKAceRGGeDygY195mmZkbamnrC28SahtSagMzV6BGxw0pqM6jHIpcXvqqxYWWO0x+err20rbqWzayu9sSaTPM4m4kHxwW59mfRaLri7vTSnPo+fqnVp88Y6TAvqlnpxbDfwZvOZt2h/4Llr3Bqxnp9YD7LBfJU4aRj20qidVUli3tjBSOlyp6kZWlY4VHs+6EniPBrmi3yWxKubwoU00AqKESIJkF87OAtl0F6Ehc+S9v/22yQi1oEy6JjmI0Hfrl2Cky4xxlrEuppoxZrIjX4IrMQ7N6OgX42Ox/CA2W+ioHEghKfk+70xMORMEcPHUM8iMcQgwnHEA9BRfOvzsc7Cj9EGcS0LeawPStICXQ+vJhHEm641xUdt5qccMy/+sC3hA9BrO2J0w52NjzJtyx5bO85ek7f5sv5pU7uWDZPx0D6fntkaI1ZzF6+R7WY+VYktZhDLS43/VIX3uV7KKlwbJtt03/POh+Oh70Nb/L5Uyr94oUXpp4PKzVC30Yr40zK1MhxQHLi2ZHgF1nmjQvRsN9oAtmwlM5dnxAoI2LvaPp32kT/zuTSv74r6Z9spX/9kylOWktPaBQ8mUif7tPigyXd9saA9OmcvStwBSenh5VgGJURMaAGGQ8MsxyS34fj8dykQD+7IJcLXHj/LUXi6ScBu8+3FtaBno6FHpcozohOflTgcWhOcalddmJ/ChmKcEjh8CnHOT6NC8fTGJdALKhyeFOssIgVeWKFNbyU8tFpxUYgLkJ3qYWOTt3hax5ILq0RuufmUWmBb2dS6WhovbuEonWyHNhB212wX86hs8yX1mJpGATJH0kspWGFt2EhJw3EctrTlDdqyt8eSBRTYNAAOuyobAZ5iZNDLf1L5ocrFX7o850ekR/KySUq1/MNjsgphc+TOGXW5YQltOdSRlbUpBZHfdPGvoCpWrvLSzAcW3f5PBRpxKYKsWmR2OQUm5ZwIGxDLxqpaq3YtEwsXy42rRCbfCBniuUrlUNx3eWrozGvRPF18n6gGCPi6xQl+/Wd9P08fe+i01TqsbbuDc8pR4y47bQ+ej02ksTfr1+hwR9T2vRvqlYSEFEXO7DESErVx09tIZqxOfZBs/QKOrL5rJ9zXDuBA89qaV+TDZDm
+*/

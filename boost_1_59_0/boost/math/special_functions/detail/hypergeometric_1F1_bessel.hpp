@@ -1,4 +1,3 @@
-
 ///////////////////////////////////////////////////////////////////////////////
 //  Copyright 2014 Anton Bikineev
 //  Copyright 2014 Christopher Kormanyos
@@ -21,7 +20,7 @@
   namespace boost { namespace math { namespace detail {
 
      template <class T, class Policy>
-     T hypergeometric_1F1_divergent_fallback(const T& a, const T& b, const T& z, const Policy& pol, int& log_scaling);
+     T hypergeometric_1F1_divergent_fallback(const T& a, const T& b, const T& z, const Policy& pol, long long& log_scaling);
 
      template <class T>
      bool hypergeometric_1F1_is_tricomi_viable_positive_b(const T& a, const T& b, const T& z)
@@ -79,7 +78,7 @@
            if ((term * bessel_cache[cache_size - 1] < tools::min_value<T>() / (tools::epsilon<T>() * tools::epsilon<T>())) || !(boost::math::isfinite)(term) || (!std::numeric_limits<T>::has_infinity && (fabs(term) > tools::max_value<T>())))
            {
               term = -log(fabs(bessel_arg)) * b_minus_1_plus_n / 2;
-              log_scale = itrunc(term);
+              log_scale = lltrunc(term);
               term -= log_scale;
               term = exp(term);
            }
@@ -137,7 +136,7 @@
            return result;
         }
 
-        int scale()const
+        long long scale()const
         {
            return log_scale;
         }
@@ -146,7 +145,8 @@
         T A_minus_2, A_minus_1, A, mult, term, b_minus_1_plus_n, bessel_arg, two_a_minus_b;
         std::array<T, cache_size> bessel_cache;
         const Policy& pol;
-        int n, log_scale, cache_offset;
+        int n, cache_offset;
+        long long log_scale;
 
         hypergeometric_1F1_AS_13_3_7_tricomi_series operator=(const hypergeometric_1F1_AS_13_3_7_tricomi_series&);
 
@@ -170,7 +170,7 @@
               //
               if (b_minus_1_plus_n > 0)
               {
-                 bessel_j_backwards_iterator<T> i(b_minus_1_plus_n + (int)cache_size - 1, 2 * sqrt(bessel_arg), arbitrary_small_value(last_value));
+                 bessel_j_backwards_iterator<T, Policy> i(b_minus_1_plus_n + (int)cache_size - 1, 2 * sqrt(bessel_arg), arbitrary_small_value(last_value));
 
                  for (int j = cache_size - 1; j >= 0; --j, ++i)
                  {
@@ -189,7 +189,7 @@
                           rescale = tools::max_value<T>();
                        for (int k = j; k < cache_size; ++k)
                           bessel_cache[k] /= rescale;
-                       bessel_j_backwards_iterator<T> ti(b_minus_1_plus_n + j, 2 * sqrt(bessel_arg), bessel_cache[j + 1], bessel_cache[j]);
+                       bessel_j_backwards_iterator<T, Policy> ti(b_minus_1_plus_n + j, 2 * sqrt(bessel_arg), bessel_cache[j + 1], bessel_cache[j]);
                        i = ti;
                     }
                  }
@@ -220,7 +220,7 @@
                     // We have crossed over into the region where backward recursion is the stable direction
                     // start from arbitrary value and recurse down to "pos" and normalise:
                     //
-                    bessel_j_backwards_iterator<T> i2(b_minus_1_plus_n + (int)cache_size - 1, 2 * sqrt(bessel_arg), arbitrary_small_value(bessel_cache[pos-1]));
+                    bessel_j_backwards_iterator<T, Policy> i2(b_minus_1_plus_n + (int)cache_size - 1, 2 * sqrt(bessel_arg), arbitrary_small_value(bessel_cache[pos-1]));
                     for (int loc = cache_size - 1; loc >= pos; --loc)
                        bessel_cache[loc] = *i2++;
                     ratio = bessel_cache[pos - 1] / *i2;
@@ -245,7 +245,7 @@
               //
               if (b_minus_1_plus_n > 0)
               {
-                 bessel_i_backwards_iterator<T> i(b_minus_1_plus_n + (int)cache_size - 1, 2 * sqrt(-bessel_arg), arbitrary_small_value(last_value));
+                 bessel_i_backwards_iterator<T, Policy> i(b_minus_1_plus_n + (int)cache_size - 1, 2 * sqrt(-bessel_arg), arbitrary_small_value(last_value));
 
                  for (int j = cache_size - 1; j >= 0; --j, ++i)
                  {
@@ -264,7 +264,7 @@
                           rescale = tools::max_value<T>();
                        for (int k = j; k < cache_size; ++k)
                           bessel_cache[k] /= rescale;
-                       i = bessel_i_backwards_iterator<T>(b_minus_1_plus_n + j, 2 * sqrt(-bessel_arg), bessel_cache[j + 1], bessel_cache[j]);
+                       i = bessel_i_backwards_iterator<T, Policy>(b_minus_1_plus_n + j, 2 * sqrt(-bessel_arg), bessel_cache[j + 1], bessel_cache[j]);
                     }
                  }
                  ratio = last_value / *i;
@@ -274,7 +274,7 @@
                  //
                  // Forwards iteration is stable:
                  //
-                 bessel_i_forwards_iterator<T> i(b_minus_1_plus_n, 2 * sqrt(-bessel_arg));
+                 bessel_i_forwards_iterator<T, Policy> i(b_minus_1_plus_n, 2 * sqrt(-bessel_arg));
                  int pos = 0;
                  while ((pos < cache_size) && (b_minus_1_plus_n + pos < 0.5))
                  {
@@ -286,7 +286,7 @@
                     // We have crossed over into the region where backward recursion is the stable direction
                     // start from arbitrary value and recurse down to "pos" and normalise:
                     //
-                    bessel_i_backwards_iterator<T> i2(b_minus_1_plus_n + (int)cache_size - 1, 2 * sqrt(-bessel_arg), arbitrary_small_value(last_value));
+                    bessel_i_backwards_iterator<T, Policy> i2(b_minus_1_plus_n + (int)cache_size - 1, 2 * sqrt(-bessel_arg), arbitrary_small_value(last_value));
                     for (int loc = cache_size - 1; loc >= pos; --loc)
                        bessel_cache[loc] = *i2++;
                     ratio = bessel_cache[pos - 1] / *i2;
@@ -315,7 +315,7 @@
      };
 
      template <class T, class Policy>
-     T hypergeometric_1F1_AS_13_3_7_tricomi(const T& a, const T& b, const T& z, const Policy& pol, int& log_scale)
+     T hypergeometric_1F1_AS_13_3_7_tricomi(const T& a, const T& b, const T& z, const Policy& pol, long long& log_scale)
      {
         BOOST_MATH_STD_USING
         //
@@ -330,7 +330,7 @@
         T prefix(0);
         int prefix_sgn(0);
         bool use_logs = false;
-        int scale = 0;
+        long long scale = 0;
         //
         // We can actually support the b == 2a case within here, but we haven't
         // as we appear never to get here in practice.  Which means this get out
@@ -352,14 +352,14 @@
         {
            use_logs = true;
            prefix = boost::math::lgamma(b, &prefix_sgn, pol) + z / 2;
-           scale = itrunc(prefix);
+           scale = lltrunc(prefix);
            log_scale += scale;
            prefix -= scale;
         }
         T result(0);
-        boost::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
+        std::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
         bool retry = false;
-        int series_scale = 0;
+        long long series_scale = 0;
         try
         {
            hypergeometric_1F1_AS_13_3_7_tricomi_series<T, Policy> s(a, b, z, pol);
@@ -415,7 +415,7 @@
            if ((fabs(result) > 1) && (fabs(prefix) > 1) && (tools::max_value<T>() / fabs(result) < fabs(prefix)))
            {
               // Overflow:
-              scale = itrunc(tools::log_max_value<T>()) - 10;
+              scale = lltrunc(tools::log_max_value<T>()) - 10;
               log_scale += scale;
               result /= exp(T(scale));
            }
@@ -444,14 +444,14 @@
      };
 
      template <class T, class Policy>
-     T cyl_bessel_i_large_x_scaled(const T& v, const T& x, int& log_scaling, const Policy& pol)
+     T cyl_bessel_i_large_x_scaled(const T& v, const T& x, long long& log_scaling, const Policy& pol)
      {
         BOOST_MATH_STD_USING
            cyl_bessel_i_large_x_sum<T> s(v, x);
-        boost::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
+        std::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
         T result = boost::math::tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
         boost::math::policies::check_series_iterations<T>("boost::math::cyl_bessel_i_large_x<%1%>(%1%,%1%)", max_iter, pol);
-        int scale = boost::math::itrunc(x);
+        long long scale = boost::math::lltrunc(x);
         log_scaling += scale;
         return result * exp(x - scale) / sqrt(boost::math::constants::two_pi<T>() * x);
      }
@@ -508,7 +508,7 @@
            return result;
         }
 
-        int scaling()const
+        long long scaling()const
         {
            return scale;
         }
@@ -516,7 +516,8 @@
      private:
         T b_minus_a, half_z, poch_1, poch_2, b_poch, term, last_result;
         int sign;
-        int n, cache_offset, scale;
+        int n, cache_offset;
+        long long scale;
         const Policy& pol;
         std::array<T, cache_size> bessel_i_cache;
 
@@ -531,7 +532,7 @@
            //
            cache_offset += cache_size;
            T last_value = bessel_i_cache.back();
-           bessel_i_backwards_iterator<T> i(b_minus_a + cache_offset + (int)cache_size - 1.5f, half_z, tools::min_value<T>() * (fabs(last_value) > 1 ? last_value : 1) / tools::epsilon<T>());
+           bessel_i_backwards_iterator<T, Policy> i(b_minus_a + cache_offset + (int)cache_size - 1.5f, half_z, tools::min_value<T>() * (fabs(last_value) > 1 ? last_value : 1) / tools::epsilon<T>());
 
            for (int j = cache_size - 1; j >= 0; --j, ++i)
            {
@@ -550,7 +551,7 @@
                     rescale = tools::max_value<T>();
                  for (int k = j; k < cache_size; ++k)
                     bessel_i_cache[k] /= rescale;
-                 i = bessel_i_backwards_iterator<T>(b_minus_a -0.5f + cache_offset + j, half_z, bessel_i_cache[j + 1], bessel_i_cache[j]);
+                 i = bessel_i_backwards_iterator<T, Policy>(b_minus_a -0.5f + cache_offset + j, half_z, bessel_i_cache[j + 1], bessel_i_cache[j]);
               }
            }
            T ratio = last_value / *i;
@@ -564,22 +565,22 @@
      };
 
      template <class T, class Policy>
-     T hypergeometric_1F1_AS_13_3_6(const T& a, const T& b, const T& z, const T& b_minus_a, const Policy& pol, int& log_scaling)
+     T hypergeometric_1F1_AS_13_3_6(const T& a, const T& b, const T& z, const T& b_minus_a, const Policy& pol, long long& log_scaling)
      {
         BOOST_MATH_STD_USING
         if(b_minus_a == 0)
         {
            // special case: M(a,a,z) == exp(z)
-           int scale = itrunc(z, pol);
+           long long scale = lltrunc(z, pol);
            log_scaling += scale;
            return exp(z - scale);
         }
         hypergeometric_1F1_AS_13_3_6_series<T, Policy> s(a, b, z, b_minus_a, pol);
-        boost::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
+        std::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
         T result = boost::math::tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
         boost::math::policies::check_series_iterations<T>("boost::math::hypergeometric_1F1_AS_13_3_6<%1%>(%1%,%1%,%1%)", max_iter, pol);
-        result *= boost::math::tgamma(b_minus_a - 0.5f) * pow(z / 4, -b_minus_a + 0.5f);
-        int scale = itrunc(z / 2);
+        result *= boost::math::tgamma(b_minus_a - 0.5f, pol) * pow(z / 4, -b_minus_a + 0.5f);
+        long long scale = lltrunc(z / 2);
         log_scaling += scale;
         log_scaling += s.scaling();
         result *= exp(z / 2 - scale);
@@ -641,7 +642,7 @@
         BOOST_MATH_STD_USING
         T prefix = exp(h * z) * boost::math::tgamma(b);
         hypergeometric_1F1_AS_13_3_8_series<T, Policy> s(a, b, z, h, pol);
-        boost::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
+        std::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
         T result = boost::math::tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
         boost::math::policies::check_series_iterations<T>("boost::math::hypergeometric_1F1_AS_13_3_8<%1%>(%1%,%1%,%1%)", max_iter, pol);
         result *= prefix;
@@ -676,12 +677,12 @@
            return result;
         }
         T term, two_a_minus_1_plus_s, two_a_minus_b_plus_s, b_plus_s, a_minus_half_plus_s, half_z;
-        int s;
+        long long s;
         const Policy& pol;
      };
 
      template <class T, class Policy>
-     T hypergeometric_1f1_13_11_1(const T& a, const T& b, const T& z, const Policy& pol, int& log_scaling)
+     T hypergeometric_1f1_13_11_1(const T& a, const T& b, const T& z, const Policy& pol, long long& log_scaling)
      {
         BOOST_MATH_STD_USING
            bool use_logs = false;
@@ -711,12 +712,12 @@
         }
 
         hypergeometric_1f1_13_11_1_series<T, Policy> s(a, b, z, pol);
-        boost::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
+        std::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
         T result = boost::math::tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
         boost::math::policies::check_series_iterations<T>("boost::math::hypergeometric_1f1_13_11_1<%1%>(%1%,%1%,%1%)", max_iter, pol);
         if (use_logs)
         {
-           int scaling = itrunc(prefix);
+           long long scaling = lltrunc(prefix);
            log_scaling += scaling;
            prefix -= scaling;
            result *= exp(prefix) * prefix_sgn;
@@ -732,3 +733,7 @@
   } } } // namespaces
 
 #endif // BOOST_MATH_HYPERGEOMETRIC_1F1_BESSEL_HPP
+
+/* hypergeometric_1F1_bessel.hpp
+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
+*/

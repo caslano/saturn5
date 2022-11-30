@@ -1,5 +1,5 @@
 /* Error observers for a very simple basic_result type
-(C) 2017-2020 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
+(C) 2017-2022 Niall Douglas <http://www.nedproductions.biz/> (2 commits)
 File Created: Oct 2017
 
 
@@ -46,43 +46,43 @@ namespace detail
     constexpr error_type &assume_error() & noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<basic_result_error_observers &>(*this));
-      return this->_error;
+      return this->_state._error;
     }
     constexpr const error_type &assume_error() const &noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<const basic_result_error_observers &>(*this));
-      return this->_error;
+      return this->_state._error;
     }
     constexpr error_type &&assume_error() && noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<basic_result_error_observers &&>(*this));
-      return static_cast<error_type &&>(this->_error);
+      return static_cast<error_type &&>(this->_state._error);
     }
     constexpr const error_type &&assume_error() const &&noexcept
     {
       NoValuePolicy::narrow_error_check(static_cast<const basic_result_error_observers &&>(*this));
-      return static_cast<const error_type &&>(this->_error);
+      return static_cast<const error_type &&>(this->_state._error);
     }
 
     constexpr error_type &error() &
     {
       NoValuePolicy::wide_error_check(static_cast<basic_result_error_observers &>(*this));
-      return this->_error;
+      return this->_state._error;
     }
     constexpr const error_type &error() const &
     {
       NoValuePolicy::wide_error_check(static_cast<const basic_result_error_observers &>(*this));
-      return this->_error;
+      return this->_state._error;
     }
     constexpr error_type &&error() &&
     {
       NoValuePolicy::wide_error_check(static_cast<basic_result_error_observers &&>(*this));
-      return static_cast<error_type &&>(this->_error);
+      return static_cast<error_type &&>(this->_state._error);
     }
     constexpr const error_type &&error() const &&
     {
       NoValuePolicy::wide_error_check(static_cast<const basic_result_error_observers &&>(*this));
-      return static_cast<const error_type &&>(this->_error);
+      return static_cast<const error_type &&>(this->_state._error);
     }
   };
   template <class Base, class NoValuePolicy> class basic_result_error_observers<Base, void, NoValuePolicy> : public Base
@@ -96,3 +96,7 @@ namespace detail
 BOOST_OUTCOME_V2_NAMESPACE_END
 
 #endif
+
+/* basic_result_error_observers.hpp
+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
+*/

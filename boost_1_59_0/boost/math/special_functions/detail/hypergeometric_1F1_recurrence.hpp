@@ -24,7 +24,7 @@
   inline T hypergeometric_1F1_imp(const T& a, const T& b, const T& z, const Policy& pol);
 
   template <class T, class Policy>
-  inline T hypergeometric_1F1_imp(const T& a, const T& b, const T& z, const Policy& pol, int& log_scaling);
+  inline T hypergeometric_1F1_imp(const T& a, const T& b, const T& z, const Policy& pol, long long& log_scaling);
 
   template <class T>
   struct hypergeometric_1F1_recurrence_a_coefficients
@@ -36,7 +36,7 @@
     {
     }
 
-    result_type operator()(boost::intmax_t i) const
+    result_type operator()(std::intmax_t i) const
     {
       const T ai = a + i;
 
@@ -62,7 +62,7 @@
     {
     }
 
-    result_type operator()(boost::intmax_t i) const
+    result_type operator()(std::intmax_t i) const
     {
       const T bi = b + i;
 
@@ -75,7 +75,7 @@
 
   private:
     const T a, b, z;
-    hypergeometric_1F1_recurrence_b_coefficients& operator=(const hypergeometric_1F1_recurrence_b_coefficients&);
+    hypergeometric_1F1_recurrence_b_coefficients& operator=(const hypergeometric_1F1_recurrence_b_coefficients&) = delete;
   };
   //
   // for use when we're recursing to a small b:
@@ -90,7 +90,7 @@
      {
      }
 
-     result_type operator()(boost::intmax_t i) const
+     result_type operator()(std::intmax_t i) const
      {
         const T bi = b + (i + N);
         const T bi_minus_1 = b + (i + N - 1);
@@ -103,7 +103,7 @@
      }
 
   private:
-     hypergeometric_1F1_recurrence_small_b_coefficients operator=(const hypergeometric_1F1_recurrence_small_b_coefficients&);
+     hypergeometric_1F1_recurrence_small_b_coefficients operator=(const hypergeometric_1F1_recurrence_small_b_coefficients&) = delete;
      const T a, b, z;
      int N;
   };
@@ -118,7 +118,7 @@
     {
     }
 
-    result_type operator()(boost::intmax_t i) const
+    result_type operator()(std::intmax_t i) const
     {
       const T ai = a + (offset + i);
       const T bi = b + (offset + i);
@@ -133,7 +133,7 @@
   private:
     const T a, b, z;
     int offset;
-    hypergeometric_1F1_recurrence_a_and_b_coefficients operator=(const hypergeometric_1F1_recurrence_a_and_b_coefficients&);
+    hypergeometric_1F1_recurrence_a_and_b_coefficients operator=(const hypergeometric_1F1_recurrence_a_and_b_coefficients&) = delete;
   };
 #if 0
   //
@@ -153,7 +153,7 @@
      {
      }
 
-     result_type operator()(boost::intmax_t i) const
+     result_type operator()(std::intmax_t i) const
      {
         i *= 2;
         const T ai = a + (offset + i);
@@ -188,7 +188,7 @@
      {
      }
 
-     result_type operator()(boost::intmax_t i) const
+     result_type operator()(std::intmax_t i) const
      {
         i *= 2;
         const T ai = a + (offset + i);
@@ -220,7 +220,7 @@
      {
      }
 
-     result_type operator()(boost::intmax_t i) const
+     result_type operator()(std::intmax_t i) const
      {
         i *= 2;
         const T bi = b + (offset + i);
@@ -257,7 +257,7 @@
      {
      }
 
-     result_type operator()(boost::intmax_t i) const
+     result_type operator()(std::intmax_t i) const
      {
         const T ai = a + (offset + i);
         const T bi = b - (offset + i);
@@ -277,11 +277,11 @@
 #endif
 
   template <class T, class Policy>
-  inline T hypergeometric_1F1_backward_recurrence_for_negative_a(const T& a, const T& b, const T& z, const Policy& pol, const char* function, int& log_scaling)
+  inline T hypergeometric_1F1_backward_recurrence_for_negative_a(const T& a, const T& b, const T& z, const Policy& pol, const char* function, long long& log_scaling)
   {
     BOOST_MATH_STD_USING // modf, frexp, fabs, pow
 
-    boost::intmax_t integer_part = 0;
+    std::intmax_t integer_part = 0;
     T ak = modf(a, &integer_part);
     //
     // We need ak-1 positive to avoid infinite recursion below:
@@ -292,7 +292,7 @@
        integer_part -= 2;
     }
 
-    if (-integer_part > static_cast<boost::intmax_t>(policies::get_max_series_iterations<Policy>()))
+    if (-integer_part > static_cast<std::intmax_t>(policies::get_max_series_iterations<Policy>()))
        return policies::raise_evaluation_error<T>(function, "1F1 arguments sit in a range with a so negative that we have no evaluation method, got a = %1%", std::numeric_limits<T>::quiet_NaN(), pol);
 
     T first, second;
@@ -304,7 +304,7 @@
     }
     else
     {
-       int scaling1(0), scaling2(0);
+       long long scaling1(0), scaling2(0);
        first = detail::hypergeometric_1F1_imp(ak, b, z, pol, scaling1);
        ak -= 1;
        second = detail::hypergeometric_1F1_imp(ak, b, z, pol, scaling2);
@@ -326,7 +326,7 @@
 
 
   template <class T, class Policy>
-  T hypergeometric_1F1_backwards_recursion_on_b_for_negative_a(const T& a, const T& b, const T& z, const Policy& pol, const char*, int& log_scaling)
+  T hypergeometric_1F1_backwards_recursion_on_b_for_negative_a(const T& a, const T& b, const T& z, const Policy& pol, const char*, long long& log_scaling)
   {
      using std::swap;
      BOOST_MATH_STD_USING // modf, frexp, fabs, pow
@@ -351,7 +351,7 @@
      // to recurse on a and b together when we can.
      //
 
-     BOOST_ASSERT(a < -1); // Not tested nor taken for -1 < a < 0
+     BOOST_MATH_ASSERT(a < -1); // Not tested nor taken for -1 < a < 0
 
      int b_shift = itrunc(z - b) + 2;
 
@@ -364,10 +364,10 @@
      // If the shifts are so large that we would throw an evaluation_error, try the series instead,
      // even though this will almost certainly throw as well:
      //
-     if (b_shift > static_cast<boost::intmax_t>(boost::math::policies::get_max_series_iterations<Policy>()))
+     if (b_shift > static_cast<std::intmax_t>(boost::math::policies::get_max_series_iterations<Policy>()))
         return hypergeometric_1F1_checked_series_impl(a, b, z, pol, log_scaling);
 
-     if (a_shift > static_cast<boost::intmax_t>(boost::math::policies::get_max_series_iterations<Policy>()))
+     if (a_shift > static_cast<std::intmax_t>(boost::math::policies::get_max_series_iterations<Policy>()))
         return hypergeometric_1F1_checked_series_impl(a, b, z, pol, log_scaling);
 
      int a_b_shift = b < 0 ? itrunc(b + b_shift) : b_shift;   // The max we can shift on a and b together
@@ -395,9 +395,9 @@
         --leading_a_shift;
      }
 
-     BOOST_ASSERT(leading_a_shift > 1);
-     BOOST_ASSERT(a_b_shift + leading_a_shift + (a_b_shift == 0 ? 1 : 0) == a_shift);
-     BOOST_ASSERT(a_b_shift + trailing_b_shift == b_shift);
+     BOOST_MATH_ASSERT(leading_a_shift > 1);
+     BOOST_MATH_ASSERT(a_b_shift + leading_a_shift + (a_b_shift == 0 ? 1 : 0) == a_shift);
+     BOOST_MATH_ASSERT(a_b_shift + trailing_b_shift == b_shift);
 
      if ((trailing_b_shift == 0) && (fabs(b) < 0.5) && a_b_shift)
      {
@@ -409,7 +409,7 @@
      }
 
      T first, second;
-     int scale1(0), scale2(0);
+     long long scale1(0), scale2(0);
      first = boost::math::detail::hypergeometric_1F1_imp(T(a + a_shift), T(b + b_shift), z, pol, scale1);
      //
      // It would be good to compute "second" from first and the ratio - unfortunately we are right on the cusp
@@ -486,3 +486,7 @@
   } } } // namespaces
 
 #endif // BOOST_HYPERGEOMETRIC_1F1_RECURRENCE_HPP_
+
+/* hypergeometric_1F1_recurrence.hpp
+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
+*/

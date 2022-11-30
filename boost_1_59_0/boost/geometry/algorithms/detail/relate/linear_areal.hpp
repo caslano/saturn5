@@ -2,8 +2,8 @@
 
 // Copyright (c) 2007-2012 Barend Gehrels, Amsterdam, the Netherlands.
 
-// This file was modified by Oracle on 2013, 2014, 2015, 2017, 2018, 2019.
-// Modifications copyright (c) 2013-2019 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2013-2021.
+// Modifications copyright (c) 2013-2021 Oracle and/or its affiliates.
 
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
@@ -22,6 +22,7 @@
 
 #include <boost/geometry/util/condition.hpp>
 #include <boost/geometry/util/range.hpp>
+#include <boost/geometry/util/type_traits.hpp>
 
 #include <boost/geometry/algorithms/num_interior_rings.hpp>
 #include <boost/geometry/algorithms/detail/point_on_border.hpp>
@@ -33,7 +34,7 @@
 #include <boost/geometry/algorithms/detail/relate/boundary_checker.hpp>
 #include <boost/geometry/algorithms/detail/relate/follow_helpers.hpp>
 
-#include <boost/geometry/views/detail/normalized_view.hpp>
+#include <boost/geometry/views/detail/closed_clockwise_view.hpp>
 
 namespace boost { namespace geometry
 {
@@ -210,15 +211,6 @@ struct linear_areal
     typedef typename geometry::point_type<Geometry1>::type point1_type;
     typedef typename geometry::point_type<Geometry2>::type point2_type;
 
-    template <typename Geometry>
-        struct is_multi
-            : boost::is_base_of
-                <
-                    multi_tag,
-                    typename tag<Geometry>::type
-                >
-        {};
-
     template <typename Geom1, typename Geom2, typename Strategy>
     struct multi_turn_info
         : turns::get_turns<Geom1, Geom2>::template turn_info_type<Strategy>::type
@@ -229,18 +221,18 @@ struct linear_areal
 
     template <typename Geom1, typename Geom2, typename Strategy>
     struct turn_info_type
-        : boost::mpl::if_c
+        : std::conditional
             <
-                is_multi<Geometry2>::value,
+                util::is_multi<Geometry2>::value,
                 multi_turn_info<Geom1, Geom2, Strategy>,
                 typename turns::get_turns<Geom1, Geom2>::template turn_info_type<Strategy>::type
             >
     {};
     
-    template <typename Result, typename IntersectionStrategy>
+    template <typename Result, typename Strategy>
     static inline void apply(Geometry1 const& geometry1, Geometry2 const& geometry2,
                              Result & result,
-                             IntersectionStrategy const& intersection_strategy)
+                             Strategy const& strategy)
     {
 // TODO: If Areal geometry may have infinite size, change the following line:
 
@@ -251,38 +243,34 @@ struct linear_areal
             return;
 
         // get and analyse turns
-        typedef typename turn_info_type<Geometry1, Geometry2, IntersectionStrategy>::type turn_type;
+        typedef typename turn_info_type<Geometry1, Geometry2, Strategy>::type turn_type;
         std::vector<turn_type> turns;
 
         interrupt_policy_linear_areal<Geometry2, Result> interrupt_policy(geometry2, result);
 
-        turns::get_turns<Geometry1, Geometry2>::apply(turns, geometry1, geometry2, interrupt_policy, intersection_strategy);
+        turns::get_turns<Geometry1, Geometry2>::apply(turns, geometry1, geometry2, interrupt_policy, strategy);
         if ( BOOST_GEOMETRY_CONDITION( result.interrupt ) )
             return;
 
-        typedef typename IntersectionStrategy::template point_in_geometry_strategy<Geometry1, Geometry2>::type within_strategy_type;
-        within_strategy_type const within_strategy = intersection_strategy.template get_point_in_geometry_strategy<Geometry1, Geometry2>();
-
-        typedef typename IntersectionStrategy::cs_tag cs_tag;
-        typedef typename within_strategy_type::equals_point_point_strategy_type eq_pp_strategy_type;
+        typedef typename Strategy::cs_tag cs_tag;
         
         typedef boundary_checker
             <
                 Geometry1,
-                eq_pp_strategy_type
+                Strategy
             > boundary_checker1_type;
-        boundary_checker1_type boundary_checker1(geometry1);
+        boundary_checker1_type boundary_checker1(geometry1, strategy);
 
         no_turns_la_linestring_pred
             <
                 Geometry2,
                 Result,
-                within_strategy_type,
+                Strategy,
                 boundary_checker1_type,
                 TransposeResult
             > pred1(geometry2,
                     result,
-                    within_strategy,
+                    strategy,
                     boundary_checker1);
         for_each_disjoint_geometry_if<0, Geometry1>::apply(turns.begin(), turns.end(), geometry1, pred1);
         if ( BOOST_GEOMETRY_CONDITION( result.interrupt ) )
@@ -303,14 +291,14 @@ struct linear_areal
             return;
 
         {
-            sort_dispatch<cs_tag>(turns.begin(), turns.end(), is_multi<Geometry2>());
+            sort_dispatch<cs_tag>(turns.begin(), turns.end(), util::is_multi<Geometry2>());
 
             turns_analyser<turn_type> analyser;
             analyse_each_turn(result, analyser,
                               turns.begin(), turns.end(),
                               geometry1, geometry2,
                               boundary_checker1,
-                              intersection_strategy.get_side_strategy());
+                              strategy);
 
             if ( BOOST_GEOMETRY_CONDITION( result.interrupt ) )
                 return;
@@ -403,14 +391,12 @@ struct linear_areal
                     typedef turns::less<1, turns::less_op_areal_linear<1>, cs_tag> less;
                     std::sort(it, next, less());
 
-                    eq_pp_strategy_type const eq_pp_strategy = within_strategy.get_equals_point_point_strategy();
-
                     // analyse
                     areal_boundary_analyser<turn_type> analyser;
                     for ( turn_iterator rit = it ; rit != next ; ++rit )
                     {
                         // if the analyser requests, break the search
-                        if ( !analyser.apply(it, rit, next, eq_pp_strategy) )
+                        if ( !analyser.apply(it, rit, next, strategy) )
                             break;
                     }
 
@@ -531,7 +517,7 @@ struct linear_areal
     };
 
     template <typename CSTag, typename TurnIt>
-    static void sort_dispatch(TurnIt first, TurnIt last, boost::true_type const& /*is_multi*/)
+    static void sort_dispatch(TurnIt first, TurnIt last, std::true_type const& /*is_multi*/)
     {
         // sort turns by Linear seg_id, then by fraction, then by other multi_index
         typedef turns::less<0, turns::less_other_multi_index<0>, CSTag> less;
@@ -555,7 +541,7 @@ struct linear_areal
     }
 
     template <typename CSTag, typename TurnIt>
-    static void sort_dispatch(TurnIt first, TurnIt last, boost::false_type const& /*is_multi*/)
+    static void sort_dispatch(TurnIt first, TurnIt last, std::false_type const& /*is_multi*/)
     {
         // sort turns by Linear seg_id, then by fraction, then
         // for same ring id: x, u, i, c
@@ -634,18 +620,20 @@ struct linear_areal
         static const std::size_t other_op_id = 1;
 
         template <typename TurnPointCSTag, typename PointP, typename PointQ,
-                  typename SideStrategy,
+                  typename Strategy,
                   typename Pi = PointP, typename Pj = PointP, typename Pk = PointP,
                   typename Qi = PointQ, typename Qj = PointQ, typename Qk = PointQ
         >
         struct la_side_calculator
         {
+            typedef decltype(std::declval<Strategy>().side()) side_strategy_type;
+
             inline la_side_calculator(Pi const& pi, Pj const& pj, Pk const& pk,
-                                   Qi const& qi, Qj const& qj, Qk const& qk,
-                                   SideStrategy const& side_strategy)
+                                      Qi const& qi, Qj const& qj, Qk const& qk,
+                                      Strategy const& strategy)
                 : m_pi(pi), m_pj(pj), m_pk(pk)
                 , m_qi(qi), m_qj(qj), m_qk(qk)
-                , m_side_strategy(side_strategy)
+                , m_side_strategy(strategy.side())
             {}
 
             inline int pk_wrt_p1() const { return m_side_strategy.apply(m_pi, m_pj, m_pk); }
@@ -660,7 +648,7 @@ struct linear_areal
             Qj const& m_qj;
             Qk const& m_qk;
 
-            SideStrategy m_side_strategy;
+            side_strategy_type m_side_strategy;
         };
 
 
@@ -680,12 +668,12 @@ struct linear_areal
                   typename Geometry,
                   typename OtherGeometry,
                   typename BoundaryChecker,
-                  typename SideStrategy>
+                  typename Strategy>
         void apply(Result & res, TurnIt it,
                    Geometry const& geometry,
                    OtherGeometry const& other_geometry,
                    BoundaryChecker const& boundary_checker,
-                   SideStrategy const& side_strategy)
+                   Strategy const& strategy)
         {
             overlay::operation_type op = it->operations[op_id].operation;
 
@@ -714,7 +702,7 @@ struct linear_areal
                 // real exit point - may be multiple
                 // we know that we entered and now we exit
                 if ( ! turn_on_the_same_ip<op_id>(m_exit_watcher.get_exit_turn(), *it,
-                                                  side_strategy.get_equals_point_point_strategy()) )
+                                                  strategy) )
                 {
                     m_exit_watcher.reset_detected_exit();
                     
@@ -757,7 +745,7 @@ struct linear_areal
                 if ( ( op == overlay::operation_intersection
                     || op == overlay::operation_continue )
                   && turn_on_the_same_ip<op_id>(m_exit_watcher.get_exit_turn(), *it,
-                                                side_strategy.get_equals_point_point_strategy()) )
+                                                strategy) )
                 {
                     fake_enter_detected = true;
                 }
@@ -765,7 +753,7 @@ struct linear_areal
                 m_exit_watcher.reset_detected_exit();
             }
 
-            if ( BOOST_GEOMETRY_CONDITION( is_multi<OtherGeometry>::value )
+            if ( BOOST_GEOMETRY_CONDITION( util::is_multi<OtherGeometry>::value )
               && m_first_from_unknown )
             {
                 // For MultiPolygon many x/u operations may be generated as a first IP
@@ -778,7 +766,7 @@ struct linear_areal
                         || seg_id.multi_index != m_previous_turn_ptr->operations[op_id].seg_id.multi_index ) ) // or the next single-geometry
                   || ( m_previous_operation == overlay::operation_union
                     && ! turn_on_the_same_ip<op_id>(*m_previous_turn_ptr, *it,
-                                                    side_strategy.get_equals_point_point_strategy()) )
+                                                    strategy) )
                    )
                 {
                     update<interior, exterior, '1', TransposeResult>(res);
@@ -811,7 +799,7 @@ struct linear_areal
 
                 // real interior overlap
                 if ( ! turn_on_the_same_ip<op_id>(*m_previous_turn_ptr, *it,
-                                                  side_strategy.get_equals_point_point_strategy()) )
+                                                  strategy) )
                 {
                     update<interior, interior, '1', TransposeResult>(res);
                     m_interior_detected = false;
@@ -927,7 +915,7 @@ struct linear_areal
                                               && calculate_from_inside(geometry,
                                                                        other_geometry,
                                                                        *it,
-                                                                       side_strategy);
+                                                                       strategy);
 
                         if ( from_inside )
                             update<interior, interior, '1', TransposeResult>(res);
@@ -953,7 +941,7 @@ struct linear_areal
                     }
                 }
 
-                if ( BOOST_GEOMETRY_CONDITION( is_multi<OtherGeometry>::value ) )
+                if ( BOOST_GEOMETRY_CONDITION( util::is_multi<OtherGeometry>::value ) )
                 {
                     m_first_from_unknown = false;
                     m_first_from_unknown_boundary_detected = false;
@@ -1028,7 +1016,7 @@ struct linear_areal
                                                     && calculate_from_inside(geometry,
                                                                              other_geometry,
                                                                              *it,
-                                                                             side_strategy);
+                                                                             strategy);
                         if ( first_from_inside )
                         {
                             update<interior, interior, '1', TransposeResult>(res);
@@ -1041,7 +1029,7 @@ struct linear_areal
                         }
                         else
                         {
-                            if ( BOOST_GEOMETRY_CONDITION( is_multi<OtherGeometry>::value )
+                            if ( BOOST_GEOMETRY_CONDITION( util::is_multi<OtherGeometry>::value )
                               /*&& ( op == overlay::operation_blocked
                                 || op == overlay::operation_union )*/ ) // if we're here it's u or x
                             {
@@ -1069,7 +1057,7 @@ struct linear_areal
                                 }
                                 else
                                 {
-                                    if ( BOOST_GEOMETRY_CONDITION( is_multi<OtherGeometry>::value )
+                                    if ( BOOST_GEOMETRY_CONDITION( util::is_multi<OtherGeometry>::value )
                                       /*&& ( op == overlay::operation_blocked
                                         || op == overlay::operation_union )*/ ) // if we're here it's u or x
                                     {
@@ -1119,7 +1107,7 @@ struct linear_areal
             // For MultiPolygon many x/u operations may be generated as a first IP
             // if for all turns x/u was generated and any of the Polygons doesn't contain the LineString
             // then we know that the LineString is outside
-            if ( BOOST_GEOMETRY_CONDITION( is_multi<OtherGeometry>::value )
+            if ( BOOST_GEOMETRY_CONDITION( util::is_multi<OtherGeometry>::value )
               && m_first_from_unknown )
             {
                 update<interior, exterior, '1', TransposeResult>(res);
@@ -1216,11 +1204,11 @@ struct linear_areal
 
         // check if the passed turn's segment of Linear geometry arrived
         // from the inside or the outside of the Areal geometry
-        template <typename Turn, typename SideStrategy>
+        template <typename Turn, typename Strategy>
         static inline bool calculate_from_inside(Geometry1 const& geometry1,
                                                  Geometry2 const& geometry2,
                                                  Turn const& turn,
-                                                 SideStrategy const& side_strategy)
+                                                 Strategy const& strategy)
         {
             typedef typename cs_tag<typename Turn::point_type>::type cs_tag;
 
@@ -1230,9 +1218,9 @@ struct linear_areal
             typename sub_range_return_type<Geometry1 const>::type
                 range1 = sub_range(geometry1, turn.operations[op_id].seg_id);
             
-            typedef detail::normalized_view<Geometry2 const> const range2_type;
-            typedef typename boost::range_iterator<range2_type>::type range2_iterator;
-            range2_type range2(sub_range(geometry2, turn.operations[other_op_id].seg_id));
+            using range2_view = detail::closed_clockwise_view<typename ring_type<Geometry2>::type const>;
+            using range2_iterator = typename boost::range_iterator<range2_view const>::type;
+            range2_view const range2(sub_range(geometry2, turn.operations[other_op_id].seg_id));
             
             BOOST_GEOMETRY_ASSERT(boost::size(range1));
             std::size_t const s2 = boost::size(range2);
@@ -1250,7 +1238,7 @@ struct linear_areal
             point2_type const& qj = range::at(range2, q_seg_ij + 1);
             point1_type qi_conv;
             geometry::convert(qi, qi_conv);
-            bool const is_ip_qj = equals::equals_point_point(turn.point, qj, side_strategy.get_equals_point_point_strategy());
+            bool const is_ip_qj = equals::equals_point_point(turn.point, qj, strategy);
 // TODO: test this!
 //            BOOST_GEOMETRY_ASSERT(!equals::equals_point_point(turn.point, pi));
 //            BOOST_GEOMETRY_ASSERT(!equals::equals_point_point(turn.point, qi));
@@ -1265,11 +1253,11 @@ struct linear_areal
                 range2_iterator qk_it = find_next_non_duplicated(boost::begin(range2),
                                                                  range::pos(range2, q_seg_jk),
                                                                  boost::end(range2),
-                                                                 side_strategy.get_equals_point_point_strategy());
+                                                                 strategy);
 
                 // Will this sequence of points be always correct?
-                la_side_calculator<cs_tag, point1_type, point2_type, SideStrategy>
-                    side_calc(qi_conv, new_pj, pi, qi, qj, *qk_it, side_strategy);
+                la_side_calculator<cs_tag, point1_type, point2_type, Strategy>
+                    side_calc(qi_conv, new_pj, pi, qi, qj, *qk_it, strategy);
 
                 return calculate_from_inside_sides(side_calc);
             }
@@ -1278,16 +1266,16 @@ struct linear_areal
                 point2_type new_qj;
                 geometry::convert(turn.point, new_qj);
 
-                la_side_calculator<cs_tag, point1_type, point2_type, SideStrategy>
-                    side_calc(qi_conv, new_pj, pi, qi, new_qj, qj, side_strategy);
+                la_side_calculator<cs_tag, point1_type, point2_type, Strategy>
+                    side_calc(qi_conv, new_pj, pi, qi, new_qj, qj, strategy);
 
                 return calculate_from_inside_sides(side_calc);
             }
         }
 
-        template <typename It, typename EqPPStrategy>
+        template <typename It, typename Strategy>
         static inline It find_next_non_duplicated(It first, It current, It last,
-                                                  EqPPStrategy const& strategy)
+                                                  Strategy const& strategy)
         {
             BOOST_GEOMETRY_ASSERT( current != last );
 
@@ -1348,14 +1336,14 @@ struct linear_areal
               typename Geometry,
               typename OtherGeometry,
               typename BoundaryChecker,
-              typename SideStrategy>
+              typename Strategy>
     static inline void analyse_each_turn(Result & res,
                                          Analyser & analyser,
                                          TurnIt first, TurnIt last,
                                          Geometry const& geometry,
                                          OtherGeometry const& other_geometry,
                                          BoundaryChecker const& boundary_checker,
-                                         SideStrategy const& side_strategy)
+                                         Strategy const& strategy)
     {
         if ( first == last )
             return;
@@ -1365,7 +1353,7 @@ struct linear_areal
             analyser.apply(res, it,
                            geometry, other_geometry,
                            boundary_checker,
-                           side_strategy);
+                           strategy);
 
             if ( BOOST_GEOMETRY_CONDITION( res.interrupt ) )
                 return;
@@ -1445,9 +1433,9 @@ struct linear_areal
             , m_previous_turn_ptr(NULL)
         {}
 
-        template <typename TurnIt, typename EqPPStrategy>
+        template <typename TurnIt, typename Strategy>
         bool apply(TurnIt /*first*/, TurnIt it, TurnIt last,
-                   EqPPStrategy const& strategy)
+                   Strategy const& strategy)
         {
             overlay::operation_type op = it->operations[1].operation;
 
@@ -1501,12 +1489,12 @@ struct areal_linear
 
     static const bool interruption_enabled = linear_areal_type::interruption_enabled;
 
-    template <typename Result, typename IntersectionStrategy>
+    template <typename Result, typename Strategy>
     static inline void apply(Geometry1 const& geometry1, Geometry2 const& geometry2,
                              Result & result,
-                             IntersectionStrategy const& intersection_strategy)
+                             Strategy const& strategy)
     {
-        linear_areal_type::apply(geometry2, geometry1, result, intersection_strategy);
+        linear_areal_type::apply(geometry2, geometry1, result, strategy);
     }
 };
 
@@ -1516,3 +1504,7 @@ struct areal_linear
 }} // namespace boost::geometry
 
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_RELATE_LINEAR_AREAL_HPP
+
+/* linear_areal.hpp
+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
+*/

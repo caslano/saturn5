@@ -1,8 +1,7 @@
-
-//  Copyright John Maddock 2006-7, 2013-14.
+//  Copyright John Maddock 2006-7, 2013-20.
 //  Copyright Paul A. Bristow 2007, 2013-14.
 //  Copyright Nikhar Agrawal 2013-14
-//  Copyright Christopher Kormanyos 2013-14
+//  Copyright Christopher Kormanyos 2013-14, 2020
 
 //  Use, modification and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
@@ -15,11 +14,12 @@
 #pragma once
 #endif
 
-#include <boost/config.hpp>
 #include <boost/math/tools/series.hpp>
 #include <boost/math/tools/fraction.hpp>
 #include <boost/math/tools/precision.hpp>
 #include <boost/math/tools/promotion.hpp>
+#include <boost/math/tools/assert.hpp>
+#include <boost/math/tools/config.hpp>
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/math_fwd.hpp>
@@ -34,16 +34,12 @@
 #include <boost/math/special_functions/detail/lgamma_small.hpp>
 #include <boost/math/special_functions/bernoulli.hpp>
 #include <boost/math/special_functions/polygamma.hpp>
-#include <boost/type_traits/is_convertible.hpp>
-#include <boost/assert.hpp>
-#include <boost/mpl/greater.hpp>
-#include <boost/mpl/equal_to.hpp>
-#include <boost/mpl/greater.hpp>
 
-#include <boost/config/no_tr1/cmath.hpp>
+#include <cmath>
 #include <algorithm>
+#include <type_traits>
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 # pragma warning(push)
 # pragma warning(disable: 4702) // unreachable code (return after domain_error throw).
 # pragma warning(disable: 4127) // conditional expression is constant.
@@ -59,13 +55,13 @@ namespace boost{ namespace math{
 namespace detail{
 
 template <class T>
-inline bool is_odd(T v, const boost::true_type&)
+inline bool is_odd(T v, const std::true_type&)
 {
    int i = static_cast<int>(v);
    return i&1;
 }
 template <class T>
-inline bool is_odd(T v, const boost::false_type&)
+inline bool is_odd(T v, const std::false_type&)
 {
    // Oh dear can't cast T to int!
    BOOST_MATH_STD_USING
@@ -75,7 +71,7 @@ inline bool is_odd(T v, const boost::false_type&)
 template <class T>
 inline bool is_odd(T v)
 {
-   return is_odd(v, ::boost::is_convertible<T, int>());
+   return is_odd(v, ::std::is_convertible<T, int>());
 }
 
 template <class T>
@@ -101,7 +97,7 @@ T sinpx(T z)
    {
       dist = z - fl;
    }
-   BOOST_ASSERT(fl >= 0);
+   BOOST_MATH_ASSERT(fl >= 0);
    if(dist > 0.5)
       dist = 1 - dist;
    T result = sin(dist*boost::math::constants::pi<T>());
@@ -241,7 +237,7 @@ T lgamma_imp(T z, const Policy& pol, const Lanczos& l, int* sign = 0)
    {
       if (0 == z)
          return policies::raise_pole_error<T>(function, "Evaluation of lgamma at %1%.", z, pol);
-      if (fabs(z) < 1 / tools::max_value<T>())
+      if (4 * fabs(z) < tools::epsilon<T>())
          result = -log(fabs(z));
       else
          result = log(fabs(1 / z - constants::euler<T>()));
@@ -251,7 +247,7 @@ T lgamma_imp(T z, const Policy& pol, const Lanczos& l, int* sign = 0)
    else if(z < 15)
    {
       typedef typename policies::precision<T, Policy>::type precision_type;
-      typedef boost::integral_constant<int,
+      typedef std::integral_constant<int,
          precision_type::value <= 0 ? 0 :
          precision_type::value <= 64 ? 64 :
          precision_type::value <= 113 ? 113 : 0
@@ -342,7 +338,7 @@ inline T lower_gamma_series(T a, T z, const Policy& pol, T init_value = 0)
    // lower incomplete integral. Then divide by tgamma(a)
    // to get the normalised value.
    lower_incomplete_gamma_series<T> s(a, z);
-   boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
+   std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
    T factor = policies::get_epsilon<T, Policy>();
    T result = boost::math::tools::sum_series(s, factor, max_iter, init_value);
    policies::check_series_iterations<T>("boost::math::detail::lower_gamma_series<%1%>(%1%)", max_iter, pol);
@@ -367,13 +363,35 @@ std::size_t highest_bernoulli_index()
 template<class T>
 int minimum_argument_for_bernoulli_recursion()
 {
+   BOOST_MATH_STD_USING
+
    const float digits10_of_type = (std::numeric_limits<T>::is_specialized
-                                      ? static_cast<float>(std::numeric_limits<T>::digits10)
-                                      : static_cast<float>(boost::math::tools::digits<T>() * 0.301F));
+                                    ? (float) std::numeric_limits<T>::digits10
+                                    : (float) (boost::math::tools::digits<T>() * 0.301F));
 
-   const float limit = std::ceil(std::pow(1.0f / std::ldexp(1.0f, 1-boost::math::tools::digits<T>()), 1.0f / 20.0f));
+   int min_arg = (int) (digits10_of_type * 1.7F);
 
-   return (int)((std::min)(digits10_of_type * 1.7F, limit));
+   if(digits10_of_type < 50.0F)
+   {
+      // The following code sequence has been modified
+      // within the context of issue 396.
+
+      // The calculation of the test-variable limit has now
+      // been protected against overflow/underflow dangers.
+
+      // The previous line looked like this and did, in fact,
+      // underflow ldexp when using certain multiprecision types.
+
+      // const float limit = std::ceil(std::pow(1.0f / std::ldexp(1.0f, 1-boost::math::tools::digits<T>()), 1.0f / 20.0f));
+
+      // The new safe version of the limit check is now here.
+      const float d2_minus_one = ((digits10_of_type / 0.301F) - 1.0F);
+      const float limit        = ceil(exp((d2_minus_one * log(2.0F)) / 20.0F));
+
+      min_arg = (int) ((std::min)(digits10_of_type * 1.7F, limit));
+   }
+
+   return min_arg;
 }
 
 template <class T, class Policy>
@@ -385,7 +403,7 @@ T scaled_tgamma_no_lanczos(const T& z, const Policy& pol, bool islog = false)
    // Requires that our argument is large enough for Sterling's approximation to hold.
    // Used internally when combining gamma's of similar magnitude without logarithms.
    //
-   BOOST_ASSERT(minimum_argument_for_bernoulli_recursion<T>() <= z);
+   BOOST_MATH_ASSERT(minimum_argument_for_bernoulli_recursion<T>() <= z);
 
    // Perform the Bernoulli series expansion of Stirling's approximation.
 
@@ -567,7 +585,7 @@ inline T log_gamma_near_1(const T& z, Policy const& pol)
    //
    BOOST_MATH_STD_USING // ADL of std names
 
-   BOOST_ASSERT(fabs(z) < 1);
+   BOOST_MATH_ASSERT(fabs(z) < 1);
 
    T result = -constants::euler<T>() * z;
 
@@ -577,7 +595,7 @@ inline T log_gamma_near_1(const T& z, Policy const& pol)
 
    do
    {
-      term = power_term * boost::math::polygamma(n - 1, T(1));
+      term = power_term * boost::math::polygamma(n - 1, T(1), pol);
       result += term;
       ++n;
       power_term *= z / n;
@@ -707,7 +725,7 @@ T tgammap1m1_imp(T dz, Policy const& pol, const Lanczos& l)
 
    typedef typename policies::precision<T,Policy>::type precision_type;
 
-   typedef boost::integral_constant<int,
+   typedef std::integral_constant<int,
       precision_type::value <= 0 ? 0 :
       precision_type::value <= 64 ? 64 :
       precision_type::value <= 113 ? 113 : 0
@@ -726,7 +744,7 @@ T tgammap1m1_imp(T dz, Policy const& pol, const Lanczos& l)
       {
          // Use expm1 on lgamma:
          result = boost::math::expm1(-boost::math::log1p(dz, pol) 
-            + lgamma_small_imp<T>(dz+2, dz + 1, dz, tag_type(), pol, l));
+            + lgamma_small_imp<T>(dz+2, dz + 1, dz, tag_type(), pol, l), pol);
          BOOST_MATH_INSTRUMENT_CODE(result);
       }
    }
@@ -1010,7 +1028,7 @@ inline T tgamma_small_upper_part(T a, T x, const Policy& pol, T* pgam = 0, bool 
    result -= p;
    result /= a;
    detail::small_gamma2_series<T> s(a, x);
-   boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>() - 10;
+   std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>() - 10;
    p += 1;
    if(pderivative)
       *pderivative = p / (*pgam * exp(x));
@@ -1110,7 +1128,7 @@ T incomplete_tgamma_large_x(const T& a, const T& x, const Policy& pol)
 {
    BOOST_MATH_STD_USING
    incomplete_tgamma_large_x_series<T> s(a, x);
-   boost::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
+   std::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
    T result = boost::math::tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
    boost::math::policies::check_series_iterations<T>("boost::math::tgamma<%1%>(%1%,%1%)", max_iter, pol);
    return result;
@@ -1200,7 +1218,7 @@ T gamma_incomplete_imp(T a, T x, bool normalised, bool invert,
       return exp(result);
    }
 
-   BOOST_ASSERT((p_derivative == 0) || (normalised == true));
+   BOOST_MATH_ASSERT((p_derivative == 0) || normalised);
 
    bool is_int, is_half_int;
    bool is_small_a = (a < 30) && (a <= x + 1) && (x < tools::log_max_value<T>());
@@ -1331,14 +1349,14 @@ T gamma_incomplete_imp(T a, T x, bool normalised, bool invert,
    case 0:
       {
          result = finite_gamma_q(a, x, pol, p_derivative);
-         if(normalised == false)
+         if(!normalised)
             result *= boost::math::tgamma(a, pol);
          break;
       }
    case 1:
       {
          result = finite_half_gamma_q(a, x, p_derivative, pol);
-         if(normalised == false)
+         if(!normalised)
             result *= boost::math::tgamma(a, pol);
          if(p_derivative && (*p_derivative == 0))
             *p_derivative = regularised_gamma_prefix(a, x, pol, lanczos_type());
@@ -1425,7 +1443,7 @@ T gamma_incomplete_imp(T a, T x, bool normalised, bool invert,
          //
          typedef typename policies::precision<T, Policy>::type precision_type;
 
-         typedef boost::integral_constant<int,
+         typedef std::integral_constant<int,
             precision_type::value <= 0 ? 0 :
             precision_type::value <= 53 ? 53 :
             precision_type::value <= 64 ? 64 :
@@ -1443,7 +1461,19 @@ T gamma_incomplete_imp(T a, T x, bool normalised, bool invert,
       {
          // x is so small that P is necessarily very small too,
          // use http://functions.wolfram.com/GammaBetaErf/GammaRegularized/06/01/05/01/01/
-         result = !normalised ? pow(x, a) / (a) : pow(x, a) / boost::math::tgamma(a + 1, pol);
+         if(!normalised)
+            result = pow(x, a) / (a);
+         else
+         {
+            try 
+            {
+               result = pow(x, a) / boost::math::tgamma(a + 1, pol);
+            }
+            catch (const std::overflow_error&)
+            {
+               result = 0;
+            }
+         }
          result *= 1 - a * x / (a + 1);
          if (p_derivative)
             *p_derivative = regularised_gamma_prefix(a, x, pol, lanczos_type());
@@ -1521,9 +1551,17 @@ T tgamma_delta_ratio_imp_lanczos(T z, T delta, const Policy& pol, const Lanczos&
    T result;
    if(z + delta == z)
    {
-      if(fabs(delta) < 10)
-         result = exp((constants::half<T>() - z) * boost::math::log1p(delta / zgh, pol));
+      if (fabs(delta / zgh) < boost::math::tools::epsilon<T>())
+      {
+         // We have:
+         // result = exp((constants::half<T>() - z) * boost::math::log1p(delta / zgh, pol));
+         // 0.5 - z == -z
+         // log1p(delta / zgh) = delta / zgh = delta / z
+         // multiplying we get -delta.
+         result = exp(-delta);
+      }
       else
+         // from the pow formula below... but this may actually be wrong, we just can't really calculate it :(
          result = 1;
    }
    else
@@ -1771,7 +1809,7 @@ T gamma_p_derivative_imp(T a, T x, const Policy& pol)
 
 template <class T, class Policy>
 inline typename tools::promote_args<T>::type 
-   tgamma(T z, const Policy& /* pol */, const boost::true_type)
+   tgamma(T z, const Policy& /* pol */, const std::true_type)
 {
    BOOST_FPU_EXCEPTION_GUARD
    typedef typename tools::promote_args<T>::type result_type;
@@ -1795,7 +1833,7 @@ struct igamma_initializer
       {
          typedef typename policies::precision<T, Policy>::type precision_type;
 
-         typedef boost::integral_constant<int,
+         typedef std::integral_constant<int,
             precision_type::value <= 0 ? 0 :
             precision_type::value <= 53 ? 53 :
             precision_type::value <= 64 ? 64 :
@@ -1805,7 +1843,7 @@ struct igamma_initializer
          do_init(tag_type());
       }
       template <int N>
-      static void do_init(const boost::integral_constant<int, N>&)
+      static void do_init(const std::integral_constant<int, N>&)
       {
          // If std::numeric_limits<T>::digits is zero, we must not call
          // our initialization code here as the precision presumably
@@ -1816,7 +1854,7 @@ struct igamma_initializer
             boost::math::gamma_p(static_cast<T>(400), static_cast<T>(400), Policy());
          }
       }
-      static void do_init(const boost::integral_constant<int, 53>&){}
+      static void do_init(const std::integral_constant<int, 53>&){}
       void force_instantiate()const{}
    };
    static const init initializer;
@@ -1837,7 +1875,7 @@ struct lgamma_initializer
       init()
       {
          typedef typename policies::precision<T, Policy>::type precision_type;
-         typedef boost::integral_constant<int,
+         typedef std::integral_constant<int,
             precision_type::value <= 0 ? 0 :
             precision_type::value <= 64 ? 64 :
             precision_type::value <= 113 ? 113 : 0
@@ -1845,20 +1883,20 @@ struct lgamma_initializer
 
          do_init(tag_type());
       }
-      static void do_init(const boost::integral_constant<int, 64>&)
+      static void do_init(const std::integral_constant<int, 64>&)
       {
          boost::math::lgamma(static_cast<T>(2.5), Policy());
          boost::math::lgamma(static_cast<T>(1.25), Policy());
          boost::math::lgamma(static_cast<T>(1.75), Policy());
       }
-      static void do_init(const boost::integral_constant<int, 113>&)
+      static void do_init(const std::integral_constant<int, 113>&)
       {
          boost::math::lgamma(static_cast<T>(2.5), Policy());
          boost::math::lgamma(static_cast<T>(1.25), Policy());
          boost::math::lgamma(static_cast<T>(1.5), Policy());
          boost::math::lgamma(static_cast<T>(1.75), Policy());
       }
-      static void do_init(const boost::integral_constant<int, 0>&)
+      static void do_init(const std::integral_constant<int, 0>&)
       {
       }
       void force_instantiate()const{}
@@ -1875,7 +1913,7 @@ const typename lgamma_initializer<T, Policy>::init lgamma_initializer<T, Policy>
 
 template <class T1, class T2, class Policy>
 inline typename tools::promote_args<T1, T2>::type
-   tgamma(T1 a, T2 z, const Policy&, const boost::false_type)
+   tgamma(T1 a, T2 z, const Policy&, const std::false_type)
 {
    BOOST_FPU_EXCEPTION_GUARD
    typedef typename tools::promote_args<T1, T2>::type result_type;
@@ -1898,7 +1936,7 @@ inline typename tools::promote_args<T1, T2>::type
 
 template <class T1, class T2>
 inline typename tools::promote_args<T1, T2>::type
-   tgamma(T1 a, T2 z, const boost::false_type& tag)
+   tgamma(T1 a, T2 z, const std::false_type& tag)
 {
    return tgamma(a, z, policies::policy<>(), tag);
 }
@@ -1969,7 +2007,7 @@ inline typename tools::promote_args<T>::type
       policies::discrete_quantile<>,
       policies::assert_undefined<> >::type forwarding_policy;
 
-   return policies::checked_narrowing_cast<typename remove_cv<result_type>::type, forwarding_policy>(detail::tgammap1m1_imp(static_cast<value_type>(z), forwarding_policy(), evaluation_type()), "boost::math::tgamma1pm1<%!%>(%1%)");
+   return policies::checked_narrowing_cast<typename std::remove_cv<result_type>::type, forwarding_policy>(detail::tgammap1m1_imp(static_cast<value_type>(z), forwarding_policy(), evaluation_type()), "boost::math::tgamma1pm1<%!%>(%1%)");
 }
 
 template <class T>
@@ -1997,7 +2035,7 @@ template <class T1, class T2, class Policy>
 inline typename tools::promote_args<T1, T2>::type
    tgamma(T1 a, T2 z, const Policy& pol)
 {
-   return detail::tgamma(a, z, pol, boost::false_type());
+   return detail::tgamma(a, z, pol, std::false_type());
 }
 //
 // Full lower incomplete gamma:
@@ -2164,7 +2202,7 @@ inline typename tools::promote_args<T1, T2>::type
 } // namespace math
 } // namespace boost
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 # pragma warning(pop)
 #endif
 
@@ -2174,6 +2212,6 @@ inline typename tools::promote_args<T1, T2>::type
 
 #endif // BOOST_MATH_SF_GAMMA_HPP
 
-
-
-
+/* gamma.hpp
+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
+*/

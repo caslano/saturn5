@@ -45,6 +45,8 @@
 #define BOOST_MPI_PYTHON_FORWARD_ONLY
 #include <boost/mpi/python.hpp>
 
+#include "bytesobject.h"
+
 /************************************************************************
  * Boost.Python Serialization Section                                   *
  ************************************************************************/
@@ -140,8 +142,8 @@ class BOOST_MPI_PYTHON_DECL pickle {
   struct data_t;
 
 public:
-  static str dumps(object obj, int protocol = -1);
-  static object loads(str s);
+  static object dumps(object obj, int protocol = -1);
+  static object loads(object s);
   
 private:
   static void initialize_data();
@@ -399,10 +401,10 @@ save_impl(Archiver& ar, const boost::python::object& obj,
           const unsigned int /*version*/,
           mpl::false_ /*has_direct_serialization*/)
 {
-  boost::python::str py_string = boost::python::pickle::dumps(obj);
-  int len = boost::python::extract<int>(py_string.attr("__len__")());
-  const char* string = boost::python::extract<const char*>(py_string);
-  ar << len << boost::serialization::make_array(string, len);
+  boost::python::object bytes = boost::python::pickle::dumps(obj);
+  int   sz    = PyBytes_Size(bytes.ptr());
+  char *data  = PyBytes_AsString(bytes.ptr());  
+  ar << sz << boost::serialization::make_array(data, sz);
 }
 
 /// Try to save a Python object by directly serializing it; fall back
@@ -441,11 +443,10 @@ load_impl(Archiver& ar, boost::python::object& obj,
 {
   int len;
   ar >> len;
-
-  boost::scoped_array<char> string(new char[len]);
-  ar >> boost::serialization::make_array(string.get(), len);
-  boost::python::str py_string(string.get(), len);
-  obj = boost::python::pickle::loads(py_string);
+  boost::scoped_array<char> data(new char[len]);
+  ar >> boost::serialization::make_array(data.get(), len);
+  boost::python::object bytes(boost::python::handle<>(PyBytes_FromStringAndSize(data.get(), len)));
+  obj = boost::python::pickle::loads(bytes);
 }
 
 /// Try to load a Python object by directly deserializing it; fall back
@@ -487,7 +488,6 @@ save(Archiver& ar, const boost::python::object& obj,
 {
   typedef Archiver OArchiver;
   typedef typename input_archiver<OArchiver>::type IArchiver;
-
   detail::save_impl(ar, obj, version, 
                     has_direct_serialization<IArchiver, OArchiver>());
 }
@@ -499,7 +499,6 @@ load(Archiver& ar, boost::python::object& obj,
 {
   typedef Archiver IArchiver;
   typedef typename output_archiver<IArchiver>::type OArchiver;
-
   detail::load_impl(ar, obj, version, 
                     has_direct_serialization<IArchiver, OArchiver>());
 }
@@ -538,3 +537,7 @@ register_serialized(const T& value, PyTypeObject* type)
 } } } // end namespace boost::mpi::python
 
 #endif // BOOST_MPI_PYTHON_SERIALIZE_HPP
+
+/* serialize.hpp
+20a9raqMfFpkm+rKTDUo9mHjTb6U1DQUVyYRQKXNzKeCRCiqsqfH23tKdy3mQdwff0jHMVqmpMyhD2gtss0eyUHId/Lj5hYq4V92/aad2eJJEoD6jHM0JW6edbJF2tzx1wEbzQeSTRIRyCDjwLbJEyyAsynEPoJ0dPed8uUavPwT/cJrmaw9e6f7B9211FYAUWySCTbUdCqdRwkNMt+Ylk7yPQ9JIgpAVnKDl+h+dAQb6IORV5a/DO+Z3SnEs4rI25xj/HYyZgIYQN7XHlBrAbxPrXT8gQet4YUJiOYY5iCfs/CA5hvVjQiEtciEqXCLToh51DUif4QkDtzlIGpegzzQCemfiiYWW+FU5xvqBI+uo7GdXbfSb2wKX0KIfYSUS32xXmKa2ChpT3pyqUJHB+DVIT9bB0UeMXOfTzMoyyXH+3qjIvicyh6x7gaTE+FdlJuOnIQl7YbhNX7Z6rlTHUwzuPMufD0dBIN6PBvB3lybys75HVAx9YMynh6fYehdTvEHtMYei73A3El32JrRo4WabfjDjgNV/nt2aF+FjIQ54atP8XafRmeA5vDI47vpXkszUZIq2Sc2hv9BqBB25286iWl8IcQeQsmyTQNsyzceKna1jLgQzdDeMy9I4MMT42YhREOFEEGi+uneZZ8DgKIziWG0o3LwqSoEg/qHqEnQ8lEIzZ8PZFF8nZF1hmW84bXxHan9X/d34PSArE10FA0Qk2/ygpg6TxqOAKtrOzfkVsl+R+wa4ukcDNWLZGvU7tU/mO/m9DwD3n3ZBAryM7ltLTIQsupegJb3bQ4eCOvS6p2GOk7jEa5RxyaKoKFL1N8WBWGXzaOz3jzG8bnO3V28npr+5KoyBkkusykoPN3/wGN7U8kH85DQRD0TCbSmfUURKJ5oa/Mm6Rgb8ZKtpVvzbPm/IHZtEBi1VVwT/7P9rajlxmzxk6NUOwoLBOW3dUouKwTA89MbshUtZpbXD8WFDKOEHh76wp+MZcsCkb9telb81kA/sKdZF9v/PMkVfm/7vdsp6QQjoJ7+zgygkM0JIRtKtboGp5hEDEdBWzySKCVM+txtzt4QUQ59a6oUlb9gBbr0BmnfkVrYmthx4kNgWFdyCjDsOHsKo2cTyJOtYmB9AAXN5PLpBvNcj05Qoox43RysDtQXTTYoaOoCIVVWOMblE8sUR5xs2FLjR+BX6vwdzHTjeU5CNtZTxOGgWCYFc6At5phsHQ/qKvyUmlkGZVznl+vPq6T6UIVnJO0BCTTOCmKkyvCC4VSfP52e1kNJE0IA/5llox3AlnWQZFP4wV/VFE2jN+HoIe/4geW7sKaUEWDqMs5CcuPj7KSFa3oRwpYHpxvcDnvVo4TaJExPwC/I74NroqI0LsIj8ZDRX/iLzBOf3kJDfD5W/dNohO5v73ioFec4vejJnWDVOIxeEk0sAWJ1rgD11Gw0icZ/qDKX32TmK9gIpVgX7aesXv2exCbYjEAdHE//9RFTSmlBbQru7+HT6Q5i13tzzrrkLQ1pL3ysqZ4UyMoUyoXl0Priw0SE0FFn9GoPg7MORohSakWNpJAvAMDAwyDGrQQzT737P5Zkjb5TD+dOX0ekrqajzGUqf61+G8QFHuWV10gb5Ah/7nm1AtOHHhT5+fuWTzVE0pwTkPveZ9x+pyJSsCBHui6TR/WWnz8I6J1bU/ItCTChkyd/+k/71PkRgp4wUwTo7SllO0iGKoC2fqVuLMcIn/Ayq4ODAvXeIB1A74LXg1e+IrVY6xDLjaY7kssMthL45rO8bebfH8a7EzFrDhVP3CBf7yE0bRorokfCblNyWJWH8l9Tn/deA19HL/rluIqIyDbt2/Ms4F7tXrlIm7xoUFsTCwWNMZGvTSJDZX+P0/QvNJkl6fAf3MeW9ENfpgs3ya3vZSnqcx2VMAsnS+87/6oT6y5beh57BPedgBKYA9QKZTbfWhw3AYAyBy+Yyum/+1caP+0NxYgp7UnEaJkX8PWj+Dsd6p2r7iP/VweBtMZ4NI6EAUfkcUwlyRQqcEBMHualDwiXW2Feag2u/7HB8JsGTAG0fkEBJTmxDYUO2i6xHa0IQUeEyAk0aEt219WhGG0vXipNbMcQIhsXqg9Q/BsjPyspMIJN4a4JiPizHywmxKpBQdMAgT3JAFh3FTz14D5EG9u7pcvu/nh7DeMqifcrULqeKOLDtEUQNCriFQCuGfHfVPiZDjHk9nOeIIjCtTWp/vnQCb5BuLxyLD3Jqi1m+O51adC+xWuTtBpJeDRyz96kNWuYkgUM32r/CGsrEOV7p0j/grRLSoz499lK7TM52fjWp0noowGYRUQLbXhsKkgVTKFSX4KPwTM0k2/A1zSjv+Xr1AwFf8Grt1W8NFP/WIdPCkhxV5ix2AdFBWRJXFzwPkp6MbaQqv5w1Bfab93OeVTnA1J4HQx4sNPZJGA9zPsHcmOVZOo9BEIAPmSMoU1fns7I7/uGlNdAofDWopPTAG5vkAIaJh/1s6jvg9vPaqC/LK44Lv/aE8UsumzrN8mdfjFHMo7q56Smjg8eySid/nRk3cla9/VFLUWJHzpYKSbALRayvzTKjTZYrQRmZLBiXfj9qx/krMkefrX+DK5Thz5V8q/0UsOdP94hkG3pKqpbdRvth6vXUByEAcX43fHp99N++bNvXc/qoGgaYn1SP4YSXHcSur9u9Ta17vuqOE6aqRKItyHBjPDlAl5sp4g+sWnqp8O3L2C5mY40IlEBdBUwP5hBqHtUT99Ao3y56N3rAAoFf1hn9hYTZNMQmzhE5ngbyeZzG9KnHi5XTmjrP4Gc91j9lxETdMjc1YSRcZLkG0/MnQAj/v3HjZcQIDF2kaV5c4pROuy577udJdH8wGFZ/G+Jzzjw23SmdM94DGX6+9KK5xMjljECxWWFk2+XCFZzFjIxftbjXg31mcKsmh87dEdat/cUJNJxtIQdApjLSKYGv3BEyN+mYWGtKkYFPLc0ZovKavX+cM33LPpusEBrwS2NxYcAmxVsRHLbVDHUre70G5Fa+1kivClheaXbhaKl1QbVcnqqYWfurrjU1TSNrkSpa/Bm+B45mWM5bSBTBwOJt5OLLOQj+JOh2Ko6fPdrSFr7i1a4OiLxbLcFMeOTeyR5d+/YOIRAgesz2J2ftMJIHT5EHKXwM0lTtXr9lhuMEe9cDxk+E6sEKpdx6Tn7/yIGT4QWebSGIeVVWHMDLea5CRNo/nkGOoXV9QBXbs/rylJ//2Tz2nU+SUUJ1WYkbqVYFYWlgDKAFrJEDGVeDt/GrWj/fAOLT4sX5tdsvr03XNWD9v9yzrNha+Qd6QyGvO1K97ws0SwnC/DtLN1LWepO58COzbFtaJbKDHviS8gO0LhFSMmtKffrbLY13ykB/WtTcD9M+/I0Jcohv65RQomgG76+nnNvrDq7Tfc0O7YoTky3oy8vKKvHGB/xABSsDD2Ef3/VwTdQEOw1mY93LSdQ0nEc6lGMLNaI79mpiUO/IFQN7w5Ol2OX3sxgiLea0qfgh8kelzpFzor6vp9nvwtNzSjT0VxRtYZJn2bJeUfVeTUVxF4/HFbEiZ7aEx0xPXiDzrxpR+/+bLbeeMijX+8hOaXVKe7W1eqNiq0wVAJP+wYSJ9hiBYlqMZe3uDA6OJ+wxTi1MAL5QhyBFb1Q7hkKzaQVmPwJRziQpVdCvA1Spk8A7FzmUl6ULuh5SGA7KtRCuVSUDmN5OOesBBmRD5TBPxvclpgOvsUs9nU8OcVu9mDIYUZYvPZ0r4a+H9YvAkXfYxoV3XCtxinf94N5q2akHOAi9pN7e9IntlHqydbY5Cv3evt0QtWDpUQAACz/09tz6bCfKbyu6loGkTt5jZdd44DDL/9gWuWizAmUXNj+INS1eNSd7LrUukQNuaUFYRg+nR97Hh60Ct2RYVMAocutRuuxS11xtEZZiCF3uwKWUo6PLHfsnntcMSBkXRJPtSUYMbFY8JPcJ+e2k3lLdPoIdiXixiou6rA5QJOxicX7/h7ox/+RWHLkocSYCcU0JG8fU/SwtO5suPqHIt367P3MNcxhno5xMnglWBI7hGRJ48uyORJl/i/PRbokvZpBZviU7hfM656ZBenGIpEPo/NjTO3jnHdDXGClpJHsywLIhNS/hXxic5DAkt0ag6WmL0SY4L/r4rqHAfyie2P436fKxyysyuqjAe32w0bX9pOOHKlDo3xAwqNDg+lBg//y5rXblMiz1PD3jjeOyaeF6oek2lslj/wXd3z5zxV50ktW2oOdXeMwqCiwvXS5NHRg3IRiT2a9neQcFNNGHIcDDuGkh63O2fyYOjbMDp1PSyOrdKVqmQUJ18a4NjtbTLf7sfZEtYWq3EX5pHRKQiQUIM/zrVoOQ0mdi2OAeqtgWxqfrjkrUi6TVeaTU7ZkJy72YLfjltwM+h4u7XLpXeMq6AWBRp2HldKPma5EqR8a4q7NLqZ8HF09g4kZ+u4sR92VJlvbtC2Y6lT/i8aFQg+NL9Ls3XM09xWAmT9sv2eB5ya0m+RWH594fp1xEPWLLj2gyZ9Y+fRXLk0vh3nDpMcimpmO5HcOY7NZtMB2O7FiHgBzAQ1PG6Vo+afpmtXXFF7wXxV1hUHPYpSmrdRLVyN71wZ2h+FuBdi/JFpaBhwbWlR4thYMDaW5/ziqqyz0o+1uZ68QA3IjenJVQnXYfZSkxWCtFNyOn9Z81PRagZNO5PD9er2dKt3lBzsEehB1qiv05Q6lt6Xs87Ciwc3aDi1YqDpO+IRnwr1h/e4DO7Hvi5LCeC/9WcdczUBXsEf2DtUai7Thrt0/7OVaCE1d1Q8V2UVU4jJ6qd/CCAVgVO0P6xePL05YhBOWxqoe1yQV1Jnqi/Nrl5Y+FYl4kIh2Ftcz/fCgGO0jzb8/n+h/+sKZftWQi6WCWXpCROuEkllVFZ0S9fajnHBVbyWilB2ujqQ8ZGeYsFPGP1iOgExU+7Lw+ZAonS85yocqXaWOTTvj0lW7mElA3g7pnEjCf0fK9N+hZmayP0J5TWIj9Sc9lV0klmKYRImBmSfaREPHDzG13wDsp3RJ4INbtMqe8Hid2I7qnyV1Rn+a/cifo5CJvcSpQWWJgWPhD7eZ7V1Y5qE9PRwbw3xFPEn9sxPYQ2P+NZq0nGWh8834dWxnSPg8ENsBRZfHfPGSL9v0HeyPFzEICFkGYdn4+h9aX1Ey0WYuz5j6olVi1X/qJ+I+mPRSTLZJ0U7aGUKNXq+1uk+c69mIUljdebcZYgQ2IPQvmOhihPymXxA3dMFi7TRbnQM+Lk2tM8U07pszJKopTS9qvLgQs9RvVp+e998HhbczqACqZxtjjYXzf2ITXzz+gyQDdWbIFjcH9LM2UnnTZwbj8tAU8uGVUXsiHorsZUMj5+jv7dpD9NC7XmPXYfUx3XSh9Ilc1kZj1X5a4rWg9RQBPi2PH191ik05AXPpz7qfjHCj4xiREv14ZUikvtQAUz0qwq0+Cw4Fur9otzefPFQCV2qYKn8/g7JeuziLfHHiifX8oMgtsG9JUiZi/pYwH5IvhCMs+ALfx7UT8ysq4JGo2nRe03lKKXKNezcFpYPildQq3MEsknRYRkblFmS0N+NY9Ydp+Wx1IH99L9jt4W8txLcbzh9sDsXsPz4SizJXXKVD1eq/bhJuzuFC2jCEO3jluRhpH4eGiJas+md28eQ49sj2+Y9q+9kaDWOeaEZBBtZ69xGmnXzLq0gpG4g3Ruh0ZlOdZPnC+wPfQ8o8XivcbXNti2rahTEl0mWi4fy2i/WGFjqYJL2J6CLgo3Or3UvBbb6B/sn/eYIQu6niKdhXS/50bqwruGA22pqm+uD4zdhfy8nZJ9ZDIQUJJd/V7FKq8Wq9TnzoAemm1DOhmhYoHGR0Z2c4st51unVqdwiK9EA5BfI2B3yT/kUfSasL1w20PJZq8PVWz6XMBY7rGbp7WqZf7b3iYoHoeoBTa1pP1HZtyLW8oufUrUZZT+uhyyH45x1c7dcqdGOHuDRud+szF9wMiypzsToq17InDx8ai9Ou27U/OZELn4EgDFxMVZjbuHimIe4E+3Sap8m3b/k8RuYJkvw/YnLWBKpjtIs+i6JEjbukgBWZUdoV+Jnj+uI9PcNt53+lisa7Ds2sJH7Dt5Cn6YssO/oSL5y2SyWrr6PgS7MKJtK1MPzoxKNdEQ7ZvLUB9UOlC2HNPfErTR/5a9cEnmivVtYh3hc7uTT2GKTUYe7Tg23TdfnppiVCVKEbPg9iUXpOPIzkMEnYpWAFDiAapb0qNCtbGTRLswXG8k7WFB/e/QodKspDZCyy8Z4YpV+UK3lUqWQK3w6XYhb7Ew8XKmK8xBhqAccefAYIyBZ9R+7DOB4EObvAyz2KCoAiksasPnZZe/5ytmNtlu435dsSOfFpyTuN2dRXLr7+poqyZThLDZRCJ3AX1TQb04tRR7lCithbvXHHZ96++3rLPhXCk3AZW/vQGRvCp4IwLnoNPGzWQGKvzIJnXySmMX3hM1ORXSEAAs+2PtA6jXgicpL3BjzwryA/vN14sFdJM8aJlvz4lwZxLbe1qSmAwQ47+YmHszS1yYdDi1Mok32+js768DN8U1Kzaoc+nWnYZj+zsa/XoxMwzpQ2xKKpJEzEcx+WxVqsiYhC0nxqnYOcbcEvNyWDoYRWnFOkHODIS5jO3P9ctpgsHhBGdlU/11KVssnPnNWGykdT9SztxUijBycrzfoalFikjm3n1eZtnh/b9p2bRZo84t8yFLR46a7aKdJWQkbtovKbrSL6cGPXItSNzOuWiOtjcSK5akgPND7HkSQgbO2SqT7KtXkpchXGEXxqE2yiQ0on/ccrd8xi6XIhRTAKsS9HGa56i3GEwLXVBjaAqbTbvAu72Kq4Ek0L18aX9WVobCmerp3fb960qyH7U3KwXWnOX7oUX1c+Mu9jqrP6NNUvs7YT2/7h1WEc0yg7LTXKfnpbrK6ZaljoeAmuWLI0V7qR2NBslt6EWA2PWXPHoOsnPqBX64Zr/ZyNylxVO9v0iCnZAY1Wj2h9+e3uRlrRXs4J7WbsBoDvHpIZapkdr4zInoafagMPcVsFCI+Q2N48ZlO0laCKzYpcrO4RVxxsjmUvMwjAWYiJCZvFINvfHbEY+OdMK0tWc7BSzuzIZ0VMy3FnltUmcn88NC47RcsDHZuuX7y7NWudzVZTEdvz2lez5bzfczHHankR/LP5Kn67x/6nm2Wj8twn6UdMCAQs4C+oTwgyMEccLYcMPXGIXYQY8XJqCBu6f8atJU9qnEhesq9MZxNxhNgjfMFQiCN8IyCOeF5WenYfUVtafDReyx86j/aXeY/vlBS7bFFuvfV4K9p/H7/eBsXtceafHe3AzpKRt90MGd2r+/2rDkrCYNKg/MGWFAb2OafEK54Uj8bM9HWT52HWrmyzdwYSAWcERNIFI8dTW4iXuB6HpjxubQRPminS3MiulZcuUxEkhqS2ZOCn5ERecvAaDv+Vqc5DXQG6WGjB2JkqQOXvMSG4xBXi/ldXeuMxta+oeWRrWADv74UOfm/ZMZYYyDxI/0o3QsZYWtNafG21mIDskicTfpbKxn3iGpyfvYLwOPy0yL+3zMS66qGt8wZ7+kTnTX8RZg276rjR
+*/

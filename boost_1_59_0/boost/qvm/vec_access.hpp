@@ -1,82 +1,78 @@
-//Copyright (c) 2008-2016 Emil Dotchevski and Reverge Studios, Inc.
+#ifndef BOOST_QVM_VEC_ACCESS_HPP_INCLUDED
+#define BOOST_QVM_VEC_ACCESS_HPP_INCLUDED
 
-//Distributed under the Boost Software License, Version 1.0. (See accompanying
-//file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+// Copyright 2008-2022 Emil Dotchevski and Reverge Studios, Inc.
 
-#ifndef BOOST_QVM_10F2D1EA17B511E0BA29FE0BDFD72085
-#define BOOST_QVM_10F2D1EA17B511E0BA29FE0BDFD72085
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/qvm/vec_traits.hpp>
 #include <boost/qvm/inline.hpp>
 #include <boost/qvm/static_assert.hpp>
 #include <boost/qvm/enable_if.hpp>
 
-namespace
-boost
+namespace boost { namespace qvm {
+
+template <int I,class V>
+BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL
+typename enable_if_c<
+    is_vec<V>::value,
+    typename vec_traits<V>::scalar_type>::type
+A( V const & a )
     {
-    namespace
-    qvm
-        {
-        ////////////////////////////////////////////////
-
-        template <int I,class V>
-        BOOST_QVM_INLINE_TRIVIAL
-        typename enable_if_c<
-            is_vec<V>::value,
-            typename vec_traits<V>::scalar_type>::type
-        A( V const & a )
-            {
-            BOOST_STATIC_ASSERT(I>=0);
-            BOOST_STATIC_ASSERT(I<vec_traits<V>::dim);
-            return vec_traits<V>::template read_element<I>(a);
-            }
-
-        template <int I,class V>
-        BOOST_QVM_INLINE_TRIVIAL
-        typename enable_if_c<
-            is_vec<V>::value,
-            typename vec_traits<V>::scalar_type &>::type
-        A( V & a )
-            {
-            BOOST_STATIC_ASSERT(I>=0);
-            BOOST_STATIC_ASSERT(I<vec_traits<V>::dim);
-            return vec_traits<V>::template write_element<I>(a);
-            }
-
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type X( V const & a ) { BOOST_STATIC_ASSERT(0<vec_traits<V>::dim); return vec_traits<V>::template read_element<0>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type Y( V const & a ) { BOOST_STATIC_ASSERT(1<vec_traits<V>::dim); return vec_traits<V>::template read_element<1>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type Z( V const & a ) { BOOST_STATIC_ASSERT(2<vec_traits<V>::dim); return vec_traits<V>::template read_element<2>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type W( V const & a ) { BOOST_STATIC_ASSERT(3<vec_traits<V>::dim); return vec_traits<V>::template read_element<3>(a); }
-
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type X( V & a ) { BOOST_STATIC_ASSERT(0<vec_traits<V>::dim); return vec_traits<V>::template write_element<0>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type Y( V & a ) { BOOST_STATIC_ASSERT(1<vec_traits<V>::dim); return vec_traits<V>::template write_element<1>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type Z( V & a ) { BOOST_STATIC_ASSERT(2<vec_traits<V>::dim); return vec_traits<V>::template write_element<2>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type W( V & a ) { BOOST_STATIC_ASSERT(3<vec_traits<V>::dim); return vec_traits<V>::template write_element<3>(a); }
-
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A0( V const & a ) { BOOST_STATIC_ASSERT(0<vec_traits<V>::dim); return vec_traits<V>::template read_element<0>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A1( V const & a ) { BOOST_STATIC_ASSERT(1<vec_traits<V>::dim); return vec_traits<V>::template read_element<1>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A2( V const & a ) { BOOST_STATIC_ASSERT(2<vec_traits<V>::dim); return vec_traits<V>::template read_element<2>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A3( V const & a ) { BOOST_STATIC_ASSERT(3<vec_traits<V>::dim); return vec_traits<V>::template read_element<3>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A4( V const & a ) { BOOST_STATIC_ASSERT(4<vec_traits<V>::dim); return vec_traits<V>::template read_element<4>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A5( V const & a ) { BOOST_STATIC_ASSERT(5<vec_traits<V>::dim); return vec_traits<V>::template read_element<5>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A6( V const & a ) { BOOST_STATIC_ASSERT(6<vec_traits<V>::dim); return vec_traits<V>::template read_element<6>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A7( V const & a ) { BOOST_STATIC_ASSERT(7<vec_traits<V>::dim); return vec_traits<V>::template read_element<7>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A8( V const & a ) { BOOST_STATIC_ASSERT(8<vec_traits<V>::dim); return vec_traits<V>::template read_element<8>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A9( V const & a ) { BOOST_STATIC_ASSERT(9<vec_traits<V>::dim); return vec_traits<V>::template read_element<9>(a); }
-
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A0( V & a ) {  BOOST_STATIC_ASSERT(0<vec_traits<V>::dim); return vec_traits<V>::template write_element<0>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A1( V & a ) {  BOOST_STATIC_ASSERT(1<vec_traits<V>::dim); return vec_traits<V>::template write_element<1>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A2( V & a ) {  BOOST_STATIC_ASSERT(2<vec_traits<V>::dim); return vec_traits<V>::template write_element<2>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A3( V & a ) {  BOOST_STATIC_ASSERT(3<vec_traits<V>::dim); return vec_traits<V>::template write_element<3>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A4( V & a ) {  BOOST_STATIC_ASSERT(4<vec_traits<V>::dim); return vec_traits<V>::template write_element<4>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A5( V & a ) {  BOOST_STATIC_ASSERT(5<vec_traits<V>::dim); return vec_traits<V>::template write_element<5>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A6( V & a ) {  BOOST_STATIC_ASSERT(6<vec_traits<V>::dim); return vec_traits<V>::template write_element<6>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A7( V & a ) {  BOOST_STATIC_ASSERT(7<vec_traits<V>::dim); return vec_traits<V>::template write_element<7>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A8( V & a ) {  BOOST_STATIC_ASSERT(8<vec_traits<V>::dim); return vec_traits<V>::template write_element<8>(a); }
-        template <class V> BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A9( V & a ) {  BOOST_STATIC_ASSERT(9<vec_traits<V>::dim); return vec_traits<V>::template write_element<9>(a); }
-
-        ////////////////////////////////////////////////
-        }
+    BOOST_QVM_STATIC_ASSERT(I>=0);
+    BOOST_QVM_STATIC_ASSERT(I<vec_traits<V>::dim);
+    return vec_traits<V>::template read_element<I>(a);
     }
 
+template <int I,class V>
+BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL
+typename enable_if_c<
+    is_vec<V>::value,
+    typename vec_traits<V>::scalar_type &>::type
+A( V & a )
+    {
+    BOOST_QVM_STATIC_ASSERT(I>=0);
+    BOOST_QVM_STATIC_ASSERT(I<vec_traits<V>::dim);
+    return vec_traits<V>::template write_element<I>(a);
+    }
+
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type X( V const & a ) { BOOST_QVM_STATIC_ASSERT(0<vec_traits<V>::dim); return vec_traits<V>::template read_element<0>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type Y( V const & a ) { BOOST_QVM_STATIC_ASSERT(1<vec_traits<V>::dim); return vec_traits<V>::template read_element<1>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type Z( V const & a ) { BOOST_QVM_STATIC_ASSERT(2<vec_traits<V>::dim); return vec_traits<V>::template read_element<2>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type W( V const & a ) { BOOST_QVM_STATIC_ASSERT(3<vec_traits<V>::dim); return vec_traits<V>::template read_element<3>(a); }
+
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type X( V & a ) { BOOST_QVM_STATIC_ASSERT(0<vec_traits<V>::dim); return vec_traits<V>::template write_element<0>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type Y( V & a ) { BOOST_QVM_STATIC_ASSERT(1<vec_traits<V>::dim); return vec_traits<V>::template write_element<1>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type Z( V & a ) { BOOST_QVM_STATIC_ASSERT(2<vec_traits<V>::dim); return vec_traits<V>::template write_element<2>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type W( V & a ) { BOOST_QVM_STATIC_ASSERT(3<vec_traits<V>::dim); return vec_traits<V>::template write_element<3>(a); }
+
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A0( V const & a ) { BOOST_QVM_STATIC_ASSERT(0<vec_traits<V>::dim); return vec_traits<V>::template read_element<0>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A1( V const & a ) { BOOST_QVM_STATIC_ASSERT(1<vec_traits<V>::dim); return vec_traits<V>::template read_element<1>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A2( V const & a ) { BOOST_QVM_STATIC_ASSERT(2<vec_traits<V>::dim); return vec_traits<V>::template read_element<2>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A3( V const & a ) { BOOST_QVM_STATIC_ASSERT(3<vec_traits<V>::dim); return vec_traits<V>::template read_element<3>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A4( V const & a ) { BOOST_QVM_STATIC_ASSERT(4<vec_traits<V>::dim); return vec_traits<V>::template read_element<4>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A5( V const & a ) { BOOST_QVM_STATIC_ASSERT(5<vec_traits<V>::dim); return vec_traits<V>::template read_element<5>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A6( V const & a ) { BOOST_QVM_STATIC_ASSERT(6<vec_traits<V>::dim); return vec_traits<V>::template read_element<6>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A7( V const & a ) { BOOST_QVM_STATIC_ASSERT(7<vec_traits<V>::dim); return vec_traits<V>::template read_element<7>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A8( V const & a ) { BOOST_QVM_STATIC_ASSERT(8<vec_traits<V>::dim); return vec_traits<V>::template read_element<8>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type>::type A9( V const & a ) { BOOST_QVM_STATIC_ASSERT(9<vec_traits<V>::dim); return vec_traits<V>::template read_element<9>(a); }
+
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A0( V & a ) {  BOOST_QVM_STATIC_ASSERT(0<vec_traits<V>::dim); return vec_traits<V>::template write_element<0>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A1( V & a ) {  BOOST_QVM_STATIC_ASSERT(1<vec_traits<V>::dim); return vec_traits<V>::template write_element<1>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A2( V & a ) {  BOOST_QVM_STATIC_ASSERT(2<vec_traits<V>::dim); return vec_traits<V>::template write_element<2>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A3( V & a ) {  BOOST_QVM_STATIC_ASSERT(3<vec_traits<V>::dim); return vec_traits<V>::template write_element<3>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A4( V & a ) {  BOOST_QVM_STATIC_ASSERT(4<vec_traits<V>::dim); return vec_traits<V>::template write_element<4>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A5( V & a ) {  BOOST_QVM_STATIC_ASSERT(5<vec_traits<V>::dim); return vec_traits<V>::template write_element<5>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A6( V & a ) {  BOOST_QVM_STATIC_ASSERT(6<vec_traits<V>::dim); return vec_traits<V>::template write_element<6>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A7( V & a ) {  BOOST_QVM_STATIC_ASSERT(7<vec_traits<V>::dim); return vec_traits<V>::template write_element<7>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A8( V & a ) {  BOOST_QVM_STATIC_ASSERT(8<vec_traits<V>::dim); return vec_traits<V>::template write_element<8>(a); }
+template <class V> BOOST_QVM_CONSTEXPR BOOST_QVM_INLINE_TRIVIAL typename enable_if_c<is_vec<V>::value,typename vec_traits<V>::scalar_type &>::type A9( V & a ) {  BOOST_QVM_STATIC_ASSERT(9<vec_traits<V>::dim); return vec_traits<V>::template write_element<9>(a); }
+
+} }
+
 #endif
+
+/* vec_access.hpp
++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
+*/

@@ -11,7 +11,7 @@
 #include <boost/math/special_functions/detail/hypergeometric_1F1_bessel.hpp>
 #include <boost/math/special_functions/detail/hypergeometric_series.hpp>
 #include <boost/math/special_functions/gamma.hpp>
-
+#include <boost/math/special_functions/trunc.hpp>
 
   namespace boost { namespace math { namespace detail {
 
@@ -34,7 +34,7 @@
         {
            BOOST_MATH_STD_USING
            T log_term = log(x) * -alpha;
-           log_scaling = itrunc(log_term - 3 - boost::math::tools::log_min_value<T>() / 50);
+           log_scaling = lltrunc(log_term - 3 - boost::math::tools::log_min_value<T>() / 50);
            term = exp(log_term - log_scaling);
            refill_cache();
         }
@@ -64,35 +64,35 @@
         T delta_poch, alpha_poch, x, term;
         T gamma_cache[cache_size];
         int k;
-        int log_scaling;
+        long long log_scaling;
         int cache_offset;
         Policy pol;
      };
 
      template <class T, class Policy>
-     T hypergeometric_1F1_igamma(const T& a, const T& b, const T& x, const T& b_minus_a, const Policy& pol, int& log_scaling)
+     T hypergeometric_1F1_igamma(const T& a, const T& b, const T& x, const T& b_minus_a, const Policy& pol, long long& log_scaling)
      {
         BOOST_MATH_STD_USING
         if (b_minus_a == 0)
         {
            // special case: M(a,a,z) == exp(z)
-           int scale = itrunc(x, pol);
+           long long scale = lltrunc(x, pol);
            log_scaling += scale;
            return exp(x - scale);
         }
         hypergeometric_1F1_igamma_series<T, Policy> s(b_minus_a, a - 1, x, pol);
         log_scaling += s.log_scaling;
-        boost::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
+        std::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
         T result = boost::math::tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
         boost::math::policies::check_series_iterations<T>("boost::math::tgamma<%1%>(%1%,%1%)", max_iter, pol);
         T log_prefix = x + boost::math::lgamma(b, pol) - boost::math::lgamma(a, pol);
-        int scale = itrunc(log_prefix);
+        long long scale = lltrunc(log_prefix);
         log_scaling += scale;
         return result * exp(log_prefix - scale);
      }
 
      template <class T, class Policy>
-     T hypergeometric_1F1_shift_on_a(T h, const T& a_local, const T& b_local, const T& x, int a_shift, const Policy& pol, int& log_scaling)
+     T hypergeometric_1F1_shift_on_a(T h, const T& a_local, const T& b_local, const T& x, int a_shift, const Policy& pol, long long& log_scaling)
      {
         BOOST_MATH_STD_USING
         T a = a_local + a_shift;
@@ -124,7 +124,7 @@
                  crossover_shift = a_shift;
               crossover_a = a_local + crossover_shift;
               boost::math::detail::hypergeometric_1F1_recurrence_b_coefficients<T> b_coef(crossover_a, b_local, x);
-              boost::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
+              std::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
               T b_ratio = boost::math::tools::function_ratio_from_backwards_recurrence(b_coef, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
               boost::math::policies::check_series_iterations<T>("boost::math::hypergeometric_1F1_large_abz<%1%>(%1%,%1%,%1%)", max_iter, pol);
               //
@@ -139,13 +139,13 @@
               // Recurse down to a_local, compare values and re-normalise first and second:
               //
               boost::math::detail::hypergeometric_1F1_recurrence_a_coefficients<T> a_coef(crossover_a, b_local, x);
-              int backwards_scale = 0;
+              long long backwards_scale = 0;
               T comparitor = boost::math::tools::apply_recurrence_relation_backward(a_coef, crossover_shift, second, first, &backwards_scale);
               log_scaling -= backwards_scale;
               if ((h < 1) && (tools::max_value<T>() * h > comparitor))
               {
                  // Need to rescale!
-                 int scale = itrunc(log(h), pol) + 1;
+                 long long scale = lltrunc(log(h), pol) + 1;
                  h *= exp(T(-scale));
                  log_scaling += scale;
               }
@@ -169,7 +169,7 @@
               // Regular case where forwards iteration is stable right from the start:
               //
               boost::math::detail::hypergeometric_1F1_recurrence_b_coefficients<T> b_coef(a_local, b_local, x);
-              boost::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
+              std::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
               T b_ratio = boost::math::tools::function_ratio_from_backwards_recurrence(b_coef, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
               boost::math::policies::check_series_iterations<T>("boost::math::hypergeometric_1F1_large_abz<%1%>(%1%,%1%,%1%)", max_iter, pol);
               //
@@ -195,9 +195,9 @@
            // is the only stable direction as we will only iterate down until a ~ b, but we
            // will check this with an assert:
            //
-           BOOST_ASSERT(2 * a - b_local + x > 0);
+           BOOST_MATH_ASSERT(2 * a - b_local + x > 0);
            boost::math::detail::hypergeometric_1F1_recurrence_b_coefficients<T> b_coef(a, b_local, x);
-           boost::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
+           std::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
            T b_ratio = boost::math::tools::function_ratio_from_backwards_recurrence(b_coef, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
            boost::math::policies::check_series_iterations<T>("boost::math::hypergeometric_1F1_large_abz<%1%>(%1%,%1%,%1%)", max_iter, pol);
            //
@@ -218,7 +218,7 @@
               if (boost::math::tools::min_value<T>() * comparitor > h)
               {
                  // Ooops, need to rescale h:
-                 int rescale = itrunc(log(fabs(h)));
+                 long long rescale = lltrunc(log(fabs(h)));
                  T scale = exp(T(-rescale));
                  h *= scale;
                  log_scaling += rescale;
@@ -230,7 +230,7 @@
      }
 
      template <class T, class Policy>
-     T hypergeometric_1F1_shift_on_b(T h, const T& a, const T& b_local, const T& x, int b_shift, const Policy& pol, int& log_scaling)
+     T hypergeometric_1F1_shift_on_b(T h, const T& a, const T& b_local, const T& x, int b_shift, const Policy& pol, long long& log_scaling)
      {
         BOOST_MATH_STD_USING
 
@@ -244,7 +244,7 @@
            // so grab the ratio and work backwards to b - b_shift and normalise.
            //
            boost::math::detail::hypergeometric_1F1_recurrence_b_coefficients<T> b_coef(a, b, x);
-           boost::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
+           std::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
 
            T first = 1;  // arbitrary value;
            T second = 1 / boost::math::tools::function_ratio_from_backwards_recurrence(b_coef, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
@@ -257,13 +257,13 @@
               // Reset coefficients and recurse:
               //
               boost::math::detail::hypergeometric_1F1_recurrence_b_coefficients<T> b_coef_2(a, b - 1, x);
-              int local_scale = 0;
+              long long local_scale = 0;
               T comparitor = boost::math::tools::apply_recurrence_relation_backward(b_coef_2, --b_shift, first, second, &local_scale);
               log_scaling -= local_scale;
               if (boost::math::tools::min_value<T>() * comparitor > h)
               {
                  // Ooops, need to rescale h:
-                 int rescale = itrunc(log(fabs(h)));
+                 long long rescale = lltrunc(log(fabs(h)));
                  T scale = exp(T(-rescale));
                  h *= scale;
                  log_scaling += rescale;
@@ -281,9 +281,9 @@
            }
            else
            {
-              BOOST_ASSERT(!is_negative_integer(b - a));
+              BOOST_MATH_ASSERT(!is_negative_integer(b - a));
               boost::math::detail::hypergeometric_1F1_recurrence_b_coefficients<T> b_coef(a, b_local, x);
-              boost::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
+              std::uintmax_t max_iter = boost::math::policies::get_max_series_iterations<Policy>();
               second = h / boost::math::tools::function_ratio_from_backwards_recurrence(b_coef, boost::math::policies::get_epsilon<T, Policy>(), max_iter);
               boost::math::policies::check_series_iterations<T>("boost::math::hypergeometric_1F1_large_abz<%1%>(%1%,%1%,%1%)", max_iter, pol);
            }
@@ -300,7 +300,7 @@
 
 
      template <class T, class Policy>
-     T hypergeometric_1F1_large_igamma(const T& a, const T& b, const T& x, const T& b_minus_a, const Policy& pol, int& log_scaling)
+     T hypergeometric_1F1_large_igamma(const T& a, const T& b, const T& x, const T& b_minus_a, const Policy& pol, long long& log_scaling)
      {
         BOOST_MATH_STD_USING
         //
@@ -321,7 +321,7 @@
         T a_local = a - a_shift;
         T b_local = b - b_shift;
         T b_minus_a_local = (a_shift == 0) && (b_shift == 0) ? b_minus_a : b_local - a_local;
-        int local_scaling = 0;
+        long long local_scaling = 0;
         T h = hypergeometric_1F1_igamma(a_local, b_local, x, b_minus_a_local, pol, local_scaling);
         log_scaling += local_scaling;
 
@@ -335,7 +335,7 @@
      }
 
      template <class T, class Policy>
-     T hypergeometric_1F1_large_series(const T& a, const T& b, const T& z, const Policy& pol, int& log_scaling)
+     T hypergeometric_1F1_large_series(const T& a, const T& b, const T& z, const Policy& pol, long long& log_scaling)
      {
         BOOST_MATH_STD_USING
         //
@@ -366,7 +366,7 @@
            // a_local == 0.  However, the value of h calculated was trivial (unity), so
            // calculate a second 1F1 for a == 1 and recurse as normal:
            //
-           int scale = 0;
+           long long scale = 0;
            T h2 = boost::math::detail::hypergeometric_1F1_generic_series(T(a_local + 1), b_local, z, pol, scale, "hypergeometric_1F1_large_series<%1%>(a,b,z)");
            if (scale != log_scaling)
            {
@@ -385,7 +385,7 @@
      }
 
      template <class T, class Policy>
-     T hypergeometric_1F1_large_13_3_6_series(const T& a, const T& b, const T& z, const Policy& pol, int& log_scaling)
+     T hypergeometric_1F1_large_13_3_6_series(const T& a, const T& b, const T& z, const Policy& pol, long long& log_scaling)
      {
         BOOST_MATH_STD_USING
         //
@@ -399,7 +399,7 @@
      }
 
      template <class T, class Policy>
-     T hypergeometric_1F1_large_abz(const T& a, const T& b, const T& z, const Policy& pol, int& log_scaling)
+     T hypergeometric_1F1_large_abz(const T& a, const T& b, const T& z, const Policy& pol, long long& log_scaling)
      {
         BOOST_MATH_STD_USING
         //
@@ -482,3 +482,7 @@
   } } } // namespaces
 
 #endif // BOOST_HYPERGEOMETRIC_1F1_LARGE_ABZ_HPP_
+
+/* hypergeometric_1F1_large_abz.hpp
+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
+*/

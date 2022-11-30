@@ -17,17 +17,17 @@
 #endif
 
 #include <boost/math/special_functions/math_fwd.hpp>
-#include <boost/config/no_tr1/cmath.hpp>
 #include <boost/math/special_functions/erf.hpp>
 #include <boost/math/special_functions/expm1.hpp>
-#include <boost/throw_exception.hpp>
-#include <boost/assert.hpp>
+#include <boost/math/tools/throw_exception.hpp>
+#include <boost/math/tools/assert.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/tools/big_constant.hpp>
 
 #include <stdexcept>
+#include <cmath>
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable:4127)
 #endif
@@ -49,19 +49,19 @@ namespace boost
       namespace detail
       {
          // owens_t_znorm1(x) = P(-oo<Z<=x)-0.5 with Z being normally distributed.
-         template<typename RealType>
-         inline RealType owens_t_znorm1(const RealType x)
+         template<typename RealType, class Policy>
+         inline RealType owens_t_znorm1(const RealType x, const Policy& pol)
          {
             using namespace boost::math::constants;
-            return boost::math::erf(x*one_div_root_two<RealType>())*half<RealType>();
+            return boost::math::erf(x*one_div_root_two<RealType>(), pol)*half<RealType>();
          } // RealType owens_t_znorm1(const RealType x)
 
          // owens_t_znorm2(x) = P(x<=Z<oo) with Z being normally distributed.
-         template<typename RealType>
-         inline RealType owens_t_znorm2(const RealType x)
+         template<typename RealType, class Policy>
+         inline RealType owens_t_znorm2(const RealType x, const Policy& pol)
          {
             using namespace boost::math::constants;
-            return boost::math::erfc(x*one_div_root_two<RealType>())*half<RealType>();
+            return boost::math::erfc(x*one_div_root_two<RealType>(), pol)*half<RealType>();
          } // RealType owens_t_znorm2(const RealType x)
 
          // Auxiliary function, it computes an array key that is used to determine
@@ -123,31 +123,31 @@ namespace boost
          } // unsigned short owens_t_compute_code(const RealType h, const RealType a)
 
          template<typename RealType>
-         inline unsigned short owens_t_get_order_imp(const unsigned short icode, RealType, const boost::integral_constant<int, 53>&)
+         inline unsigned short owens_t_get_order_imp(const unsigned short icode, RealType, const std::integral_constant<int, 53>&)
          {
             static const unsigned short ord[] = {2, 3, 4, 5, 7, 10, 12, 18, 10, 20, 30, 0, 4, 7, 8, 20, 0, 0}; // 18 entries
 
-            BOOST_ASSERT(icode<18);
+            BOOST_MATH_ASSERT(icode<18);
 
             return ord[icode];
-         } // unsigned short owens_t_get_order(const unsigned short icode, RealType, boost::integral_constant<int, 53> const&)
+         } // unsigned short owens_t_get_order(const unsigned short icode, RealType, std::integral_constant<int, 53> const&)
 
          template<typename RealType>
-         inline unsigned short owens_t_get_order_imp(const unsigned short icode, RealType, const boost::integral_constant<int, 64>&)
+         inline unsigned short owens_t_get_order_imp(const unsigned short icode, RealType, const std::integral_constant<int, 64>&)
         {
            // method ================>>>       {1, 1, 1, 1, 1,  1,  1,  1,  2,  2,  2,  3, 4,  4,  4,  4,  5, 6}
            static const unsigned short ord[] = {3, 4, 5, 6, 8, 11, 13, 19, 10, 20, 30,  0, 7, 10, 11, 23,  0, 0}; // 18 entries
 
-          BOOST_ASSERT(icode<18);
+          BOOST_MATH_ASSERT(icode<18);
 
           return ord[icode];
-        } // unsigned short owens_t_get_order(const unsigned short icode, RealType, boost::integral_constant<int, 64> const&)
+        } // unsigned short owens_t_get_order(const unsigned short icode, RealType, std::integral_constant<int, 64> const&)
 
          template<typename RealType, typename Policy>
          inline unsigned short owens_t_get_order(const unsigned short icode, RealType r, const Policy&)
          {
             typedef typename policies::precision<RealType, Policy>::type precision_type;
-            typedef boost::integral_constant<int,
+            typedef std::integral_constant<int,
                precision_type::value <= 0 ? 64 :
                precision_type::value <= 53 ? 53 : 64
             > tag_type;
@@ -193,7 +193,7 @@ namespace boost
 
          // compute the value of Owen's T function with method T2 from the reference paper
          template<typename RealType, class Policy>
-         inline RealType owens_t_T2(const RealType h, const RealType a, const unsigned short m, const RealType ah, const Policy&, const boost::false_type&)
+         inline RealType owens_t_T2(const RealType h, const RealType a, const unsigned short m, const RealType ah, const Policy& pol, const std::false_type&)
          {
             BOOST_MATH_STD_USING
             using namespace boost::math::constants;
@@ -206,7 +206,7 @@ namespace boost
             unsigned short ii = 1;
             RealType val = 0;
             RealType vi = a * exp( -ah*ah*half<RealType>() ) * one_div_root_two_pi<RealType>();
-            RealType z = owens_t_znorm1(ah)/h;
+            RealType z = owens_t_znorm1(ah, pol)/h;
 
             while( true )
             {
@@ -225,8 +225,8 @@ namespace boost
          } // RealType owens_t_T2(const RealType h, const RealType a, const unsigned short m, const RealType ah)
 
          // compute the value of Owen's T function with method T3 from the reference paper
-         template<typename RealType>
-         inline RealType owens_t_T3_imp(const RealType h, const RealType a, const RealType ah, const boost::integral_constant<int, 53>&)
+         template<typename RealType, class Policy>
+         inline RealType owens_t_T3_imp(const RealType h, const RealType a, const RealType ah, const std::integral_constant<int, 53>&, const Policy& pol)
          {
             BOOST_MATH_STD_USING
             using namespace boost::math::constants;
@@ -255,12 +255,12 @@ namespace boost
             RealType ii = 1;
             unsigned short i = 0;
             RealType vi = a * exp( -ah*ah*half<RealType>() ) * one_div_root_two_pi<RealType>();
-            RealType zi = owens_t_znorm1(ah)/h;
+            RealType zi = owens_t_znorm1(ah, pol)/h;
             RealType val = 0;
 
             while( true )
             {
-               BOOST_ASSERT(i < 21);
+               BOOST_MATH_ASSERT(i < 21);
                val += zi*c2[i];
                if( m <= i ) // if( m < i+1 )
                {
@@ -277,8 +277,8 @@ namespace boost
          } // RealType owens_t_T3(const RealType h, const RealType a, const RealType ah)
 
         // compute the value of Owen's T function with method T3 from the reference paper
-        template<class RealType>
-        inline RealType owens_t_T3_imp(const RealType h, const RealType a, const RealType ah, const boost::integral_constant<int, 64>&)
+        template<class RealType, class Policy>
+        inline RealType owens_t_T3_imp(const RealType h, const RealType a, const RealType ah, const std::integral_constant<int, 64>&, const Policy& pol)
         {
           BOOST_MATH_STD_USING
           using namespace boost::math::constants;
@@ -327,12 +327,12 @@ namespace boost
           RealType ii = 1;
           unsigned short i = 0;
           RealType vi = a * exp( -ah*ah*half<RealType>() ) * one_div_root_two_pi<RealType>();
-          RealType zi = owens_t_znorm1(ah)/h;
+          RealType zi = owens_t_znorm1(ah, pol)/h;
           RealType val = 0;
 
           while( true )
           {
-              BOOST_ASSERT(i < 31);
+              BOOST_MATH_ASSERT(i < 31);
               val += zi*c2[i];
               if( m <= i ) // if( m < i+1 )
               {
@@ -349,15 +349,15 @@ namespace boost
         } // RealType owens_t_T3(const RealType h, const RealType a, const RealType ah)
 
         template<class RealType, class Policy>
-        inline RealType owens_t_T3(const RealType h, const RealType a, const RealType ah, const Policy&)
+        inline RealType owens_t_T3(const RealType h, const RealType a, const RealType ah, const Policy& pol)
         {
             typedef typename policies::precision<RealType, Policy>::type precision_type;
-            typedef boost::integral_constant<int,
+            typedef std::integral_constant<int,
                precision_type::value <= 0 ? 64 :
                precision_type::value <= 53 ? 53 : 64
             > tag_type;
 
-            return owens_t_T3_imp(h, a, ah, tag_type());
+            return owens_t_T3_imp(h, a, ah, tag_type(), pol);
         }
 
          // compute the value of Owen's T function with method T4 from the reference paper
@@ -391,7 +391,7 @@ namespace boost
 
          // compute the value of Owen's T function with method T5 from the reference paper
          template<typename RealType>
-         inline RealType owens_t_T5_imp(const RealType h, const RealType a, const boost::integral_constant<int, 53>&)
+         inline RealType owens_t_T5_imp(const RealType h, const RealType a, const std::integral_constant<int, 53>&)
          {
             BOOST_MATH_STD_USING
             /*
@@ -427,7 +427,7 @@ namespace boost
             RealType val = 0;
             for(unsigned short i = 0; i < m; ++i)
             {
-               BOOST_ASSERT(i < 13);
+               BOOST_MATH_ASSERT(i < 13);
                const RealType r = static_cast<RealType>(1) + as*pts[i];
                val += wts[i] * exp( hs*r ) / r;
             } // for(unsigned short i = 0; i < m; ++i)
@@ -437,7 +437,7 @@ namespace boost
 
         // compute the value of Owen's T function with method T5 from the reference paper
         template<typename RealType>
-        inline RealType owens_t_T5_imp(const RealType h, const RealType a, const boost::integral_constant<int, 64>&)
+        inline RealType owens_t_T5_imp(const RealType h, const RealType a, const std::integral_constant<int, 64>&)
         {
           BOOST_MATH_STD_USING
             /*
@@ -499,7 +499,7 @@ namespace boost
           RealType val = 0;
           for(unsigned short i = 0; i < m; ++i)
             {
-              BOOST_ASSERT(i < 19);
+              BOOST_MATH_ASSERT(i < 19);
               const RealType r = 1 + as*pts[i];
               val += wts[i] * exp( hs*r ) / r;
             } // for(unsigned short i = 0; i < m; ++i)
@@ -511,7 +511,7 @@ namespace boost
         inline RealType owens_t_T5(const RealType h, const RealType a, const Policy&)
         {
             typedef typename policies::precision<RealType, Policy>::type precision_type;
-            typedef boost::integral_constant<int,
+            typedef std::integral_constant<int,
                precision_type::value <= 0 ? 64 :
                precision_type::value <= 53 ? 53 : 64
             > tag_type;
@@ -521,13 +521,13 @@ namespace boost
 
 
          // compute the value of Owen's T function with method T6 from the reference paper
-         template<typename RealType>
-         inline RealType owens_t_T6(const RealType h, const RealType a)
+         template<typename RealType, class Policy>
+         inline RealType owens_t_T6(const RealType h, const RealType a, const Policy& pol)
          {
             BOOST_MATH_STD_USING
             using namespace boost::math::constants;
 
-            const RealType normh = owens_t_znorm2( h );
+            const RealType normh = owens_t_znorm2(h, pol);
             const RealType y = static_cast<RealType>(1) - a;
             const RealType r = atan2(y, static_cast<RealType>(1 + a) );
 
@@ -621,7 +621,7 @@ namespace boost
          }
 
          template<typename RealType, class Policy>
-         inline RealType owens_t_T2(const RealType h, const RealType a, const unsigned short m, const RealType ah, const Policy&, const boost::true_type&)
+         inline RealType owens_t_T2(const RealType h, const RealType a, const unsigned short m, const RealType ah, const Policy& pol, const std::true_type&)
          {
             BOOST_MATH_STD_USING
             using namespace boost::math::constants;
@@ -634,7 +634,7 @@ namespace boost
             unsigned short ii = 1;
             RealType val = 0;
             RealType vi = a * exp( -ah*ah*half<RealType>() ) / root_two_pi<RealType>();
-            RealType z = owens_t_znorm1(ah)/h;
+            RealType z = owens_t_znorm1(ah, pol)/h;
             RealType last_z = fabs(z);
             RealType lim = policies::get_epsilon<RealType, Policy>();
 
@@ -660,7 +660,7 @@ namespace boost
          } // RealType owens_t_T2(const RealType h, const RealType a, const unsigned short m, const RealType ah)
 
          template<typename RealType, class Policy>
-         inline std::pair<RealType, RealType> owens_t_T2_accelerated(const RealType h, const RealType a, const RealType ah, const Policy&)
+         inline std::pair<RealType, RealType> owens_t_T2_accelerated(const RealType h, const RealType a, const RealType ah, const Policy& pol)
          {
             //
             // This is the same series as T2, but with acceleration applied.
@@ -678,7 +678,7 @@ namespace boost
             unsigned short ii = 1;
             RealType val = 0;
             RealType vi = a * exp( -ah*ah*half<RealType>() ) / root_two_pi<RealType>();
-            RealType z = boost::math::detail::owens_t_znorm1(ah)/h;
+            RealType z = boost::math::detail::owens_t_znorm1(ah, pol)/h;
             RealType last_z = fabs(z);
 
             //
@@ -776,7 +776,7 @@ namespace boost
          //
          // Note there are different versions for different precisions....
          template<typename RealType, typename Policy>
-         inline RealType owens_t_dispatch(const RealType h, const RealType a, const RealType ah, const Policy& pol, boost::integral_constant<int, 64> const&)
+         inline RealType owens_t_dispatch(const RealType h, const RealType a, const RealType ah, const Policy& pol, std::integral_constant<int, 64> const&)
          {
             // Simple main case for 64-bit precision or less, this is as per the Patefield-Tandy paper:
             BOOST_MATH_STD_USING
@@ -794,11 +794,11 @@ namespace boost
             }
             if(a == 1)
             {
-               return owens_t_znorm2(RealType(-h)) * owens_t_znorm2(h) / 2;
+               return owens_t_znorm2(RealType(-h), pol) * owens_t_znorm2(h, pol) / 2;
             }
             if(a >= tools::max_value<RealType>())
             {
-               return owens_t_znorm2(RealType(fabs(h)));
+               return owens_t_znorm2(RealType(fabs(h)), pol);
             }
             RealType val = 0; // avoid compiler warnings, 0 will be overwritten in any case
             const unsigned short icode = owens_t_compute_code(h, a);
@@ -813,7 +813,7 @@ namespace boost
                break;
             case 2: // T2
                typedef typename policies::precision<RealType, Policy>::type precision_type;
-               typedef boost::integral_constant<bool, (precision_type::value == 0) || (precision_type::value > 64)> tag_type;
+               typedef std::integral_constant<bool, (precision_type::value == 0) || (precision_type::value > 64)> tag_type;
                val = owens_t_T2(h, a, m, ah, pol, tag_type());
                break;
             case 3: // T3
@@ -826,16 +826,16 @@ namespace boost
                val = owens_t_T5(h,a, pol);
                break;
             case 6: // T6
-               val = owens_t_T6(h,a);
+               val = owens_t_T6(h,a, pol);
                break;
             default:
-               BOOST_THROW_EXCEPTION(std::logic_error("selection routine in Owen's T function failed"));
+               BOOST_MATH_THROW_EXCEPTION(std::logic_error("selection routine in Owen's T function failed"));
             }
             return val;
          }
 
          template<typename RealType, typename Policy>
-         inline RealType owens_t_dispatch(const RealType h, const RealType a, const RealType ah, const Policy& pol, const boost::integral_constant<int, 65>&)
+         inline RealType owens_t_dispatch(const RealType h, const RealType a, const RealType ah, const Policy& pol, const std::integral_constant<int, 65>&)
          {
             // Arbitrary precision version:
             BOOST_MATH_STD_USING
@@ -853,11 +853,11 @@ namespace boost
             }
             if(a == 1)
             {
-               return owens_t_znorm2(RealType(-h)) * owens_t_znorm2(h) / 2;
+               return owens_t_znorm2(RealType(-h), pol) * owens_t_znorm2(h, pol) / 2;
             }
             if(a >= tools::max_value<RealType>())
             {
-               return owens_t_znorm2(RealType(fabs(h)));
+               return owens_t_znorm2(RealType(fabs(h)), pol);
             }
             // Attempt arbitrary precision code, this will throw if it goes wrong:
             typedef typename boost::math::policies::normalise<Policy, boost::math::policies::evaluation_error<> >::type forwarding_policy;
@@ -956,22 +956,22 @@ namespace boost
             //
             // We give up - no arbitrary precision versions succeeded!
             //
-            return owens_t_dispatch(h, a, ah, pol, boost::integral_constant<int, 64>());
+            return owens_t_dispatch(h, a, ah, pol, std::integral_constant<int, 64>());
          } // RealType owens_t_dispatch(RealType h, RealType a, RealType ah)
          template<typename RealType, typename Policy>
-         inline RealType owens_t_dispatch(const RealType h, const RealType a, const RealType ah, const Policy& pol, const boost::integral_constant<int, 0>&)
+         inline RealType owens_t_dispatch(const RealType h, const RealType a, const RealType ah, const Policy& pol, const std::integral_constant<int, 0>&)
          {
             // We don't know what the precision is until runtime:
             if(tools::digits<RealType>() <= 64)
-               return owens_t_dispatch(h, a, ah, pol, boost::integral_constant<int, 64>());
-            return owens_t_dispatch(h, a, ah, pol, boost::integral_constant<int, 65>());
+               return owens_t_dispatch(h, a, ah, pol, std::integral_constant<int, 64>());
+            return owens_t_dispatch(h, a, ah, pol, std::integral_constant<int, 65>());
          }
          template<typename RealType, typename Policy>
          inline RealType owens_t_dispatch(const RealType h, const RealType a, const RealType ah, const Policy& pol)
          {
             // Figure out the precision and forward to the correct version:
             typedef typename policies::precision<RealType, Policy>::type precision_type;
-            typedef boost::integral_constant<int,
+            typedef std::integral_constant<int,
                precision_type::value <= 0 ? 0 :
                precision_type::value <= 64 ? 64 : 65
             > tag_type;
@@ -1003,15 +1003,15 @@ namespace boost
             {
                if( h <= 0.67 )
                {
-                  const RealType normh = owens_t_znorm1(h);
-                  const RealType normah = owens_t_znorm1(fabs_ah);
+                  const RealType normh = owens_t_znorm1(h, pol);
+                  const RealType normah = owens_t_znorm1(fabs_ah, pol);
                   val = static_cast<RealType>(1)/static_cast<RealType>(4) - normh*normah -
                      owens_t_dispatch(fabs_ah, static_cast<RealType>(1 / fabs_a), h, pol);
                } // if( h <= 0.67 )
                else
                {
-                  const RealType normh = detail::owens_t_znorm2(h);
-                  const RealType normah = detail::owens_t_znorm2(fabs_ah);
+                  const RealType normh = detail::owens_t_znorm2(h, pol);
+                  const RealType normah = detail::owens_t_znorm2(fabs_ah, pol);
                   val = constants::half<RealType>()*(normh+normah) - normh*normah -
                      owens_t_dispatch(fabs_ah, static_cast<RealType>(1 / fabs_a), h, pol);
                } // else [if( h <= 0.67 )]
@@ -1036,8 +1036,8 @@ namespace boost
                   do_init(tag());
                }
                template <int N>
-               static void do_init(const boost::integral_constant<int, N>&){}
-               static void do_init(const boost::integral_constant<int, 64>&)
+               static void do_init(const std::integral_constant<int, N>&){}
+               static void do_init(const std::integral_constant<int, 64>&)
                {
                   boost::math::owens_t(static_cast<T>(7), static_cast<T>(0.96875), Policy());
                   boost::math::owens_t(static_cast<T>(2), static_cast<T>(0.5), Policy());
@@ -1062,7 +1062,7 @@ namespace boost
          typedef typename tools::promote_args<T1, T2>::type result_type;
          typedef typename policies::evaluation<result_type, Policy>::type value_type;
          typedef typename policies::precision<value_type, Policy>::type precision_type;
-         typedef boost::integral_constant<int,
+         typedef std::integral_constant<int,
             precision_type::value <= 0 ? 0 :
             precision_type::value <= 64 ? 64 : 65
          > tag_type;
@@ -1082,9 +1082,13 @@ namespace boost
    } // namespace math
 } // namespace boost
 
-#ifdef BOOST_MSVC
+#ifdef _MSC_VER
 #pragma warning(pop)
 #endif
 
 #endif
 // EOF
+
+/* owens_t.hpp
+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
+*/

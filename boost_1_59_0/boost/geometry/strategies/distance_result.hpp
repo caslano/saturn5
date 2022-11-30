@@ -6,10 +6,10 @@
 // Copyright (c) 2013-2015 Adam Wulkiewicz, Lodz, Poland.
 // Copyright (c) 2014-2015 Samuel Debionne, Grenoble, France.
 
-// This file was modified by Oracle on 2014, 2015.
-// Modifications copyright (c) 2014-2015, Oracle and/or its affiliates.
-
+// This file was modified by Oracle on 2014-2021.
+// Modifications copyright (c) 2014-2021, Oracle and/or its affiliates.
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -21,22 +21,17 @@
 #ifndef BOOST_GEOMETRY_STRATEGIES_DISTANCE_RESULT_HPP
 #define BOOST_GEOMETRY_STRATEGIES_DISTANCE_RESULT_HPP
 
-#include <boost/mpl/always.hpp>
-#include <boost/mpl/bool.hpp>
-#include <boost/mpl/vector.hpp>
 
-#include <boost/variant/variant_fwd.hpp>
-
+#include <boost/geometry/algorithms/detail/select_geometry_type.hpp>
 #include <boost/geometry/core/point_type.hpp>
-
+#include <boost/geometry/core/reverse_dispatch.hpp>
 #include <boost/geometry/strategies/default_strategy.hpp>
+#include <boost/geometry/strategies/detail.hpp>
 #include <boost/geometry/strategies/distance.hpp>
-
-#include <boost/geometry/util/compress_variant.hpp>
-#include <boost/geometry/util/transform_variant.hpp>
-#include <boost/geometry/util/combine_if.hpp>
-
-#include <boost/geometry/algorithms/detail/distance/default_strategies.hpp>
+#include <boost/geometry/strategies/distance/services.hpp>
+#include <boost/geometry/util/select_most_precise.hpp>
+#include <boost/geometry/util/sequence.hpp>
+#include <boost/geometry/util/type_traits.hpp>
 
 
 namespace boost { namespace geometry
@@ -46,11 +41,48 @@ namespace boost { namespace geometry
 namespace resolve_strategy
 {
 
+
+// TODO: This utility could be entirely implemented as:
+//       decltype(geometry::distance(std::declval<Geometry1>(), std::declval<Geometry2>(), std::declval<Strategy>()))
+//       however then the algorithm would have to be compiled.
+
+template
+<
+    typename Geometry1, typename Geometry2, typename Strategy,
+    bool IsUmbrella = strategies::detail::is_umbrella_strategy<Strategy>::value
+>
+struct distance_result_strategy2_type
+{
+    typedef decltype(std::declval<Strategy>().distance(
+        std::declval<Geometry1>(), std::declval<Geometry2>())) type;
+};
+
+template <typename Geometry1, typename Geometry2, typename Strategy>
+struct distance_result_strategy2_type<Geometry1, Geometry2, Strategy, false>
+{
+    typedef Strategy type;
+};
+
+template
+<
+    typename Geometry1, typename Geometry2, typename Strategy,
+    bool Reverse = reverse_dispatch<Geometry1, Geometry2>::value
+>
+struct distance_result_strategy_type
+    : distance_result_strategy2_type<Geometry1, Geometry2, Strategy>
+{};
+
+template <typename Geometry1, typename Geometry2, typename Strategy>
+struct distance_result_strategy_type<Geometry1, Geometry2, Strategy, true>
+    : distance_result_strategy_type<Geometry2, Geometry1, Strategy, false>
+{};
+
+
 template <typename Geometry1, typename Geometry2, typename Strategy>
 struct distance_result
     : strategy::distance::services::return_type
         <
-            Strategy,
+            typename distance_result_strategy_type<Geometry1, Geometry2, Strategy>::type,
             typename point_type<Geometry1>::type,
             typename point_type<Geometry2>::type
         >
@@ -62,20 +94,68 @@ struct distance_result<Geometry1, Geometry2, default_strategy>
         <
             Geometry1,
             Geometry2,
-            typename detail::distance::default_strategy
+            typename strategies::distance::services::default_strategy
                 <
                     Geometry1, Geometry2
                 >::type
         >
 {};
 
+
 } // namespace resolve_strategy
 
 
-namespace resolve_variant
+#ifndef DOXYGEN_NO_DETAIL
+namespace detail { namespace distance
 {
 
-template <typename Geometry1, typename Geometry2, typename Strategy>
+template <typename Strategy = geometry::default_strategy>
+struct more_precise_distance_result
+{
+    template <typename Curr, typename Next>
+    struct predicate
+        : std::is_same
+            <
+                typename resolve_strategy::distance_result
+                    <
+                        typename util::sequence_element<0, Curr>::type,
+                        typename util::sequence_element<1, Curr>::type,
+                        Strategy
+                    >::type,
+                typename geometry::select_most_precise
+                    <
+                        typename resolve_strategy::distance_result
+                            <
+                                typename util::sequence_element<0, Curr>::type,
+                                typename util::sequence_element<1, Curr>::type,
+                                Strategy
+                            >::type,
+                        typename resolve_strategy::distance_result
+                            <
+                                typename util::sequence_element<0, Next>::type,
+                                typename util::sequence_element<1, Next>::type,
+                                Strategy
+                            >::type
+                    >::type
+            >
+    {};
+};
+
+}} // namespace detail::distance
+#endif //DOXYGEN_NO_DETAIL
+
+
+namespace resolve_dynamic
+{
+
+template
+<
+    typename Geometry1, typename Geometry2, typename Strategy,
+    bool IsDynamicOrCollection = util::is_dynamic_geometry<Geometry1>::value
+                              || util::is_dynamic_geometry<Geometry2>::value
+                              || util::is_geometry_collection<Geometry1>::value
+                              || util::is_geometry_collection<Geometry2>::value
+>
 struct distance_result
     : resolve_strategy::distance_result
         <
@@ -86,102 +166,29 @@ struct distance_result
 {};
 
 
-template
-<
-    typename Geometry1,
-    BOOST_VARIANT_ENUM_PARAMS(typename T),
-    typename Strategy
->
-struct distance_result
-    <
-        Geometry1, boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>, Strategy
-    >
+template <typename Geometry1, typename Geometry2, typename Strategy>
+struct distance_result<Geometry1, Geometry2, Strategy, true>
 {
-    // A set of all variant type combinations that are compatible and
-    // implemented
-    typedef typename util::combine_if<
-        typename boost::mpl::vector1<Geometry1>,
-        typename boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>::types,
-        // Here we want should remove most of the combinations that
-        // are not valid, mostly to limit the size of the resulting MPL set.
-        // But is_implementedn is not ready for prime time
-        //
-        // util::is_implemented2<boost::mpl::_1, boost::mpl::_2, dispatch::distance<boost::mpl::_1, boost::mpl::_2> >
-        boost::mpl::always<boost::mpl::true_>
-    >::type possible_input_types;
+    // Select the most precise distance strategy result type
+    //   for all variant type combinations.
+    // TODO: We should ignore the combinations that are not valid
+    //   but is_implemented is not ready for prime time.
+    using selected_types = typename detail::select_geometry_types
+        <
+            Geometry1, Geometry2,
+            detail::distance::more_precise_distance_result<Strategy>::template predicate
+        >::type;
 
-    // The (possibly variant) result type resulting from these combinations
-    typedef typename compress_variant<
-        typename transform_variant<
-            possible_input_types,
-            resolve_strategy::distance_result<
-                boost::mpl::first<boost::mpl::_>,
-                boost::mpl::second<boost::mpl::_>,
-                Strategy
-            >,
-            boost::mpl::back_inserter<boost::mpl::vector0<> >
-        >::type
-    >::type type;
+    using type = typename resolve_strategy::distance_result
+        <
+            typename util::sequence_element<0, selected_types>::type,
+            typename util::sequence_element<1, selected_types>::type,
+            Strategy
+        >::type;
 };
 
 
-// Distance arguments are commutative
-template
-<
-    BOOST_VARIANT_ENUM_PARAMS(typename T),
-    typename Geometry2,
-    typename Strategy
->
-struct distance_result
-    <
-        boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>,
-        Geometry2,
-        Strategy
-    > : public distance_result
-        <
-            Geometry2, boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>, Strategy
-        >
-{};
-
-
-template <BOOST_VARIANT_ENUM_PARAMS(typename T), typename Strategy>
-struct distance_result
-    <
-        boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>,
-        boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>,
-        Strategy
-    >
-{
-    // A set of all variant type combinations that are compatible and
-    // implemented
-    typedef typename util::combine_if
-        <
-            typename boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>::types,
-            typename boost::variant<BOOST_VARIANT_ENUM_PARAMS(T)>::types,
-            // Here we want to try to remove most of the combinations
-            // that are not valid, mostly to limit the size of the
-            // resulting MPL vector.
-            // But is_implemented is not ready for prime time
-            //
-            // util::is_implemented2<boost::mpl::_1, boost::mpl::_2, dispatch::distance<boost::mpl::_1, boost::mpl::_2> >
-            boost::mpl::always<boost::mpl::true_>
-        >::type possible_input_types;
-
-    // The (possibly variant) result type resulting from these combinations
-    typedef typename compress_variant<
-        typename transform_variant<
-            possible_input_types,
-            resolve_strategy::distance_result<
-                boost::mpl::first<boost::mpl::_>,
-                boost::mpl::second<boost::mpl::_>,
-                Strategy
-            >,
-            boost::mpl::back_inserter<boost::mpl::vector0<> >
-        >::type
-    >::type type;
-};
-
-} // namespace resolve_variant
+} // namespace resolve_dynamic
 
 
 /*!
@@ -197,7 +204,7 @@ template
     typename Strategy = void
 >
 struct distance_result
-    : resolve_variant::distance_result<Geometry1, Geometry2, Strategy>
+    : resolve_dynamic::distance_result<Geometry1, Geometry2, Strategy>
 {};
 
 
@@ -211,3 +218,7 @@ struct distance_result<Geometry1, Geometry2, void>
 
 
 #endif // BOOST_GEOMETRY_STRATEGIES_DISTANCE_RESULT_HPP
+
+/* distance_result.hpp
+x3BpK8BuLTISrkHLT7gXbrQQ6EusFedgq3EHAj3QaCMZefUUmEDE0/s1nk9QYFLW58GyVBgWdEiFLhgM0Ie0Y30YS+txCk+qTOXXBua25oPggRgeNMVnzjQEVwIxI9vF4DFa+kmwI1VtvNRDKhKjTN5ZnqfmYXdtWBm8fg7yCamMSovgNGvzsuR3AYhZFB65sFcNatq75nFUVkH3180jagcJ6pDEP0CMzJD4BEXTMmMgc4xa7dXxro+r6S3F1yyUprFxgjM+cDhmRDJ1LQ39F7mOnPBFsy3CTR4+fut14RRmN86DUAEA4PamEde8d9jPeiC20QZvAua0loS0LmA7dKQmnGzwdqCCvppaIfiODK7sGwixnjrf5jN2j3Qe3vE0TIbqvrsRc58Dxic00LuWixVYBk1uSyp1aqAEnv7oSm2Qe8jx/JvkelKRwNdoRxRipWYAAyz806CQhAZrb64b53jNDqUX8i0Cam21GMgnGtUV/1ipo/6aAs3vYPHpXOj+LRQvJFpIkI7p7yeNY21GARBEa1zyplGd8x3BDfw6SJk9JEOvEePUOTcHiGTrMqaDumQCaz4h3N+gZfP453Kvgi/ZvSOX7X2mnQVSs9mkcnd92/LBrLx3ZbtMAEbXCATTs6PfQYhVnsmrf/uOzwyzcBR3AQ6EqS7/hl+2KZ6gWQlTNQHTZ3nqFvvVS5fTI/vGwfnxxnL+bA7DF7x3/t5ba0vVk91L0UndQ7e5g4dZrtgPHCkBNOaCwO2PtNF5vEvUPaqM6nuA8Qr4vl0LkdnEun7dfhhcQ58iCdgPhwey0seTZX7LdSSQz954jxvF4pJrUKVGFXY7IdJgBmW1qrMGcNEfYwaL1IBRKXnEObSIXCw1vJGZr2KAmw9YHVvO8GwSzMZQVkP8ak7pgdlAtKujPLSWrEb8SmNMA4h/C06YeHRsvl0ZLKY644gTI3M7LjVuWQXg0mkmwwKi3GRp67hnI2CcnmFvBILvwAqpRMFLcFYAOA5qW4cEKZvIH6HKEgDB5vJdA5jKH5WkJdwvUzFxV/++wrrGrkWNyimPY1L8lJ64jmQFPc80Ism05H8Poa3sL2bU0UDCzk0HlVCR+LS0iEZowrZ59QScT0ZJzxSw5AzWnRdZD3c4V4+cz4CMD0btSOibFF/ghISkxfsGZ61w7Zb6RE4MKOjDIElD/tEaSJNefE8I8mZnWvOvMXyZ2AjlSGsei6QmIiN6iLMh2PF1P+HV0Q+rfbkllmw6xCYBgmdipE1KxkkgPFvpoKHd5nD69eFFrLDDIJhOT9aWs8vT+gqKnJns7wdSep0Qhgh5qQ1s/3CbTo28DtGx3kSnIWN8/gi7PxErqFsEG353gUuXUlemyL/KDNZWZpaaQgDmdp8NyUTI/VNJkEZAB8lv9o/2qkCWMJAodn35sIKNVw85IFii2aVrNw+Owo81DQik0kaJzeav5YZmFcK3cHnUnkC5sBRpM6tgUQqjmOkebjebmQiDYAd42u7ZKJCGfDx4Ci4aQ+8EXSi9sBEgwhElaA7KxYr1+2AufTruCji+JcjcLs8J4gFVWVtlhlJhrvhejB14ui5gSYv5t5T++zVEv8dPYiKjkDt9QlsOfxTP8wQ3uvbtaYdLJpda5zXO+6cM3HzW1YB/bwy6DjYLM1nUBOh09UPwilh/LHmUSmhGdzDllTdYeLg3u0I/PaqHppm0cGhEJvZbJEenMjKZkaY588iHXzVvDBO766Cbsk0UpkgLiEnbpFNAqlkxXBH+7rcoEpleV1pbrTl/nYRC7RJXizZHdAg0G7fnkzahbW68AF6pEGZufFWImuIfcm3Qhg+Xqp4AiqpZ8tM4xtf8lRiGI+lzdSZIOd8D41g0zrumtZaeBbMcIjIF8YNZVleZgOywkV5J+FClIbHdg85YSLZQHrK3V6j0apyLgbXZ3EtVKjNf2kZsf+hKhD8dQJAcevhs+CBsRk1ImRdBV+hVMh6yK4qs6NkH75VeJFNPRTJryvfWU3Ti49Ur21s1OOqZdH/3aXt71rCGBSFnGXusDR//lOlgV5iVtFZu5G8IYSuy+g4Ead+ck1APz/vg+CAqPfbS1bN0lO+6415wiDtRBmvkmJWVzIIU5d8qB/PVKezXD0KwB5CO+7iW6CMneN3Ev/DRhFyJs3XvKr17bVIGzbh2Ml0RfGx0Nvu++uoQ2nvpsNj+2EKytYdvx70dBfaVXb8g8Uhqiy55e+Y21aAA+rcvGNukET4xo20w3jll/OeAwd++4VHgppnzKQuIuYXDDVhZHPUOoKSKmlfq0EvnxbScPVQsZjRgSghJtKCgPC8E13ornEqyRXeplnjXZTUFw9HBZT+hOKP+lJFmA6cPrZAk3NF/4G9y/AsLSn0WoStWCgKvF27IpVn3eba+PP5YJUK3Sqct8TwqekVFIeRysvzJME0EQ9WuZEvEHQUM8jqJpGOdfBsOeBDxMgO6GL/GaRErcbOENBHXbRtWplPmGir+arjSdrhXuuB0kjYUgPeEn6kDwbJT2CohXrFAd1gMUcm/oDvnDvUx9DN1Z6fgz+x2TmJsHb6f9PYm3Jc+sLXv5VnB3kI6+R7W6r1LC47Fs3GrRGf5R2UpDp7Ph+x9gJGrWMCOVVunGXIPdxIaeq37CA9zYAhvvhOUz/BVnlQ0RaablKOdk+Z3MXU6MKN/Fl2Dk5BFGtSa/qqxjgEEjqIZwT3poqcUKsw3QbVlFQ23wp/GrV3UpG/X91YUkLhH2c44RAlH3wZsBeEtDgvGrcGVesSdCPKSjy/pHJNLhcQXy58uJPBd7wQnDlWN2RLAOzynPJJp7NXN7lwEdkhBqiyWyFWlaQ9uh1x2l+W2I8tHPTlYZpWZQV0rjrKxZSmLprARWtlHtJLIbxcIjaSs/2QHeA4FR3qLc5dZyDwMhvc7sNwOpEhEIQo2U7aVYqhEGm4/mXpVdy1a7oSxMDCNu8lrFeRSyuoWC8gOnW34pgyoBTDoBxieOGr5Romq1CLAVb5H1Mm9MZnRbGFWYEivVxkUIqDXUNuARgsapjIw2TxCLPoj45wjWsGo/HMGnYhyc0aAsfO1wtDM/lohUzsuEf4EXiqI7kMMBZHJpLQ7piI2JLzd00ITsCbirSKGlbnDZNwxzcfJeOLQWufzZc7e8LX+pBTbo0K/fMQkaPKtMg5TiOsCjcW6MCqOlhwtFQ45I6T2y7xmIndYFOwNvHYoWP+9qgFcONvuBxck99DHhqdaWkcEGouX8SpL609cjKYfTXAqdw9J0tn6AGC+ToHfayOFKenEEES1O82i/bE8i58E3BNooArgyQExHWdpTJn1HZNOqKHUITx+EQKIQKfYd9VfgrflcRpWUnTlT1NyEr05UkWHtk5qeMdcQeA0ZhUzC4rNWD2c9p/YQaYMStBkZB/HTd1mFBUlEY4dw2Ne9FsuxbilqLzN6llNjNI/iI7xiRNyu2JmA4JX/3MgRm12YSvepgfhdxf40+nFqpME7ZkXBgZTlH/pbER4rBNWy2u5HVP2kkvqu1Qi0zBegHG9ubNFu8HIK96PMeZ3ADBZC6jRVAbe/lO1tXNoR/T9wuUOzmfys8dPn1/wE/GRu2YQUhRM4Yq8hVYRLlKIQysR/gaBlK70YaVDQ3KODHhAfUicrn3VDdkuIZAA1EykUs87EBBvXulm2OmevX7r1qSu67W23NS71kIvT3ilsjWwlTfnAz5joHQANnPN89YYNWAHII3ImlzELdI/Jy/h36u0TnzO2s0dmNEO0bhYWrjaFQ/hhFY4OrnNSm3BRaOsLEgqBoWZAuLviLUM47MYXygEjDsvgxyTGHxdcV2TGpkyTHefEhGeQ8L8589MfgGdPLpP0i7xJyVpZThVKeF5WfIjRqlWi6Ov0fiq79GgrnmG6G4leX7yU37zMwigO+ClPyCD8ciDGd2EsK22mx2M9VrTlfKstxACNbt1LuFLNG+4c11AJ/SfEiMuA5mWf2HPdqpG1+7jxaPer7C9byjMDSrK1PApPUvzVORfLe2ZFpqBxMfIoR4eKHf7YxARqhODP88owJRAift2ZvFIoKLXvNSBiolMEenDmkciIunkSKlkfkbajcHz89YlBZhRoyShS1lkvm1qxonV0fDkGi42F33udxPSSF0uNlEtNksc9tSTCeRh+JwerpfbCAozPZ7bkHi62AqTnJj6HwE0HI2W68p5gt9uF8TfQeiIP4PQJMhvmT8I+FAcVz+P8qiNSg4iOF1TLOjD4aiu9DLizYERgwrB27Huhd2AKKGn6GctTX8pUPQuMm6gH+B63TTzRSDj/PtS8HiDz7HeZf1w+jbJZUVEut+93xjM9FprMkHvFeofed99nRCRjUXidKzt7MqkJSSGs9htynFc3MtkcVWfHh8RBAQENuPhGfePjw7HU2lzUmT9VO7xOF7ffFib22siYdmPjo+VTHonLWKw2sw/RsWzLbXHkH+KM81XeIU39QI4NP52CYrwisNobSvLpZOl0ASYWfLE1cQ6SzF+Uu4DnQFVMJXa6oZV0USFvygPE3LiuEowDIx31laHwT7CKHF6HvfzQiwhMNOk1gOlWWc3oHm2mi6Rq+8MmwxfSNEuW6Lxmd+AuSmIrEv/zaytcrXs5CBDnM4ENOzHh8KcQGO+xKCkQpSx5Iat/mcnRySbsfCETlkspdsZTrBPuw9ghIAIhBB4Qtl7u8NjB1Gw54GAWA7Bx8DHaErKIWRwd9lIHIPAJgXacIi0UPkd9pBy9lbJt39r2iyHhKT0OG7HaaUNTOdw+MXePllSUtI6vZLHfgPxl+ZWWfzFamzX0vR1rnfnc9h3f+hv7ooHODj41dVVWRXOUdXnIKNEHfyueVFXDD5LKnE8v2j+FkFI9fO7659vvDljC8bN6mewg13gPezcmE6tv5CCwLCUjDEGwe51luFE9iri64qy3juE8FjcwfMslw8wur6oCk4tLnZn6RnBg+rZ+kqJYpehZTIId6HB4ME7ROvZCAFKCeIU0rkrWUwdQqERRT+LE4CiowjCErjOqBDBPoW8RHrzBESo4X1db2/85N1hQteI49G1iSf0TOGKU+FD9v+WYZZ4q94zt0GmLEjLaf12KVxbGfn/aLX/RHmYxPdBfui7Xzu7eb/lXZIa/uiJk7L1AluEI6KhGMODRGtNNeM0l8xfoduHnEoCVMOCsEmuANgvpuvDyfXpyz0DL9YqIPk/wlBxMCDs1HLcwxBnJhIS7H/zlYAVr5piz+IhjBb0zxq2xqwovT6stgDV+feOaMMVWxYqlz3FKpwUbENSkKCKnQeqItf1XB5aZvLvQi/3Ssq/V/t0lx32naJf7Dze1fk6wIUw/4D3xhrd2r1vLSdVEecoHHAzXjyvf0fRS7fCBjKahAXwhw6tfIDfiGuPBLTAQcDIao3FiEHACH4GEEECiYE5CLnfsSdiLUf4u2cyHGjCWriAMdcyP/R2KzHjIhYSjxpXklP/bMeSzhUNy9WUdXpmLjbYtYJDSkPcnnTU3DgVPw/CA9bOUYjtHugU3djMnhSW1rzcXRXO/jCzZu1JW1L139jY+bXdGKaaoS9fvvVcq9+QY/dDWfXWnhz42oRdfYkPOhbCokXbzu+z8+46d2yBNvpZwLAIeUBjchAUI4AhsGxLjUIJS0GNgNFHZN8Sphe7B9DvsGBKAaMYJpZDSEIF1iwIRqURRMno2FWR6kqmFpqKG5sXkWb/g0xBEAC8JF3LV6GiACWByEB5jAKo3CoY1NO8zeSd5QBEdQ/UW/86raqf4uMmHcB+mJEvTgB7i2G4BiA6n2XkEvj8A/aQX9QuWb/wBrrnf4e+zQaovVy3iThmW+AFGw/w+j2n3NfSwF1gYhkNzLzJiCGgO3nQG97cRX/MCu6yB2yGow/QQ8I8ARsu7vvjdWm+B2yaIFNk8LfSyht9/wmj1D+k8bawyoSAEgIgNFwdA2mgSwjq5DNNJJVWABlgHMFpS6x6qcm0NixuzE10UOb2Xw4LkZdDs6Qv9NqFdV+IkjNiuL53pK3lYEJS7OnoTacvcArLQbz5+vrPaa4Aaq9e1p+5ZUFCmf3Tyqdn63WDECz6hlELIOp6NidgQqMZEQfdQ6ZrUyDH9QuaUUquZG3RL9YxJ/xORLVow/fp6sRmHYSFCSADjZaNxH9kdcXKLyGsyjtSBEJDNZrlKGAYrcHOvt1q1IIhk3jpJXKwilM2ZM4dSa6G1ExshFhDo1J5athq5br4JJRGE7Sy2zkEcW5LthXO8+gjw45h64CKvsQWbSh0vg4rY7oHSQ2Sb1gjHN3N5CQmx6VgQ5La5bgzTKPPzXyM7DNUwg9ua2QZWTWJSJ3EpzULawpAy6Rmu0NbSaYFkMwtOHowM9UqIYuH05XM4OJtLfVs4LPj91mSvD1URbKgGIv+cBoAo6ZetXRdwpLPbahwrhVU0TQ8BG1XpvNCku4EL804qr5cR7dAfdrLArQq2xDUyycDkMcc9PWIdTidB2H0JA3kh00qtSEfek71/O5PPcUVQm2cgkvDiaXdnezIDoQ95fK1j1n2HjpGZVrgpSUFviT3aXlIgFzbWctlj5jLy82d0/1Z1c5qm4u0oiwSkonjFe4DKs/ZmnMHPhDFJiF+WoJX5B1bctjbJwp3a9BAFMSKKpMOQffJXjr55rEFrWnIDs7k4onCTAlAwQtEXZP9kWFGL/jXtJ2CmEkKjYTM4isTzpiV5rMgYfeL9GolZdVfvpHF8+dgC4ugm7mg2UZP8aN+h1+eR2kBJqzfDbMX90Vi+3/Os5nxw9UI2ybBv0uKBwkDLwYPnqx9j+Vhvo/uk7D1sFxw0+reIFKoaOE10lIDqv4ZFXOWm73patoktLaQKVsj+XG6J0XO4t2PvEl4z/9dYICsDe3xLxA8eowPtyriIesYpA/DlIIvD1E+zJuSUY9UJCUcEiO6DT1LdbcFH1ce4lLH9+4FuhkB92jZvNYMf3O5Vhrg5FxVKuhW6B2KqV8UBY0pQAUodB5UVXkvUU/mfdQZlPib2oKPlB4phSsVhflNFzlNAVi3i+zMtF6NObtw2iDep9A9EJiXLd0eYA6IBVmIDNCROtUvPIOMiBofRnckfrUwtaKzawqLLffv3FzxAm0RaQ4JMSOo0q1T48FJ4chpJJSaQBDk+ELMl4dbBnYzoKiU9fR7Let4p2BGLduoBjDgfwAfgOB/lwWkRECYpLbuQHiK2iCEAqun2mwKIDwWJFkg5O66L4s4ksfK5WTNYLekPBDnADjupM8Nq5vkMeGAuEozZfergoSrD3acnlQqKKGzleRuREQEBw6vFSIJIzmlTJWk/UReSRpqrrKjDjx1MHWIIBAcNKjEX8Dtt7wnNnSzjq1Y14vFaobpcse2DG3KTyv0FjUNCMB4I5oq+T+dhgL16/AA7v0O4Tm3SWcuSUk3QNXefkDSEyBWI9M8SrOW4iTzBMDNJEDXquFWlvWL7vpB/HLKmuWJJw+2Rsvce5SltQ4VMkLIHNAq7ePf4SDyATzf5gwnKJy1xdO8SmQlx8VK0TbrhbR5nfx6wP5noJrqHZCK9RjoyMrKfOqxVXz6QBavYeGq8XMJBBVJ6ndmyc2/zBjVzSszpdqNSaBCdqEArHHGBMbdmCj12/jHUZv7
+*/

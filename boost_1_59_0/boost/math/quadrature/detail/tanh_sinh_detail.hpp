@@ -9,11 +9,15 @@
 
 #include <cmath>
 #include <vector>
-#include <boost/math/tools/atomic.hpp>
-#include <boost/detail/lightweight_mutex.hpp>
 #include <typeinfo>
+#include <boost/math/tools/atomic.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <boost/math/special_functions/next.hpp>
+#include <boost/math/tools/config.hpp>
+
+#ifdef BOOST_HAS_THREADS
+#include <mutex>
+#endif
 
 namespace boost{ namespace math{ namespace quadrature { namespace detail{
 
@@ -40,7 +44,7 @@ class tanh_sinh_detail
 public:
     tanh_sinh_detail(size_t max_refinements, const Real& min_complement) : m_max_refinements(max_refinements)
     {
-       typedef boost::integral_constant<int, initializer_selector> tag_type;
+       typedef std::integral_constant<int, initializer_selector> tag_type;
        init(min_complement, tag_type());
     }
 
@@ -50,61 +54,61 @@ public:
 private:
    const std::vector<Real>& get_abscissa_row(std::size_t n)const
    {
-#ifndef BOOST_MATH_NO_ATOMIC_INT
+#if !defined(BOOST_MATH_NO_ATOMIC_INT) && defined(BOOST_HAS_THREADS)
       if (m_committed_refinements.load() < n)
          extend_refinements();
-      BOOST_ASSERT(m_committed_refinements.load() >= n);
+      BOOST_MATH_ASSERT(m_committed_refinements.load() >= n);
 #else
       if (m_committed_refinements < n)
          extend_refinements();
-      BOOST_ASSERT(m_committed_refinements >= n);
+      BOOST_MATH_ASSERT(m_committed_refinements >= n);
 #endif
       return m_abscissas[n];
    }
    const std::vector<Real>& get_weight_row(std::size_t n)const
    {
-#ifndef BOOST_MATH_NO_ATOMIC_INT
+#if !defined(BOOST_MATH_NO_ATOMIC_INT) && defined(BOOST_HAS_THREADS)
       if (m_committed_refinements.load() < n)
          extend_refinements();
-      BOOST_ASSERT(m_committed_refinements.load() >= n);
+      BOOST_MATH_ASSERT(m_committed_refinements.load() >= n);
 #else
       if (m_committed_refinements < n)
          extend_refinements();
-      BOOST_ASSERT(m_committed_refinements >= n);
+      BOOST_MATH_ASSERT(m_committed_refinements >= n);
 #endif
       return m_weights[n];
    }
    std::size_t get_first_complement_index(std::size_t n)const
    {
-#ifndef BOOST_MATH_NO_ATOMIC_INT
+#if !defined(BOOST_MATH_NO_ATOMIC_INT) && defined(BOOST_HAS_THREADS)
       if (m_committed_refinements.load() < n)
          extend_refinements();
-      BOOST_ASSERT(m_committed_refinements.load() >= n);
+      BOOST_MATH_ASSERT(m_committed_refinements.load() >= n);
 #else
       if (m_committed_refinements < n)
          extend_refinements();
-      BOOST_ASSERT(m_committed_refinements >= n);
+      BOOST_MATH_ASSERT(m_committed_refinements >= n);
 #endif
       return m_first_complements[n];
    }
 
-   void init(const Real& min_complement, const boost::integral_constant<int, 0>&);
-   void init(const Real& min_complement, const boost::integral_constant<int, 1>&);
-   void init(const Real& min_complement, const boost::integral_constant<int, 2>&);
-   void init(const Real& min_complement, const boost::integral_constant<int, 3>&);
+   void init(const Real& min_complement, const std::integral_constant<int, 0>&);
+   void init(const Real& min_complement, const std::integral_constant<int, 1>&);
+   void init(const Real& min_complement, const std::integral_constant<int, 2>&);
+   void init(const Real& min_complement, const std::integral_constant<int, 3>&);
 #ifdef BOOST_HAS_FLOAT128
-   void init(const Real& min_complement, const boost::integral_constant<int, 4>&);
+   void init(const Real& min_complement, const std::integral_constant<int, 4>&);
 #endif
    void prune_to_min_complement(const Real& m);
    void extend_refinements()const
    {
-#ifndef BOOST_MATH_NO_ATOMIC_INT
-      boost::detail::lightweight_mutex::scoped_lock guard(m_mutex);
+#if !defined(BOOST_MATH_NO_ATOMIC_INT) && defined(BOOST_HAS_THREADS)
+      std::lock_guard<std::mutex> guard(m_mutex);
 #endif
       //
       // Check some other thread hasn't got here after we read the atomic variable, but before we got here:
       //
-#ifndef BOOST_MATH_NO_ATOMIC_INT
+#if !defined(BOOST_MATH_NO_ATOMIC_INT) && defined(BOOST_HAS_THREADS)
       if (m_committed_refinements.load() >= m_max_refinements)
          return;
 #else
@@ -115,12 +119,12 @@ private:
       using std::ldexp;
       using std::ceil;
       ++m_committed_refinements;
-#ifndef BOOST_MATH_NO_ATOMIC_INT
+#if !defined(BOOST_MATH_NO_ATOMIC_INT) && defined(BOOST_HAS_THREADS)
       std::size_t row = m_committed_refinements.load();
 #else
       std::size_t row = m_committed_refinements;
 #endif
-      Real h = ldexp(Real(1), -static_cast<int>(row));
+      Real h = ldexp(static_cast<Real>(1), -static_cast<int>(row));
       std::size_t first_complement = 0;
       std::size_t n = boost::math::itrunc(ceil((m_t_max - h) / (2 * h)));
       m_abscissas[row].reserve(n);
@@ -140,29 +144,33 @@ private:
    {
       using std::tanh;
       using std::sinh;
-      return tanh(constants::half_pi<Real>()*sinh(t));
+      using boost::math::constants::half_pi;
+      return tanh(half_pi<Real>()*sinh(t));
    }
    static inline Real weight_at_t(const Real& t)
    {
       using std::cosh;
       using std::sinh;
-      Real cs = cosh(constants::half_pi<Real>() * sinh(t));
-      return constants::half_pi<Real>() * cosh(t) / (cs * cs);
+      using boost::math::constants::half_pi;
+      Real cs = cosh(half_pi<Real>() * sinh(t));
+      return half_pi<Real>() * cosh(t) / (cs * cs);
    }
    static inline Real abscissa_complement_at_t(const Real& t)
    {
       using std::cosh;
       using std::exp;
       using std::sinh;
-      Real u2 = constants::half_pi<Real>() * sinh(t);
+      using boost::math::constants::half_pi;
+      Real u2 = half_pi<Real>() * sinh(t);
       return 1 / (exp(u2) *cosh(u2));
    }
    static inline Real t_from_abscissa_complement(const Real& x)
    {
       using std::log;
       using std::sqrt;
-      Real l = log(sqrt((2 - x) / x));
-      return log((sqrt(4 * l * l + constants::pi<Real>() * constants::pi<Real>()) + 2 * l) / constants::pi<Real>());
+      using boost::math::constants::pi;
+      Real l = log(2-x) - log(x);
+      return log((sqrt(l * l + pi<Real>() * pi<Real>()) + l) / pi<Real>());
    };
 
 
@@ -170,9 +178,9 @@ private:
    mutable std::vector<std::vector<Real>> m_weights;
    mutable std::vector<std::size_t>       m_first_complements;
    std::size_t                       m_max_refinements, m_inital_row_length;
-#ifndef BOOST_MATH_NO_ATOMIC_INT
+#if !defined(BOOST_MATH_NO_ATOMIC_INT) && defined(BOOST_HAS_THREADS)
    mutable boost::math::detail::atomic_unsigned_type      m_committed_refinements;
-   mutable boost::detail::lightweight_mutex m_mutex;
+   mutable std::mutex m_mutex;
 #else
    mutable unsigned                  m_committed_refinements;
 #endif
@@ -191,6 +199,14 @@ decltype(std::declval<F>()(std::declval<Real>(), std::declval<Real>())) tanh_sin
     using std::sqrt;
     using boost::math::constants::half;
     using boost::math::constants::half_pi;
+
+    //
+    // The type of the result:
+    typedef decltype(std::declval<F>()(std::declval<Real>(), std::declval<Real>())) result_type;
+
+    Real h = m_t_max / m_inital_row_length;
+    result_type I0 = half_pi<Real>() * f(0, 1);
+    Real L1_I0 = abs(I0);
     //
     // We maintain 4 integer values:
     // max_left_position is the logical index of the abscissa value closest to the
@@ -218,22 +234,62 @@ decltype(std::declval<F>()(std::declval<Real>(), std::declval<Real>())) tanh_sin
     while (max_right_position && fabs(m_abscissas[0][max_right_position]) < right_min_complement)
        --max_right_position;
     //
+    // Check for non-finite values at the end points:
+    // 
+    result_type yp, ym, tail_tolerance((std::max)(boost::math::tools::epsilon<Real>(), Real(tolerance * tolerance)));
+    do
+    {
+       yp = f(-1 - m_abscissas[0][max_left_position], m_abscissas[0][max_left_position]);
+       if ((boost::math::isfinite)(yp))
+          break;
+       --max_left_position;
+    } while (m_abscissas[0][max_left_position] < 0);
+    //
+    // Also remove points which are insignificant or zero:
+    //
+    while (max_left_position > 1)
+    {
+       if (abs(yp * m_weights[0][max_left_position]) > abs(L1_I0 * tail_tolerance))
+          break;
+       --max_left_position;
+       yp = f(-1 - m_abscissas[0][max_left_position], m_abscissas[0][max_left_position]);
+    }
+    //
+    // Over again for the right hand side:
+    //
+    do
+    {
+       ym = f(1 + m_abscissas[0][max_right_position], -m_abscissas[0][max_right_position]);
+       if ((boost::math::isfinite)(ym))
+          break;
+       --max_right_position;
+    } while (m_abscissas[0][max_right_position] < 0);
+    while (max_right_position > 1)
+    {
+       if (abs(ym * m_weights[0][max_right_position]) > abs(L1_I0 * tail_tolerance))
+          break;
+       --max_right_position;
+       ym = f(1 + m_abscissas[0][max_right_position], -m_abscissas[0][max_right_position]);
+    }
+
+    if ((max_left_position == 0) && (max_right_position == 0))
+    {
+       return policies::raise_evaluation_error(function, "The tanh_sinh quadrature found your function to be non-finite everywhere! Please check your function for singularities.", ym, Policy());
+    }
+
+    I0 += yp * m_weights[0][max_left_position] + ym * m_weights[0][max_right_position];
+    L1_I0 += abs(yp * m_weights[0][max_left_position]) + abs(ym * m_weights[0][max_right_position]);
+    //
     // Assumption: left_min_complement/right_min_complement are sufficiently small that we only
     // ever decrement through the stored values that are complements (the negative ones), and
     // never ever hit the true abscissa values (positive stored values).
     //
-    BOOST_ASSERT(m_abscissas[0][max_left_position] < 0);
-    BOOST_ASSERT(m_abscissas[0][max_right_position] < 0);
-    //
-    // The type of the result:
-    typedef decltype(std::declval<F>()(std::declval<Real>(), std::declval<Real>())) result_type;
+    BOOST_MATH_ASSERT(m_abscissas[0][max_left_position] < 0);
+    BOOST_MATH_ASSERT(m_abscissas[0][max_right_position] < 0);
 
-    Real h = m_t_max / m_inital_row_length;
-    result_type I0 = half_pi<Real>()*f(0, 1);
-    Real L1_I0 = abs(I0);
     for(size_t i = 1; i < m_abscissas[0].size(); ++i)
     {
-        if ((i > max_right_position) && (i > max_left_position))
+        if ((i >= max_right_position) && (i >= max_left_position))
             break;
         Real x = m_abscissas[0][i];
         Real xc = x;
@@ -245,9 +301,8 @@ decltype(std::declval<F>()(std::declval<Real>(), std::declval<Real>())) tanh_sin
         }
         else
            xc = x - 1;
-        result_type yp, ym;
-        yp = i <= max_right_position ? f(x, -xc) : 0;
-        ym = i <= max_left_position ? f(-x, xc) : 0;
+        yp = i < max_right_position ? f(x, -xc) : 0;
+        ym = i < max_left_position ? f(-x, xc) : 0;
         I0 += (yp + ym)*w;
         L1_I0 += (abs(yp) + abs(ym))*w;
     }
@@ -278,6 +333,7 @@ decltype(std::declval<F>()(std::declval<Real>(), std::declval<Real>())) tanh_sin
         h *= half<Real>();
         result_type sum = 0;
         Real absum = 0;
+        Real endpoint_error = 0;
         auto const& abscissa_row = this->get_abscissa_row(k);
         auto const& weight_row = this->get_weight_row(k);
         std::size_t first_complement_index = this->get_first_complement_index(k);
@@ -307,12 +363,50 @@ decltype(std::declval<F>()(std::declval<Real>(), std::declval<Real>())) tanh_sin
            ++max_right_position;
            ++max_right_index;
         }
+        //
+        // We also check that our endpoints don't hit singularities:
+        //
+        do
+        {
+           yp = f(-1 - abscissa_row[max_left_index], abscissa_row[max_left_index]);
+           if ((boost::math::isfinite)(yp))
+              break;
+           max_left_position -= 2;
+           --max_left_index;
+        } while (abscissa_row[max_left_index] < 0);
+        bool truncate_left(false), truncate_right(false);
+        if (abs(L1_I1 * tail_tolerance) > abs(yp * weight_row[max_left_index]))
+           truncate_left = true;
+        do
+        {
+           ym = f(1 + abscissa_row[max_right_index], -abscissa_row[max_right_index]);
+           if ((boost::math::isfinite)(ym))
+              break;
+           --max_right_index;
+           max_right_position -= 2;
+        } while (abscissa_row[max_right_index] < 0);
+        if (abs(L1_I1 * tail_tolerance) > abs(ym * weight_row[max_right_index]))
+           truncate_right = true;
+
+        sum += yp * weight_row[max_left_index] + ym * weight_row[max_right_index];
+        absum += abs(yp * weight_row[max_left_index]) + abs(ym * weight_row[max_right_index]);
+        //
+        // We estimate the error due to truncation as the value contributed by the two most extreme points.
+        // In most cases this is tiny and can be ignored, if it is significant then either the area of the
+        // integral is so far our in the tails that our exponent range can't reach it (example x^-p at double
+        // precision and p ~ 1), or our function is truncated near epsilon, and we have had to narrow our endpoints.
+        // In this latter case we may over-estimate the error, but this is the best we can do.
+        // In any event, we do not add endpoint_error to the error estimate until we terminate the main loop,
+        // otherwise it can make things appear to be non-converged, when in reality, they are as converged as they
+        // will ever be.
+        //
+        endpoint_error = absum;
 
         for(size_t j = 0; j < weight_row.size(); ++j)
         {
             // If both left and right abscissa values are out of bounds at this step
             // we can just stop this loop right now:
-            if ((j > max_left_index) && (j > max_right_index))
+            if ((j >= max_left_index) && (j >= max_right_index))
                 break;
             Real x = abscissa_row[j];
             Real xc = x;
@@ -320,17 +414,17 @@ decltype(std::declval<F>()(std::declval<Real>(), std::declval<Real>())) tanh_sin
             if (j >= first_complement_index)
             {
                // We have stored x - 1:
-               BOOST_ASSERT(x < 0);
+               BOOST_MATH_ASSERT(x < 0);
                x = 1 + xc;
             }
             else
             {
-               BOOST_ASSERT(x >= 0);
+               BOOST_MATH_ASSERT(x >= 0);
                xc = x - 1;
             }
 
-            result_type yp = j > max_right_index ? 0 : f(x, -xc);
-            result_type ym = j > max_left_index ? 0 : f(-x, xc);
+            yp = j >= max_right_index ? 0 : f(x, -xc);
+            ym = j >= max_left_index ? 0 : f(-x, xc);
             result_type term = (yp + ym)*w;
             sum += term;
 
@@ -343,10 +437,10 @@ decltype(std::declval<F>()(std::declval<Real>(), std::declval<Real>())) tanh_sin
 
         I1 += sum*h;
         L1_I1 += absum*h;
+
         ++k;
         Real last_err = err;
         err = abs(I0 - I1);
-        // std::cout << "Estimate:        " << I1 << " Error estimate at level " << k  << " = " << err << std::endl;
 
         if (!(boost::math::isfinite)(I1))
         {
@@ -355,15 +449,38 @@ decltype(std::declval<F>()(std::declval<Real>(), std::declval<Real>())) tanh_sin
         //
         // If the error is increasing, and we're past level 4, something bad is very likely happening:
         //
-        if ((err > last_err) && (k > 4) && (++thrash_count > 1))
+        if ((err * 1.5 > last_err) && (k > 4))
         {
-           // We could raise an evaluation_error, but since we likely have some sort of result, just return the last one
-           // (ie before the error started going up)
-           I1 = I0;
-           L1_I1 = L1_I0;
-           --k;
-           err = last_err;
-           break;
+           bool terminate = false;
+           if ((++thrash_count > 1) && (last_err < 1e-3))
+              // Probably just thrashing, abort:
+              terminate = true;
+           else if(thrash_count > 2)
+              // OK, terrible error, but giving up anyway!
+              terminate = true;
+           else if (last_err < boost::math::tools::root_epsilon<Real>())
+              // Trying to squeeze precision that probably isn't there, abort:
+              terminate = true;
+           else
+           {
+              // Take a look at the end points, if there's significant new area being
+              // discovered, then we're not able to get close enough to the endpoints
+              // to ever find the integral:
+              if (abs(endpoint_error / sum) > err)
+                 terminate = true;
+           }
+
+           if (terminate)
+           {
+              // We could raise an evaluation_error, but since we likely have some sort of result, just return the last one
+              // (ie before the error started going up)
+              I1 = I0;
+              L1_I1 = L1_I0;
+              --k;
+              err = last_err + endpoint_error;
+              break;
+           }
+           // Fall through and keep going, assume we've discovered a new feature of f(x)....
         }
         //
         // Termination condition:
@@ -374,10 +491,40 @@ decltype(std::declval<F>()(std::declval<Real>(), std::declval<Real>())) tanh_sin
         // parameters.  We could keep hunting until we find something, but that would handicap
         // integrals which really are zero.... so a compromise then!
         //
-        if (err <= abs(tolerance*L1_I1))
+        if ((err <= abs(tolerance*L1_I1)) && (k >= 4))
         {
+            //
+            // A quick sanity check: have we at some point narrowed our boundaries as a result
+            // of non-finite values?  If so let's check that the area isn't on an increasing
+            // trajectory at our new end point, and increase our error estimate by the last
+            // good value as an estimate for what we may have discarded.
+            //
+            if ((max_left_index < abscissa_row.size() - 1) && (abs(abscissa_row[max_left_index + 1]) > left_min_complement))
+            {
+               yp = f(-1 - abscissa_row[max_left_index], abscissa_row[max_left_index]) * weight_row[max_left_index];
+               ym = f(-1 - abscissa_row[max_left_index - 1], abscissa_row[max_left_index - 1]) * weight_row[max_left_index - 1];
+               if (abs(yp) > abs(ym))
+               {
+                  return policies::raise_evaluation_error(function, "The tanh_sinh quadrature evaluated your function at a singular point and got %1%. Integration bounds were automatically narrowed, but the integral was found to be increasing at the new endpoint.  Please check your function, and consider providing a 2-argument functor.", I1, Policy());
+               }
+            }
+            if ((max_right_index < abscissa_row.size() - 1) && (abs(abscissa_row[max_right_index + 1]) > right_min_complement))
+            {
+               yp = f(1 + abscissa_row[max_right_index], -abscissa_row[max_right_index]) * weight_row[max_right_index];
+               ym = f(1 + abscissa_row[max_right_index - 1], -abscissa_row[max_right_index - 1]) * weight_row[max_right_index - 1];
+               if (abs(yp) > abs(ym))
+               {
+                  return policies::raise_evaluation_error(function, "The tanh_sinh quadrature evaluated your function at a singular point and got %1%. Integration bounds were automatically narrowed, but the integral was found to be increasing at the new endpoint.  Please check your function, and consider providing a 2-argument functor.", I1, Policy());
+               }
+            }
+            err += endpoint_error;
             break;
         }
+
+        if (truncate_left)
+           --max_left_position;
+        if (truncate_right)
+           --max_right_position;
 
     }
     if (error)
@@ -399,7 +546,7 @@ decltype(std::declval<F>()(std::declval<Real>(), std::declval<Real>())) tanh_sin
 }
 
 template<class Real, class Policy>
-void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boost::integral_constant<int, 0>&)
+void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const std::integral_constant<int, 0>&)
 {
    using std::tanh;
    using std::sinh;
@@ -409,6 +556,7 @@ void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boos
    using boost::math::constants::half_pi;
    using boost::math::constants::pi;
    using boost::math::constants::two_div_pi;
+   using boost::math::lltrunc;
 
    m_committed_refinements = 4;
    //
@@ -417,7 +565,7 @@ void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boos
    // to ensure full precision as otherwise we chop off quite a chunk of the
    // range in *subsequent* rows.
    //
-   m_inital_row_length = itrunc(ceil(t_from_abscissa_complement(min_complement)));
+   m_inital_row_length = lltrunc(ceil(t_from_abscissa_complement(min_complement)));
    std::size_t first_complement = 0;
    m_t_max = m_inital_row_length;
    m_t_crossover = t_from_abscissa_complement(Real(0.5f));
@@ -447,7 +595,7 @@ void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boos
    temp[m_inital_row_length] = weight_at_t(m_t_max);
    m_weights[0].swap(temp);
 
-#ifndef BOOST_MATH_NO_ATOMIC_INT
+#if !defined(BOOST_MATH_NO_ATOMIC_INT) && defined(BOOST_HAS_THREADS)
    for (std::size_t row = 1; row <= m_committed_refinements.load(); ++row)
 #else
    for (std::size_t row = 1; row <= m_committed_refinements; ++row)
@@ -479,7 +627,7 @@ void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boos
 #endif
 
 template<class Real, class Policy>
-void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boost::integral_constant<int, 1>&)
+void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const std::integral_constant<int, 1>&)
 {
    m_inital_row_length = 4;
    m_abscissas.reserve(m_max_refinements + 1);
@@ -508,7 +656,7 @@ void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boos
    m_first_complements = {
       1, 0, 1, 1, 3, 5, 11, 22,
    };
-#ifndef BOOST_MATH_NO_ATOMIC_INT
+#if !defined(BOOST_MATH_NO_ATOMIC_INT) && defined(BOOST_HAS_THREADS)
    m_committed_refinements = static_cast<boost::math::detail::atomic_unsigned_integer_type>(m_abscissas.size() - 1);
 #else
    m_committed_refinements = m_abscissas.size() - 1;
@@ -532,9 +680,9 @@ void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boos
 }
 
 template<class Real, class Policy>
-void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boost::integral_constant<int, 2>&)
+void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const std::integral_constant<int, 2>&)
 {
-   m_inital_row_length = 5;
+   m_inital_row_length = 6;
    m_abscissas.reserve(m_max_refinements + 1);
    m_weights.reserve(m_max_refinements + 1);
    m_first_complements.reserve(m_max_refinements + 1);
@@ -561,7 +709,7 @@ void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boos
    m_first_complements = {
       1, 0, 1, 1, 3, 5, 11, 22,
    };
-#ifndef BOOST_MATH_NO_ATOMIC_INT
+#if !defined(BOOST_MATH_NO_ATOMIC_INT) && defined(BOOST_HAS_THREADS)
    m_committed_refinements = static_cast<boost::math::detail::atomic_unsigned_integer_type>(m_abscissas.size() - 1);
 #else
    m_committed_refinements = m_abscissas.size() - 1;
@@ -584,7 +732,7 @@ void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boos
 }
 
 template<class Real, class Policy>
-void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boost::integral_constant<int, 3>&)
+void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const std::integral_constant<int, 3>&)
 {
    m_inital_row_length = 9;
    m_abscissas.reserve(m_max_refinements + 1);
@@ -613,7 +761,7 @@ void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boos
    m_first_complements = {
       1, 0, 1, 1, 3, 5, 11, 22,
    };
-#ifndef BOOST_MATH_NO_ATOMIC_INT
+#if !defined(BOOST_MATH_NO_ATOMIC_INT) && defined(BOOST_HAS_THREADS)
    m_committed_refinements = static_cast<boost::math::detail::atomic_unsigned_integer_type>(m_abscissas.size() - 1);
 #else
    m_committed_refinements = m_abscissas.size() - 1;
@@ -638,7 +786,7 @@ void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boos
 #ifdef BOOST_HAS_FLOAT128
 
 template<class Real, class Policy>
-void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boost::integral_constant<int, 4>&)
+void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const std::integral_constant<int, 4>&)
 {
    m_inital_row_length = 9;
    m_abscissas.reserve(m_max_refinements + 1);
@@ -667,7 +815,7 @@ void tanh_sinh_detail<Real, Policy>::init(const Real& min_complement, const boos
    m_first_complements = {
       1, 0, 1, 1, 3, 5, 11, 22,
    };
-#ifndef BOOST_MATH_NO_ATOMIC_INT
+#if !defined(BOOST_MATH_NO_ATOMIC_INT) && defined(BOOST_HAS_THREADS)
    m_committed_refinements = static_cast<boost::math::detail::atomic_unsigned_integer_type>(m_abscissas.size() - 1);
 #else
    m_committed_refinements = m_abscissas.size() - 1;
@@ -717,3 +865,7 @@ void tanh_sinh_detail<Real, Policy>::prune_to_min_complement(const Real& m)
 }}}}  // namespaces
 
 #endif
+
+/* tanh_sinh_detail.hpp
+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
+*/

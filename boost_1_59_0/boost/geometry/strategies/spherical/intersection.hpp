@@ -2,7 +2,7 @@
 
 // Copyright (c) 2017 Adam Wulkiewicz, Lodz, Poland.
 
-// Copyright (c) 2016-2019, Oracle and/or its affiliates.
+// Copyright (c) 2016-2021, Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
@@ -13,6 +13,7 @@
 #define BOOST_GEOMETRY_STRATEGIES_SPHERICAL_INTERSECTION_HPP
 
 #include <algorithm>
+#include <type_traits>
 
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/core/access.hpp>
@@ -32,20 +33,23 @@
 
 #include <boost/geometry/geometries/concepts/point_concept.hpp>
 #include <boost/geometry/geometries/concepts/segment_concept.hpp>
+#include <boost/geometry/geometries/segment.hpp>
 
 #include <boost/geometry/policies/robustness/segment_ratio.hpp>
+
+#include <boost/geometry/strategy/spherical/area.hpp>
+#include <boost/geometry/strategy/spherical/envelope.hpp>
+#include <boost/geometry/strategy/spherical/expand_box.hpp>
+#include <boost/geometry/strategy/spherical/expand_segment.hpp>
 
 #include <boost/geometry/strategies/covered_by.hpp>
 #include <boost/geometry/strategies/intersection.hpp>
 #include <boost/geometry/strategies/intersection_result.hpp>
 #include <boost/geometry/strategies/side.hpp>
 #include <boost/geometry/strategies/side_info.hpp>
-#include <boost/geometry/strategies/spherical/area.hpp>
 #include <boost/geometry/strategies/spherical/disjoint_box_box.hpp>
 #include <boost/geometry/strategies/spherical/disjoint_segment_box.hpp>
 #include <boost/geometry/strategies/spherical/distance_haversine.hpp>
-#include <boost/geometry/strategies/spherical/envelope.hpp>
-#include <boost/geometry/strategies/spherical/expand_box.hpp>
 #include <boost/geometry/strategies/spherical/point_in_point.hpp>
 #include <boost/geometry/strategies/spherical/point_in_poly_winding.hpp>
 #include <boost/geometry/strategies/spherical/ssf.hpp>
@@ -91,119 +95,6 @@ template
 struct ecef_segments
 {
     typedef spherical_tag cs_tag;
-
-    typedef side::spherical_side_formula<CalculationType> side_strategy_type;
-
-    static inline side_strategy_type get_side_strategy()
-    {
-        return side_strategy_type();
-    }
-
-    template <typename Geometry1, typename Geometry2>
-    struct point_in_geometry_strategy
-    {
-        typedef strategy::within::spherical_winding
-            <
-                typename point_type<Geometry1>::type,
-                typename point_type<Geometry2>::type,
-                CalculationType
-            > type;
-    };
-
-    template <typename Geometry1, typename Geometry2>
-    static inline typename point_in_geometry_strategy<Geometry1, Geometry2>::type
-        get_point_in_geometry_strategy()
-    {
-        typedef typename point_in_geometry_strategy
-            <
-                Geometry1, Geometry2
-            >::type strategy_type;
-        return strategy_type();
-    }
-
-    template <typename Geometry>
-    struct area_strategy
-    {
-        typedef area::spherical
-            <
-                typename coordinate_type<Geometry>::type,
-                CalculationType
-            > type;
-    };
-
-    template <typename Geometry>
-    static inline typename area_strategy<Geometry>::type get_area_strategy()
-    {
-        typedef typename area_strategy<Geometry>::type strategy_type;
-        return strategy_type();
-    }
-
-    template <typename Geometry>
-    struct distance_strategy
-    {
-        typedef distance::haversine
-            <
-                typename coordinate_type<Geometry>::type,
-                CalculationType
-            > type;
-    };
-
-    template <typename Geometry>
-    static inline typename distance_strategy<Geometry>::type get_distance_strategy()
-    {
-        typedef typename distance_strategy<Geometry>::type strategy_type;
-        return strategy_type();
-    }
-
-    typedef envelope::spherical<CalculationType>
-        envelope_strategy_type;
-
-    static inline envelope_strategy_type get_envelope_strategy()
-    {
-        return envelope_strategy_type();
-    }
-
-    typedef expand::spherical_segment<CalculationType>
-        expand_strategy_type;
-
-    static inline expand_strategy_type get_expand_strategy()
-    {
-        return expand_strategy_type();
-    }
-
-    typedef within::spherical_point_point point_in_point_strategy_type;
-
-    static inline point_in_point_strategy_type get_point_in_point_strategy()
-    {
-        return point_in_point_strategy_type();
-    }
-
-    typedef within::spherical_point_point equals_point_point_strategy_type;
-
-    static inline equals_point_point_strategy_type get_equals_point_point_strategy()
-    {
-        return equals_point_point_strategy_type();
-    }
-
-    typedef disjoint::spherical_box_box disjoint_box_box_strategy_type;
-
-    static inline disjoint_box_box_strategy_type get_disjoint_box_box_strategy()
-    {
-        return disjoint_box_box_strategy_type();
-    }
-
-    typedef disjoint::segment_box_spherical disjoint_segment_box_strategy_type;
-
-    static inline disjoint_segment_box_strategy_type get_disjoint_segment_box_strategy()
-    {
-        return disjoint_segment_box_strategy_type();
-    }
-
-    typedef covered_by::spherical_point_box disjoint_point_box_strategy_type;
-    typedef covered_by::spherical_point_box covered_by_point_box_strategy_type;
-    typedef within::spherical_point_box within_point_box_strategy_type;
-    typedef envelope::spherical_box envelope_box_strategy_type;
-    typedef expand::spherical_box expand_box_strategy_type;
 
     enum intersection_point_flag { ipi_inters = 0, ipi_at_a1, ipi_at_a2, ipi_at_b1, ipi_at_b2 };
 
@@ -857,7 +748,7 @@ private:
     template <typename CalcT>
     static inline bool is_near(CalcT const& dist)
     {
-        CalcT const small_number = CalcT(boost::is_same<CalcT, float>::value ? 0.0001 : 0.00000001);
+        CalcT const small_number = CalcT(std::is_same<CalcT, float>::value ? 0.0001 : 0.00000001);
         return math::abs(dist) <= small_number;
     }
 
@@ -882,8 +773,7 @@ private:
     template <typename Point1, typename Point2>
     static inline bool equals_point_point(Point1 const& point1, Point2 const& point2)
     {
-        return detail::equals::equals_point_point(point1, point2,
-                                                  point_in_point_strategy_type());
+        return strategy::within::spherical_point_point::apply(point1, point2);
     }
 };
 
@@ -950,10 +840,12 @@ struct spherical_segments_calc_policy
         //       not checked before this function is called the length
         //       should be checked here (math::equals(len, c0))
         coord_t const len = math::sqrt(dot_product(ip1, ip1));
-        divide_value(ip1, len); // normalize i1
-
-        ip2 = ip1;
-        multiply_value(ip2, coord_t(-1));
+        geometry::detail::for_each_dimension<Point3d>([&](auto index)
+        {
+            coord_t const coord = get<index>(ip1) / len; // normalize
+            set<index>(ip1, coord);
+            set<index>(ip2, -coord);
+        });
 
         return true;
     }    
@@ -1075,3 +967,7 @@ struct default_strategy<Geometry1, Geometry2, AnyTag1, AnyTag2, polygonal_tag, p
 
 
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_INTERSECTION_HPP
+
+/* intersection.hpp
+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
+*/

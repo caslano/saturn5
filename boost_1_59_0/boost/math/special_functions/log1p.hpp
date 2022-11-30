@@ -12,21 +12,17 @@
 #pragma warning(disable:4702) // Unreachable code (release mode only warning)
 #endif
 
-#include <boost/config/no_tr1/cmath.hpp>
-#include <math.h> // platform's ::log1p
-#include <boost/limits.hpp>
+#include <cmath>
+#include <cstdint>
+#include <limits>
 #include <boost/math/tools/config.hpp>
 #include <boost/math/tools/series.hpp>
 #include <boost/math/tools/rational.hpp>
 #include <boost/math/tools/big_constant.hpp>
 #include <boost/math/policies/error_handling.hpp>
 #include <boost/math/special_functions/math_fwd.hpp>
-
-#ifndef BOOST_NO_LIMITS_COMPILE_TIME_CONSTANTS
-#  include <boost/static_assert.hpp>
-#else
-#  include <boost/assert.hpp>
-#endif
+#include <boost/math/tools/assert.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 
 #if defined(__GNUC__) && defined(BOOST_MATH_USE_FLOAT128)
 //
@@ -83,7 +79,7 @@ namespace detail
 // it performs no better than log(1+x): which is to say not very well at all.
 //
 template <class T, class Policy>
-T log1p_imp(T const & x, const Policy& pol, const boost::integral_constant<int, 0>&)
+T log1p_imp(T const & x, const Policy& pol, const std::integral_constant<int, 0>&)
 { // The function returns the natural logarithm of 1 + x.
    typedef typename tools::promote_args<T>::type result_type;
    BOOST_MATH_STD_USING
@@ -105,19 +101,16 @@ T log1p_imp(T const & x, const Policy& pol, const boost::integral_constant<int, 
    if(a < tools::epsilon<result_type>())
       return x;
    detail::log1p_series<result_type> s(x);
-   boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
-#if !BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582)) && !BOOST_WORKAROUND(__EDG_VERSION__, <= 245)
+   std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
+
    result_type result = tools::sum_series(s, policies::get_epsilon<result_type, Policy>(), max_iter);
-#else
-   result_type zero = 0;
-   result_type result = tools::sum_series(s, policies::get_epsilon<result_type, Policy>(), max_iter, zero);
-#endif
+
    policies::check_series_iterations<T>(function, max_iter, pol);
    return result;
 }
 
 template <class T, class Policy>
-T log1p_imp(T const& x, const Policy& pol, const boost::integral_constant<int, 53>&)
+T log1p_imp(T const& x, const Policy& pol, const std::integral_constant<int, 53>&)
 { // The function returns the natural logarithm of 1 + x.
    BOOST_MATH_STD_USING
 
@@ -170,7 +163,7 @@ T log1p_imp(T const& x, const Policy& pol, const boost::integral_constant<int, 5
 }
 
 template <class T, class Policy>
-T log1p_imp(T const& x, const Policy& pol, const boost::integral_constant<int, 64>&)
+T log1p_imp(T const& x, const Policy& pol, const std::integral_constant<int, 64>&)
 { // The function returns the natural logarithm of 1 + x.
    BOOST_MATH_STD_USING
 
@@ -225,7 +218,7 @@ T log1p_imp(T const& x, const Policy& pol, const boost::integral_constant<int, 6
 }
 
 template <class T, class Policy>
-T log1p_imp(T const& x, const Policy& pol, const boost::integral_constant<int, 24>&)
+T log1p_imp(T const& x, const Policy& pol, const std::integral_constant<int, 24>&)
 { // The function returns the natural logarithm of 1 + x.
    BOOST_MATH_STD_USING
 
@@ -280,8 +273,8 @@ struct log1p_initializer
          do_init(tag());
       }
       template <int N>
-      static void do_init(const boost::integral_constant<int, N>&){}
-      static void do_init(const boost::integral_constant<int, 64>&)
+      static void do_init(const std::integral_constant<int, N>&){}
+      static void do_init(const std::integral_constant<int, 64>&)
       {
          boost::math::log1p(static_cast<T>(0.25), Policy());
       }
@@ -313,7 +306,7 @@ inline typename tools::promote_args<T>::type log1p(T x, const Policy&)
       policies::discrete_quantile<>,
       policies::assert_undefined<> >::type forwarding_policy;
 
-   typedef boost::integral_constant<int,
+   typedef std::integral_constant<int,
       precision_type::value <= 0 ? 0 :
       precision_type::value <= 53 ? 53 :
       precision_type::value <= 64 ? 64 : 0
@@ -324,24 +317,6 @@ inline typename tools::promote_args<T>::type log1p(T x, const Policy&)
    return policies::checked_narrowing_cast<result_type, forwarding_policy>(
       detail::log1p_imp(static_cast<value_type>(x), forwarding_policy(), tag_type()), "boost::math::log1p<%1%>(%1%)");
 }
-
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x564))
-// These overloads work around a type deduction bug:
-inline float log1p(float z)
-{
-   return log1p<float>(z);
-}
-inline double log1p(double z)
-{
-   return log1p<double>(z);
-}
-#ifndef BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
-inline long double log1p(long double z)
-{
-   return log1p<long double>(z);
-}
-#endif
-#endif
 
 #ifdef log1p
 #  ifndef BOOST_HAS_LOG1P
@@ -481,13 +456,10 @@ inline typename tools::promote_args<T>::type
       return -x * x / 2;
    boost::math::detail::log1p_series<T> s(x);
    s();
-   boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582))
-   T zero = 0;
-   T result = boost::math::tools::sum_series(s, policies::get_epsilon<T, Policy>(), max_iter, zero);
-#else
+   std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
+
    T result = boost::math::tools::sum_series(s, policies::get_epsilon<T, Policy>(), max_iter);
-#endif
+
    policies::check_series_iterations<T>(function, max_iter, pol);
    return result;
 }
@@ -509,3 +481,7 @@ inline typename tools::promote_args<T>::type log1pmx(T x)
 
 
 
+
+/* log1p.hpp
+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
+*/

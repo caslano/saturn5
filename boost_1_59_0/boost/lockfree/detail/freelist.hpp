@@ -9,6 +9,7 @@
 #ifndef BOOST_LOCKFREE_FREELIST_HPP_INCLUDED
 #define BOOST_LOCKFREE_FREELIST_HPP_INCLUDED
 
+#include <cstring>
 #include <limits>
 #include <memory>
 
@@ -59,6 +60,7 @@ public:
     {
         for (std::size_t i = 0; i != n; ++i) {
             T * node = Alloc::allocate(1);
+            std::memset((void*)node, 0, sizeof(T));
 #ifdef BOOST_LOCKFREE_FREELIST_INIT_RUNS_DTOR
             destruct<false>(node);
 #else
@@ -72,6 +74,7 @@ public:
     {
         for (std::size_t i = 0; i != count; ++i) {
             T * node = Alloc::allocate(1);
+            std::memset((void*)node, 0, sizeof(T));
             deallocate<ThreadSafe>(node);
         }
     }
@@ -178,8 +181,11 @@ private:
 
         for(;;) {
             if (!old_pool.get_ptr()) {
-                if (!Bounded)
-                    return Alloc::allocate(1);
+                if (!Bounded) {
+                    T *ptr = Alloc::allocate(1);
+                    std::memset((void*)ptr, 0, sizeof(T));
+                    return ptr;
+                }
                 else
                     return 0;
             }
@@ -200,8 +206,11 @@ private:
         tagged_node_ptr old_pool = pool_.load(memory_order_relaxed);
 
         if (!old_pool.get_ptr()) {
-            if (!Bounded)
-                return Alloc::allocate(1);
+            if (!Bounded) {
+                T *ptr = Alloc::allocate(1);
+                std::memset((void*)ptr, 0, sizeof(T));
+                return ptr;
+            }
             else
                 return 0;
         }
@@ -329,7 +338,7 @@ protected:
 
 template <typename T,
           std::size_t size>
-struct compiletime_sized_freelist_storage
+struct BOOST_ALIGNMENT(BOOST_LOCKFREE_CACHELINE_BYTES) compiletime_sized_freelist_storage
 {
     // array-based freelists only support a 16bit address space.
     BOOST_STATIC_ASSERT(size < 65536);
@@ -339,7 +348,9 @@ struct compiletime_sized_freelist_storage
     // unused ... only for API purposes
     template <typename Allocator>
     compiletime_sized_freelist_storage(Allocator const & /* alloc */, std::size_t /* count */)
-    {}
+    {
+        data.fill(0);
+    }
 
     T * nodes(void) const
     {
@@ -369,6 +380,7 @@ struct runtime_sized_freelist_storage:
         if (count > 65535)
             boost::throw_exception(std::runtime_error("boost.lockfree: freelist size is limited to a maximum of 65535 objects"));
         nodes_ = allocator_type::allocate(count);
+        std::memset((void*)nodes_, 0, sizeof(T) * count);
     }
 
     ~runtime_sized_freelist_storage(void)
@@ -654,3 +666,7 @@ struct select_tagged_handle
 
 
 #endif /* BOOST_LOCKFREE_FREELIST_HPP_INCLUDED */
+
+/* freelist.hpp
+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
+*/

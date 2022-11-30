@@ -1,6 +1,6 @@
 // Boost.Geometry (aka GGL, Generic Geometry Library)
 
-// Copyright (c) 2014-2019 Oracle and/or its affiliates.
+// Copyright (c) 2014-2021 Oracle and/or its affiliates.
 
 // Contributed and/or modified by Vissarion Fysikopoulos, on behalf of Oracle
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
@@ -13,14 +13,23 @@
 #define BOOST_GEOMETRY_ALGORITHMS_DETAIL_DISTANCE_SEGMENT_TO_BOX_HPP
 
 #include <cstddef>
-
 #include <functional>
+#include <type_traits>
 #include <vector>
 
 #include <boost/core/ignore_unused.hpp>
-#include <boost/mpl/if.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/type_traits/is_same.hpp>
+
+#include <boost/geometry/algorithms/detail/assign_box_corners.hpp>
+#include <boost/geometry/algorithms/detail/assign_indexed_point.hpp>
+#include <boost/geometry/algorithms/detail/closest_feature/point_to_range.hpp>
+#include <boost/geometry/algorithms/detail/disjoint/segment_box.hpp>
+#include <boost/geometry/algorithms/detail/distance/is_comparable.hpp>
+#include <boost/geometry/algorithms/detail/distance/strategy_utils.hpp>
+#include <boost/geometry/algorithms/detail/dummy_geometries.hpp>
+#include <boost/geometry/algorithms/detail/equals/point_point.hpp>
+#include <boost/geometry/algorithms/dispatch/distance.hpp>
+#include <boost/geometry/algorithms/not_implemented.hpp>
 
 #include <boost/geometry/core/access.hpp>
 #include <boost/geometry/core/assert.hpp>
@@ -28,16 +37,6 @@
 #include <boost/geometry/core/coordinate_dimension.hpp>
 #include <boost/geometry/core/point_type.hpp>
 #include <boost/geometry/core/tags.hpp>
-
-#include <boost/geometry/algorithms/detail/assign_box_corners.hpp>
-#include <boost/geometry/algorithms/detail/assign_indexed_point.hpp>
-#include <boost/geometry/algorithms/detail/closest_feature/point_to_range.hpp>
-#include <boost/geometry/algorithms/detail/disjoint/segment_box.hpp>
-#include <boost/geometry/algorithms/detail/distance/default_strategies.hpp>
-#include <boost/geometry/algorithms/detail/distance/is_comparable.hpp>
-#include <boost/geometry/algorithms/detail/equals/point_point.hpp>
-#include <boost/geometry/algorithms/dispatch/distance.hpp>
-#include <boost/geometry/algorithms/not_implemented.hpp>
 
 #include <boost/geometry/policies/compare.hpp>
 
@@ -50,7 +49,6 @@
 #include <boost/geometry/strategies/distance.hpp>
 #include <boost/geometry/strategies/tags.hpp>
 
-
 namespace boost { namespace geometry
 {
 
@@ -60,26 +58,24 @@ namespace detail { namespace distance
 {
 
 
-// TODO: Take strategy
-template <typename Segment, typename Box>
-inline bool intersects_segment_box(Segment const& segment, Box const& box)
+template <typename Segment, typename Box, typename Strategy>
+inline bool intersects_segment_box(Segment const& segment, Box const& box,
+                                   Strategy const& strategy)
 {
-    typedef typename strategy::disjoint::services::default_strategy
-        <
-            Segment, Box
-        >::type strategy_type;
-
-    return ! detail::disjoint::disjoint_segment_box::apply(segment, box,
-                                                           strategy_type());
+    return ! detail::disjoint::disjoint_segment_box::apply(segment, box, strategy);
 }
 
+// TODO: segment_to_box_2D_generic is not used anymore. Remove?
+
+// TODO: Furthermore this utility can potentially use different strategy than
+//       the one that was passed into bg::distance() but it seems this is by design.
 
 template
 <
     typename Segment,
     typename Box,
-    typename Strategy,
-    bool UsePointBoxStrategy = false
+    typename Strategies,
+    bool UsePointBoxStrategy = false // use only PointSegment strategy
 >
 class segment_to_box_2D_generic
 {
@@ -87,45 +83,28 @@ private:
     typedef typename point_type<Segment>::type segment_point;
     typedef typename point_type<Box>::type box_point;
 
-    typedef typename strategy::distance::services::comparable_type
-        <
-            typename Strategy::distance_ps_strategy::type
-        >::type comparable_strategy;
+    typedef distance::strategy_t<box_point, Segment, Strategies> ps_strategy_type;
 
     typedef detail::closest_feature::point_to_point_range
         <
             segment_point,
             std::vector<box_point>,
-            open,
-            comparable_strategy
+            open
         > point_to_point_range;
-
-    typedef typename strategy::distance::services::return_type
-        <
-            comparable_strategy, segment_point, box_point
-        >::type comparable_return_type;
     
 public:
-    typedef typename strategy::distance::services::return_type
-        <
-            Strategy, segment_point, box_point
-        >::type return_type;
+    // TODO: Or should the return type be defined by sb_strategy_type?
+    typedef distance::return_t<box_point, Segment, Strategies> return_type;
 
     static inline return_type apply(Segment const& segment,
                                     Box const& box,
-                                    Strategy const& strategy,
+                                    Strategies const& strategies,
                                     bool check_intersection = true)
     {
-        if (check_intersection && intersects_segment_box(segment, box))
+        if (check_intersection && intersects_segment_box(segment, box, strategies))
         {
-            return 0;
+            return return_type(0);
         }
-
-        comparable_strategy cstrategy =
-            strategy::distance::services::get_comparable
-                <
-                    typename Strategy::distance_ps_strategy::type
-                >::apply(strategy.get_distance_ps_strategy());
 
         // get segment points
         segment_point p[2];
@@ -136,7 +115,14 @@ public:
         std::vector<box_point> box_points(4);
         detail::assign_box_corners_oriented<true>(box, box_points);
  
-        comparable_return_type cd[6];
+        ps_strategy_type const strategy = strategies.distance(dummy_point(), dummy_segment());
+
+        auto const cstrategy = strategy::distance::services::get_comparable
+                                <
+                                    ps_strategy_type
+                                >::apply(strategy);
+
+        distance::creturn_t<box_point, Segment, Strategies> cd[6];
         for (unsigned int i = 0; i < 4; ++i)
         {
             cd[i] = cstrategy.apply(box_points[i], p[0], p[1]);
@@ -168,19 +154,19 @@ public:
             }
         }
 
-        if (BOOST_GEOMETRY_CONDITION(is_comparable<Strategy>::value))
+        if (BOOST_GEOMETRY_CONDITION(is_comparable<ps_strategy_type>::value))
         {
             return cd[imin];
         }
 
         if (imin < 4)
         {
-            return strategy.get_distance_ps_strategy().apply(box_points[imin], p[0], p[1]);
+            return strategy.apply(box_points[imin], p[0], p[1]);
         }
         else
         {
             unsigned int bimin = imin - 4;
-            return strategy.get_distance_ps_strategy().apply(p[bimin],
+            return strategy.apply(p[bimin],
                                   *bit_min[bimin].first,
                                   *bit_min[bimin].second);
         }
@@ -192,56 +178,30 @@ template
 <
     typename Segment,
     typename Box,
-    typename Strategy
+    typename Strategies
 >
-class segment_to_box_2D_generic<Segment, Box, Strategy, true>
+class segment_to_box_2D_generic<Segment, Box, Strategies, true> // Use both PointSegment and PointBox strategies
 {
 private:
     typedef typename point_type<Segment>::type segment_point;
     typedef typename point_type<Box>::type box_point;
 
-    typedef typename strategy::distance::services::comparable_type
-        <
-            Strategy
-        >::type comparable_strategy;
-
-    typedef typename strategy::distance::services::return_type
-        <
-            comparable_strategy, segment_point, box_point
-        >::type comparable_return_type;
-
-    typedef typename detail::distance::default_strategy
-        <
-            segment_point, Box
-        >::type point_box_strategy;
-
-    typedef typename strategy::distance::services::comparable_type
-        <
-            point_box_strategy
-        >::type point_box_comparable_strategy;
+    typedef distance::strategy_t<box_point, Segment, Strategies> ps_strategy_type;
+    typedef distance::strategy_t<segment_point, Box, Strategies> pb_strategy_type;
 
 public:
-    typedef typename strategy::distance::services::return_type
-        <
-            Strategy, segment_point, box_point
-        >::type return_type;
-
+    // TODO: Or should the return type be defined by sb_strategy_type?
+    typedef distance::return_t<box_point, Segment, Strategies> return_type;
+    
     static inline return_type apply(Segment const& segment,
                                     Box const& box,
-                                    Strategy const& strategy,
+                                    Strategies const& strategies,
                                     bool check_intersection = true)
     {
-        if (check_intersection && intersects_segment_box(segment, box))
+        if (check_intersection && intersects_segment_box(segment, box, strategies))
         {
-            return 0;
+            return return_type(0);
         }
-
-        comparable_strategy cstrategy =
-            strategy::distance::services::get_comparable
-                <
-                    Strategy
-                >::apply(strategy);
-        boost::ignore_unused(cstrategy);
 
         // get segment points
         segment_point p[2];
@@ -251,15 +211,28 @@ public:
         // get box points
         std::vector<box_point> box_points(4);
         detail::assign_box_corners_oriented<true>(box, box_points);
- 
-        comparable_return_type cd[6];
+
+        distance::creturn_t<box_point, Segment, Strategies> cd[6];
+
+        ps_strategy_type ps_strategy = strategies.distance(dummy_point(), dummy_segment());
+        auto const ps_cstrategy = strategy::distance::services::get_comparable
+                                    <
+                                        ps_strategy_type
+                                    >::apply(ps_strategy);
+        boost::ignore_unused(ps_strategy, ps_cstrategy);
+
         for (unsigned int i = 0; i < 4; ++i)
         {
-            cd[i] = cstrategy.apply(box_points[i], p[0], p[1]);
+            cd[i] = ps_cstrategy.apply(box_points[i], p[0], p[1]);
         }
 
-        point_box_comparable_strategy pb_cstrategy;
-        boost::ignore_unused(pb_cstrategy);
+        pb_strategy_type const pb_strategy = strategies.distance(dummy_point(), dummy_box());
+        auto const pb_cstrategy = strategy::distance::services::get_comparable
+                                    <
+                                        pb_strategy_type
+                                    >::apply(pb_strategy);
+        boost::ignore_unused(pb_strategy, pb_cstrategy);
+
         cd[4] = pb_cstrategy.apply(p[0], box);
         cd[5] = pb_cstrategy.apply(p[1], box);
 
@@ -272,18 +245,23 @@ public:
             }
         }
 
-        if (is_comparable<Strategy>::value)
-        {
-            return cd[imin];
-        }
-
         if (imin < 4)
         {
-            strategy.apply(box_points[imin], p[0], p[1]);
+            if (is_comparable<ps_strategy_type>::value)
+            {
+                return cd[imin];
+            }
+
+            return ps_strategy.apply(box_points[imin], p[0], p[1]);
         }
         else
         {
-            return point_box_strategy().apply(p[imin - 4], box);
+            if (is_comparable<pb_strategy_type>::value)
+            {
+                return cd[imin];
+            }
+
+            return pb_strategy.apply(p[imin - 4], box);
         }
     }
 };
@@ -296,7 +274,7 @@ template
     typename ReturnType,
     typename SegmentPoint,
     typename BoxPoint,
-    typename SBStrategy
+    typename Strategies
 >
 class segment_to_box_2D
 {
@@ -355,10 +333,8 @@ private:
                                        SegmentPoint const& p1,
                                        BoxPoint const& bottom_right,
                                        BoxPoint const& top_right,
-                                       SBStrategy const& sb_strategy)
+                                       Strategies const& strategies)
         {
-            boost::ignore_unused(sb_strategy);
-
             // the implementation below is written for non-negative slope
             // segments
             //
@@ -369,8 +345,7 @@ private:
 
             LessEqual less_equal;
 
-            typename SBStrategy::distance_ps_strategy::type ps_strategy =
-                                sb_strategy.get_distance_ps_strategy();
+            auto const ps_strategy = strategies.distance(dummy_point(), dummy_segment());
 
             if (less_equal(geometry::get<1>(bottom_right), geometry::get<1>(p0)))
             {
@@ -412,19 +387,19 @@ private:
         static inline ReturnType apply(SegmentPoint const& p0,
                                        SegmentPoint const& p1,
                                        BoxPoint const& top_left,
-                                       SBStrategy const& sb_strategy)
+                                       Strategies const& strategies)
         {
-            boost::ignore_unused(sb_strategy);
-            return apply(p0, p1, p0, top_left, sb_strategy);
+            return apply(p0, p1, p0, top_left, strategies);
         }
 
         static inline ReturnType apply(SegmentPoint const& p0,
                                        SegmentPoint const& p1,
                                        SegmentPoint const& p_max,
                                        BoxPoint const& top_left,
-                                       SBStrategy const& sb_strategy)
+                                       Strategies const& strategies)
         {
-            boost::ignore_unused(sb_strategy);
+            auto const ps_strategy = strategies.distance(dummy_point(), dummy_segment());
+
             typedef cast_to_result<ReturnType> cast;
             LessEqual less_equal;
 
@@ -432,22 +407,21 @@ private:
             // then compute the vertical (i.e. meridian for spherical) distance
             if (less_equal(geometry::get<0>(top_left), geometry::get<0>(p_max)))
             {
-                ReturnType diff =
-                sb_strategy.get_distance_ps_strategy().vertical_or_meridian(
+                ReturnType diff = ps_strategy.vertical_or_meridian(
                                     geometry::get_as_radian<1>(p_max),
                                     geometry::get_as_radian<1>(top_left));
 
                 return strategy::distance::services::result_from_distance
                     <
-                        SBStrategy, SegmentPoint, BoxPoint
-                    >::apply(sb_strategy, math::abs(diff));
+                        std::remove_const_t<decltype(ps_strategy)>,
+                        SegmentPoint, BoxPoint
+                    >::apply(ps_strategy, math::abs(diff));
             }
 
             // p0 is to the left of the box, but p1 is above the box
             // in this case the distance is realized between the
             // top-left corner of the box and the segment
-            return cast::apply(sb_strategy.get_distance_ps_strategy().
-                                                      apply(top_left, p0, p1));
+            return cast::apply(ps_strategy.apply(top_left, p0, p1));
         }
     };
 
@@ -460,7 +434,7 @@ private:
                                  BoxPoint const& top_right,
                                  BoxPoint const& bottom_left,
                                  BoxPoint const& bottom_right,
-                                 SBStrategy const& sb_strategy,
+                                 Strategies const& strategies,
                                  ReturnType& result)
         {
             // p0 lies to the right of the box
@@ -470,7 +444,7 @@ private:
                     <
                         LessEqual
                     >::apply(p0, p1, bottom_right, top_right,
-                             sb_strategy);
+                             strategies);
                 return true;
             }
 
@@ -481,7 +455,7 @@ private:
                     <
                         typename other_compare<LessEqual>::type
                     >::apply(p1, p0, top_left, bottom_left,
-                             sb_strategy);
+                             strategies);
                 return true;
             }
 
@@ -498,7 +472,7 @@ private:
                                  BoxPoint const& top_right,
                                  BoxPoint const& bottom_left,
                                  BoxPoint const& bottom_right,
-                                 SBStrategy const& sb_strategy,
+                                 Strategies const& strategies,
                                  ReturnType& result)
         {
             typedef compare_less_equal<ReturnType, false> GreaterEqual;
@@ -506,13 +480,20 @@ private:
             // the segment lies below the box
             if (geometry::get<1>(p1) < geometry::get<1>(bottom_left))
             {
+                auto const sb_strategy = strategies.distance(dummy_segment(), dummy_box());
+
+                // TODO: this strategy calls this algorithm's again, specifically:
+                //       geometry::detail::distance::segment_to_box_2D<>::call_above_of_box
+                //       If possible rewrite them to avoid this.
+                //       For now just pass umbrella strategy.
                 result = sb_strategy.template segment_below_of_box
                         <
                             LessEqual,
                             ReturnType
                         >(p0, p1,
                           top_left, top_right,
-                          bottom_left, bottom_right);
+                          bottom_left, bottom_right,
+                          strategies);
                 return true;
             }
 
@@ -522,11 +503,11 @@ private:
                 result = (std::min)(above_of_box
                                     <
                                         LessEqual
-                                    >::apply(p0, p1, top_left, sb_strategy),
+                                    >::apply(p0, p1, top_left, strategies),
                                     above_of_box
                                     <
                                         GreaterEqual
-                                    >::apply(p1, p0, top_right, sb_strategy));
+                                    >::apply(p1, p0, top_right, strategies));
                 return true;
             }
             return false;
@@ -539,18 +520,15 @@ private:
                                  SegmentPoint const& p1,
                                  BoxPoint const& corner1,
                                  BoxPoint const& corner2,
-                                 SBStrategy const& sb_strategy,
+                                 Strategies const& strategies,
                                  ReturnType& result)
         {
-            typename SBStrategy::side_strategy_type
-                side_strategy = sb_strategy.get_side_strategy();
+            auto const side_strategy = strategies.side();
+            auto const ps_strategy = strategies.distance(dummy_point(), dummy_segment());
 
             typedef cast_to_result<ReturnType> cast;
             ReturnType diff1 = cast::apply(geometry::get<1>(p1))
                                - cast::apply(geometry::get<1>(p0));
-
-            typename SBStrategy::distance_ps_strategy::type ps_strategy =
-                                sb_strategy.get_distance_ps_strategy();
 
             int sign = diff1 < 0 ? -1 : 1;
             if (side_strategy.apply(p0, p1, corner1) * sign < 0)
@@ -574,7 +552,7 @@ private:
                                BoxPoint const& top_right,
                                BoxPoint const& bottom_left,
                                BoxPoint const& bottom_right,
-                               SBStrategy const& sb_strategy)
+                               Strategies const& strategies)
     {
         typedef compare_less_equal<ReturnType, true> less_equal;
 
@@ -594,7 +572,7 @@ private:
                     less_equal
                 >::apply(p0, p1,
                          top_left, top_right, bottom_left, bottom_right,
-                         sb_strategy, result))
+                         strategies, result))
         {
             return result;
         }
@@ -604,14 +582,14 @@ private:
                     less_equal
                 >::apply(p0, p1,
                          top_left, top_right, bottom_left, bottom_right,
-                         sb_strategy, result))
+                         strategies, result))
         {
             return result;
         }
 
         if (check_generic_position::apply(p0, p1,
                                           top_left, bottom_right,
-                                          sb_strategy, result))
+                                          strategies, result))
         {
             return result;
         }
@@ -628,7 +606,7 @@ private:
                            BoxPoint const& top_right,
                            BoxPoint const& bottom_left,
                            BoxPoint const& bottom_right,
-                           SBStrategy const& sb_strategy)
+                           Strategies const& strategies)
     {
         typedef compare_less_equal<ReturnType, false> greater_equal;
 
@@ -645,7 +623,7 @@ private:
                     greater_equal
                 >::apply(p0, p1,
                          bottom_left, bottom_right, top_left, top_right,
-                         sb_strategy, result))
+                         strategies, result))
         {
             return result;
         }
@@ -655,14 +633,14 @@ private:
                     greater_equal
                 >::apply(p1, p0,
                          top_right, top_left, bottom_right, bottom_left,
-                         sb_strategy, result))
+                         strategies, result))
         {
             return result;
         }
 
         if (check_generic_position::apply(p0, p1,
                                           bottom_left, top_right,
-                                          sb_strategy, result))
+                                          strategies, result))
         {
             return result;
         }
@@ -678,9 +656,9 @@ public:
                                    BoxPoint const& top_right,
                                    BoxPoint const& bottom_left,
                                    BoxPoint const& bottom_right,
-                                   SBStrategy const& sb_strategy)
+                                   Strategies const& strategies)
     {
-        BOOST_GEOMETRY_ASSERT( (geometry::less<SegmentPoint, -1, typename SBStrategy::cs_tag>()(p0, p1))
+        BOOST_GEOMETRY_ASSERT( (geometry::less<SegmentPoint, -1, typename Strategies::cs_tag>()(p0, p1))
                             || geometry::has_nan_coordinate(p0)
                             || geometry::has_nan_coordinate(p1) );
 
@@ -690,13 +668,13 @@ public:
             return negative_slope_segment(p0, p1,
                                           top_left, top_right,
                                           bottom_left, bottom_right,
-                                          sb_strategy);
+                                          strategies);
         }
 
         return non_negative_slope_segment(p0, p1,
                                           top_left, top_right,
                                           bottom_left, bottom_right,
-                                          sb_strategy);
+                                          strategies);
     }
 
     template <typename LessEqual>
@@ -704,18 +682,18 @@ public:
                                                SegmentPoint const& p1,
                                                SegmentPoint const& p_max,
                                                BoxPoint const& top_left,
-                                               SBStrategy const& sb_strategy)
+                                               Strategies const& strategies)
     {
-        return above_of_box<LessEqual>::apply(p0, p1, p_max, top_left, sb_strategy);
+        return above_of_box<LessEqual>::apply(p0, p1, p_max, top_left, strategies);
     }
 
     template <typename LessEqual>
     static inline ReturnType call_above_of_box(SegmentPoint const& p0,
                                                SegmentPoint const& p1,
                                                BoxPoint const& top_left,
-                                               SBStrategy const& sb_strategy)
+                                               Strategies const& strategies)
     {
-        return above_of_box<LessEqual>::apply(p0, p1, top_left, sb_strategy);
+        return above_of_box<LessEqual>::apply(p0, p1, top_left, strategies);
     }
 };
 
@@ -726,7 +704,7 @@ template
     typename Segment,
     typename Box,
     typename std::size_t Dimension,
-    typename SBStrategy
+    typename Strategies
 >
 class segment_to_box
     : not_implemented<Segment, Box>
@@ -737,71 +715,45 @@ template
 <
     typename Segment,
     typename Box,
-    typename SBStrategy
+    typename Strategies
 >
-class segment_to_box<Segment, Box, 2, SBStrategy>
+class segment_to_box<Segment, Box, 2, Strategies>
 {
-private:
-    typedef typename point_type<Segment>::type segment_point;
-    typedef typename point_type<Box>::type box_point;
+    typedef distance::strategy_t<Segment, Box, Strategies> strategy_type;
 
-    typedef typename strategy::distance::services::comparable_type
-        <
-            SBStrategy
-        >::type ps_comparable_strategy;
-
-    typedef typename strategy::distance::services::return_type
-        <
-            ps_comparable_strategy, segment_point, box_point
-        >::type comparable_return_type;
 public:
-    typedef typename strategy::distance::services::return_type
-        <
-            SBStrategy, segment_point, box_point
-        >::type return_type;
+    typedef distance::return_t<Segment, Box, Strategies> return_type;
 
     static inline return_type apply(Segment const& segment,
                                     Box const& box,
-                                    SBStrategy const& sb_strategy)
+                                    Strategies const& strategies)
     {
+        typedef typename point_type<Segment>::type segment_point;
+        typedef typename point_type<Box>::type box_point;
+
         segment_point p[2];
         detail::assign_point_from_index<0>(segment, p[0]);
         detail::assign_point_from_index<1>(segment, p[1]);
 
-        if (detail::equals::equals_point_point(p[0], p[1],
-                sb_strategy.get_equals_point_point_strategy()))
+        if (detail::equals::equals_point_point(p[0], p[1], strategies))
         {
-            typedef typename boost::mpl::if_
-                <
-                    boost::is_same
-                        <
-                            ps_comparable_strategy,
-                            SBStrategy
-                        >,
-                    typename strategy::distance::services::comparable_type
-                        <
-                            typename SBStrategy::distance_pb_strategy::type
-                        >::type,
-                    typename SBStrategy::distance_pb_strategy::type
-                >::type point_box_strategy_type;
-
             return dispatch::distance
                 <
                     segment_point,
                     Box,
-                    point_box_strategy_type
-                >::apply(p[0], box, point_box_strategy_type());
+                    Strategies
+                >::apply(p[0], box, strategies);
         }
 
         box_point top_left, top_right, bottom_left, bottom_right;
         detail::assign_box_corners(box, bottom_left, bottom_right,
                                    top_left, top_right);
 
-        SBStrategy::mirror(p[0], p[1],
-                           bottom_left, bottom_right,
-                           top_left, top_right);
+        strategy_type::mirror(p[0], p[1],
+                              bottom_left, bottom_right,
+                              top_left, top_right);
 
-        typedef geometry::less<segment_point, -1, typename SBStrategy::cs_tag> less_type;
+        typedef geometry::less<segment_point, -1, typename Strategies::cs_tag> less_type;
         if (less_type()(p[0], p[1]))
         {
             return segment_to_box_2D
@@ -809,10 +761,10 @@ public:
                     return_type,
                     segment_point,
                     box_point,
-                    SBStrategy
+                    Strategies
                 >::apply(p[0], p[1],
                          top_left, top_right, bottom_left, bottom_right,
-                         sb_strategy);
+                         strategies);
         }
         else
         {
@@ -821,10 +773,10 @@ public:
                     return_type,
                     segment_point,
                     box_point,
-                    SBStrategy
+                    Strategies
                 >::apply(p[1], p[0],
                          top_left, top_right, bottom_left, bottom_right,
-                         sb_strategy);
+                         strategies);
         }
     }
 };
@@ -839,24 +791,15 @@ namespace dispatch
 {
 
 
-template <typename Segment, typename Box, typename Strategy>
+template <typename Segment, typename Box, typename Strategies>
 struct distance
     <
-        Segment, Box, Strategy, segment_tag, box_tag,
+        Segment, Box, Strategies, segment_tag, box_tag,
         strategy_tag_distance_segment_box, false
     >
 {
-    typedef typename strategy::distance::services::return_type
-        <
-            Strategy,
-            typename point_type<Segment>::type,
-            typename point_type<Box>::type
-        >::type return_type;
-
-
-    static inline return_type apply(Segment const& segment,
-                                    Box const& box,
-                                    Strategy const& strategy)
+    static inline auto apply(Segment const& segment, Box const& box,
+                             Strategies const& strategies)
     {
         assert_dimension_equal<Segment, Box>();
 
@@ -865,8 +808,8 @@ struct distance
                 Segment,
                 Box,
                 dimension<Segment>::value,
-                Strategy
-            >::apply(segment, box, strategy);
+                Strategies
+            >::apply(segment, box, strategies);
     }
 };
 
@@ -880,3 +823,7 @@ struct distance
 
 
 #endif // BOOST_GEOMETRY_ALGORITHMS_DETAIL_DISTANCE_SEGMENT_TO_BOX_HPP
+
+/* segment_to_box.hpp
+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
+*/

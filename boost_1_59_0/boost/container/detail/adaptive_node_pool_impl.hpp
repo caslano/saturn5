@@ -30,8 +30,10 @@
 #include <boost/container/detail/iterator.hpp>
 #include <boost/move/detail/iterator_to_raw_pointer.hpp>
 #include <boost/container/detail/math_functions.hpp>
+#include <boost/container/detail/placement_new.hpp>
 #include <boost/container/detail/mpl.hpp>
 #include <boost/move/detail/to_raw_pointer.hpp>
+#include <boost/move/detail/force_ptr.hpp>
 #include <boost/container/detail/type_traits.hpp>
 // intrusive
 #include <boost/intrusive/pointer_traits.hpp>
@@ -534,12 +536,12 @@ class private_adaptive_node_pool_impl_common
                //Check that header offsets are correct
                hdr_offset_holder *hdr_off_holder = this->priv_first_subblock_from_block(const_cast<block_info_t *>(&*it), num_subblocks, real_block_alignment);
                for (size_type i = 0, max = num_subblocks; i < max; ++i) {
-                  const size_type offset = reinterpret_cast<char*>(const_cast<block_info_t *>(&*it)) - reinterpret_cast<char*>(hdr_off_holder);
+                  const size_type offset = size_type(reinterpret_cast<char*>(const_cast<block_info_t *>(&*it)) - reinterpret_cast<char*>(hdr_off_holder));
                   (void)offset;
                   BOOST_ASSERT(hdr_off_holder->hdr_offset == offset);
                   BOOST_ASSERT(0 == (reinterpret_cast<std::size_t>(hdr_off_holder) & (real_block_alignment - 1)));
                   BOOST_ASSERT(0 == (hdr_off_holder->hdr_offset & (real_block_alignment - 1)));
-                  hdr_off_holder = reinterpret_cast<hdr_offset_holder *>(reinterpret_cast<char*>(hdr_off_holder) + real_block_alignment);
+                  hdr_off_holder = move_detail::force_ptr<hdr_offset_holder *>(reinterpret_cast<char*>(hdr_off_holder) + real_block_alignment);
                }
             }
          }
@@ -562,7 +564,7 @@ class private_adaptive_node_pool_impl_common
 
    hdr_offset_holder *priv_first_subblock_from_block(block_info_t *block, const size_type num_subblocks, const size_type real_block_alignment, AlignOnlyFalse) const
    {
-      hdr_offset_holder *const hdr_off_holder = reinterpret_cast<hdr_offset_holder*>
+      hdr_offset_holder *const hdr_off_holder = move_detail::force_ptr<hdr_offset_holder*>
             (reinterpret_cast<char*>(block) - (num_subblocks-1)*real_block_alignment);
       BOOST_ASSERT(hdr_off_holder->hdr_offset == size_type(reinterpret_cast<char*>(block) - reinterpret_cast<char*>(hdr_off_holder)));
       BOOST_ASSERT(0 == ((std::size_t)hdr_off_holder & (real_block_alignment - 1)));
@@ -573,7 +575,7 @@ class private_adaptive_node_pool_impl_common
    hdr_offset_holder *priv_first_subblock_from_block(block_info_t *block, const size_type num_subblocks, const size_type real_block_alignment, AlignOnlyTrue) const
    {
       (void)num_subblocks; (void)real_block_alignment;
-      return reinterpret_cast<hdr_offset_holder*>(block);
+      return move_detail::force_ptr<hdr_offset_holder*>(block);
    }
 
    void priv_deallocate_free_blocks_impl( const size_type max_free_blocks, const size_type real_num_node
@@ -662,7 +664,7 @@ class private_adaptive_node_pool_impl_common
             this->priv_deallocate_nodes(chain, max_free_blocks, real_num_node, num_subblocks, real_block_alignment);
             throw_bad_alloc();
          }
-         block_info_t &c_info = *new(mem_address)block_info_t();
+         block_info_t &c_info = *new(mem_address, boost_container_new_t())block_info_t();
          mem_address += HdrSize;
          this->priv_fill_chain_remaining_to_block(chain, target_elem_in_chain, c_info, mem_address, real_num_node, real_node_size);
          const size_type free_nodes = c_info.free_nodes.size();
@@ -703,7 +705,7 @@ class private_adaptive_node_pool_impl_common
          }
          //First initialize header information on the last subblock
          char *hdr_addr = mem_address + real_block_alignment*(num_subblocks-1);
-         block_info_t &c_info = *new(hdr_addr)block_info_t();
+         block_info_t &c_info = *new(hdr_addr, boost_container_new_t())block_info_t();
          //Some structural checks
          BOOST_ASSERT(static_cast<void*>(&static_cast<hdr_offset_holder&>(c_info).hdr_offset) ==
                       static_cast<void*>(&c_info));   (void)c_info;
@@ -711,7 +713,7 @@ class private_adaptive_node_pool_impl_common
             ; subblock < maxsubblock
             ; ++subblock, mem_address += real_block_alignment){
             //Initialize header offset mark
-            new(mem_address) hdr_offset_holder(size_type(hdr_addr - mem_address));
+            new(mem_address, boost_container_new_t()) hdr_offset_holder(size_type(hdr_addr - mem_address));
             const size_type elements_per_subblock = (subblock != (maxsubblock - 1)) ? elements_per_subblock_mid : elements_per_subblock_end;
             this->priv_fill_chain_remaining_to_block
                (chain, target_elem_in_chain, c_info, mem_address + HdrOffsetSize, elements_per_subblock, real_node_size);
@@ -902,7 +904,7 @@ class private_adaptive_node_pool_impl_common
          reinterpret_cast<hdr_offset_holder*>((std::size_t)node & size_type(~(real_block_alignment - 1)));
       BOOST_ASSERT(0 == ((std::size_t)hdr_off_holder & (real_block_alignment - 1)));
       BOOST_ASSERT(0 == (hdr_off_holder->hdr_offset & (real_block_alignment - 1)));
-      block_info_t *block = reinterpret_cast<block_info_t *>
+      block_info_t *block = move_detail::force_ptr<block_info_t *>
          (reinterpret_cast<char*>(hdr_off_holder) + hdr_off_holder->hdr_offset);
       BOOST_ASSERT(block->hdr_offset == 0);
       return block;
@@ -1257,3 +1259,7 @@ class private_adaptive_node_pool_impl_rt
 #include <boost/container/detail/config_end.hpp>
 
 #endif   //#ifndef BOOST_CONTAINER_DETAIL_ADAPTIVE_NODE_POOL_IMPL_HPP
+
+/* adaptive_node_pool_impl.hpp
+i4MCZfyFednAALVlOHI5Fu40lxRuaRM0AI+BN93ikRNdxuNGl8D9NgFK4kNATvhnXBIYlFuHP9A0+zeVRJlKlEFLHAgIkesw/vwh3ipYOT7iCHOuDz8wPbkFkneKXiWxca9lNfw4/nOXNWOaXIHWnypewGlonAKaThqRHAtDYQPLqo1GECczk6DJYZmiR6OFBgzBcc/TnJ/ksfW3RmQKPfHn5t2ZrR0+L43BUM4i0gC0yYp8Y2RTQfnxlNvt6+QvpUjp6AyuXM/sYqoztJmBP2epiYL2VxDrpNfnc/lI6K5MqkO6slZ2PNb5ELwqY0Cz7y30VuIDUWoVBHfbTeGqo1qNKzsZrwgYY2RGh7fpL2ZBwkjxNdmBoJX0W0TIJUyhIYph7M/8oiggAoWvQis1PbE5JhLnDbZ50ET3Qp3ShKpTSCHdmopw+nVywGtCdOW3TlgJcruFIC5c3rxMzKp8Lt9wZ2rW/SOG+tVrGc7J+lQ9ubhw4yFstkPqn5DIAQQ/IwAkG4PNmg89mmyRCdqdIBn8OXi2V0/GPoKRlk0UbRRwQ5zRU+8gAC7/RtEAOfXe4v7el84Mby3ks+JUyOODryDzZnwaydgWoPOyo7Y3DAWV60MqbWmzFDBWCAMGa6RXsl+IH+3oKzfo9BYojMyfccpVXVVpar0QUdUUFsP2Uzod8PC+oQb/olSOCos4NfEVLACSEFwZadhhj+vNF8+OYn2B98sEwi87P+/XmQQ4/rhNexQwLoGqhzObX86IejfOQXFiAn6C9TM6RsDfXKTCFMqGkbyICOT8Vij2GBUSnStGqn7rb58ocyKDqiHd+CuSowXngehT40O0mXeinrDoZExoz/t0A43RkhqGYWL+ua+vNoEkbDGmyiTT0DqKaMbxdCNZtUswOOAdLQ+ut7pLdJzAi7y/CbThn1dJq95HXiRXBvGEKWkkTt4uTqDTJKN+WguOcDoMkvuMRo1q/35PyXjkKF7BU+oYxCfxwBCDUZ7IaRmBw5g8gDPK5zyvp5j3GRJkL6WSNhr5M9P3FD3dQ054uySBv8a9ydAP04vHY1351yr73cC8er09hjBC0zp3hyJofGJebMPI/SGg7nfHnNP1oJuCR2KnVgVlNE7IDfFJT2dXbebxx5mAehww+YVkLjUpSfSE4d1vGEaZhsFdOsrK8a4mf67Wa+YVrGm/6wUP2dmaC4X+RwePKLzB00iZGA+Fh3quXqe//a+r0zBkFWtIL+H0cs244vdDQC1/cUIXOojJcvRHnG33SIdbNBnkYbxflEfUrLBoB2qamIEGwSndhXdo7akJFQ/pZ3An/QdrMl+ty3czhslyP8gdbhYezNKN0ZgIigeHivvavUjNKX+Rpff+LB2hXN4TJ2/JM/0Rhh8jy+pSpeDtZBbnarS/LvF7hrnjU+O0OWa3fM9qaJx4kyYeekXIMYI2abuiC73xCwyIT+iv7PravXm4U5eoRjEI9fZXl/HzlEy8m6owAG9WrwdsgjdwiBLOxIyy1ex48xp0ngGmWTwJu/2OTURSghOVJ0FUSYNVtK7Ra4FZkVj4OMTmOQVmjrZEN2qBC4yRfongJB1NIblLZHnCBNdE7pbPSodFy5GNnmQtvGRvIWFdVQPOLYN0JWYbVShBYVEef7/5ahzjJ663u0Xizh6LFJkFakPT3PSQaKVhwMOwZxEERsSbP90iDJUAYl4gCYxl21vPntlVsxuYYQl42TRf9PflPjAhYIZeAfCgJaEEdMxMfCwOI/TMd3QsE6FaICZOsijNtkhZRCQ3OgWvcRTXBB1PT5T4RJToYRTbchTfXZRAXpQwerRgXrQya7RIT7TEcrSiaLSsaIx2fLRuTSSHCKnQRIz3AoUIwRsbUpRhMC5tOni3UyD+rYCQr9Pod4PGdMzNEi0xbyerdpGaCjxTH7NqAT4rebUPApJ5/4C8LYqmHX5+DgKy5YpJonyayMo4KlLBgGXMdJWE7AkDUbAhFQtq0LLBiL3A+ywXTaFEfSJBl5o4WksBfaK4bDIfoc+xaQFOZTV+o+DEN1FiO6Tx77zFhfQlPckwMaBxwWC92niBB0LM19HuJh5KozFWUczYsrwOs0YEZKiYOoYEczWvV+4YdSNZOG5TNnu8QCSpAGbe10skORfM/a1efyZMVn+kbqGnbbKm/VZJOzkk5sRPuztMPexJe1BheiIjurlLfVSJxB0mQK+mF85k/hjDhGrFgB+g9O1AbVLHHiXCw0rBIfJGlo4vBQKWGN5jMOjEhE36mOjK0c+H/GSF6u6HPLZlegtBR3izJAkgn3Wwm5GCUKvsDFYhaTNmKIzRgUUsQzxS4jMcALEEqvZmqzkC385la5hg6YjlaJjkGKxkv4UDOhFZbCDMzU7RbjBVbCtmSxemAh+KentWKEo22rwvwwiLOwZLDyJbTRXTUBXgp5oTGJhrNJmr7pj7n7WCTRXqZO1lQc/gA8zlK2OIf0+QKMagkEngdJmnphuV+T7Poy0vw5ExT4w+3fF94Z+89/fvUzCwsifzctnyi0zeVwbmF4i9L5/Mr3XMb03IL1UtwHVM71Ml1G0XlYUTqdmQzXcVjJkU5gJzZYGF6m8Lp1cKEyKYBW8LiHhRSYYYYnYKl99/sONj4HQAesIxiEukh5GV//WoI99GItNRN/+42C/A9u+LzleIgFVFW70+P8mL794Xi23R/VIs3jaBLtUWg8RLhj7H/Okt8lAtwewrgbV6EaWj5usUs42UEJmWUvAxKERgKFuVUq2W4g8XM/Ixs84bmWyVMgeVyZATcF5QUKqRARPLeOtKgH4EIGFfvqByrAcmN1lgHhyWnlAOVyuhYycQdPKSDaoA1ZVnzJejXJSrPFTsi1UgdSoq0SoN6z6o5ZdKP5QZrVaWo5XJ61WsHVTafi10lSWqhFKam1a59PmqOTFOzFV5mRa+VQNWtvjk8FUHHVUJsTO+loU691VHPlj7BlX/xK+Jyq/xr6wIQ2KWJD7UpP2MdFADKIJq3x1ZW+hhKw8T/w2sLRI3zXSqzu6jLTate5VTW7BKHO9U1yAuUZpflbNa18YuV8NOWide36Om1Cxep5FZ/9FJtPNrbf1D/ZgpfT9F/ef8hhiChu66hpkjnnG1ulnxRuKRhg9qjctHtD4Ibc3xD00ACoe+whW1IiV+B9E7yl952K502JMtPJ+hr98akHUKWC4wpYCjsGgcs44dmt/opYhvM/3CTKExkIDX1k7FsFDXNr8BsSzkNMsN40TtMLEsZ5yKm+ehMJ05Ne8K8NrcN82xspw+hNjqUQvVNM36p6wq8va0YGLVR70ZaXsDYppiaoH2v+5BljR9tWPoSU/DTMpSpWvpt7Jn5WvYUYsMAAQs+9MrU3IEiGExQGlGefF3ZHrGOjDS0STPpTEAEBp5sTxmPoUsdWQ6Gr5AJ80/6VcFnShWbigXvNAstAv5LjEon1mBI0Zpl3U/1HKHz8MZ6oPV5Rzb5VcghKbb2TXehR4R4O4cHH8LfCnvxM0CbKYDPrS4mMCBLNdmilOFvbESSQRoar86ofpJFjHBA7vqFVjBVZThlUl91ZSKdb/6Gh77arH66yn7OyT6u477OpP6uzn6a47Dbplcbl+5jNgkfiixxbFEpc5+zxXYO6bKa3ahR7iJ8VEf2mks2eVnUQoA821C5BHvZtEkppFThR4YLJ/hjg1QbI9dOW5b/VyrvqEOHMl0qT+G4M4YcoVqLZ1rkQgGJSKyj0pTMfStrKr9r+pz0cjaP4boOkW1DCFLwMEtaNMe6KEVYHFLODJdP0MQ2mZHnteuNYkeuHT0qb+WKLZUqRDLzTNpyOoibHgMnHiFPgqH9w+9SRBSIEBRLfZRgHYYZ1xhI6GA/7yyhPoDK3OAlZIQ+uQPJVtM+oSD39Wh9df2Eltiyi0yUUOauE8yg5YaS/JSXTCcmApjLAMVwmgpaMdouqAuchOooQCl5VWknEcDWanI2JGULosx/Bgc7BxQbQgVvsfzIMDap0SRtIylsTE+rcYvRfLqC6W7ff+HNwDFKWOELgzJqxI5+a6pLDNAkx4VvkMtJgTCJWSxFmDg2WyDKg0pwTWikTyLN+ei6reyIWvjiLeMf1p71fq7JKImBm2h/TpgACOcT1LFLkahYNoYF6CJhH9FwnEKdaDN15op86hrthaC+CHmjL1EsKmO6cKRdKUk3iGogL4Xh06uKPT2HE9IBwUYrSHOO5pqp0DZMAzJkCK4wtNBYGtCg3+PBT9p0BJFqdXqjylPW6y7FKqVSuBYCtmKzuR4a70fDV7acSOt/BK/qw+1g1KK9I3JYilUEO7nitHCIWtJ77wWstBOxyH/ZPecgQdTYBr5GeSm/RnSCJpzPo8ji+WKEK21DGtAN7Lw0duUcAW+WyApM2LXM92O6ugN4T/PssGcR433VbkmSqRN/5QuMmWc8XpJyYPNdNGIPs/GaXFnmG5E56Nz9tSuoswANn6CJFRMUItXVuHfNFSyQrcrxkXZUhDiCuyEQeW5CH+jA090cJBwq/sSxvHzCKSO5RIqEGhoCebDk7V8TUSCUfD2NUgXh2vTDnTwwzaFsr8VU5NzMIpYJ/9m1u1Z4Qtdn6as29+4xEYoJmPj+L1CNiYBERTmIQIjuD83SRr0L4oB0N6Y3J//KkZZgbZE5FFDik5NKOHQ2J8R4GrGz6+tqCbw8LocuEhWu5HDLHdqmfuUYTPy+jqNZA7EtrRWyli8P/RkVRTsg4dz1ehabCNsUggcCHdUCaE3mP4HqUl+4I1QSrWI5rddEh+OF995b9jR+WC7EYrZovyC2z6xEJ8QGz7whrzRH/iqAqy37BUgJZKBYtDzbwLaiGPppEENHeI7XwS/UcX7qvrx4Tj8+C6VIqZXYvtbzAvGXczUujbpuo3cYpYFDGKvbycu6bo3St3pfw/xtN1XlpHW/AUTwXpgZpp5ax9Hv90RGyhHA5OghESeLHz6t5gqKlwnReVNZIHSiiWWrXHtMg+eVyWJIRx/J0bb4MMx724aBn3ux1/tBO61WKfc7AFHGjeQ735udsml3m2+AFGQLYbV3wlHAsTTqg9k/vgweWIvGW4XRZjLemCj7puobP6J5aaTA2I1lTD0WI4IVqlT2SR+7Nlt3RX6QIL5ORjFFI7BEJe1q++1o0LwxtBKKQj6+w78z8P1Bwy39PqgOgzGb7ar6LI6nNVZxPqZ56dh0KiQJBwCqz647TsgFOV9L7K9qIwXTnpC1vVrKRbCcHeiGfUbCcvhTuHFSBfYF4pf/mttHiUp8m84q6Dg00zyih3ulYclEr7CKPuawxAnFO2MTrCwyQ0dKv9GrN0PRfaYJBPBnx0MdpDJihFfbcga/eNOzxea/A3vkRcv4xxrF/0n1IL+GUkglEI4I7jPx+txtvNOTIcm/LlasoGyX8Zdf8Jb/JY4WHl29uzgX9WjdwXR3r1Wn0Gy2GrqoIqh8pT3gVT3tXx4n4l2n1nxfm/B1T5av+Zfdd0m754mWxQd1MkpQY3bjF7HPKrtCopIbZvX0DMAENUSUIpGiOGUF06QLdb2O1qPgV32jKjlLiktl9mWoaLkLlkbmCrDmM5zn2xxz0lwny18n/2ptiDtPgXvIff3fVbzfaU7sCjtoYrtoRh51+j+8F77obX5oVr7sdD9sR3vsffTQ8/ZQ8Pvx+7Zx6FwItsRgsDaxyR3oG0kkU1mdlGz9AovEAWKRp6OaqoDgLXcAZA6APISlJ8WAJwWbNUVwE9atP4mFMISaew5wI9mFPJ04Ors80bxiyPvS7Yw8Cfy+RAPSshqbDlXAqficuSvAMhGgBBRptAqx5ZkRAwqeYdDRYUiTDbKU8HJ6hBaRsKVvU1U4wC0KcSmEDIkMz63RI1hYkOwIgjo1JN49HFTspgU3wkS6Kpxegiqa1TSp1QhenUdKcpNLOlPWBccUaOtsHg9yPBLvxDhkmcnlLM5yWO+oZqpNFv6u95LTFTFNrTEM/Mx1BN345dIyu+heGKsDfXvW0ygCsvnqFfvFxWxfBmQOzdnv+tgecemsM+BPw7muJVz9/0oOhz6KjTLY6WM/JDOq3U27X4fxP/9XWn2/bX/4VHkYvOjEUvz6bnf2T44CUvm70DH25OVTveDjfVH//Otz2ksFhtPgVd/fjQbWZzQsp74DGBNfVTLCzU+l12xqEQOPt9eEkKJzNGJqoZAjzvunx7hbF+Gv6/1u4+E73rPyjxDx9I/YQDH5ton5a5ORsPXvN37UaSukkdPNs10yR6+7Mx9hCk18KGDkMOKEsbW5hmpr7S88SVoW4/PpKg86RCRbJyiF1KsSXR7k6eWW/b8Z00VnBJcjWNeX6/7xrgkeNjA+gNsZhLt/YJGJln9wr/XuLXYDziVvol3lv/rlxo8zvomsT4t0C+zhW2gJYVHjcyWUqL0vdJVYcjx0VP7fz3qq36YOE5KJBPnsqf+/zxqA/1Xvq8MzXz/51FfL7JJDF5+5+P08DZ88388amI/Y+skIcNlSudOOA8Taw/ulE15jp+p0/886vaUGyVtpGoUQT4nOkgdv1Po1tzn+/886pQf3yk+4Sy1U8j6/Nej/uFvEfYoRfLGfZg6/s1JyfWtZTShYYBVLPHfq2KYG04eMy+K691/PeoAm9RgFOONCAmSQNtMdeF72zMa3Mhs6lxNeYyFtXYyu3znrnv7wtlTvz25run/etQkQYev3Ad8JyV8QvPavRL8Hhxryt+J92tZ/UFmZxe9Lwpybuq/ebANyOX8DIo/Pr107vhuGHzq09uZ/3a2wzbYre+4K3i5hY2s/6Sn4OOj+xCYlEqvu3nG9O8woVGI55fRqeCzylm3EK+vHBb9Hj2dXSHeMxK/xV2wMtM1lGfVRZ6v8ntPDVzaQpWefZdt3hrbUbf+9FKOslsK9d+Yj+lWcoMeNvhvJ4lsmM4pjrtN7xT4v9wbvkIKGuB7x70EnbQXZ/uZt3zUCj4fJS0e/O3sA+5+1ZPhFXLzy7/YSZtHT/rv941u5MtxpUXmA1fjODIc8DU1eAPLEojT03/5vBPSpPv7FvcOjq41o7+WXgx+JpXFtk93eyhHoHICkI1YTjrRDCero8z62CCiSDtGWyusedTmrd7hGIGKrUVmY1n+HzpxEhXkaFLocjSouvHUAlYJej0jdMy6CaRRpW9texRYlfCtRLA/oFQGKHI+NLnUH2+iYb1T5I1tNVVUKMVUZlISrGo11jQooVi/+2Kp6xl2E2lDfRrAThuUkeq/a0PLpfiFoWg+LYqRcYv5cEyOWS8jJbOcmPReRcWLJQ2ebMvEgaEiYKqX9c52h1DkXlVFmD+uhHGPmuX+s14VQWqeQhn76/svWh/13hkTMT65xMijzejlChnQpnV4yw8mOOX2L+oNRiKSbDLZyK8x9fzSTcjFIXT518F43Ic7NPdIBIhkano/o8KH4h6hRCZbUiXMAsZ0jFSRLiJnGfOB0N4uspIzjSjyX8pr6SG+yPxtwBeqJI+2Xownnmr4nbJpUgr4JlCAkjjLvsswO6uDU3Qdos1/YlLOMqlcvtYCjT9ZESz/I/AeZf1AZh+DVtxFgPwWoyZHUh7turLl3ajP3jksVgtraBhLazJS9ysA0Ga3w1pw6EginYGBNQ3At4M5aU+l
+*/

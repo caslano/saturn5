@@ -79,12 +79,12 @@
         }
 
       private:
-        const equation_as_9_3_39_and_its_derivative& operator=(const equation_as_9_3_39_and_its_derivative&);
+        const equation_as_9_3_39_and_its_derivative& operator=(const equation_as_9_3_39_and_its_derivative&) = delete;
         const T zeta;
       };
 
-      template<class T>
-      static T equation_as_9_5_26(const T& v, const T& ai_bi_root)
+      template<class T, class Policy>
+      static T equation_as_9_5_26(const T& v, const T& ai_bi_root, const Policy& pol)
       {
         BOOST_MATH_STD_USING // ADL of std names, needed for log, sqrt.
 
@@ -105,7 +105,7 @@
         // to refine the value of the estimate of the root of z
         // as a function of zeta.
 
-        const T v_pow_third(boost::math::cbrt(v));
+        const T v_pow_third(boost::math::cbrt(v, pol));
         const T v_pow_minus_two_thirds(T(1) / (v_pow_third * v_pow_third));
 
         // Obtain zeta using the order v combined with the m'th root of
@@ -130,9 +130,9 @@
 
         // Select the maximum allowed iterations based on the number
         // of decimal digits in the numeric type T, being at least 12.
-        const boost::uintmax_t iterations_allowed = static_cast<boost::uintmax_t>((std::max)(12, my_digits10 * 2));
+        const std::uintmax_t iterations_allowed = static_cast<std::uintmax_t>((std::max)(12, my_digits10 * 2));
 
-        boost::uintmax_t iterations_used = iterations_allowed;
+        std::uintmax_t iterations_used = iterations_allowed;
 
         // Calculate the root of z as a function of zeta.
         const T z = boost::math::tools::newton_raphson_iterate(
@@ -165,10 +165,10 @@
 
       namespace cyl_bessel_j_zero_detail
       {
-        template<class T>
-        T equation_nist_10_21_40_a(const T& v)
+        template<class T, class Policy>
+        T equation_nist_10_21_40_a(const T& v, const Policy& pol)
         {
-          const T v_pow_third(boost::math::cbrt(v));
+          const T v_pow_third(boost::math::cbrt(v, pol));
           const T v_pow_minus_two_thirds(T(1) / (v_pow_third * v_pow_third));
 
           return v * (((((                         + T(0.043)
@@ -195,7 +195,7 @@
         private:
           const T my_v;
           const Policy& my_pol;
-          const function_object_jv& operator=(const function_object_jv&);
+          const function_object_jv& operator=(const function_object_jv&) = delete;
         };
 
         template<class T, class Policy>
@@ -237,7 +237,7 @@
           const T my_v;
           const bool my_order_is_zero;
           const Policy& my_pol;
-          const function_object_jv_and_jv_prime& operator=(const function_object_jv_and_jv_prime&);
+          const function_object_jv_and_jv_prime& operator=(const function_object_jv_and_jv_prime&) = delete;
         };
 
         template<class T> bool my_bisection_unreachable_tolerance(const T&, const T&) { return false; }
@@ -319,7 +319,7 @@
             }
 
             // Perform several steps of bisection iteration to refine the guess.
-            boost::uintmax_t number_of_iterations(12U);
+            std::uintmax_t number_of_iterations(12U);
 
             // Do the bisection iteration.
             const boost::math::tuple<T, T> guess_pair =
@@ -355,7 +355,7 @@
             else
             {
               // For larger v, use the first line of Eqs. 10.21.40 in the NIST Handbook.
-              guess = boost::math::detail::bessel_zero::cyl_bessel_j_zero_detail::equation_nist_10_21_40_a(v);
+              guess = boost::math::detail::bessel_zero::cyl_bessel_j_zero_detail::equation_nist_10_21_40_a(v, pol);
             }
           }
           else
@@ -370,10 +370,10 @@
             else
             {
               // Get an estimate of the m'th root of airy_ai.
-              const T airy_ai_root(boost::math::detail::airy_zero::airy_ai_zero_detail::initial_guess<T>(m));
+              const T airy_ai_root(boost::math::detail::airy_zero::airy_ai_zero_detail::initial_guess<T>(m, pol));
 
               // Use Eq. 9.5.26 in the A&S Handbook.
-              guess = boost::math::detail::bessel_zero::equation_as_9_5_26(v, airy_ai_root);
+              guess = boost::math::detail::bessel_zero::equation_as_9_5_26(v, airy_ai_root, pol);
             }
           }
 
@@ -383,10 +383,10 @@
 
       namespace cyl_neumann_zero_detail
       {
-        template<class T>
-        T equation_nist_10_21_40_b(const T& v)
+        template<class T, class Policy>
+        T equation_nist_10_21_40_b(const T& v, const Policy& pol)
         {
-          const T v_pow_third(boost::math::cbrt(v));
+          const T v_pow_third(boost::math::cbrt(v, pol));
           const T v_pow_minus_two_thirds(T(1) / (v_pow_third * v_pow_third));
 
           return v * (((((                         - T(0.001)
@@ -413,7 +413,7 @@
         private:
           const T my_v;
           const Policy& my_pol;
-          const function_object_yv& operator=(const function_object_yv&);
+          const function_object_yv& operator=(const function_object_yv&) = delete;
         };
 
         template<class T, class Policy>
@@ -456,7 +456,7 @@
         private:
           const T my_v;
           const Policy& my_pol;
-          const function_object_yv_and_yv_prime& operator=(const function_object_yv_and_yv_prime&);
+          const function_object_yv_and_yv_prime& operator=(const function_object_yv_and_yv_prime&) = delete;
         };
 
         template<class T> bool my_bisection_unreachable_tolerance(const T&, const T&) { return false; }
@@ -550,7 +550,7 @@
             }
 
             // Perform several steps of bisection iteration to refine the guess.
-            boost::uintmax_t number_of_iterations(12U);
+            std::uintmax_t number_of_iterations(12U);
 
             // Do the bisection iteration.
             const boost::math::tuple<T, T> guess_pair =
@@ -586,7 +586,7 @@
             else
             {
               // For larger v, use the second line of Eqs. 10.21.40 in the NIST Handbook.
-              guess = boost::math::detail::bessel_zero::cyl_neumann_zero_detail::equation_nist_10_21_40_b(v);
+              guess = boost::math::detail::bessel_zero::cyl_neumann_zero_detail::equation_nist_10_21_40_b(v, pol);
             }
           }
           else
@@ -601,10 +601,10 @@
             else
             {
               // Get an estimate of the m'th root of airy_bi.
-              const T airy_bi_root(boost::math::detail::airy_zero::airy_bi_zero_detail::initial_guess<T>(m));
+              const T airy_bi_root(boost::math::detail::airy_zero::airy_bi_zero_detail::initial_guess<T>(m, pol));
 
               // Use Eq. 9.5.26 in the A&S Handbook.
-              guess = boost::math::detail::bessel_zero::equation_as_9_5_26(v, airy_bi_root);
+              guess = boost::math::detail::bessel_zero::equation_as_9_5_26(v, airy_bi_root, pol);
             }
           }
 
@@ -615,3 +615,7 @@
   } } } // namespace boost::math::detail
 
 #endif // BOOST_MATH_BESSEL_JY_ZERO_2013_01_18_HPP_
+
+/* bessel_jy_zero.hpp
+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
+*/

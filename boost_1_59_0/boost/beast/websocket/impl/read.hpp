@@ -102,14 +102,25 @@ public:
             {
             do_suspend:
                 BOOST_ASIO_CORO_YIELD
-                impl.op_r_rd.emplace(std::move(*this));
+                {
+                    BOOST_ASIO_HANDLER_LOCATION((
+                        __FILE__, __LINE__,
+                        "websocket::async_read_some"));
+
+                    impl.op_r_rd.emplace(std::move(*this));
+                }
                 impl.rd_block.lock(this);
                 BOOST_ASIO_CORO_YIELD
-                net::post(std::move(*this));
+                {
+                    BOOST_ASIO_HANDLER_LOCATION((
+                        __FILE__, __LINE__,
+                        "websocket::async_read_some"));
+
+                    net::post(std::move(*this));
+                }
                 BOOST_ASSERT(impl.rd_block.is_locked(this));
 
-                // VFALCO Is this check correct here?
-                BOOST_ASSERT(! ec && impl.check_stop_now(ec));
+                BOOST_ASSERT(!ec);
                 if(impl.check_stop_now(ec))
                 {
                     BOOST_ASSERT(ec == net::error::operation_aborted);
@@ -163,10 +174,16 @@ public:
                     }
                     BOOST_ASSERT(impl.rd_block.is_locked(this));
                     BOOST_ASIO_CORO_YIELD
-                    impl.stream().async_read_some(
-                        impl.rd_buf.prepare(read_size(
-                            impl.rd_buf, impl.rd_buf.max_size())),
-                                std::move(*this));
+                    {
+                        BOOST_ASIO_HANDLER_LOCATION((
+                            __FILE__, __LINE__,
+                            "websocket::async_read_some"));
+
+                        impl.stream().async_read_some(
+                            impl.rd_buf.prepare(read_size(
+                                impl.rd_buf, impl.rd_buf.max_size())),
+                                    std::move(*this));
+                    }
                     BOOST_ASSERT(impl.rd_block.is_locked(this));
                     impl.rd_buf.commit(bytes_transferred);
                     if(impl.check_stop_now(ec))
@@ -206,7 +223,13 @@ public:
                             if(! cont)
                             {
                                 BOOST_ASIO_CORO_YIELD
-                                net::post(std::move(*this));
+                                {
+                                    BOOST_ASIO_HANDLER_LOCATION((
+                                        __FILE__, __LINE__,
+                                        "websocket::async_read_some"));
+
+                                    net::post(std::move(*this));
+                                }
                                 BOOST_ASSERT(cont);
                                 // VFALCO call check_stop_now() here?
                             }
@@ -241,10 +264,22 @@ public:
                         if(! impl.wr_block.try_lock(this))
                         {
                             BOOST_ASIO_CORO_YIELD
-                            impl.op_rd.emplace(std::move(*this));
+                            {
+                                BOOST_ASIO_HANDLER_LOCATION((
+                                    __FILE__, __LINE__,
+                                    "websocket::async_read_some"));
+
+                                impl.op_rd.emplace(std::move(*this));
+                            }
                             impl.wr_block.lock(this);
                             BOOST_ASIO_CORO_YIELD
-                            net::post(std::move(*this));
+                            {
+                                BOOST_ASIO_HANDLER_LOCATION((
+                                    __FILE__, __LINE__,
+                                    "websocket::async_read_some"));
+
+                                net::post(std::move(*this));
+                            }
                             BOOST_ASSERT(impl.wr_block.is_locked(this));
                             if(impl.check_stop_now(ec))
                                 goto upcall;
@@ -253,9 +288,15 @@ public:
                         // Send pong
                         BOOST_ASSERT(impl.wr_block.is_locked(this));
                         BOOST_ASIO_CORO_YIELD
-                        net::async_write(
-                            impl.stream(), impl.rd_fb.data(),
-                            beast::detail::bind_continuation(std::move(*this)));
+                        {
+                            BOOST_ASIO_HANDLER_LOCATION((
+                                __FILE__, __LINE__,
+                                "websocket::async_read_some"));
+
+                            net::async_write(
+                                impl.stream(), net::const_buffer(impl.rd_fb.data()),
+                                beast::detail::bind_continuation(std::move(*this)));
+                        }
                         BOOST_ASSERT(impl.wr_block.is_locked(this));
                         if(impl.check_stop_now(ec))
                             goto upcall;
@@ -276,7 +317,13 @@ public:
                             if(! cont)
                             {
                                 BOOST_ASIO_CORO_YIELD
-                                net::post(std::move(*this));
+                                {
+                                    BOOST_ASIO_HANDLER_LOCATION((
+                                        __FILE__, __LINE__,
+                                        "websocket::async_read_some"));
+
+                                    net::post(std::move(*this));
+                                }
                                 BOOST_ASSERT(cont);
                             }
                         }
@@ -301,7 +348,13 @@ public:
                             if(! cont)
                             {
                                 BOOST_ASIO_CORO_YIELD
-                                net::post(std::move(*this));
+                                {
+                                    BOOST_ASIO_HANDLER_LOCATION((
+                                        __FILE__, __LINE__,
+                                        "websocket::async_read_some"));
+
+                                    net::post(std::move(*this));
+                                }
                                 BOOST_ASSERT(cont);
                             }
                         }
@@ -359,10 +412,16 @@ public:
                         // Fill the read buffer first, otherwise we
                         // get fewer bytes at the cost of one I/O.
                         BOOST_ASIO_CORO_YIELD
-                        impl.stream().async_read_some(
-                            impl.rd_buf.prepare(read_size(
-                                impl.rd_buf, impl.rd_buf.max_size())),
-                                    std::move(*this));
+                        {
+                            BOOST_ASIO_HANDLER_LOCATION((
+                                __FILE__, __LINE__,
+                                "websocket::async_read_some"));
+
+                            impl.stream().async_read_some(
+                                impl.rd_buf.prepare(read_size(
+                                    impl.rd_buf, impl.rd_buf.max_size())),
+                                        std::move(*this));
+                        }
                         impl.rd_buf.commit(bytes_transferred);
                         if(impl.check_stop_now(ec))
                             goto upcall;
@@ -405,8 +464,14 @@ public:
                         BOOST_ASSERT(buffer_bytes(buffers_prefix(
                             clamp(impl.rd_remain), cb_)) > 0);
                         BOOST_ASIO_CORO_YIELD
-                        impl.stream().async_read_some(buffers_prefix(
-                            clamp(impl.rd_remain), cb_), std::move(*this));
+                        {
+                            BOOST_ASIO_HANDLER_LOCATION((
+                                __FILE__, __LINE__,
+                                "websocket::async_read_some"));
+
+                            impl.stream().async_read_some(buffers_prefix(
+                                clamp(impl.rd_remain), cb_), std::move(*this));
+                        }
                         if(impl.check_stop_now(ec))
                             goto upcall;
                         impl.reset_idle();
@@ -449,10 +514,16 @@ public:
                     {
                         // read new
                         BOOST_ASIO_CORO_YIELD
-                        impl.stream().async_read_some(
-                            impl.rd_buf.prepare(read_size(
-                                impl.rd_buf, impl.rd_buf.max_size())),
-                                    std::move(*this));
+                        {
+                            BOOST_ASIO_HANDLER_LOCATION((
+                                __FILE__, __LINE__,
+                                "websocket::async_read_some"));
+
+                            impl.stream().async_read_some(
+                                impl.rd_buf.prepare(read_size(
+                                    impl.rd_buf, impl.rd_buf.max_size())),
+                                        std::move(*this));
+                        }
                         if(impl.check_stop_now(ec))
                             goto upcall;
                         impl.reset_idle();
@@ -471,6 +542,8 @@ public:
                         zs.avail_out = out.size();
                         BOOST_ASSERT(zs.avail_out > 0);
                     }
+                    // boolean to track the end of the message.
+                    bool fin = false;
                     if(impl.rd_remain > 0)
                     {
                         if(impl.rd_buf.size() > 0)
@@ -490,22 +563,11 @@ public:
                     else if(impl.rd_fh.fin)
                     {
                         // append the empty block codes
-                        std::uint8_t constexpr
+                        static std::uint8_t constexpr
                             empty_block[4] = { 0x00, 0x00, 0xff, 0xff };
                         zs.next_in = empty_block;
                         zs.avail_in = sizeof(empty_block);
-                        impl.inflate(zs, zlib::Flush::sync, ec);
-                        if(! ec)
-                        {
-                            // https://github.com/madler/zlib/issues/280
-                            if(zs.total_out > 0)
-                                ec = error::partial_deflate_block;
-                        }
-                        if(impl.check_stop_now(ec))
-                            goto upcall;
-                        impl.do_context_takeover_read(impl.role);
-                        impl.rd_done = true;
-                        break;
+                        fin = true;
                     }
                     else
                     {
@@ -514,6 +576,11 @@ public:
                     impl.inflate(zs, zlib::Flush::sync, ec);
                     if(impl.check_stop_now(ec))
                         goto upcall;
+                    if(fin && zs.total_out == 0) {
+                        impl.do_context_takeover_read(impl.role);
+                        impl.rd_done = true;
+                        break;
+                    }
                     if(impl.rd_msg_max && beast::detail::sum_exceeds(
                         impl.rd_size, zs.total_out, impl.rd_msg_max))
                     {
@@ -524,8 +591,10 @@ public:
                     }
                     cb_.consume(zs.total_out);
                     impl.rd_size += zs.total_out;
-                    impl.rd_remain -= zs.total_in;
-                    impl.rd_buf.consume(zs.total_in);
+                    if (! fin) {
+                        impl.rd_remain -= zs.total_in;
+                        impl.rd_buf.consume(zs.total_in);
+                    }
                     bytes_written_ += zs.total_out;
                 }
                 if(impl.rd_op == detail::opcode::text)
@@ -549,10 +618,22 @@ public:
             if(! impl.wr_block.try_lock(this))
             {
                 BOOST_ASIO_CORO_YIELD
-                impl.op_rd.emplace(std::move(*this));
+                {
+                    BOOST_ASIO_HANDLER_LOCATION((
+                        __FILE__, __LINE__,
+                        "websocket::async_read_some"));
+
+                    impl.op_rd.emplace(std::move(*this));
+                }
                 impl.wr_block.lock(this);
                 BOOST_ASIO_CORO_YIELD
-                net::post(std::move(*this));
+                {
+                    BOOST_ASIO_HANDLER_LOCATION((
+                        __FILE__, __LINE__,
+                        "websocket::async_read_some"));
+
+                    net::post(std::move(*this));
+                }
                 BOOST_ASSERT(impl.wr_block.is_locked(this));
                 if(impl.check_stop_now(ec))
                     goto upcall;
@@ -573,8 +654,14 @@ public:
                 // Send close frame
                 BOOST_ASSERT(impl.wr_block.is_locked(this));
                 BOOST_ASIO_CORO_YIELD
-                net::async_write(impl.stream(), impl.rd_fb.data(),
-                    beast::detail::bind_continuation(std::move(*this)));
+                {
+                    BOOST_ASIO_HANDLER_LOCATION((
+                        __FILE__, __LINE__,
+                        "websocket::async_read_some"));
+
+                    net::async_write(impl.stream(), net::const_buffer(impl.rd_fb.data()),
+                        beast::detail::bind_continuation(std::move(*this)));
+                }
                 BOOST_ASSERT(impl.wr_block.is_locked(this));
                 if(impl.check_stop_now(ec))
                     goto upcall;
@@ -584,8 +671,14 @@ public:
             using beast::websocket::async_teardown;
             BOOST_ASSERT(impl.wr_block.is_locked(this));
             BOOST_ASIO_CORO_YIELD
-            async_teardown(impl.role, impl.stream(),
-                beast::detail::bind_continuation(std::move(*this)));
+            {
+                BOOST_ASIO_HANDLER_LOCATION((
+                    __FILE__, __LINE__,
+                    "websocket::async_read_some"));
+
+                async_teardown(impl.role, impl.stream(),
+                    beast::detail::bind_continuation(std::move(*this)));
+            }
             BOOST_ASSERT(impl.wr_block.is_locked(this));
             if(ec == net::error::eof)
             {
@@ -678,6 +771,11 @@ public:
                             ec, error::buffer_overflow);
                     if(impl.check_stop_now(ec))
                         goto upcall;
+
+                    BOOST_ASIO_HANDLER_LOCATION((
+                        __FILE__, __LINE__,
+                        "websocket::async_read"));
+
                     read_some_op<read_op, mutable_buffers_type>(
                         std::move(*this), sp, *mb);
                 }
@@ -804,7 +902,7 @@ read(DynamicBuffer& buffer, error_code& ec)
 }
 
 template<class NextLayer, bool deflateSupported>
-template<class DynamicBuffer, class ReadHandler>
+template<class DynamicBuffer, BOOST_BEAST_ASYNC_TPARAM2 ReadHandler>
 BOOST_BEAST_ASYNC_RESULT2(ReadHandler)
 stream<NextLayer, deflateSupported>::
 async_read(DynamicBuffer& buffer, ReadHandler&& handler)
@@ -878,7 +976,7 @@ read_some(
 }
 
 template<class NextLayer, bool deflateSupported>
-template<class DynamicBuffer, class ReadHandler>
+template<class DynamicBuffer, BOOST_BEAST_ASYNC_TPARAM2 ReadHandler>
 BOOST_BEAST_ASYNC_RESULT2(ReadHandler)
 stream<NextLayer, deflateSupported>::
 async_read_some(
@@ -1165,6 +1263,8 @@ loop:
                 zs.avail_out = out.size();
                 BOOST_ASSERT(zs.avail_out > 0);
             }
+            // boolean to track the end of the message.
+            bool fin = false;
             if(impl.rd_remain > 0)
             {
                 if(impl.rd_buf.size() > 0)
@@ -1208,22 +1308,10 @@ loop:
             {
                 // append the empty block codes
                 static std::uint8_t constexpr
-                    empty_block[4] = {
-                        0x00, 0x00, 0xff, 0xff };
+                    empty_block[4] = { 0x00, 0x00, 0xff, 0xff };
                 zs.next_in = empty_block;
                 zs.avail_in = sizeof(empty_block);
-                impl.inflate(zs, zlib::Flush::sync, ec);
-                if(! ec)
-                {
-                    // https://github.com/madler/zlib/issues/280
-                    if(zs.total_out > 0)
-                        ec = error::partial_deflate_block;
-                }
-                if(impl.check_stop_now(ec))
-                    return bytes_written;
-                impl.do_context_takeover_read(impl.role);
-                impl.rd_done = true;
-                break;
+                fin = true;
             }
             else
             {
@@ -1232,6 +1320,11 @@ loop:
             impl.inflate(zs, zlib::Flush::sync, ec);
             if(impl.check_stop_now(ec))
                 return bytes_written;
+            if (fin && zs.total_out == 0) {
+                impl.do_context_takeover_read(impl.role);
+                impl.rd_done = true;
+                break;
+            }
             if(impl.rd_msg_max && beast::detail::sum_exceeds(
                 impl.rd_size, zs.total_out, impl.rd_msg_max))
             {
@@ -1241,8 +1334,10 @@ loop:
             }
             cb.consume(zs.total_out);
             impl.rd_size += zs.total_out;
-            impl.rd_remain -= zs.total_in;
-            impl.rd_buf.consume(zs.total_in);
+            if (! fin) {
+                impl.rd_remain -= zs.total_in;
+                impl.rd_buf.consume(zs.total_in);
+            }
             bytes_written += zs.total_out;
         }
         if(impl.rd_op == detail::opcode::text)
@@ -1263,7 +1358,7 @@ loop:
 }
 
 template<class NextLayer, bool deflateSupported>
-template<class MutableBufferSequence, class ReadHandler>
+template<class MutableBufferSequence, BOOST_BEAST_ASYNC_TPARAM2 ReadHandler>
 BOOST_BEAST_ASYNC_RESULT2(ReadHandler)
 stream<NextLayer, deflateSupported>::
 async_read_some(
@@ -1289,3 +1384,7 @@ async_read_some(
 } // boost
 
 #endif
+
+/* read.hpp
++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
+*/

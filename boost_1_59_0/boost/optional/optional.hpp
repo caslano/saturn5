@@ -1,5 +1,5 @@
 // Copyright (C) 2003, 2008 Fernando Luis Cacciola Carballal.
-// Copyright (C) 2014 - 2018 Andrzej Krzemienski.
+// Copyright (C) 2014 - 2021 Andrzej Krzemienski.
 //
 // Use, modification, and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,7 +18,9 @@
 #define BOOST_OPTIONAL_OPTIONAL_FLC_19NOV2002_HPP
 
 #include <new>
+#ifndef BOOST_NO_IOSTREAM
 #include <iosfwd>
+#endif // BOOST_NO_IOSTREAM
 
 #ifdef BOOST_OPTIONAL_DETAIL_USE_STD_TYPE_TRAITS
 #  include <type_traits>
@@ -35,14 +37,18 @@
 #include <boost/type.hpp>
 #include <boost/type_traits/alignment_of.hpp>
 #include <boost/type_traits/conditional.hpp>
+#include <boost/type_traits/conjunction.hpp>
+#include <boost/type_traits/disjunction.hpp>
 #include <boost/type_traits/has_nothrow_constructor.hpp>
 #include <boost/type_traits/type_with_alignment.hpp>
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/type_traits/decay.hpp>
+#include <boost/type_traits/is_assignable.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/type_traits/is_const.hpp>
 #include <boost/type_traits/is_constructible.hpp>
+#include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/is_lvalue_reference.hpp>
 #include <boost/type_traits/is_nothrow_move_assignable.hpp>
 #include <boost/type_traits/is_nothrow_move_constructible.hpp>
@@ -123,6 +129,7 @@ class optional_base : public optional_tag
   protected :
 
     typedef T value_type ;
+    typedef typename boost::remove_const<T>::type unqualified_value_type;
 
   protected:
     typedef T &       reference_type ;
@@ -399,14 +406,14 @@ class optional_base : public optional_tag
 
     void construct ( argument_type val )
      {
-       ::new (m_storage.address()) value_type(val) ;
+       ::new (m_storage.address()) unqualified_value_type(val) ;
        m_initialized = true ;
      }
 
 #ifndef  BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
     void construct ( rval_reference_type val )
      {
-       ::new (m_storage.address()) value_type( boost::move(val) ) ;
+       ::new (m_storage.address()) unqualified_value_type( boost::move(val) ) ;
        m_initialized = true ;
      }
 #endif
@@ -418,7 +425,7 @@ class optional_base : public optional_tag
     template<class... Args>
     void construct ( in_place_init_t, Args&&... args )
     {
-      ::new (m_storage.address()) value_type( boost::forward<Args>(args)... ) ;
+      ::new (m_storage.address()) unqualified_value_type( boost::forward<Args>(args)... ) ;
       m_initialized = true ;
     }
 
@@ -449,13 +456,13 @@ class optional_base : public optional_tag
     template<class Arg>
     void construct ( in_place_init_t, Arg&& arg )
      {
-       ::new (m_storage.address()) value_type( boost::forward<Arg>(arg) );
+       ::new (m_storage.address()) unqualified_value_type( boost::forward<Arg>(arg) );
        m_initialized = true ;
      }
 
     void construct ( in_place_init_t )
      {
-       ::new (m_storage.address()) value_type();
+       ::new (m_storage.address()) unqualified_value_type();
        m_initialized = true ;
      }
 
@@ -509,20 +516,20 @@ class optional_base : public optional_tag
     template<class Arg>
     void construct ( in_place_init_t, const Arg& arg )
      {
-       ::new (m_storage.address()) value_type( arg );
+       ::new (m_storage.address()) unqualified_value_type( arg );
        m_initialized = true ;
      }
 
     template<class Arg>
     void construct ( in_place_init_t, Arg& arg )
      {
-       ::new (m_storage.address()) value_type( arg );
+       ::new (m_storage.address()) unqualified_value_type( arg );
        m_initialized = true ;
      }
 
     void construct ( in_place_init_t )
      {
-       ::new (m_storage.address()) value_type();
+       ::new (m_storage.address()) unqualified_value_type();
        m_initialized = true ;
      }
 
@@ -667,7 +674,7 @@ class optional_base : public optional_tag
     template<class Expr>
     void construct ( Expr&& expr, void const* )
     {
-      new (m_storage.address()) value_type(boost::forward<Expr>(expr)) ;
+      new (m_storage.address()) unqualified_value_type(boost::forward<Expr>(expr)) ;
       m_initialized = true ;
     }
 
@@ -688,7 +695,7 @@ class optional_base : public optional_tag
     template<class Expr>
     void construct ( Expr const& expr, void const* )
      {
-       new (m_storage.address()) value_type(expr) ;
+       new (m_storage.address()) unqualified_value_type(expr) ;
        m_initialized = true ;
      }
 
@@ -726,7 +733,7 @@ class optional_base : public optional_tag
        {
          // An exception can be thrown here.
          // It it happens, THIS will be left uninitialized.
-         new (m_storage.address()) value_type(boost::move(expr.get())) ;
+         new (m_storage.address()) unqualified_value_type(boost::move(expr.get())) ;
          m_initialized = true ;
        }
      }
@@ -739,7 +746,7 @@ class optional_base : public optional_tag
        {
          // An exception can be thrown here.
          // It it happens, THIS will be left uninitialized.
-         new (m_storage.address()) value_type(expr.get()) ;
+         new (m_storage.address()) unqualified_value_type(expr.get()) ;
          m_initialized = true ;
        }
      }
@@ -779,7 +786,7 @@ class optional_base : public optional_tag
 
 // definition of metafunction is_optional_val_init_candidate
 template <typename U>
-struct is_optional_related
+struct is_optional_or_tag
   : boost::conditional< boost::is_base_of<optional_detail::optional_tag, BOOST_DEDUCED_TYPENAME boost::decay<U>::type>::value
                      || boost::is_same<BOOST_DEDUCED_TYPENAME boost::decay<U>::type, none_t>::value
                      || boost::is_same<BOOST_DEDUCED_TYPENAME boost::decay<U>::type, in_place_init_t>::value
@@ -787,14 +794,22 @@ struct is_optional_related
     boost::true_type, boost::false_type>::type
 {};
 
+template <typename T, typename U>
+struct has_dedicated_constructor
+  : boost::disjunction<is_optional_or_tag<U>, boost::is_same<T, BOOST_DEDUCED_TYPENAME boost::decay<U>::type> >
+{};
+
+template <typename U>
+struct is_in_place_factory
+  : boost::disjunction< boost::is_base_of<boost::in_place_factory_base, BOOST_DEDUCED_TYPENAME boost::decay<U>::type>,
+                        boost::is_base_of<boost::typed_in_place_factory_base, BOOST_DEDUCED_TYPENAME boost::decay<U>::type> >
+{};
+
 #if !defined(BOOST_OPTIONAL_DETAIL_NO_IS_CONSTRUCTIBLE_TRAIT)
 
 template <typename T, typename U>
-struct is_convertible_to_T_or_factory
-  : boost::conditional< boost::is_base_of<boost::in_place_factory_base, BOOST_DEDUCED_TYPENAME boost::decay<U>::type>::value
-                     || boost::is_base_of<boost::typed_in_place_factory_base, BOOST_DEDUCED_TYPENAME boost::decay<U>::type>::value
-                     || (boost::is_constructible<T, U&&>::value && !boost::is_same<T, BOOST_DEDUCED_TYPENAME boost::decay<U>::type>::value)
-                      , boost::true_type, boost::false_type>::type
+struct is_factory_or_constructible_to_T
+  : boost::disjunction< is_in_place_factory<U>, boost::is_constructible<T, U&&> >
 {};
 
 template <typename T, typename U>
@@ -804,7 +819,7 @@ struct is_optional_constructible : boost::is_constructible<T, U>
 #else
 
 template <typename, typename>
-struct is_convertible_to_T_or_factory : boost::true_type
+struct is_factory_or_constructible_to_T : boost::true_type
 {};
 
 template <typename T, typename U>
@@ -813,15 +828,58 @@ struct is_optional_constructible : boost::true_type
 
 #endif // is_convertible condition
 
-template <typename T, typename U, bool = is_optional_related<U>::value>
+#if !defined(BOOST_NO_CXX11_DECLTYPE) && !BOOST_WORKAROUND(BOOST_MSVC, < 1800)
+// for is_assignable
+
+#if (!defined BOOST_NO_CXX11_RVALUE_REFERENCES)
+// On some initial rvalue reference implementations GCC does it in a strange way,
+// preferring perfect-forwarding constructor to implicit copy constructor.
+
+template <typename T, typename U>
+struct is_opt_assignable
+  : boost::conjunction<boost::is_convertible<U&&, T>, boost::is_assignable<T&, U&&> >
+{};
+
+#else
+
+template <typename T, typename U>
+struct is_opt_assignable
+  : boost::conjunction<boost::is_convertible<U, T>, boost::is_assignable<T&, U> >
+{};
+
+#endif
+
+#else
+
+template <typename T, typename U>
+struct is_opt_assignable : boost::is_convertible<U, T>
+{};
+
+#endif
+
+template <typename T, typename U>
+struct is_factory_or_opt_assignable_to_T
+  : boost::disjunction< is_in_place_factory<U>, is_opt_assignable<T, U> >
+{};
+
+template <typename T, typename U, bool = has_dedicated_constructor<T, U>::value>
 struct is_optional_val_init_candidate
   : boost::false_type
 {};
 
 template <typename T, typename U>
 struct is_optional_val_init_candidate<T, U, false>
-  : boost::conditional< is_convertible_to_T_or_factory<T, U>::value
-                      , boost::true_type, boost::false_type>::type
+  : is_factory_or_constructible_to_T<T, U>
+{};
+
+template <typename T, typename U, bool = has_dedicated_constructor<T, U>::value>
+struct is_optional_val_assign_candidate
+  : boost::false_type
+{};
+
+template <typename T, typename U>
+struct is_optional_val_assign_candidate<T, U, false>
+  : is_factory_or_opt_assignable_to_T<T, U>
 {};
 
 } // namespace optional_detail
@@ -994,7 +1052,7 @@ class optional
 #ifndef  BOOST_OPTIONAL_DETAIL_NO_RVALUE_REFERENCES
 
     template<class Expr>
-    BOOST_DEDUCED_TYPENAME boost::enable_if<optional_detail::is_optional_val_init_candidate<T, Expr>, optional&>::type
+    BOOST_DEDUCED_TYPENAME boost::enable_if<optional_detail::is_optional_val_assign_candidate<T, Expr>, optional&>::type
     operator= ( Expr&& expr )
       {
         this->assign_expr(boost::forward<Expr>(expr),boost::addressof(expr));
@@ -1586,6 +1644,7 @@ get_pointer ( optional<T>& opt )
 
 } // namespace boost
 
+#ifndef BOOST_NO_IOSTREAM
 namespace boost {
 
 // The following declaration prevents a bug where operator safe-bool is used upon streaming optional object if you forget the IO header.
@@ -1598,8 +1657,13 @@ operator<<(std::basic_ostream<CharType, CharTrait>& os, optional_detail::optiona
 }
 
 } // namespace boost
+#endif // BOOST_NO_IOSTREAM
 
 #include <boost/optional/detail/optional_relops.hpp>
 #include <boost/optional/detail/optional_swap.hpp>
 
 #endif // header guard
+
+/* optional.hpp
+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
+*/

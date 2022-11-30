@@ -4,10 +4,11 @@
 // Copyright (c) 2007-2015 Barend Gehrels, Amsterdam, the Netherlands.
 // Copyright (c) 2009-2015 Mateusz Loskot, London, UK.
 
-// This file was modified by Oracle on 2015.
-// Modifications copyright (c) 2015, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2015-2020.
+// Modifications copyright (c) 2015-2020, Oracle and/or its affiliates.
 
 // Contributed and/or modified by Menelaos Karavelas, on behalf of Oracle
+// Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
 // (geolib/GGL), copyright (c) 1995-2010 Geodan, Amsterdam, the Netherlands.
@@ -21,30 +22,12 @@
 #define BOOST_GEOMETRY_ALGORITHMS_NOT_IMPLEMENTED_HPP
 
 
-#include <boost/mpl/assert.hpp>
-#include <boost/mpl/identity.hpp>
+#include <boost/geometry/core/static_assert.hpp>
 #include <boost/geometry/core/tags.hpp>
 
 
 namespace boost { namespace geometry
 {
-
-
-namespace info
-{
-    struct UNRECOGNIZED_GEOMETRY_TYPE {};
-    struct POINT {};
-    struct LINESTRING {};
-    struct POLYGON {};
-    struct RING {};
-    struct BOX {};
-    struct SEGMENT {};
-    struct MULTI_POINT {};
-    struct MULTI_LINESTRING {};
-    struct MULTI_POLYGON {};
-    struct GEOMETRY_COLLECTION {};
-    template <size_t D> struct DIMENSION {};
-}
 
 
 namespace nyi
@@ -53,12 +36,7 @@ namespace nyi
 
 struct not_implemented_tag {};
 
-template
-<
-    typename Term1,
-    typename Term2,
-    typename Term3
->
+template <typename ...Terms>
 struct not_implemented_error
 {
 
@@ -66,62 +44,20 @@ struct not_implemented_error
 # define BOOST_GEOMETRY_IMPLEMENTATION_STATUS_BUILD false
 #endif
 
-    BOOST_MPL_ASSERT_MSG
-        (
-            BOOST_GEOMETRY_IMPLEMENTATION_STATUS_BUILD,
-            THIS_OPERATION_IS_NOT_OR_NOT_YET_IMPLEMENTED,
-            (
-                types<Term1, Term2, Term3>
-            )
-        );
+    BOOST_GEOMETRY_STATIC_ASSERT(
+        BOOST_GEOMETRY_IMPLEMENTATION_STATUS_BUILD,
+        "This operation is not or not yet implemented.",
+        Terms...);
 };
-
-template <typename Tag>
-struct tag_to_term
-{
-    typedef Tag type;
-};
-
-template <> struct tag_to_term<geometry_not_recognized_tag> { typedef info::UNRECOGNIZED_GEOMETRY_TYPE type; };
-template <> struct tag_to_term<point_tag>                   { typedef info::POINT type; };
-template <> struct tag_to_term<linestring_tag>              { typedef info::LINESTRING type; };
-template <> struct tag_to_term<polygon_tag>                 { typedef info::POLYGON type; };
-template <> struct tag_to_term<ring_tag>                    { typedef info::RING type; };
-template <> struct tag_to_term<box_tag>                     { typedef info::BOX type; };
-template <> struct tag_to_term<segment_tag>                 { typedef info::SEGMENT type; };
-template <> struct tag_to_term<multi_point_tag>             { typedef info::MULTI_POINT type; };
-template <> struct tag_to_term<multi_linestring_tag>        { typedef info::MULTI_LINESTRING type; };
-template <> struct tag_to_term<multi_polygon_tag>           { typedef info::MULTI_POLYGON type; };
-template <> struct tag_to_term<geometry_collection_tag>     { typedef info::GEOMETRY_COLLECTION type; };
-template <int D> struct tag_to_term<boost::mpl::int_<D> >   { typedef info::DIMENSION<D> type; };
 
 
 }
 
 
-template
-<
-    typename Term1 = void,
-    typename Term2 = void,
-    typename Term3 = void
->
+template <typename ...Terms>
 struct not_implemented
     : nyi::not_implemented_tag,
-      nyi::not_implemented_error
-      <
-          typename boost::mpl::identity
-              <
-                  typename nyi::tag_to_term<Term1>::type
-              >::type,
-          typename boost::mpl::identity
-              <
-                  typename nyi::tag_to_term<Term2>::type
-              >::type,
-          typename boost::mpl::identity
-              <
-                  typename nyi::tag_to_term<Term3>::type
-              >::type
-      >
+      nyi::not_implemented_error<Terms...>
 {};
 
 
@@ -129,3 +65,7 @@ struct not_implemented
 
 
 #endif // BOOST_GEOMETRY_ALGORITHMS_NOT_IMPLEMENTED_HPP
+
+/* not_implemented.hpp
+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
+*/

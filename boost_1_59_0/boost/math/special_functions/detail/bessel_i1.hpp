@@ -19,7 +19,7 @@
 
 #include <boost/math/tools/rational.hpp>
 #include <boost/math/tools/big_constant.hpp>
-#include <boost/assert.hpp>
+#include <boost/math/tools/assert.hpp>
 
 #if defined(__GNUC__) && defined(BOOST_MATH_USE_FLOAT128)
 //
@@ -49,14 +49,14 @@ struct bessel_i1_initializer
       {
          do_init(tag());
       }
-      static void do_init(const boost::integral_constant<int, 64>&)
+      static void do_init(const std::integral_constant<int, 64>&)
       {
          bessel_i1(T(1));
          bessel_i1(T(15));
          bessel_i1(T(80));
          bessel_i1(T(101));
       }
-      static void do_init(const boost::integral_constant<int, 113>&)
+      static void do_init(const std::integral_constant<int, 113>&)
       {
          bessel_i1(T(1));
          bessel_i1(T(10));
@@ -81,14 +81,14 @@ template <class T, class tag>
 const typename bessel_i1_initializer<T, tag>::init bessel_i1_initializer<T, tag>::initializer;
 
 template <typename T, int N>
-T bessel_i1_imp(const T&, const boost::integral_constant<int, N>&)
+T bessel_i1_imp(const T&, const std::integral_constant<int, N>&)
 {
-   BOOST_ASSERT(0);
+   BOOST_MATH_ASSERT(0);
    return 0;
 }
 
 template <typename T>
-T bessel_i1_imp(const T& x, const boost::integral_constant<int, 24>&)
+T bessel_i1_imp(const T& x, const std::integral_constant<int, 24>&)
 {
    BOOST_MATH_STD_USING
       if(x < 7.75)
@@ -129,7 +129,7 @@ T bessel_i1_imp(const T& x, const boost::integral_constant<int, 24>&)
 }
 
 template <typename T>
-T bessel_i1_imp(const T& x, const boost::integral_constant<int, 53>&)
+T bessel_i1_imp(const T& x, const std::integral_constant<int, 53>&)
 {
    BOOST_MATH_STD_USING
    if(x < 7.75)
@@ -207,7 +207,7 @@ T bessel_i1_imp(const T& x, const boost::integral_constant<int, 53>&)
 }
 
 template <typename T>
-T bessel_i1_imp(const T& x, const boost::integral_constant<int, 64>&)
+T bessel_i1_imp(const T& x, const std::integral_constant<int, 64>&)
 {
    BOOST_MATH_STD_USING
       if(x < 7.75)
@@ -316,7 +316,7 @@ T bessel_i1_imp(const T& x, const boost::integral_constant<int, 64>&)
 }
 
 template <typename T>
-T bessel_i1_imp(const T& x, const boost::integral_constant<int, 113>&)
+T bessel_i1_imp(const T& x, const std::integral_constant<int, 113>&)
 {
    BOOST_MATH_STD_USING
    if(x < 7.75)
@@ -552,24 +552,24 @@ T bessel_i1_imp(const T& x, const boost::integral_constant<int, 113>&)
 }
 
 template <typename T>
-T bessel_i1_imp(const T& x, const boost::integral_constant<int, 0>&)
+T bessel_i1_imp(const T& x, const std::integral_constant<int, 0>&)
 {
    if(boost::math::tools::digits<T>() <= 24)
-      return bessel_i1_imp(x, boost::integral_constant<int, 24>());
+      return bessel_i1_imp(x, std::integral_constant<int, 24>());
    else if(boost::math::tools::digits<T>() <= 53)
-      return bessel_i1_imp(x, boost::integral_constant<int, 53>());
+      return bessel_i1_imp(x, std::integral_constant<int, 53>());
    else if(boost::math::tools::digits<T>() <= 64)
-      return bessel_i1_imp(x, boost::integral_constant<int, 64>());
+      return bessel_i1_imp(x, std::integral_constant<int, 64>());
    else if(boost::math::tools::digits<T>() <= 113)
-      return bessel_i1_imp(x, boost::integral_constant<int, 113>());
-   BOOST_ASSERT(0);
+      return bessel_i1_imp(x, std::integral_constant<int, 113>());
+   BOOST_MATH_ASSERT(0);
    return 0;
 }
 
 template <typename T>
 inline T bessel_i1(const T& x)
 {
-   typedef boost::integral_constant<int,
+   typedef std::integral_constant<int,
       ((std::numeric_limits<T>::digits == 0) || (std::numeric_limits<T>::radix != 2)) ?
       0 :
       std::numeric_limits<T>::digits <= 24 ?
@@ -590,3 +590,7 @@ inline T bessel_i1(const T& x)
 
 #endif // BOOST_MATH_BESSEL_I1_HPP
 
+
+/* bessel_i1.hpp
+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
+*/

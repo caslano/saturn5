@@ -21,7 +21,7 @@
 #include <boost/config.hpp>
 #include <boost/concept_check.hpp>
 #include <boost/limits.hpp>
-#include <boost/circular_buffer/allocators.hpp>
+#include <boost/core/allocator_access.hpp>
 #include <boost/core/empty_value.hpp>
 #include <boost/type_traits/is_stateless.hpp>
 #include <boost/type_traits/is_integral.hpp>
@@ -99,13 +99,13 @@ public:
     typedef circular_buffer<T, Alloc> this_type;
 
     //! The type of elements stored in the <code>circular_buffer</code>.
-    typedef typename cb_details::allocator_traits<Alloc>::value_type value_type;
+    typedef typename Alloc::value_type value_type;
 
     //! A pointer to an element.
-    typedef typename cb_details::allocator_traits<Alloc>::pointer pointer;
+    typedef typename allocator_pointer<Alloc>::type pointer;
 
     //! A const pointer to the element.
-    typedef typename cb_details::allocator_traits<Alloc>::const_pointer const_pointer;
+    typedef typename allocator_const_pointer<Alloc>::type const_pointer;
 
     //! A reference to an element.
     typedef value_type& reference;
@@ -117,13 +117,13 @@ public:
     /*!
         (A signed integral type used to represent the distance between two iterators.)
     */
-    typedef typename cb_details::allocator_traits<Alloc>::difference_type difference_type;
+    typedef typename allocator_difference_type<Alloc>::type difference_type;
 
     //! The size type.
     /*!
         (An unsigned integral type that can represent any non-negative value of the container's distance type.)
     */
-    typedef typename cb_details::allocator_traits<Alloc>::size_type size_type;
+    typedef typename allocator_size_type<Alloc>::type size_type;
 
     //! The type of an allocator used in the <code>circular_buffer</code>.
     typedef Alloc allocator_type;
@@ -131,10 +131,10 @@ public:
 // Iterators
 
     //! A const (random access) iterator used to iterate through the <code>circular_buffer</code>.
-    typedef cb_details::iterator< circular_buffer<T, Alloc>, cb_details::const_traits<cb_details::allocator_traits<Alloc> > > const_iterator;
+    typedef cb_details::iterator< circular_buffer<T, Alloc>, cb_details::const_traits<Alloc> > const_iterator;
 
     //! A (random access) iterator used to iterate through the <code>circular_buffer</code>.
-    typedef cb_details::iterator< circular_buffer<T, Alloc>, cb_details::nonconst_traits<cb_details::allocator_traits<Alloc> > > iterator;
+    typedef cb_details::iterator< circular_buffer<T, Alloc>, cb_details::nonconst_traits<Alloc> > iterator;
 
     //! A const iterator used to iterate backwards through a <code>circular_buffer</code>.
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
@@ -287,6 +287,7 @@ public:
     */
     const_iterator begin() const BOOST_NOEXCEPT { return const_iterator(this, empty() ? 0 : m_first); }
 
+    const_iterator cbegin() const BOOST_NOEXCEPT { return begin(); }
     //! Get the const iterator pointing to the end of the <code>circular_buffer</code>.
     /*!
         \return A const random access iterator pointing to the element "one behind" the last element of the <code>
@@ -303,6 +304,7 @@ public:
     */
     const_iterator end() const BOOST_NOEXCEPT { return const_iterator(this, 0); }
 
+    const_iterator cend() const BOOST_NOEXCEPT { return end(); }
     //! Get the iterator pointing to the beginning of the "reversed" <code>circular_buffer</code>.
     /*!
         \return A reverse random access iterator pointing to the last element of the <code>circular_buffer</code>.
@@ -666,7 +668,7 @@ public:
                         break;
                     }
                     if (is_uninitialized(dest)) {
-                        cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(dest), boost::move_if_noexcept(*src));
+                        boost::allocator_construct(alloc(), boost::to_address(dest), boost::move_if_noexcept(*src));
                         ++constructed;
                     } else {
                         value_type tmp = boost::move_if_noexcept(*src); 
@@ -787,7 +789,7 @@ public:
         \sa <code>size()</code>, <code>capacity()</code>, <code>reserve()</code>
     */
     size_type max_size() const BOOST_NOEXCEPT {
-        return (std::min<size_type>)(cb_details::allocator_traits<Alloc>::max_size(alloc()), (std::numeric_limits<difference_type>::max)());
+        return (std::min<size_type>)(boost::allocator_max_size(alloc()), (std::numeric_limits<difference_type>::max)());
     }
 
     //! Is the <code>circular_buffer</code> empty?
@@ -1424,7 +1426,7 @@ private:
             increment(m_last);
             m_first = m_last;
         } else {
-            cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(m_last), static_cast<ValT>(item));
+            boost::allocator_construct(alloc(), boost::to_address(m_last), static_cast<ValT>(item));
             increment(m_last);
             ++m_size;
         }        
@@ -1442,7 +1444,7 @@ private:
                 m_last = m_first;
             } else {
                 decrement(m_first);
-                cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(m_first), static_cast<ValT>(item));
+                boost::allocator_construct(alloc(), boost::to_address(m_first), static_cast<ValT>(item));
                 ++m_size;
             }
         } BOOST_CATCH(...) {
@@ -2427,7 +2429,7 @@ private:
     /*! INTERNAL ONLY */
     void construct_or_replace(bool construct, pointer pos, param_value_type item) {
         if (construct)
-            cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(pos), item);
+            boost::allocator_construct(alloc(), boost::to_address(pos), item);
         else
             replace(pos, item);
     }
@@ -2435,14 +2437,14 @@ private:
     /*! INTERNAL ONLY */
     void construct_or_replace(bool construct, pointer pos, rvalue_type item) {
         if (construct)
-            cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(pos), boost::move(item));
+            boost::allocator_construct(alloc(), boost::to_address(pos), boost::move(item));
         else
             replace(pos, boost::move(item));
     }
 
     /*! INTERNAL ONLY */
     void destroy_item(pointer p) {
-        cb_details::allocator_traits<Alloc>::destroy(alloc(), boost::to_address(p));
+        boost::allocator_destroy(alloc(), boost::to_address(p));
 #if BOOST_CB_ENABLE_DEBUG
         invalidate_iterators(iterator(this, p));
         cb_details::do_fill_uninitialized_memory(p, sizeof(value_type));
@@ -2517,7 +2519,7 @@ private:
     template <class Iterator>
     void initialize(Iterator first, Iterator last, const false_type&) {
         BOOST_CB_IS_CONVERTIBLE(Iterator, value_type); // check for invalid iterator type
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x581))
+#if BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x581))
         initialize(first, last, std::iterator_traits<Iterator>::iterator_category());
 #else
         initialize(first, last, BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::iterator_category());
@@ -2556,7 +2558,7 @@ private:
     template <class Iterator>
     void initialize(capacity_type buffer_capacity, Iterator first, Iterator last, const false_type&) {
         BOOST_CB_IS_CONVERTIBLE(Iterator, value_type); // check for invalid iterator type
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x581))
+#if BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x581))
         initialize(buffer_capacity, first, last, std::iterator_traits<Iterator>::iterator_category());
 #else
         initialize(buffer_capacity, first, last, BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::iterator_category());
@@ -2575,7 +2577,7 @@ private:
         if (buffer_capacity == 0)
             return;
         while (first != last && !full()) {
-            cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(m_last), *first++);
+            boost::allocator_construct(alloc(), boost::to_address(m_last), *first++);
             increment(m_last);
             ++m_size;
         }
@@ -2650,7 +2652,7 @@ private:
     template <class Iterator>
     void assign(Iterator first, Iterator last, const false_type&) {
         BOOST_CB_IS_CONVERTIBLE(Iterator, value_type); // check for invalid iterator type
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x581))
+#if BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x581))
         assign(first, last, std::iterator_traits<Iterator>::iterator_category());
 #else
         assign(first, last, BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::iterator_category());
@@ -2687,7 +2689,7 @@ private:
     template <class Iterator>
     void assign(capacity_type new_capacity, Iterator first, Iterator last, const false_type&) {
         BOOST_CB_IS_CONVERTIBLE(Iterator, value_type); // check for invalid iterator type
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x581))
+#if BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x581))
         assign(new_capacity, first, last, std::iterator_traits<Iterator>::iterator_category());
 #else
         assign(new_capacity, first, last, BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::iterator_category());
@@ -2796,7 +2798,7 @@ private:
     template <class Iterator>
     void insert(const iterator& pos, Iterator first, Iterator last, const false_type&) {
         BOOST_CB_IS_CONVERTIBLE(Iterator, value_type); // check for invalid iterator type
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x581))
+#if BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x581))
         insert(pos, first, last, std::iterator_traits<Iterator>::iterator_category());
 #else
         insert(pos, first, last, BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::iterator_category());
@@ -2840,7 +2842,7 @@ private:
             pointer p = m_last;
             BOOST_TRY {
                 for (; ii < construct; ++ii, increment(p))
-                    cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(p), *wrapper());
+                    boost::allocator_construct(alloc(), boost::to_address(p), *wrapper());
                 for (;ii < n; ++ii, increment(p))
                     replace(p, *wrapper());
             } BOOST_CATCH(...) {
@@ -2887,7 +2889,7 @@ private:
     template <class Iterator>
     void rinsert(const iterator& pos, Iterator first, Iterator last, const false_type&) {
         BOOST_CB_IS_CONVERTIBLE(Iterator, value_type); // check for invalid iterator type
-#if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x581))
+#if BOOST_WORKAROUND(BOOST_BORLANDC, BOOST_TESTED_AT(0x581))
         rinsert(pos, first, last, std::iterator_traits<Iterator>::iterator_category());
 #else
         rinsert(pos, first, last, BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::iterator_category());
@@ -2934,7 +2936,7 @@ private:
                 for (;ii > construct; --ii, increment(p))
                     replace(p, *wrapper());
                 for (; ii > 0; --ii, increment(p))
-                    cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(p), *wrapper());
+                    boost::allocator_construct(alloc(), boost::to_address(p), *wrapper());
             } BOOST_CATCH(...) {
                 size_type constructed = ii < construct ? construct - ii : 0;
                 m_last = add(m_last, constructed);
@@ -3130,3 +3132,7 @@ inline void swap(circular_buffer<T, Alloc>& lhs, circular_buffer<T, Alloc>& rhs)
 } // namespace boost
 
 #endif // #if !defined(BOOST_CIRCULAR_BUFFER_BASE_HPP)
+
+/* base.hpp
+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
+*/

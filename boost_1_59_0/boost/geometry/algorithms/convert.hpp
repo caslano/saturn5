@@ -5,8 +5,8 @@
 // Copyright (c) 2009-2012 Mateusz Loskot, London, UK.
 // Copyright (c) 2014 Adam Wulkiewicz, Lodz, Poland.
 
-// This file was modified by Oracle on 2017.
-// Modifications copyright (c) 2017, Oracle and/or its affiliates.
+// This file was modified by Oracle on 2017-2021.
+// Modifications copyright (c) 2017-2021, Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Parts of Boost.Geometry are redesigned from Geodan's Geographic Library
@@ -21,30 +21,26 @@
 
 
 #include <cstddef>
+#include <type_traits>
 
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/range.hpp>
-#include <boost/type_traits/is_array.hpp>
-#include <boost/type_traits/remove_reference.hpp>
-
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
+#include <boost/range/size.hpp>
+#include <boost/range/value_type.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/static_visitor.hpp>
 #include <boost/variant/variant_fwd.hpp>
 
-#include <boost/geometry/arithmetic/arithmetic.hpp>
-#include <boost/geometry/algorithms/not_implemented.hpp>
 #include <boost/geometry/algorithms/clear.hpp>
-#include <boost/geometry/algorithms/for_each.hpp>
 #include <boost/geometry/algorithms/detail/assign_box_corners.hpp>
 #include <boost/geometry/algorithms/detail/assign_indexed_point.hpp>
 #include <boost/geometry/algorithms/detail/convert_point_to_point.hpp>
 #include <boost/geometry/algorithms/detail/convert_indexed_to_indexed.hpp>
 #include <boost/geometry/algorithms/detail/interior_iterator.hpp>
+#include <boost/geometry/algorithms/not_implemented.hpp>
 
-#include <boost/geometry/views/closeable_view.hpp>
-#include <boost/geometry/views/reversible_view.hpp>
-
-#include <boost/geometry/util/range.hpp>
+#include <boost/geometry/arithmetic/arithmetic.hpp>
 
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/core/closure.hpp>
@@ -52,6 +48,10 @@
 #include <boost/geometry/core/tags.hpp>
 
 #include <boost/geometry/geometries/concepts/check.hpp>
+
+#include <boost/geometry/util/range.hpp>
+
+#include <boost/geometry/views/detail/closed_clockwise_view.hpp>
 
 
 namespace boost { namespace geometry
@@ -144,17 +144,6 @@ template
 >
 struct range_to_range
 {
-    typedef typename reversible_view
-        <
-            Range1 const,
-            Reverse ? iterate_reverse : iterate_forward
-        >::type rview_type;
-    typedef typename closeable_view
-        <
-            rview_type const,
-            geometry::closure<Range1>::value
-        >::type view_type;
-
     struct default_policy
     {
         template <typename Point1, typename Point2>
@@ -175,11 +164,16 @@ struct range_to_range
     {
         geometry::clear(destination);
 
-        rview_type rview(source);
+        using view_type = detail::closed_clockwise_view
+            <
+                Range1 const,
+                geometry::closure<Range1>::value,
+                Reverse ? counterclockwise : clockwise
+            >;
 
         // We consider input always as closed, and skip last
         // point for open output.
-        view_type view(rview);
+        view_type const view(source);
 
         typedef typename boost::range_size<Range1>::type size_type;
         size_type n = boost::size(view);
@@ -227,7 +221,7 @@ struct polygon_to_polygon
         // Container should be resizeable
         traits::resize
             <
-                typename boost::remove_reference
+                typename std::remove_reference
                 <
                     typename traits::interior_mutable_type<Polygon2>::type
                 >::type
@@ -296,10 +290,15 @@ template
     typename Tag1 = typename tag_cast<typename tag<Geometry1>::type, multi_tag>::type,
     typename Tag2 = typename tag_cast<typename tag<Geometry2>::type, multi_tag>::type,
     std::size_t DimensionCount = dimension<Geometry1>::type::value,
-    bool UseAssignment = boost::is_same<Geometry1, Geometry2>::value
-                         && !boost::is_array<Geometry1>::value
+    bool UseAssignment = std::is_same<Geometry1, Geometry2>::value
+                         && !std::is_array<Geometry1>::value
 >
-struct convert: not_implemented<Tag1, Tag2, boost::mpl::int_<DimensionCount> >
+struct convert
+    : not_implemented
+        <
+            Tag1, Tag2,
+            std::integral_constant<std::size_t, DimensionCount>
+        >
 {};
 
 
@@ -457,7 +456,7 @@ struct convert<Polygon, Ring, polygon_tag, ring_tag, DimensionCount, false>
 
 // Dispatch for multi <-> multi, specifying their single-version as policy.
 // Note that, even if the multi-types are mutually different, their single
-// version types might be the same and therefore we call boost::is_same again
+// version types might be the same and therefore we call std::is_same again
 
 template <typename Multi1, typename Multi2, std::size_t DimensionCount>
 struct convert<Multi1, Multi2, multi_tag, multi_tag, DimensionCount, false>
@@ -579,3 +578,7 @@ inline void convert(Geometry1 const& geometry1, Geometry2& geometry2)
 }} // namespace boost::geometry
 
 #endif // BOOST_GEOMETRY_ALGORITHMS_CONVERT_HPP
+
+/* convert.hpp
+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
+*/

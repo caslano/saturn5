@@ -430,7 +430,7 @@ class unique_ptr
    {
       //If T is not an array type, element_type_t<Pointer> derives from T
       //it uses the default deleter and T has no virtual destructor, then you have a problem
-      BOOST_STATIC_ASSERT(( !::boost::move_upmu::missing_virtual_destructor
+      BOOST_STATIC_ASSERT(( !bmupd::missing_virtual_destructor
                             <D, typename bmupd::get_element_type<Pointer>::type>::value ));
       //If this constructor is instantiated with a pointer type or reference type
       //for the template argument D, the program is ill-formed.
@@ -468,7 +468,7 @@ class unique_ptr
    {
       //If T is not an array type, element_type_t<Pointer> derives from T
       //it uses the default deleter and T has no virtual destructor, then you have a problem
-      BOOST_STATIC_ASSERT(( !::boost::move_upmu::missing_virtual_destructor
+      BOOST_STATIC_ASSERT(( !bmupd::missing_virtual_destructor
                             <D, typename bmupd::get_element_type<Pointer>::type>::value ));
    }
 
@@ -506,7 +506,7 @@ class unique_ptr
    {
       //If T is not an array type, element_type_t<Pointer> derives from T
       //it uses the default deleter and T has no virtual destructor, then you have a problem
-      BOOST_STATIC_ASSERT(( !::boost::move_upmu::missing_virtual_destructor
+      BOOST_STATIC_ASSERT(( !bmupd::missing_virtual_destructor
                             <D, typename bmupd::get_element_type<Pointer>::type>::value ));
    }
 
@@ -553,7 +553,7 @@ class unique_ptr
    {
       //If T is not an array type, U derives from T
       //it uses the default deleter and T has no virtual destructor, then you have a problem
-      BOOST_STATIC_ASSERT(( !::boost::move_upmu::missing_virtual_destructor
+      BOOST_STATIC_ASSERT(( !bmupd::missing_virtual_destructor
                             <D, typename unique_ptr<U, E>::pointer>::value ));
    }
 
@@ -711,7 +711,7 @@ class unique_ptr
    {
       //If T is not an array type, element_type_t<Pointer> derives from T
       //it uses the default deleter and T has no virtual destructor, then you have a problem
-      BOOST_STATIC_ASSERT(( !::boost::move_upmu::missing_virtual_destructor
+      BOOST_STATIC_ASSERT(( !bmupd::missing_virtual_destructor
                             <D, typename bmupd::get_element_type<Pointer>::type>::value ));
       pointer tmp = m_data.m_p;
       m_data.m_p = p;
@@ -869,3 +869,7 @@ BOOST_MOVE_FORCEINLINE bool operator>=(BOOST_MOVE_DOC0PTR(bmupd::nullptr_type), 
 #include <boost/move/detail/config_end.hpp>
 
 #endif   //#ifndef BOOST_MOVE_UNIQUE_PTR_HPP_INCLUDED
+
+/* unique_ptr.hpp
+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
+*/

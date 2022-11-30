@@ -2,7 +2,7 @@
 // buffer.hpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2022 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -50,11 +50,13 @@
 
 #if defined(BOOST_ASIO_HAS_BOOST_WORKAROUND)
 # include <boost/detail/workaround.hpp>
-# if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582)) \
-    || BOOST_WORKAROUND(__SUNPRO_CC, BOOST_TESTED_AT(0x590))
+# if !defined(__clang__)
+#  if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582))
+#   define BOOST_ASIO_ENABLE_ARRAY_BUFFER_WORKAROUND
+#  endif // BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582))
+# elif BOOST_WORKAROUND(__SUNPRO_CC, BOOST_TESTED_AT(0x590))
 #  define BOOST_ASIO_ENABLE_ARRAY_BUFFER_WORKAROUND
-# endif // BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582))
-        // || BOOST_WORKAROUND(__SUNPRO_CC, BOOST_TESTED_AT(0x590))
+# endif // BOOST_WORKAROUND(__SUNPRO_CC, BOOST_TESTED_AT(0x590))
 #endif // defined(BOOST_ASIO_HAS_BOOST_WORKAROUND)
 
 #if defined(BOOST_ASIO_ENABLE_ARRAY_BUFFER_WORKAROUND)
@@ -385,9 +387,9 @@ private:
 /// Get an iterator to the first element in a buffer sequence.
 template <typename MutableBuffer>
 inline const mutable_buffer* buffer_sequence_begin(const MutableBuffer& b,
-    typename enable_if<
+    typename constraint<
       is_convertible<const MutableBuffer*, const mutable_buffer*>::value
-    >::type* = 0) BOOST_ASIO_NOEXCEPT
+    >::type = 0) BOOST_ASIO_NOEXCEPT
 {
   return static_cast<const mutable_buffer*>(detail::addressof(b));
 }
@@ -395,9 +397,9 @@ inline const mutable_buffer* buffer_sequence_begin(const MutableBuffer& b,
 /// Get an iterator to the first element in a buffer sequence.
 template <typename ConstBuffer>
 inline const const_buffer* buffer_sequence_begin(const ConstBuffer& b,
-    typename enable_if<
+    typename constraint<
       is_convertible<const ConstBuffer*, const const_buffer*>::value
-    >::type* = 0) BOOST_ASIO_NOEXCEPT
+    >::type = 0) BOOST_ASIO_NOEXCEPT
 {
   return static_cast<const const_buffer*>(detail::addressof(b));
 }
@@ -407,10 +409,10 @@ inline const const_buffer* buffer_sequence_begin(const ConstBuffer& b,
 /// Get an iterator to the first element in a buffer sequence.
 template <typename C>
 inline auto buffer_sequence_begin(C& c,
-    typename enable_if<
+    typename constraint<
       !is_convertible<const C*, const mutable_buffer*>::value
         && !is_convertible<const C*, const const_buffer*>::value
-    >::type* = 0) BOOST_ASIO_NOEXCEPT -> decltype(c.begin())
+    >::type = 0) BOOST_ASIO_NOEXCEPT -> decltype(c.begin())
 {
   return c.begin();
 }
@@ -418,10 +420,10 @@ inline auto buffer_sequence_begin(C& c,
 /// Get an iterator to the first element in a buffer sequence.
 template <typename C>
 inline auto buffer_sequence_begin(const C& c,
-    typename enable_if<
+    typename constraint<
       !is_convertible<const C*, const mutable_buffer*>::value
         && !is_convertible<const C*, const const_buffer*>::value
-    >::type* = 0) BOOST_ASIO_NOEXCEPT -> decltype(c.begin())
+    >::type = 0) BOOST_ASIO_NOEXCEPT -> decltype(c.begin())
 {
   return c.begin();
 }
@@ -430,20 +432,20 @@ inline auto buffer_sequence_begin(const C& c,
 
 template <typename C>
 inline typename C::iterator buffer_sequence_begin(C& c,
-    typename enable_if<
+    typename constraint<
       !is_convertible<const C*, const mutable_buffer*>::value
         && !is_convertible<const C*, const const_buffer*>::value
-    >::type* = 0) BOOST_ASIO_NOEXCEPT
+    >::type = 0) BOOST_ASIO_NOEXCEPT
 {
   return c.begin();
 }
 
 template <typename C>
 inline typename C::const_iterator buffer_sequence_begin(const C& c,
-    typename enable_if<
+    typename constraint<
       !is_convertible<const C*, const mutable_buffer*>::value
         && !is_convertible<const C*, const const_buffer*>::value
-    >::type* = 0) BOOST_ASIO_NOEXCEPT
+    >::type = 0) BOOST_ASIO_NOEXCEPT
 {
   return c.begin();
 }
@@ -462,9 +464,9 @@ inline typename C::const_iterator buffer_sequence_begin(const C& c,
 /// Get an iterator to one past the end element in a buffer sequence.
 template <typename MutableBuffer>
 inline const mutable_buffer* buffer_sequence_end(const MutableBuffer& b,
-    typename enable_if<
+    typename constraint<
       is_convertible<const MutableBuffer*, const mutable_buffer*>::value
-    >::type* = 0) BOOST_ASIO_NOEXCEPT
+    >::type = 0) BOOST_ASIO_NOEXCEPT
 {
   return static_cast<const mutable_buffer*>(detail::addressof(b)) + 1;
 }
@@ -472,9 +474,9 @@ inline const mutable_buffer* buffer_sequence_end(const MutableBuffer& b,
 /// Get an iterator to one past the end element in a buffer sequence.
 template <typename ConstBuffer>
 inline const const_buffer* buffer_sequence_end(const ConstBuffer& b,
-    typename enable_if<
+    typename constraint<
       is_convertible<const ConstBuffer*, const const_buffer*>::value
-    >::type* = 0) BOOST_ASIO_NOEXCEPT
+    >::type = 0) BOOST_ASIO_NOEXCEPT
 {
   return static_cast<const const_buffer*>(detail::addressof(b)) + 1;
 }
@@ -484,10 +486,10 @@ inline const const_buffer* buffer_sequence_end(const ConstBuffer& b,
 /// Get an iterator to one past the end element in a buffer sequence.
 template <typename C>
 inline auto buffer_sequence_end(C& c,
-    typename enable_if<
+    typename constraint<
       !is_convertible<const C*, const mutable_buffer*>::value
         && !is_convertible<const C*, const const_buffer*>::value
-    >::type* = 0) BOOST_ASIO_NOEXCEPT -> decltype(c.end())
+    >::type = 0) BOOST_ASIO_NOEXCEPT -> decltype(c.end())
 {
   return c.end();
 }
@@ -495,10 +497,10 @@ inline auto buffer_sequence_end(C& c,
 /// Get an iterator to one past the end element in a buffer sequence.
 template <typename C>
 inline auto buffer_sequence_end(const C& c,
-    typename enable_if<
+    typename constraint<
       !is_convertible<const C*, const mutable_buffer*>::value
         && !is_convertible<const C*, const const_buffer*>::value
-    >::type* = 0) BOOST_ASIO_NOEXCEPT -> decltype(c.end())
+    >::type = 0) BOOST_ASIO_NOEXCEPT -> decltype(c.end())
 {
   return c.end();
 }
@@ -507,20 +509,20 @@ inline auto buffer_sequence_end(const C& c,
 
 template <typename C>
 inline typename C::iterator buffer_sequence_end(C& c,
-    typename enable_if<
+    typename constraint<
       !is_convertible<const C*, const mutable_buffer*>::value
         && !is_convertible<const C*, const const_buffer*>::value
-    >::type* = 0) BOOST_ASIO_NOEXCEPT
+    >::type = 0) BOOST_ASIO_NOEXCEPT
 {
   return c.end();
 }
 
 template <typename C>
 inline typename C::const_iterator buffer_sequence_end(const C& c,
-    typename enable_if<
+    typename constraint<
       !is_convertible<const C*, const mutable_buffer*>::value
         && !is_convertible<const C*, const const_buffer*>::value
-    >::type* = 0) BOOST_ASIO_NOEXCEPT
+    >::type = 0) BOOST_ASIO_NOEXCEPT
 {
   return c.end();
 }
@@ -905,7 +907,7 @@ private:
 /**
  * @returns <tt>mutable_buffer(b)</tt>.
  */
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
     const mutable_buffer& b) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(b);
@@ -918,7 +920,8 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(
  *     b.data(),
  *     min(b.size(), max_size_in_bytes)); @endcode
  */
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(const mutable_buffer& b,
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+    const mutable_buffer& b,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(
@@ -935,7 +938,7 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(const mutable_buffer& b,
 /**
  * @returns <tt>const_buffer(b)</tt>.
  */
-inline BOOST_ASIO_CONST_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
     const const_buffer& b) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(b);
@@ -948,7 +951,8 @@ inline BOOST_ASIO_CONST_BUFFER buffer(
  *     b.data(),
  *     min(b.size(), max_size_in_bytes)); @endcode
  */
-inline BOOST_ASIO_CONST_BUFFER buffer(const const_buffer& b,
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+    const const_buffer& b,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(b.data(),
@@ -964,8 +968,8 @@ inline BOOST_ASIO_CONST_BUFFER buffer(const const_buffer& b,
 /**
  * @returns <tt>mutable_buffer(data, size_in_bytes)</tt>.
  */
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(void* data,
-    std::size_t size_in_bytes) BOOST_ASIO_NOEXCEPT
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+    void* data, std::size_t size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(data, size_in_bytes);
 }
@@ -974,8 +978,8 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(void* data,
 /**
  * @returns <tt>const_buffer(data, size_in_bytes)</tt>.
  */
-inline BOOST_ASIO_CONST_BUFFER buffer(const void* data,
-    std::size_t size_in_bytes) BOOST_ASIO_NOEXCEPT
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+    const void* data, std::size_t size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data, size_in_bytes);
 }
@@ -988,7 +992,8 @@ inline BOOST_ASIO_CONST_BUFFER buffer(const void* data,
  *     N * sizeof(PodType)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(PodType (&data)[N]) BOOST_ASIO_NOEXCEPT
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+    PodType (&data)[N]) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(data, N * sizeof(PodType));
 }
@@ -1001,7 +1006,8 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(PodType (&data)[N]) BOOST_ASIO_NOEXCEPT
  *     min(N * sizeof(PodType), max_size_in_bytes)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(PodType (&data)[N],
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+    PodType (&data)[N],
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(data,
@@ -1017,7 +1023,7 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(PodType (&data)[N],
  *     N * sizeof(PodType)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_CONST_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
     const PodType (&data)[N]) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data, N * sizeof(PodType));
@@ -1031,7 +1037,8 @@ inline BOOST_ASIO_CONST_BUFFER buffer(
  *     min(N * sizeof(PodType), max_size_in_bytes)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_CONST_BUFFER buffer(const PodType (&data)[N],
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+    const PodType (&data)[N],
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data,
@@ -1081,7 +1088,8 @@ struct buffer_types
 } // namespace detail
 
 template <typename PodType, std::size_t N>
-inline typename detail::buffer_types<PodType>::container_type
+BOOST_ASIO_NODISCARD inline
+typename detail::buffer_types<PodType>::container_type
 buffer(boost::array<PodType, N>& data) BOOST_ASIO_NOEXCEPT
 {
   typedef typename boost::asio::detail::buffer_types<PodType>::buffer_type
@@ -1093,7 +1101,8 @@ buffer(boost::array<PodType, N>& data) BOOST_ASIO_NOEXCEPT
 }
 
 template <typename PodType, std::size_t N>
-inline typename detail::buffer_types<PodType>::container_type
+BOOST_ASIO_NODISCARD inline
+typename detail::buffer_types<PodType>::container_type
 buffer(boost::array<PodType, N>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
@@ -1117,7 +1126,7 @@ buffer(boost::array<PodType, N>& data,
  *     data.size() * sizeof(PodType)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
     boost::array<PodType, N>& data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(
@@ -1132,7 +1141,8 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(
  *     min(data.size() * sizeof(PodType), max_size_in_bytes)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(boost::array<PodType, N>& data,
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+    boost::array<PodType, N>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(data.c_array(),
@@ -1148,7 +1158,7 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(boost::array<PodType, N>& data,
  *     data.size() * sizeof(PodType)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_CONST_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
     boost::array<const PodType, N>& data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.data(), data.size() * sizeof(PodType));
@@ -1162,7 +1172,8 @@ inline BOOST_ASIO_CONST_BUFFER buffer(
  *     min(data.size() * sizeof(PodType), max_size_in_bytes)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_CONST_BUFFER buffer(boost::array<const PodType, N>& data,
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+    boost::array<const PodType, N>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.data(),
@@ -1180,7 +1191,7 @@ inline BOOST_ASIO_CONST_BUFFER buffer(boost::array<const PodType, N>& data,
  *     data.size() * sizeof(PodType)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_CONST_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
     const boost::array<PodType, N>& data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.data(), data.size() * sizeof(PodType));
@@ -1194,7 +1205,8 @@ inline BOOST_ASIO_CONST_BUFFER buffer(
  *     min(data.size() * sizeof(PodType), max_size_in_bytes)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_CONST_BUFFER buffer(const boost::array<PodType, N>& data,
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+    const boost::array<PodType, N>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.data(),
@@ -1212,7 +1224,7 @@ inline BOOST_ASIO_CONST_BUFFER buffer(const boost::array<PodType, N>& data,
  *     data.size() * sizeof(PodType)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
     std::array<PodType, N>& data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(data.data(), data.size() * sizeof(PodType));
@@ -1226,7 +1238,8 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(
  *     min(data.size() * sizeof(PodType), max_size_in_bytes)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(std::array<PodType, N>& data,
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+    std::array<PodType, N>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(data.data(),
@@ -1242,7 +1255,7 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(std::array<PodType, N>& data,
  *     data.size() * sizeof(PodType)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_CONST_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
     std::array<const PodType, N>& data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.data(), data.size() * sizeof(PodType));
@@ -1256,7 +1269,8 @@ inline BOOST_ASIO_CONST_BUFFER buffer(
  *     min(data.size() * sizeof(PodType), max_size_in_bytes)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_CONST_BUFFER buffer(std::array<const PodType, N>& data,
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+    std::array<const PodType, N>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.data(),
@@ -1272,7 +1286,7 @@ inline BOOST_ASIO_CONST_BUFFER buffer(std::array<const PodType, N>& data,
  *     data.size() * sizeof(PodType)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_CONST_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
     const std::array<PodType, N>& data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.data(), data.size() * sizeof(PodType));
@@ -1286,7 +1300,8 @@ inline BOOST_ASIO_CONST_BUFFER buffer(
  *     min(data.size() * sizeof(PodType), max_size_in_bytes)); @endcode
  */
 template <typename PodType, std::size_t N>
-inline BOOST_ASIO_CONST_BUFFER buffer(const std::array<PodType, N>& data,
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
+    const std::array<PodType, N>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.data(),
@@ -1307,7 +1322,7 @@ inline BOOST_ASIO_CONST_BUFFER buffer(const std::array<PodType, N>& data,
  * invalidate iterators.
  */
 template <typename PodType, typename Allocator>
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
     std::vector<PodType, Allocator>& data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(
@@ -1331,7 +1346,8 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(
  * invalidate iterators.
  */
 template <typename PodType, typename Allocator>
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(std::vector<PodType, Allocator>& data,
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+    std::vector<PodType, Allocator>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(data.size() ? &data[0] : 0,
@@ -1356,7 +1372,7 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(std::vector<PodType, Allocator>& data,
  * invalidate iterators.
  */
 template <typename PodType, typename Allocator>
-inline BOOST_ASIO_CONST_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
     const std::vector<PodType, Allocator>& data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(
@@ -1380,7 +1396,7 @@ inline BOOST_ASIO_CONST_BUFFER buffer(
  * invalidate iterators.
  */
 template <typename PodType, typename Allocator>
-inline BOOST_ASIO_CONST_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
     const std::vector<PodType, Allocator>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
@@ -1404,7 +1420,7 @@ inline BOOST_ASIO_CONST_BUFFER buffer(
  * given string object.
  */
 template <typename Elem, typename Traits, typename Allocator>
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
     std::basic_string<Elem, Traits, Allocator>& data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_MUTABLE_BUFFER(data.size() ? &data[0] : 0,
@@ -1428,7 +1444,7 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(
  * given string object.
  */
 template <typename Elem, typename Traits, typename Allocator>
-inline BOOST_ASIO_MUTABLE_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_MUTABLE_BUFFER buffer(
     std::basic_string<Elem, Traits, Allocator>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
@@ -1451,7 +1467,7 @@ inline BOOST_ASIO_MUTABLE_BUFFER buffer(
  * given string object.
  */
 template <typename Elem, typename Traits, typename Allocator>
-inline BOOST_ASIO_CONST_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
     const std::basic_string<Elem, Traits, Allocator>& data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.data(), data.size() * sizeof(Elem)
@@ -1474,7 +1490,7 @@ inline BOOST_ASIO_CONST_BUFFER buffer(
  * given string object.
  */
 template <typename Elem, typename Traits, typename Allocator>
-inline BOOST_ASIO_CONST_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
     const std::basic_string<Elem, Traits, Allocator>& data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
@@ -1498,7 +1514,7 @@ inline BOOST_ASIO_CONST_BUFFER buffer(
  * data.size() * sizeof(Elem))</tt>.
  */
 template <typename Elem, typename Traits>
-inline BOOST_ASIO_CONST_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
     basic_string_view<Elem, Traits> data) BOOST_ASIO_NOEXCEPT
 {
   return BOOST_ASIO_CONST_BUFFER(data.size() ? &data[0] : 0,
@@ -1519,7 +1535,7 @@ inline BOOST_ASIO_CONST_BUFFER buffer(
  *     min(data.size() * sizeof(Elem), max_size_in_bytes)); @endcode
  */
 template <typename Elem, typename Traits>
-inline BOOST_ASIO_CONST_BUFFER buffer(
+BOOST_ASIO_NODISCARD inline BOOST_ASIO_CONST_BUFFER buffer(
     basic_string_view<Elem, Traits> data,
     std::size_t max_size_in_bytes) BOOST_ASIO_NOEXCEPT
 {
@@ -2095,7 +2111,8 @@ private:
  * @returns <tt>dynamic_string_buffer<Elem, Traits, Allocator>(data)</tt>.
  */
 template <typename Elem, typename Traits, typename Allocator>
-inline dynamic_string_buffer<Elem, Traits, Allocator> dynamic_buffer(
+BOOST_ASIO_NODISCARD inline
+dynamic_string_buffer<Elem, Traits, Allocator> dynamic_buffer(
     std::basic_string<Elem, Traits, Allocator>& data) BOOST_ASIO_NOEXCEPT
 {
   return dynamic_string_buffer<Elem, Traits, Allocator>(data);
@@ -2107,7 +2124,8 @@ inline dynamic_string_buffer<Elem, Traits, Allocator> dynamic_buffer(
  * max_size)</tt>.
  */
 template <typename Elem, typename Traits, typename Allocator>
-inline dynamic_string_buffer<Elem, Traits, Allocator> dynamic_buffer(
+BOOST_ASIO_NODISCARD inline
+dynamic_string_buffer<Elem, Traits, Allocator> dynamic_buffer(
     std::basic_string<Elem, Traits, Allocator>& data,
     std::size_t max_size) BOOST_ASIO_NOEXCEPT
 {
@@ -2119,7 +2137,8 @@ inline dynamic_string_buffer<Elem, Traits, Allocator> dynamic_buffer(
  * @returns <tt>dynamic_vector_buffer<Elem, Allocator>(data)</tt>.
  */
 template <typename Elem, typename Allocator>
-inline dynamic_vector_buffer<Elem, Allocator> dynamic_buffer(
+BOOST_ASIO_NODISCARD inline
+dynamic_vector_buffer<Elem, Allocator> dynamic_buffer(
     std::vector<Elem, Allocator>& data) BOOST_ASIO_NOEXCEPT
 {
   return dynamic_vector_buffer<Elem, Allocator>(data);
@@ -2130,7 +2149,8 @@ inline dynamic_vector_buffer<Elem, Allocator> dynamic_buffer(
  * @returns <tt>dynamic_vector_buffer<Elem, Allocator>(data, max_size)</tt>.
  */
 template <typename Elem, typename Allocator>
-inline dynamic_vector_buffer<Elem, Allocator> dynamic_buffer(
+BOOST_ASIO_NODISCARD inline
+dynamic_vector_buffer<Elem, Allocator> dynamic_buffer(
     std::vector<Elem, Allocator>& data,
     std::size_t max_size) BOOST_ASIO_NOEXCEPT
 {
@@ -2496,3 +2516,7 @@ struct is_dynamic_buffer
 #include <boost/asio/detail/pop_options.hpp>
 
 #endif // BOOST_ASIO_BUFFER_HPP
+
+/* buffer.hpp
+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
+*/

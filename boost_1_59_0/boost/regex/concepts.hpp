@@ -29,7 +29,13 @@
 #endif
 #include <bitset>
 #include <vector>
-#include <iostream>
+#include <ostream>
+
+#ifdef BOOST_REGEX_CXX03
+#define RW_NS boost
+#else
+#define RW_NS std
+#endif
 
 namespace boost{
 
@@ -996,37 +1002,36 @@ struct BoostRegexConcept
       out = regex_format(out, m_cresults, func2b);
       out = regex_format(out, m_cresults, func1b, f);
       out = regex_format(out, m_cresults, func1b);
-      out = regex_format(out, m_cresults, boost::ref(func3b), f);
-      out = regex_format(out, m_cresults, boost::ref(func3b));
-      out = regex_format(out, m_cresults, boost::ref(func2b), f);
-      out = regex_format(out, m_cresults, boost::ref(func2b));
-      out = regex_format(out, m_cresults, boost::ref(func1b), f);
-      out = regex_format(out, m_cresults, boost::ref(func1b));
-      out = regex_format(out, m_cresults, boost::cref(func3b), f);
-      out = regex_format(out, m_cresults, boost::cref(func3b));
-      out = regex_format(out, m_cresults, boost::cref(func2b), f);
-      out = regex_format(out, m_cresults, boost::cref(func2b));
-      out = regex_format(out, m_cresults, boost::cref(func1b), f);
-      out = regex_format(out, m_cresults, boost::cref(func1b));
-
+      out = regex_format(out, m_cresults, RW_NS::ref(func3b), f);
+      out = regex_format(out, m_cresults, RW_NS::ref(func3b));
+      out = regex_format(out, m_cresults, RW_NS::ref(func2b), f);
+      out = regex_format(out, m_cresults, RW_NS::ref(func2b));
+      out = regex_format(out, m_cresults, RW_NS::ref(func1b), f);
+      out = regex_format(out, m_cresults, RW_NS::ref(func1b));
+      out = regex_format(out, m_cresults, RW_NS::cref(func3b), f);
+      out = regex_format(out, m_cresults, RW_NS::cref(func3b));
+      out = regex_format(out, m_cresults, RW_NS::cref(func2b), f);
+      out = regex_format(out, m_cresults, RW_NS::cref(func2b));
+      out = regex_format(out, m_cresults, RW_NS::cref(func1b), f);
+      out = regex_format(out, m_cresults, RW_NS::cref(func1b));
       m_string += regex_format(m_cresults, func3b, f);
       m_string += regex_format(m_cresults, func3b);
       m_string += regex_format(m_cresults, func2b, f);
       m_string += regex_format(m_cresults, func2b);
       m_string += regex_format(m_cresults, func1b, f);
       m_string += regex_format(m_cresults, func1b);
-      m_string += regex_format(m_cresults, boost::ref(func3b), f);
-      m_string += regex_format(m_cresults, boost::ref(func3b));
-      m_string += regex_format(m_cresults, boost::ref(func2b), f);
-      m_string += regex_format(m_cresults, boost::ref(func2b));
-      m_string += regex_format(m_cresults, boost::ref(func1b), f);
-      m_string += regex_format(m_cresults, boost::ref(func1b));
-      m_string += regex_format(m_cresults, boost::cref(func3b), f);
-      m_string += regex_format(m_cresults, boost::cref(func3b));
-      m_string += regex_format(m_cresults, boost::cref(func2b), f);
-      m_string += regex_format(m_cresults, boost::cref(func2b));
-      m_string += regex_format(m_cresults, boost::cref(func1b), f);
-      m_string += regex_format(m_cresults, boost::cref(func1b));
+      m_string += regex_format(m_cresults, RW_NS::ref(func3b), f);
+      m_string += regex_format(m_cresults, RW_NS::ref(func3b));
+      m_string += regex_format(m_cresults, RW_NS::ref(func2b), f);
+      m_string += regex_format(m_cresults, RW_NS::ref(func2b));
+      m_string += regex_format(m_cresults, RW_NS::ref(func1b), f);
+      m_string += regex_format(m_cresults, RW_NS::ref(func1b));
+      m_string += regex_format(m_cresults, RW_NS::cref(func3b), f);
+      m_string += regex_format(m_cresults, RW_NS::cref(func3b));
+      m_string += regex_format(m_cresults, RW_NS::cref(func2b), f);
+      m_string += regex_format(m_cresults, RW_NS::cref(func2b));
+      m_string += regex_format(m_cresults, RW_NS::cref(func1b), f);
+      m_string += regex_format(m_cresults, RW_NS::cref(func1b));
 
       out = m_cresults.format(out, func3b, f);
       out = m_cresults.format(out, func3b);
@@ -1034,18 +1039,18 @@ struct BoostRegexConcept
       out = m_cresults.format(out, func2b);
       out = m_cresults.format(out, func1b, f);
       out = m_cresults.format(out, func1b);
-      out = m_cresults.format(out, boost::ref(func3b), f);
-      out = m_cresults.format(out, boost::ref(func3b));
-      out = m_cresults.format(out, boost::ref(func2b), f);
-      out = m_cresults.format(out, boost::ref(func2b));
-      out = m_cresults.format(out, boost::ref(func1b), f);
-      out = m_cresults.format(out, boost::ref(func1b));
-      out = m_cresults.format(out, boost::cref(func3b), f);
-      out = m_cresults.format(out, boost::cref(func3b));
-      out = m_cresults.format(out, boost::cref(func2b), f);
-      out = m_cresults.format(out, boost::cref(func2b));
-      out = m_cresults.format(out, boost::cref(func1b), f);
-      out = m_cresults.format(out, boost::cref(func1b));
+      out = m_cresults.format(out, RW_NS::ref(func3b), f);
+      out = m_cresults.format(out, RW_NS::ref(func3b));
+      out = m_cresults.format(out, RW_NS::ref(func2b), f);
+      out = m_cresults.format(out, RW_NS::ref(func2b));
+      out = m_cresults.format(out, RW_NS::ref(func1b), f);
+      out = m_cresults.format(out, RW_NS::ref(func1b));
+      out = m_cresults.format(out, RW_NS::cref(func3b), f);
+      out = m_cresults.format(out, RW_NS::cref(func3b));
+      out = m_cresults.format(out, RW_NS::cref(func2b), f);
+      out = m_cresults.format(out, RW_NS::cref(func2b));
+      out = m_cresults.format(out, RW_NS::cref(func1b), f);
+      out = m_cresults.format(out, RW_NS::cref(func1b));
 
       m_string += m_cresults.format(func3b, f);
       m_string += m_cresults.format(func3b);
@@ -1053,18 +1058,18 @@ struct BoostRegexConcept
       m_string += m_cresults.format(func2b);
       m_string += m_cresults.format(func1b, f);
       m_string += m_cresults.format(func1b);
-      m_string += m_cresults.format(boost::ref(func3b), f);
-      m_string += m_cresults.format(boost::ref(func3b));
-      m_string += m_cresults.format(boost::ref(func2b), f);
-      m_string += m_cresults.format(boost::ref(func2b));
-      m_string += m_cresults.format(boost::ref(func1b), f);
-      m_string += m_cresults.format(boost::ref(func1b));
-      m_string += m_cresults.format(boost::cref(func3b), f);
-      m_string += m_cresults.format(boost::cref(func3b));
-      m_string += m_cresults.format(boost::cref(func2b), f);
-      m_string += m_cresults.format(boost::cref(func2b));
-      m_string += m_cresults.format(boost::cref(func1b), f);
-      m_string += m_cresults.format(boost::cref(func1b));
+      m_string += m_cresults.format(RW_NS::ref(func3b), f);
+      m_string += m_cresults.format(RW_NS::ref(func3b));
+      m_string += m_cresults.format(RW_NS::ref(func2b), f);
+      m_string += m_cresults.format(RW_NS::ref(func2b));
+      m_string += m_cresults.format(RW_NS::ref(func1b), f);
+      m_string += m_cresults.format(RW_NS::ref(func1b));
+      m_string += m_cresults.format(RW_NS::cref(func3b), f);
+      m_string += m_cresults.format(RW_NS::cref(func3b));
+      m_string += m_cresults.format(RW_NS::cref(func2b), f);
+      m_string += m_cresults.format(RW_NS::cref(func2b));
+      m_string += m_cresults.format(RW_NS::cref(func1b), f);
+      m_string += m_cresults.format(RW_NS::cref(func1b));
 
       out = regex_replace(out, m_in, m_in, ce, func3, f);
       out = regex_replace(out, m_in, m_in, ce, func3);
@@ -1072,18 +1077,18 @@ struct BoostRegexConcept
       out = regex_replace(out, m_in, m_in, ce, func2);
       out = regex_replace(out, m_in, m_in, ce, func1, f);
       out = regex_replace(out, m_in, m_in, ce, func1);
-      out = regex_replace(out, m_in, m_in, ce, boost::ref(func3), f);
-      out = regex_replace(out, m_in, m_in, ce, boost::ref(func3));
-      out = regex_replace(out, m_in, m_in, ce, boost::ref(func2), f);
-      out = regex_replace(out, m_in, m_in, ce, boost::ref(func2));
-      out = regex_replace(out, m_in, m_in, ce, boost::ref(func1), f);
-      out = regex_replace(out, m_in, m_in, ce, boost::ref(func1));
-      out = regex_replace(out, m_in, m_in, ce, boost::cref(func3), f);
-      out = regex_replace(out, m_in, m_in, ce, boost::cref(func3));
-      out = regex_replace(out, m_in, m_in, ce, boost::cref(func2), f);
-      out = regex_replace(out, m_in, m_in, ce, boost::cref(func2));
-      out = regex_replace(out, m_in, m_in, ce, boost::cref(func1), f);
-      out = regex_replace(out, m_in, m_in, ce, boost::cref(func1));
+      out = regex_replace(out, m_in, m_in, ce, RW_NS::ref(func3), f);
+      out = regex_replace(out, m_in, m_in, ce, RW_NS::ref(func3));
+      out = regex_replace(out, m_in, m_in, ce, RW_NS::ref(func2), f);
+      out = regex_replace(out, m_in, m_in, ce, RW_NS::ref(func2));
+      out = regex_replace(out, m_in, m_in, ce, RW_NS::ref(func1), f);
+      out = regex_replace(out, m_in, m_in, ce, RW_NS::ref(func1));
+      out = regex_replace(out, m_in, m_in, ce, RW_NS::cref(func3), f);
+      out = regex_replace(out, m_in, m_in, ce, RW_NS::cref(func3));
+      out = regex_replace(out, m_in, m_in, ce, RW_NS::cref(func2), f);
+      out = regex_replace(out, m_in, m_in, ce, RW_NS::cref(func2));
+      out = regex_replace(out, m_in, m_in, ce, RW_NS::cref(func1), f);
+      out = regex_replace(out, m_in, m_in, ce, RW_NS::cref(func1));
 
       functor3<match_results<typename string_type::const_iterator> > func3s;
       functor2<match_results<typename string_type::const_iterator> > func2s;
@@ -1094,18 +1099,18 @@ struct BoostRegexConcept
       m_string += regex_replace(m_string, ce, func2s);
       m_string += regex_replace(m_string, ce, func1s, f);
       m_string += regex_replace(m_string, ce, func1s);
-      m_string += regex_replace(m_string, ce, boost::ref(func3s), f);
-      m_string += regex_replace(m_string, ce, boost::ref(func3s));
-      m_string += regex_replace(m_string, ce, boost::ref(func2s), f);
-      m_string += regex_replace(m_string, ce, boost::ref(func2s));
-      m_string += regex_replace(m_string, ce, boost::ref(func1s), f);
-      m_string += regex_replace(m_string, ce, boost::ref(func1s));
-      m_string += regex_replace(m_string, ce, boost::cref(func3s), f);
-      m_string += regex_replace(m_string, ce, boost::cref(func3s));
-      m_string += regex_replace(m_string, ce, boost::cref(func2s), f);
-      m_string += regex_replace(m_string, ce, boost::cref(func2s));
-      m_string += regex_replace(m_string, ce, boost::cref(func1s), f);
-      m_string += regex_replace(m_string, ce, boost::cref(func1s));
+      m_string += regex_replace(m_string, ce, RW_NS::ref(func3s), f);
+      m_string += regex_replace(m_string, ce, RW_NS::ref(func3s));
+      m_string += regex_replace(m_string, ce, RW_NS::ref(func2s), f);
+      m_string += regex_replace(m_string, ce, RW_NS::ref(func2s));
+      m_string += regex_replace(m_string, ce, RW_NS::ref(func1s), f);
+      m_string += regex_replace(m_string, ce, RW_NS::ref(func1s));
+      m_string += regex_replace(m_string, ce, RW_NS::cref(func3s), f);
+      m_string += regex_replace(m_string, ce, RW_NS::cref(func3s));
+      m_string += regex_replace(m_string, ce, RW_NS::cref(func2s), f);
+      m_string += regex_replace(m_string, ce, RW_NS::cref(func2s));
+      m_string += regex_replace(m_string, ce, RW_NS::cref(func1s), f);
+      m_string += regex_replace(m_string, ce, RW_NS::cref(func1s));
    }
 
    std::basic_ostream<value_type> m_stream;
@@ -1127,3 +1132,7 @@ struct BoostRegexConcept
 }
 
 #endif
+
+/* concepts.hpp
+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
+*/

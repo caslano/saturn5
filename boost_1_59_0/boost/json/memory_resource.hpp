@@ -1,0 +1,110 @@
+//
+// Copyright (c) 2019 Vinnie Falco (vinnie.falco@gmail.com)
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
+// Official repository: https://github.com/boostorg/json
+//
+
+#ifndef BOOST_JSON_MEMORY_RESOURCE_HPP
+#define BOOST_JSON_MEMORY_RESOURCE_HPP
+
+#include <boost/json/detail/config.hpp>
+
+#include <boost/container/pmr/memory_resource.hpp>
+#include <boost/container/pmr/polymorphic_allocator.hpp>
+
+BOOST_JSON_NS_BEGIN
+
+#ifdef BOOST_JSON_DOCS
+
+/** The type of memory resource used by the library.
+
+    Alias for `boost::container::pmr::memory_resource`.
+*/
+class memory_resource
+{
+};
+
+/** The type of polymorphic allocator used by the library.
+
+    Alias template for `boost::container::pmr::polymorphic_allocator`.
+*/
+template<class T>
+class polymorphic_allocator;
+
+// VFALCO Bug: doc toolchain won't make this a ref
+//using memory_resource = __see_below__;
+
+#else
+using memory_resource = boost::container::pmr::memory_resource;
+
+template<class T>
+using polymorphic_allocator =
+    boost::container::pmr::polymorphic_allocator<T>;
+#endif
+
+/** Return true if a memory resource's deallocate function has no effect.
+
+    This metafunction may be specialized to indicate to
+    the library that calls to the `deallocate` function of
+    a @ref memory_resource have no effect. The implementation
+    will elide such calls when it is safe to do so. By default,
+    the implementation assumes that all memory resources
+    require a call to `deallocate` for each memory region
+    obtained by calling `allocate`.
+
+    @par Example
+
+    This example specializes the metafuction for `my_resource`,
+    to indicate that calls to deallocate have no effect:
+
+    @code
+
+    // Forward-declaration for a user-defined memory resource
+    struct my_resource;
+
+    // It is necessary to specialize the template from
+    // inside the namespace in which it is declared:
+
+    namespace boost {
+    namespace json {
+
+    template<>
+    struct is_deallocate_trivial< my_resource >
+    {
+        static constexpr bool value = true;
+    };
+
+    } // namespace json
+    } // namespace boost
+
+    @endcode
+
+    It is usually not necessary for users to check this trait.
+    Instead, they can call @ref storage_ptr::is_deallocate_trivial
+    to determine if the pointed-to memory resource has a trivial
+    deallocate function.
+
+    @see
+        @ref memory_resource,
+        @ref storage_ptr
+*/
+template<class T>
+struct is_deallocate_trivial
+{
+    /** A bool equal to true if calls to `T::do_deallocate` have no effect.
+
+        The primary template sets `value` to false.
+    */
+    static constexpr bool value = false;
+};
+
+BOOST_JSON_NS_END
+
+#endif
+
+/* memory_resource.hpp
+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
+*/

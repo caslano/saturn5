@@ -1,5 +1,5 @@
 import os
-for root, dirs, files in os.walk('.'):
+for root, dirs, files in os.walk('.', topdown=False):
 	for file in files:
 
 		if file.endswith("977.cpp"):
@@ -10,6 +10,12 @@ for root, dirs, files in os.walk('.'):
 
 		if file.endswith("899.cpp"):
 			new_file = file[:-7] + ".com"
+			print(f"{root}\\{file}", end=" => ")
+			print(new_file)
+			os.rename(f"{root}\\{file}", f"{root}\\{new_file}")
+			
+		if file.endswith("261.cpp"):
+			new_file = file[:-7] + ".jam"
 			print(f"{root}\\{file}", end=" => ")
 			print(new_file)
 			os.rename(f"{root}\\{file}", f"{root}\\{new_file}")

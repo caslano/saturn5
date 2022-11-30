@@ -20,7 +20,7 @@
 #ifndef BOOST_REGEX_V4_PERL_MATCHER_NON_RECURSIVE_HPP
 #define BOOST_REGEX_V4_PERL_MATCHER_NON_RECURSIVE_HPP
 
-#include <new>
+#include <boost/regex/v4/mem_block_cache.hpp>
 
 #ifdef BOOST_MSVC
 #pragma warning(push)
@@ -111,7 +111,7 @@ struct save_state_init
       *end = reinterpret_cast<saved_state*>(reinterpret_cast<char*>(*base)+BOOST_REGEX_BLOCKSIZE);
       --(*end);
       (void) new (*end)saved_state(0);
-      BOOST_ASSERT(*end > *base);
+      BOOST_REGEX_ASSERT(*end > *base);
    }
    ~save_state_init()
    {
@@ -217,7 +217,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_all_states()
             bool successful_unwind = unwind(false);
             if((m_match_flags & match_partial) && (position == last) && (position != search_base))
                m_has_partial_match = true;
-            if(false == successful_unwind)
+            if(!successful_unwind)
                return m_recursive_result;
          }
       }
@@ -248,7 +248,7 @@ void perl_matcher<BidiIterator, Allocator, traits>::extend_stack()
 template <class BidiIterator, class Allocator, class traits>
 inline void perl_matcher<BidiIterator, Allocator, traits>::push_matched_paren(int index, const sub_match<BidiIterator>& sub)
 {
-   //BOOST_ASSERT(index);
+   //BOOST_REGEX_ASSERT(index);
    saved_matched_paren<BidiIterator>* pmp = static_cast<saved_matched_paren<BidiIterator>*>(m_backup_state);
    --pmp;
    if(pmp < m_stack_base)
@@ -264,7 +264,7 @@ inline void perl_matcher<BidiIterator, Allocator, traits>::push_matched_paren(in
 template <class BidiIterator, class Allocator, class traits>
 inline void perl_matcher<BidiIterator, Allocator, traits>::push_case_change(bool c)
 {
-   //BOOST_ASSERT(index);
+   //BOOST_REGEX_ASSERT(index);
    saved_change_case* pmp = static_cast<saved_change_case*>(m_backup_state);
    --pmp;
    if(pmp < m_stack_base)
@@ -348,7 +348,7 @@ inline void perl_matcher<BidiIterator, Allocator, traits>::push_repeater_count(i
       pmp = static_cast<saved_repeater<BidiIterator>*>(m_backup_state);
       --pmp;
    }
-   (void) new (pmp)saved_repeater<BidiIterator>(i, s, position, this->recursion_stack.size() ? this->recursion_stack.back().idx : (INT_MIN + 3));
+   (void) new (pmp)saved_repeater<BidiIterator>(i, s, position, this->recursion_stack.empty() ? (INT_MIN + 3) : this->recursion_stack.back().idx);
    m_backup_state = pmp;
 }
 
@@ -492,7 +492,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_startmark()
       {
       // conditional expression:
       const re_alt* alt = static_cast<const re_alt*>(pstate->next.p);
-      BOOST_ASSERT(alt->type == syntax_element_alt);
+      BOOST_REGEX_ASSERT(alt->type == syntax_element_alt);
       pstate = alt->next.p;
       if(pstate->type == syntax_element_assert_backref)
       {
@@ -503,7 +503,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_startmark()
       else
       {
          // zero width assertion, have to match this recursively:
-         BOOST_ASSERT(pstate->type == syntax_element_startmark);
+         BOOST_REGEX_ASSERT(pstate->type == syntax_element_startmark);
          bool negated = static_cast<const re_brace*>(pstate)->index == -2;
          BidiIterator saved_position = position;
          const re_syntax_base* next_pstate = static_cast<const re_jump*>(pstate->next.p)->alt.p->next.p;
@@ -543,7 +543,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_startmark()
       }
    default:
    {
-      BOOST_ASSERT(index > 0);
+      BOOST_REGEX_ASSERT(index > 0);
       if((m_match_flags & match_nosubs) == 0)
       {
          push_matched_paren(index, (*m_presult)[index]);
@@ -600,7 +600,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_rep()
 #pragma warning(push)
 #pragma warning(disable:4127 4244)
 #endif
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option push -w-8008 -w-8066 -w-8004
 #endif
    const re_repeat* rep = static_cast<const re_repeat*>(pstate);
@@ -691,7 +691,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_rep()
       }
    }
    return false;
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option pop
 #endif
 #ifdef BOOST_MSVC
@@ -705,7 +705,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_dot_repeat_slow()
    std::size_t count = 0;
    const re_repeat* rep = static_cast<const re_repeat*>(pstate);
    re_syntax_base* psingle = rep->next.p;
-   // match compulsary repeats first:
+   // match compulsory repeats first:
    while(count < rep->min)
    {
       pstate = psingle;
@@ -790,11 +790,11 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_char_repeat()
 #pragma warning(push)
 #pragma warning(disable:4127)
 #endif
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option push -w-8008 -w-8066 -w-8004
 #endif
    const re_repeat* rep = static_cast<const re_repeat*>(pstate);
-   BOOST_ASSERT(1 == static_cast<const re_literal*>(rep->next.p)->length);
+   BOOST_REGEX_ASSERT(1 == static_cast<const re_literal*>(rep->next.p)->length);
    const char_type what = *reinterpret_cast<const char_type*>(static_cast<const re_literal*>(rep->next.p) + 1);
    std::size_t count = 0;
    //
@@ -850,7 +850,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_char_repeat()
       pstate = rep->alt.p;
       return (position == last) ? (rep->can_be_null & mask_skip) : can_start(*position, rep->_map, mask_skip);
    }
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option pop
 #endif
 #ifdef BOOST_MSVC
@@ -865,7 +865,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_set_repeat()
 #pragma warning(push)
 #pragma warning(disable:4127)
 #endif
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option push -w-8008 -w-8066 -w-8004
 #endif
    const re_repeat* rep = static_cast<const re_repeat*>(pstate);
@@ -924,7 +924,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_set_repeat()
       pstate = rep->alt.p;
       return (position == last) ? (rep->can_be_null & mask_skip) : can_start(*position, rep->_map, mask_skip);
    }
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option pop
 #endif
 #ifdef BOOST_MSVC
@@ -939,7 +939,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_long_set_repeat()
 #pragma warning(push)
 #pragma warning(disable:4127)
 #endif
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option push -w-8008 -w-8066 -w-8004
 #endif
    typedef typename traits::char_class_type m_type;
@@ -999,7 +999,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_long_set_repeat()
       pstate = rep->alt.p;
       return (position == last) ? (rep->can_be_null & mask_skip) : can_start(*position, rep->_map, mask_skip);
    }
-#ifdef __BORLANDC__
+#ifdef BOOST_BORLANDC
 #pragma option pop
 #endif
 #ifdef BOOST_MSVC
@@ -1010,7 +1010,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_long_set_repeat()
 template <class BidiIterator, class Allocator, class traits>
 bool perl_matcher<BidiIterator, Allocator, traits>::match_recursion()
 {
-   BOOST_ASSERT(pstate->type == syntax_element_recurse);
+   BOOST_REGEX_ASSERT(pstate->type == syntax_element_recurse);
    //
    // See if we've seen this recursion before at this location, if we have then
    // we need to prevent infinite recursion:
@@ -1087,7 +1087,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::match_match()
 {
    if(!recursion_stack.empty())
    {
-      BOOST_ASSERT(0 == recursion_stack.back().idx);
+      BOOST_REGEX_ASSERT(0 == recursion_stack.back().idx);
       pstate = recursion_stack.back().preturn_address;
       push_recursion(recursion_stack.back().idx, recursion_stack.back().preturn_address, m_presult, &recursion_stack.back().results);
       *m_presult = recursion_stack.back().results;
@@ -1224,7 +1224,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::skip_until_paren(int index, 
 
 /****************************************************************************
 
-Unwind and associated proceedures follow, these perform what normal stack
+Unwind and associated procedures follow, these perform what normal stack
 unwinding does in the recursive implementation.
 
 ****************************************************************************/
@@ -1296,7 +1296,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_paren(bool have_match
 {
    saved_matched_paren<BidiIterator>* pmp = static_cast<saved_matched_paren<BidiIterator>*>(m_backup_state);
    // restore previous values if no match was found:
-   if(have_match == false)
+   if(!have_match)
    {
       m_presult->set_first(pmp->sub.first, pmp->index, pmp->index == 0);
       m_presult->set_second(pmp->sub.second, pmp->index, pmp->sub.matched, pmp->index == 0);
@@ -1354,6 +1354,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_alt(bool r)
 template <class BidiIterator, class Allocator, class traits>
 bool perl_matcher<BidiIterator, Allocator, traits>::unwind_repeater_counter(bool)
 {
+   ++used_block_count;
    saved_repeater<BidiIterator>* pmp = static_cast<saved_repeater<BidiIterator>*>(m_backup_state);
    boost::BOOST_REGEX_DETAIL_NS::inplace_destroy(pmp++);
    m_backup_state = pmp;
@@ -1394,15 +1395,15 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_greedy_single_repeat(
 
    const re_repeat* rep = pmp->rep;
    std::size_t count = pmp->count;
-   BOOST_ASSERT(rep->next.p != 0);
-   BOOST_ASSERT(rep->alt.p != 0);
+   BOOST_REGEX_ASSERT(rep->next.p != 0);
+   BOOST_REGEX_ASSERT(rep->alt.p != 0);
 
    count -= rep->min;
    
    if((m_match_flags & match_partial) && (position == last))
       m_has_partial_match = true;
 
-   BOOST_ASSERT(count);
+   BOOST_REGEX_ASSERT(count);
    position = pmp->last_position;
 
    // backtrack till we can skip out:
@@ -1443,12 +1444,12 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_slow_dot_repeat(bool 
 
    const re_repeat* rep = pmp->rep;
    std::size_t count = pmp->count;
-   BOOST_ASSERT(rep->type == syntax_element_dot_rep);
-   BOOST_ASSERT(rep->next.p != 0);
-   BOOST_ASSERT(rep->alt.p != 0);
-   BOOST_ASSERT(rep->next.p->type == syntax_element_wild);
+   BOOST_REGEX_ASSERT(rep->type == syntax_element_dot_rep);
+   BOOST_REGEX_ASSERT(rep->next.p != 0);
+   BOOST_REGEX_ASSERT(rep->alt.p != 0);
+   BOOST_REGEX_ASSERT(rep->next.p->type == syntax_element_wild);
 
-   BOOST_ASSERT(count < rep->max);
+   BOOST_REGEX_ASSERT(count < rep->max);
    pstate = rep->next.p;
    position = pmp->last_position;
 
@@ -1508,7 +1509,7 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_fast_dot_repeat(bool 
    const re_repeat* rep = pmp->rep;
    std::size_t count = pmp->count;
 
-   BOOST_ASSERT(count < rep->max);
+   BOOST_REGEX_ASSERT(count < rep->max);
    position = pmp->last_position;
    if(position != last)
    {
@@ -1568,11 +1569,11 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_char_repeat(bool r)
    const char_type what = *reinterpret_cast<const char_type*>(static_cast<const re_literal*>(pstate) + 1);
    position = pmp->last_position;
 
-   BOOST_ASSERT(rep->type == syntax_element_char_rep);
-   BOOST_ASSERT(rep->next.p != 0);
-   BOOST_ASSERT(rep->alt.p != 0);
-   BOOST_ASSERT(rep->next.p->type == syntax_element_literal);
-   BOOST_ASSERT(count < rep->max);
+   BOOST_REGEX_ASSERT(rep->type == syntax_element_char_rep);
+   BOOST_REGEX_ASSERT(rep->next.p != 0);
+   BOOST_REGEX_ASSERT(rep->alt.p != 0);
+   BOOST_REGEX_ASSERT(rep->next.p->type == syntax_element_literal);
+   BOOST_REGEX_ASSERT(count < rep->max);
 
    if(position != last)
    {
@@ -1637,11 +1638,11 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_short_set_repeat(bool
    const unsigned char* map = static_cast<const re_set*>(rep->next.p)->_map;
    position = pmp->last_position;
 
-   BOOST_ASSERT(rep->type == syntax_element_short_set_rep);
-   BOOST_ASSERT(rep->next.p != 0);
-   BOOST_ASSERT(rep->alt.p != 0);
-   BOOST_ASSERT(rep->next.p->type == syntax_element_set);
-   BOOST_ASSERT(count < rep->max);
+   BOOST_REGEX_ASSERT(rep->type == syntax_element_short_set_rep);
+   BOOST_REGEX_ASSERT(rep->next.p != 0);
+   BOOST_REGEX_ASSERT(rep->alt.p != 0);
+   BOOST_REGEX_ASSERT(rep->next.p->type == syntax_element_set);
+   BOOST_REGEX_ASSERT(count < rep->max);
    
    if(position != last)
    {
@@ -1707,11 +1708,11 @@ bool perl_matcher<BidiIterator, Allocator, traits>::unwind_long_set_repeat(bool 
    const re_set_long<m_type>* set = static_cast<const re_set_long<m_type>*>(pstate);
    position = pmp->last_position;
 
-   BOOST_ASSERT(rep->type == syntax_element_long_set_rep);
-   BOOST_ASSERT(rep->next.p != 0);
-   BOOST_ASSERT(rep->alt.p != 0);
-   BOOST_ASSERT(rep->next.p->type == syntax_element_long_set);
-   BOOST_ASSERT(count < rep->max);
+   BOOST_REGEX_ASSERT(rep->type == syntax_element_long_set_rep);
+   BOOST_REGEX_ASSERT(rep->next.p != 0);
+   BOOST_REGEX_ASSERT(rep->alt.p != 0);
+   BOOST_REGEX_ASSERT(rep->next.p->type == syntax_element_long_set);
+   BOOST_REGEX_ASSERT(count < rep->max);
 
    if(position != last)
    {
@@ -1945,4 +1946,6 @@ inline void perl_matcher<BidiIterator, Allocator, traits>::push_parenthesis_push
 
 #endif
 
-
+/* perl_matcher_non_recursive.hpp
+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
+*/

@@ -16,6 +16,7 @@
 #include <boost/aligned_storage.hpp>
 #include <boost/assert.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/core/allocator_access.hpp>
 #include <boost/utility.hpp>
 #include <boost/next_prior.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -24,7 +25,6 @@
 #include <boost/type_traits/has_trivial_destructor.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 
-#include <boost/lockfree/detail/allocator_rebind_helper.hpp>
 #include <boost/lockfree/detail/atomic.hpp>
 #include <boost/lockfree/detail/copy_payload.hpp>
 #include <boost/lockfree/detail/parameter.hpp>
@@ -352,9 +352,8 @@ public:
         if ( !boost::has_trivial_destructor<T>::value ) {
             // make sure to call all destructors!
 
-            T dummy_element;
-            while (pop(dummy_element))
-            {}
+            detail::consume_noop consume_functor;
+            (void)consume_all( consume_functor );
         } else {
             write_index_.store(0, memory_order_relaxed);
             read_index_.store(0, memory_order_release);
@@ -446,6 +445,13 @@ protected:
     size_type max_number_of_elements() const
     {
         return max_size;
+    }
+
+    ~compile_time_sized_ringbuffer(void)
+    {
+        // destroy all remaining items
+        detail::consume_noop consume_functor;
+        (void)consume_all(consume_functor);
     }
 
 public:
@@ -551,7 +557,7 @@ public:
     }
 
     template <typename U>
-    runtime_sized_ringbuffer(typename detail::allocator_rebind_helper<Alloc, U>::type const & alloc, size_type max_elements):
+    runtime_sized_ringbuffer(typename boost::allocator_rebind<Alloc, U>::type const & alloc, size_type max_elements):
         Alloc(alloc), max_elements_(max_elements + 1)
     {
 #ifdef BOOST_NO_CXX11_ALLOCATOR
@@ -576,8 +582,8 @@ public:
     ~runtime_sized_ringbuffer(void)
     {
         // destroy all remaining items
-        T out;
-        while (pop(&out, 1)) {}
+        detail::consume_noop consume_functor;
+        (void)consume_all(consume_functor);
 
 #ifdef BOOST_NO_CXX11_ALLOCATOR
         Alloc::deallocate(array_, max_elements_);
@@ -749,51 +755,72 @@ public:
      *
      *  \pre spsc_queue must be configured to be sized at compile-time
      */
-    // @{
     spsc_queue(void)
     {
+        // Don't use BOOST_STATIC_ASSERT() here since it will be evaluated when compiling
+        // this function and this function may be compiled even when it isn't being used.
         BOOST_ASSERT(!runtime_sized);
     }
 
+    /** Constructs a spsc_queue with a custom allocator
+     *
+     *  \pre spsc_queue must be configured to be sized at compile-time
+     *
+     *  \note This is just for API compatibility: an allocator isn't actually needed
+     */
     template <typename U>
-    explicit spsc_queue(typename detail::allocator_rebind_helper<allocator, U>::type const &)
+    explicit spsc_queue(typename boost::allocator_rebind<allocator, U>::type const &)
     {
-        // just for API compatibility: we don't actually need an allocator
         BOOST_STATIC_ASSERT(!runtime_sized);
     }
 
+    /** Constructs a spsc_queue with a custom allocator
+     *
+     *  \pre spsc_queue must be configured to be sized at compile-time
+     *
+     *  \note This is just for API compatibility: an allocator isn't actually needed
+     */
     explicit spsc_queue(allocator const &)
     {
-        // just for API compatibility: we don't actually need an allocator
+        // Don't use BOOST_STATIC_ASSERT() here since it will be evaluated when compiling
+        // this function and this function may be compiled even when it isn't being used.
         BOOST_ASSERT(!runtime_sized);
     }
-    // @}
-
 
     /** Constructs a spsc_queue for element_count elements
      *
      *  \pre spsc_queue must be configured to be sized at run-time
      */
-    // @{
     explicit spsc_queue(size_type element_count):
         base_type(element_count)
     {
+        // Don't use BOOST_STATIC_ASSERT() here since it will be evaluated when compiling
+        // this function and this function may be compiled even when it isn't being used.
         BOOST_ASSERT(runtime_sized);
     }
 
+    /** Constructs a spsc_queue for element_count elements with a custom allocator
+     *
+     *  \pre spsc_queue must be configured to be sized at run-time
+     */
     template <typename U>
-    spsc_queue(size_type element_count, typename detail::allocator_rebind_helper<allocator, U>::type const & alloc):
+    spsc_queue(size_type element_count, typename boost::allocator_rebind<allocator, U>::type const & alloc):
         base_type(alloc, element_count)
     {
         BOOST_STATIC_ASSERT(runtime_sized);
     }
 
+    /** Constructs a spsc_queue for element_count elements with a custom allocator
+     *
+     *  \pre spsc_queue must be configured to be sized at run-time
+     */
     spsc_queue(size_type element_count, allocator_arg const & alloc):
         base_type(alloc, element_count)
     {
+        // Don't use BOOST_STATIC_ASSERT() here since it will be evaluated when compiling
+        // this function and this function may be compiled even when it isn't being used.
         BOOST_ASSERT(runtime_sized);
     }
-    // @}
 
     /** Pushes object t to the ringbuffer.
      *
@@ -1011,9 +1038,8 @@ public:
         if ( !boost::has_trivial_destructor<T>::value ) {
             // make sure to call all destructors!
 
-            T dummy_element;
-            while (pop(dummy_element))
-            {}
+            detail::consume_noop consume_functor;
+            (void)consume_all(consume_functor);
         } else {
             base_type::write_index_.store(0, memory_order_relaxed);
             base_type::read_index_.store(0, memory_order_release);
@@ -1026,3 +1052,7 @@ public:
 
 
 #endif /* BOOST_LOCKFREE_SPSC_QUEUE_HPP_INCLUDED */
+
+/* spsc_queue.hpp
+mq597ES+RP75UYRkwT+cPz7/IHwwGYdPyioPoEgUfSwlhKVLGutxsoniuXcs1ULvMQ2UtSiX62/C6s3AuQc6bgfCFErWJhQElcaB2RDcIbmLcBfgxyyDVY6SMhlRzM3T0/2KeYrap9UghBNBMhwOvIL/kWR2/N9wk/4/cJcSADn+/zZbL5XlnGwwM4KphciEalUqC7R6SdEb8Oth1EPFJn93JY/Ckfice9pY03tYQqAhLXpRlC3n2uXFDGc4OLZ2WVJ973ZRfIk3e1RJyiruNKfy5KWAiRyrU+ELTra0XI124Q1L8xBX0kgSKRY44ollXcW1KWtPJOq+SPWUaXkpDO3lYhO0gpYC5f5lQkQcioSZISc5Q7R26mVlNvldWQVREkywyJ79HK92eTn1Xd6Yd2PDFibDvrawXkJztw7B2HZSedsEx4RbMnvg1whMwgIqGk2kB1/W85bFVSbLPDmXBngbcuJe3Dd9fjs0ICsCPSaaaSruCI4/TmAM7KxOPFP5/5qAW9rN5Ew6BsEHxe5Lpas13d09HVEIwXGAlJYFj6irtoM3pxJOY/p5/3C9/6ER77SnPP4vBDTnZIMY9aUVEWIAkqiFNKJCCgKkgqfpB5AYhujmWi5ZvkUChC3g3YhWSbf7Rx+MP3RLfnjmObPf09cuO5EqNINGB73NNSuu8Dx/1Wq7TpRk0q52D96uZ/QZ+cEfwdRYG+bWmeRXO6brn9qOEm6bqGBxSG91mVnZvwitMhfbUkYC1UauZbpdOGJ5nQmE2woxBgCQA8qG+smIQqLoCqhsAXN7NVAyD8vWDnMb0pxHapIpknAaTxO+cNk7rMbKxiz3wmalIHxoZh3p9ZmYzWvjT5P88jtdrdMLmaf5shPWrNV41MpbkwNFGY222fqXcFnHNeUcLsk6tTXRsTqF4NxnZkh7c0qMzrlopHNe1U5xqdc7DKCHQ5CEUCFlmrjdAVgZONUZm1SNeBk1cIuYdBkxTPkCUfF6/6FmJpgByWFA0gpQKqGNTGDQj20phTGCxcPnVw0562O+NyVbcTGQKES8gDRTGZCt9l2eVQS8ud4j/CCWTSHvoolT8pboFJ+/l3l28VbzKa55YNzz6HnMWR6nGtWzj12gfpK4eXIxioRcj7CLUP0kYh3YrhZb7G3TSEsu8ruis4xQpyOXO+xzym8hykmUs4EQMyqZEJbROk8xJB2SCmUuX605xSk1MfQZEZr9C9sfgYWtjDT5A0V6Ek4XzhwCHGc0/FJ/z/Wqs7GU/rSWMOInyDG1rfq18TIpzs0OEdjJ5ap1VRIqprBmY05mPnBTYFJJNKth6p30zxadvMr9HL4UDps6pnKBinoFAOrX7kj+pu5+TH74rsohogQzBLsXmpytYd0W+U0xKvy8w+N0xQ2tZa+bErqoJa8wYdemEMwLx8kq/R1TulLiadAyKR4RpUOWbB6LeWRIaHTj7mJZTZud/BzXBEzgKACB0spSxP05a93UJqR/oeILs3o+HXAyqw2SnbTOtrtvhWwf12XsUrj1aAnz8JtsDjPCl/LJFR1+AfUKFud05CsRQliQHkYrlnrxuJ9QvsNFK0fbXyaqTnxzu0JbiX7Drjn9fgX6DWKozIp+9xOtWatnc1/gR9J9TN3OBK9MkN7/pWsbYfA2985cJ65Iqjd/rMWlURX6eBKcmwfOym74MAzJBHzRgnJ2Vf8QP+sgzrDreBvQovCpd5c0it8XGYnUPmaC3XkxH1fY40D+AXw1msWKIhGBlHCnuRvlj8Pd0b1fVzwbL0EtgfWaJAFsLZUxl+0EQf4vWMaRUTyeAd2U9IrKeQPGbHL4+EPEznu6uuoABxm0aSrWEhbKbtiUM247orR+RBSGpGRgAw4zP+S9EAC7IJ4Ze3i+3ukODBxjK9pGwH8dgM1/85DbDpbScOFjhMgJcpmQkmKQk52bjrWVxXuf8ZuVPYEbonnrE9bAsQs/ASCQ7ymRF3NHRHCg75Fzt+olH4XYnE6mKl0GItHtV35SpiKnthCjDBytS9LS21g0yBOsXEsIry5Tkdn5YeoR1kTXWtRF6Wd2DBZ8ays+O58xOOmwDpsbmfqsuAsz5LpSVWLOThxgXlx0BDEvqqKD4JjPIUSBJjVRO/EwatM4E5k0p7Ioc4zkcOkEmaByH6PQZExT+d+61gTsmCBDRABShrlcsE1xTVO7pis08LFUwF7+is5obmRbqwl+5EeyPQh5Ic3K0U5gE2joAFdp0bNsP8EVznIls/864b1lq5gL+lJWchz1dWdGFSaQasiGqYHJXHLbCYwDTaUqmHAMYca5LeVrCmX5Oo4kkspGFIGJWL85vmbOgEKMjBBF2rGdnpbKZxdzh0sW2ElSZOQ55sTrLXvOP7k4mCkpCgeDaBoHZeZC+nXgSfanB8CP9qRcTu7q68krCZjLcZZhzUXJo7vq/tGMtauSeBScNGSl1bBMnIoiz7j3kVtt08bmr3f557xU2xi0EmiUzdRYqVbhgwCldnwBIGI9vwUhPN02AJDpWh8qsNegjulS0dA/71Qs4KCwx27cSGcteyY/+CiC9RwToL1xmAIr06AUjBgKntT8srBbJpoGKCkXCYrLLCbEQmmeDhcRmNsjI0NMApypzssV1EShjdB487Oo5RFhDHHAOYHxAxNhHJXI7aQDMP+ll8VxSf/90IIsTrrvs+hirUh1O80ZlIcUNG2cQ2bNU1GNyNUpBwrnHesuNI4+aKirdwKhrxPGqZSBb5sQIEouVGuo/qLd826hZY3QSmoztgg5QljtgHSz4KIRXJqK3fux53r+rTpPVi9/whGJ6Q0cW3+vKKTaL36cdrlEn6Gk1BM8uB5qCmiD7U9CbtNQUn+RiEzu7kl6DEwL2382XunVACJbGwUDBvQEXPMj1oOEsQCABHCDTJNZ0/oAEizt04mOfUBT9j51Fma3royuDPUWayzL0xEysNfdJsuKaJJCNuujrMAjhLVbBVjSALut9TvOIieHNk+8PWdUycKU/HpwddCHoEDiBRDN1txwbbPubZ63XB4PjpetXON1VWvlFqic/2URYqAcaNoSMW0Ad05J8p6MeZ+zPee/PiD3/1ccwUKZPoEeEIwXaLhK1Zkfhdw+Kp7Kg9XuNS7fcMSRfg+GmwkmdnnZ6V7ESmQRH9PNtb6Yifn+bnAMzNWx+XDcfBPTtg3+/NfpWBM6rw3/7sc6636XVSiTu/tSYOFDt0LasE6FVhOzqBzleDxQdrL9X0pYVRAmbhs0LzHMYi8Mp3Nc8+CkKhopW97KbErS2OZOMHAYbXrBhr7mRGYv7m34CqQiExHDtHpgwmYkbcVHiYGJUoK/jUBXe2Y/PLs2BN9KkpYjTlW7U7ajBFQOQytzx5hRmqh+NHKUV6ZVNZ5v9PvwbeNJXHTgBjXLQ09zX+Z/nX741DF9xNoX+agzukn1LoVgJpFkh8hMBE7ghc1igGLcc2Piuk0ZmNFcGjAkO9VdiZERIAoNMgMHAIFnHJsBeMN7WXF81+fujxi1j5sHhgQLemnZqkXBBf0C0zTEjhGIo68jH53D7pf6T6a8s6HhOTYnR60xAAhJYe7/9YntmdjBQEaEAjSWOR3NwIwtjaZiFbbWtMP3zxzIa9WvxaMqvy3iXyQHaKl3SElM1rz0cWFeaabcq0kX7d5ZAm7jQpPXr2CCt47G5E5HBIqjBXUxgnJQQsF3kRyHxUj72QhjG+L2I7rvK/3HM/uHD7eWXjkvZR0fsu9JVrlwEJDZpGfFGIZfsrHAEMiOE2bNxg8YuuVwMCIn9IpuGjedMklJbHobUVQGhsaBUkjV0hJos4WaaJHivxtPRj8GnWCWGVce+4tfIzEVeAjd9MECYLdEcZH2dEXDaens14qHQzvM+ISUKGyB4Z8O4/FiKmO2tKSZHdK8+/aKmTuPJRY8x1nHLSJP7uWdKkualjFxblqFXOGjw3/6HKRkIcxMA5OSOq5BTojDsbE9j13oaQz31yGW0qag3ONgJRAAACB7xtHHVx4EPHKSvzqcdYPmuZ8Mm7QfjzURMcjhwKqKgTKgWAvaU9lfXCtvwpMhHv/hz/4f/oz/N/7pUiGzKsqWg1ECHMVEq9lxGFOZovK6+w0PFmmG3LoJ7yoF9SDAMmLnHgDSvf+UeJ6JBCXo15BQgNFKawtYCF1QAMcIdvJJfiWNzkOB5QQnrCFVYVR+QR/pjq5L3frSb6a3oW1ZN45Za+kxXfBFzHgsO1X8WOU4CcNA9uz7O15KYjvSJoThDWqJOZ/uXeN9OvPmVarc+EQFg9FOtd8RDalYskZVm7CBJOLcf21pkC0XnzqaMXP5OCtmjxXUsKF/yU3sicLIFplNC2TBuINt26Axetp5IhNo0vSRjmyXgUgKq/4sbXotULA8V4HzVkzni71weTRVqKJbtPIP0YlcRdqTAL7EwFR6xWTkfcsCJrQ1G5NE7FRNJICJCLaucqbz5HSzw7OmqdY6X9MA62ISVRt6+A+3ZWl9al1jbIC3R+cc3XnC514XCo8NhHOOGgSAqg95TjS5wKddQQfvP6qve5JGA+rmAlC0Cak14K+HkKUEjeiUSQBUjnCteKJQ1xNxoGtyoY+anvqBN+s2RypZQZo6uMEOLmjTEx7qJ0MndOLtE2t366eFr4Uvo+bwE5O5u+wPu0vSqBWBI4GZYI46WAom7OjLCy2H4lQUZ0CoYYzPoJrpkYNCwySnIhGCCQIoAUYCIJqVmD6FUuZg0IrGgKLP511nbWu022pfaO/uhHIWApJEHkWeAgYDEmRsINzTSENqp29dMtf92V3+c5EyXlODA14LJk5CSASA6Ky7W6XMh2MCRXSzzeZ239O7r7nptoxHPKTOfLJP2FPQ3yZ5xlU5lY3O56O6W0QBaGenhzPhZn/X7hpqzzG2qlYZxff+gJ+gp1sFh1g/bYrCLDUIASCndAIgwd7CUx/OjCtX+TbMIeHm/2trCTTr/0PovwhWo8YaKGfNJrSbiw1AA0WigZN2ZGHm2oIK/PqZbXyQqYyQD/Jhv5AWvoHUSNKsYTRy7vj44JgDf1PBdG4GAEj5fx2mJ2I4kHFPQhkSU644OU7qwvRWqcIkJN+RUsANwMPPrnvdVj2Ggti8LEDNgYOn9kfV47TaG3d6eq4WsO4OIWumiv+9yTNf/Xv5Oo0ghkXg9vXRz7rGZMBcx2mXM2zJOGHwPEVHsyxvQ7TGV8j17AeZ5SKr3O2xHmdqsAxLzcbeNcgeiroobWqmot2Cp9pS6RMoa5KFaBVOmx5/f6dMeaDneiiGcjdfWSOMacmMCVAQABdBQhGxBgSRJgAOlmIDjzrkjGaVGoRoKLCA8rE0kps+NXkwV5MRh9wMR6TI/bggZSoCexJV5GEgTESAQyRwZF+0RfIiQi9x6DuldesqWWUnIm69iAs/47rdxrGVq69bfMrHeOb7Ee9uufOygBin9xFAt2OjYSKlQOqALsk3LCTsqVZCt+XNoVV2gZJPDcRLvSL0WCukOP+rZHcPRpBhn4YYCUYIYOlOxWU8Hz0+IQGnRoUEve8y1l3+sgMpLJemwlePFxMYfoZmipulVWKcdH09naXlvDuwMvtEWbdwRq96tvvPNMq2KuiwL/QFxJNHzAxebiUj+St8WxftFcuH+msisYw/wJ2D2vM6thYMG33ORxXUmJmQiJBGtG9hIq+OggAQUmYpdWW/ySB9XCKY0gj9pHTeMCkahlGfadZf4UgVvJRfmYOo1WgaEKTkxKAhTgUOIqVoINMgFcJAkexRLQwOCQ6PAoTHqNEmZ6KqpVvSedyb1FoRaZXopYlGiDNGT7VKk/sib/cvJOlktVt7NnA60mSpmWn3QwmLmC9XCvIYB7cPDOzgraCURhbsVzMEnLsvA4gp4IAhDQ1Fp0yCPnDT/G0CSIQmPNONkQMsqahvHsQcAw8AAI0TzICWMKDaBZDBexDKSmL+DiJa+Sbew9Njp3r1s/L82E0LuPF7I34mhO3GPk+r6x+kb8FMXz/+92byEkGK3qMu4PMWa6PhWhVkVrpEek8IQvx3qmTFfXs7hhwpL5C99Hh5L5Yxtdh3KjeSUdbg609wWDY//6o2ABlfv2xV4BVcwmaYwJ+3qBf4Xzru5K/aFH1odt9JLcTWSjGm+gFznuN9ExpcevJXZvhAuQhdrPPrI2Db5xkAyzTrrvt8pb3uKN5WzglnaMcf+WkePYu2Fnrw3qqQslGcBratAGMr4yPMgbHrxvyyCHJpCHR1DMV6/cRuZtZxCLYENh3oM28/A7s5H+izecMywJ4TNSwz0giRhTB8HbRVNJqp3HbjlELgnq054/HpR1lnw+Xypa0GIfTVoPt1AWJF26M7V/e7I92q05r78RJlFNYbwXfp2gcm9K0G6ntG/0P4vEeOLch3e29+Ifid+zjUaqEBywwsW5wCYxSHSysfFshlsoTkYEhhmN9545jbj7xkekW7ta4tjwobzqM+rGulctTh22DJgRZmvPeZaP8UX0QYRlN5DRuk+YTLfdpveS0FHYrOBA7hgrV3rQWCyOId1SSZiGQqTl+CuEcGI87mjv0ReCTjLFEL4iB1+gP9VcUI5GTzkiADCgMMdL5MnL5RRIqdFz6Gx9ojzrRMvlKy80QojWLyoJRWX6TK41p+yCfZEsqI+kpomv8ga2gYuFNoIM9Eqi6GpPNZJcZG21r4VaUbtoh6auJy8Su7im4IQqT2V336wg/VdksTbusQfFEnxqBjnS/jnn7fXVZojfhL5r3eBdby1dLkbwU1x7PehFsHFKmdQ/a6NFj/zjham9xWExaw4IkKNLqwuhK7eV7rFmYOyfUYRp7EUvl8/qt2/tyzzorNGUODUGzJXfvN3BVm6bbwNFGYflJ1fmUrzbaQxXewF3zgILBTksSf984FlRAEITaz79KStn6yZLKyIDyN8BHjHw0PVTtvuHxhiTcCEQ81lqsCeoY+RlZRYGMSWp6sIUAL5xsEEQWrtMy/EiGkc9lxDRi0dWlLyMHOhNmIechTkbU7+OxoY5kYRBZWCnRZg3i0IIrtoE8fMN55wP14qkfuT0GNlE5sfimqsDN73p963i5mSve5OfqBVKzJkT+TIUZ8akwFssQc7ohfguNH577TpotBn8Ojo6QXQL7F8hosHeLa4Fb5D3i8TiodjUIXFLyj9qFQAqzj5MDgh2gRNdbjYaZAKfkqjyQNKX6XBjBdFYcp942qbySI/WnxdffhLjKxqPv6HcT3QJFItCa7MFNFy6OJ6n66/RFRBivFjm0hpyw2WFWyzKE9syFRwpsg6hh1kBp6ozIeQB/NWoNABZeDWwezq0Hdpi1mV6CXChu7cSRSBCdHbN61bm285BGU638VP5Z6vLvo4VRF/B5NBKRiIWFATXNyN6wlihPkjmOQm8NRjDnpEqw79cZxqlkjbyUj72FBOP4578ZW49RgO27KxUKkhsLsk1V4FkCiq6VoJ0R0hKE2mzfK7uHkOh4deoHC1K1Yg9chKPxvU1lP7LQgQwhBmTqy0CS1VFxxIwwE3AJWHOPfIjrZU+tT/+UU+LA3+raLtKLhqYEZw0qbP22gCWcu01XKG/gD2V9qCd++rBWWz+ztJz/fr7nV9B5WpUmFHnvJzJ5VG7bJJd40+BSd7VBn
+*/

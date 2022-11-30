@@ -9,16 +9,18 @@
 
 #include <boost/histogram/detail/accumulator_traits.hpp>
 #include <boost/histogram/detail/argument_traits.hpp>
-#include <boost/histogram/detail/at.hpp>
 #include <boost/histogram/detail/axes.hpp>
 #include <boost/histogram/detail/common_type.hpp>
 #include <boost/histogram/detail/fill.hpp>
 #include <boost/histogram/detail/fill_n.hpp>
+#include <boost/histogram/detail/index_translator.hpp>
 #include <boost/histogram/detail/mutex_base.hpp>
-#include <boost/histogram/detail/non_member_container_access.hpp>
+#include <boost/histogram/detail/nonmember_container_access.hpp>
 #include <boost/histogram/detail/span.hpp>
 #include <boost/histogram/detail/static_if.hpp>
 #include <boost/histogram/fwd.hpp>
+#include <boost/histogram/indexed.hpp>
+#include <boost/histogram/multi_index.hpp>
 #include <boost/histogram/sample.hpp>
 #include <boost/histogram/storage_adaptor.hpp>
 #include <boost/histogram/unsafe_access.hpp>
@@ -68,6 +70,7 @@ public:
   // typedefs for boost::range_iterator
   using iterator = typename storage_type::iterator;
   using const_iterator = typename storage_type::const_iterator;
+  using multi_index_type = multi_index<detail::relaxed_tuple_size_t<axes_type>::value>;
 
 private:
   using mutex_base = typename detail::mutex_base<axes_type, storage_type>;
@@ -137,14 +140,14 @@ public:
   /// This version is more efficient than the one accepting a run-time number.
   template <unsigned N = 0>
   decltype(auto) axis(std::integral_constant<unsigned, N> = {}) const {
-    detail::axis_index_is_valid(axes_, N);
+    assert(N < rank());
     return detail::axis_get<N>(axes_);
   }
 
   /// Get N-th axis with run-time number.
   /// Prefer the version that accepts a compile-time number, if you can use it.
   decltype(auto) axis(unsigned i) const {
-    detail::axis_index_is_valid(axes_, i);
+    assert(i < rank());
     return detail::axis_get(axes_, i);
   }
 
@@ -276,7 +279,7 @@ public:
     detail::sample_args_passed_vs_expected<sample_args_passed,
                                            typename acc_traits::args>();
     std::lock_guard<typename mutex_base::type> guard{mutex_base::get()};
-    mp11::tuple_apply(
+    mp11::tuple_apply( // LCOV_EXCL_LINE: gcc-11 is missing this line for no reason
         [&](const auto&... sargs) {
           constexpr bool sample_valid =
               std::is_convertible<sample_args_passed, typename acc_traits::args>::value;
@@ -306,7 +309,7 @@ public:
     detail::sample_args_passed_vs_expected<sample_args_passed,
                                            typename acc_traits::args>();
     std::lock_guard<typename mutex_base::type> guard{mutex_base::get()};
-    mp11::tuple_apply(
+    mp11::tuple_apply( // LCOV_EXCL_LINE: gcc-11 is missing this line for no reason
         [&](const auto&... sargs) {
           constexpr bool weight_valid = acc_traits::weight_support;
           static_assert(weight_valid, "error: accumulator does not support weights");
@@ -349,79 +352,63 @@ public:
     @param is indices of second, third, ... axes.
     @returns reference to cell value.
   */
-  template <class... Indices>
-  decltype(auto) at(axis::index_type i, Indices... is) {
-    return at(std::forward_as_tuple(i, is...));
+  template <class... Is>
+  decltype(auto) at(axis::index_type i, Is... is) {
+    return at(multi_index_type{i, static_cast<axis::index_type>(is)...});
   }
 
   /// Access cell value at integral indices (read-only).
-  template <class... Indices>
-  decltype(auto) at(axis::index_type i, Indices... is) const {
-    return at(std::forward_as_tuple(i, is...));
-  }
-
-  /// Access cell value at integral indices stored in `std::tuple`.
-  template <class... Indices>
-  decltype(auto) at(const std::tuple<Indices...>& is) {
-    if (rank() != sizeof...(Indices))
-      BOOST_THROW_EXCEPTION(
-          std::invalid_argument("number of arguments != histogram rank"));
-    const auto idx = detail::at(axes_, is);
-    if (!is_valid(idx))
-      BOOST_THROW_EXCEPTION(std::out_of_range("at least one index out of bounds"));
-    BOOST_ASSERT(idx < storage_.size());
-    return storage_[idx];
-  }
-
-  /// Access cell value at integral indices stored in `std::tuple` (read-only).
-  template <class... Indices>
-  decltype(auto) at(const std::tuple<Indices...>& is) const {
-    if (rank() != sizeof...(Indices))
-      BOOST_THROW_EXCEPTION(
-          std::invalid_argument("number of arguments != histogram rank"));
-    const auto idx = detail::at(axes_, is);
-    if (!is_valid(idx))
-      BOOST_THROW_EXCEPTION(std::out_of_range("at least one index out of bounds"));
-    BOOST_ASSERT(idx < storage_.size());
-    return storage_[idx];
+  template <class... Is>
+  decltype(auto) at(axis::index_type i, Is... is) const {
+    return at(multi_index_type{i, static_cast<axis::index_type>(is)...});
   }
 
   /// Access cell value at integral indices stored in iterable.
-  template <class Iterable, class = detail::requires_iterable<Iterable>>
-  decltype(auto) at(const Iterable& is) {
-    if (rank() != detail::axes_rank(is))
+  decltype(auto) at(const multi_index_type& is) {
+    if (rank() != is.size())
       BOOST_THROW_EXCEPTION(
           std::invalid_argument("number of arguments != histogram rank"));
-    const auto idx = detail::at(axes_, is);
+    const auto idx = detail::linearize_indices(axes_, is);
     if (!is_valid(idx))
       BOOST_THROW_EXCEPTION(std::out_of_range("at least one index out of bounds"));
-    BOOST_ASSERT(idx < storage_.size());
+    assert(idx < storage_.size());
     return storage_[idx];
   }
 
   /// Access cell value at integral indices stored in iterable (read-only).
-  template <class Iterable, class = detail::requires_iterable<Iterable>>
-  decltype(auto) at(const Iterable& is) const {
-    if (rank() != detail::axes_rank(is))
+  decltype(auto) at(const multi_index_type& is) const {
+    if (rank() != is.size())
       BOOST_THROW_EXCEPTION(
           std::invalid_argument("number of arguments != histogram rank"));
-    const auto idx = detail::at(axes_, is);
+    const auto idx = detail::linearize_indices(axes_, is);
     if (!is_valid(idx))
       BOOST_THROW_EXCEPTION(std::out_of_range("at least one index out of bounds"));
-    BOOST_ASSERT(idx < storage_.size());
+    assert(idx < storage_.size());
     return storage_[idx];
   }
 
-  /// Access value at index (number for rank = 1, else `std::tuple` or iterable).
-  template <class Indices>
-  decltype(auto) operator[](const Indices& is) {
-    return at(is);
+  /// Access value at index (for rank = 1).
+  decltype(auto) operator[](axis::index_type i) {
+    const axis::index_type shift =
+        axis::traits::options(axis()) & axis::option::underflow ? 1 : 0;
+    return storage_[static_cast<std::size_t>(i + shift)];
   }
 
-  /// Access value at index (read-only).
-  template <class Indices>
-  decltype(auto) operator[](const Indices& is) const {
-    return at(is);
+  /// Access value at index (for rank = 1, read-only).
+  decltype(auto) operator[](axis::index_type i) const {
+    const axis::index_type shift =
+        axis::traits::options(axis()) & axis::option::underflow ? 1 : 0;
+    return storage_[static_cast<std::size_t>(i + shift)];
+  }
+
+  /// Access value at index tuple.
+  decltype(auto) operator[](const multi_index_type& is) {
+    return storage_[detail::linearize_indices(axes_, is)];
+  }
+
+  /// Access value at index tuple (read-only).
+  decltype(auto) operator[](const multi_index_type& is) const {
+    return storage_[detail::linearize_indices(axes_, is)];
   }
 
   /// Equality operator, tests equality for all axes and the storage.
@@ -442,6 +429,11 @@ public:
   /** Add values of another histogram.
 
     This operator is only available if the value_type supports operator+=.
+
+    Both histograms must be compatible to be addable. The histograms are compatible, if
+    the axes are either all identical. If the axes only differ in the states of their
+    discrete growing axis types, then they are also compatible. The discrete growing
+    axes are merged in this case.
   */
   template <class A, class S>
 #ifdef BOOST_HISTOGRAM_DOXYGEN_INVOKED
@@ -456,6 +448,37 @@ public:
       BOOST_THROW_EXCEPTION(std::invalid_argument("axes of histograms differ"));
     auto rit = unsafe_access::storage(rhs).begin();
     for (auto&& x : storage_) x += *rit++;
+    return *this;
+  }
+
+  // specialization that allows axes merging
+  template <class S>
+#ifdef BOOST_HISTOGRAM_DOXYGEN_INVOKED
+  histogram&
+#else
+  std::enable_if_t<detail::has_operator_radd<
+                       value_type, typename histogram<axes_type, S>::value_type>::value,
+                   histogram&>
+#endif
+  operator+=(const histogram<axes_type, S>& rhs) {
+    const auto& raxes = unsafe_access::axes(rhs);
+    if (detail::axes_equal(axes_, unsafe_access::axes(rhs))) {
+      auto rit = unsafe_access::storage(rhs).begin();
+      for (auto&& x : storage_) x += *rit++;
+      return *this;
+    }
+
+    if (rank() != detail::axes_rank(raxes))
+      BOOST_THROW_EXCEPTION(std::invalid_argument("axes have different length"));
+    auto h = histogram<axes_type, storage_type>(
+        detail::axes_transform(axes_, raxes, detail::axis_merger{}),
+        detail::make_default(storage_));
+    const auto& axes = unsafe_access::axes(h);
+    const auto tr1 = detail::make_index_translator(axes, axes_);
+    for (auto&& x : indexed(*this, coverage::all)) h[tr1(x.indices())] += *x;
+    const auto tr2 = detail::make_index_translator(axes, raxes);
+    for (auto&& x : indexed(rhs, coverage::all)) h[tr2(x.indices())] += *x;
+    *this = std::move(h);
     return *this;
   }
 
@@ -665,24 +688,23 @@ auto operator/(const histogram<A, S>& h, double x) {
 #if __cpp_deduction_guides >= 201606
 
 template <class... Axes, class = detail::requires_axes<std::tuple<std::decay_t<Axes>...>>>
-histogram(Axes...)->histogram<std::tuple<std::decay_t<Axes>...>>;
+histogram(Axes...) -> histogram<std::tuple<std::decay_t<Axes>...>>;
 
 template <class... Axes, class S, class = detail::requires_storage_or_adaptible<S>>
 histogram(std::tuple<Axes...>, S)
-    ->histogram<std::tuple<Axes...>, std::conditional_t<detail::is_adaptible<S>::value,
-                                                        storage_adaptor<S>, S>>;
+    -> histogram<std::tuple<Axes...>, std::conditional_t<detail::is_adaptible<S>::value,
+                                                         storage_adaptor<S>, S>>;
 
 template <class Iterable, class = detail::requires_iterable<Iterable>,
           class = detail::requires_any_axis<typename Iterable::value_type>>
-histogram(Iterable)->histogram<std::vector<typename Iterable::value_type>>;
+histogram(Iterable) -> histogram<std::vector<typename Iterable::value_type>>;
 
 template <class Iterable, class S, class = detail::requires_iterable<Iterable>,
           class = detail::requires_any_axis<typename Iterable::value_type>,
           class = detail::requires_storage_or_adaptible<S>>
-histogram(Iterable, S)
-    ->histogram<
-        std::vector<typename Iterable::value_type>,
-        std::conditional_t<detail::is_adaptible<S>::value, storage_adaptor<S>, S>>;
+histogram(Iterable, S) -> histogram<
+    std::vector<typename Iterable::value_type>,
+    std::conditional_t<detail::is_adaptible<S>::value, storage_adaptor<S>, S>>;
 
 #endif
 
@@ -690,3 +712,7 @@ histogram(Iterable, S)
 } // namespace boost
 
 #endif
+
+/* histogram.hpp
+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
+*/

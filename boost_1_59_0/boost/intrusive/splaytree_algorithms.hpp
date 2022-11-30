@@ -54,7 +54,7 @@ struct splaydown_assemble_and_fix_header
 {
    typedef typename NodeTraits::node_ptr node_ptr;
 
-   splaydown_assemble_and_fix_header(node_ptr t, node_ptr header, node_ptr leftmost, node_ptr rightmost)
+   splaydown_assemble_and_fix_header(node_ptr t, node_ptr header, node_ptr leftmost, node_ptr rightmost) BOOST_NOEXCEPT
       : t_(t)
       , null_node_(header)
       , l_(null_node_)
@@ -79,7 +79,7 @@ struct splaydown_assemble_and_fix_header
 
    private:
 
-   void assemble()
+   void assemble() BOOST_NOEXCEPT
    {
       //procedure assemble;
       //    left(r), right(l) := right(t), left(t);
@@ -175,59 +175,59 @@ class splaytree_algorithms
 
    public:
    #ifdef BOOST_INTRUSIVE_DOXYGEN_INVOKED
-   //! @copydoc ::boost::intrusive::bstree_algorithms::get_header(const const_node_ptr&)
-   static node_ptr get_header(const const_node_ptr & n);
+   //! @copydoc ::boost::intrusive::bstree_algorithms::get_header(const_node_ptr)
+   static node_ptr get_header(const_node_ptr n) BOOST_NOEXCEPT;
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::begin_node
-   static node_ptr begin_node(const const_node_ptr & header);
+   static node_ptr begin_node(const_node_ptr header) BOOST_NOEXCEPT;
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::end_node
-   static node_ptr end_node(const const_node_ptr & header);
+   static node_ptr end_node(const_node_ptr header) BOOST_NOEXCEPT;
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::swap_tree
-   static void swap_tree(const node_ptr & header1, const node_ptr & header2);
+   static void swap_tree(node_ptr header1, node_ptr header2);
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::swap_nodes(node_ptr,node_ptr)
-   static void swap_nodes(node_ptr node1, node_ptr node2);
+   static void swap_nodes(node_ptr node1, node_ptr node2) BOOST_NOEXCEPT;
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::swap_nodes(node_ptr,node_ptr,node_ptr,node_ptr)
-   static void swap_nodes(node_ptr node1, node_ptr header1, node_ptr node2, node_ptr header2);
+   static void swap_nodes(node_ptr node1, node_ptr header1, node_ptr node2, node_ptr header2) BOOST_NOEXCEPT;
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::replace_node(node_ptr,node_ptr)
-   static void replace_node(node_ptr node_to_be_replaced, node_ptr new_node);
+   static void replace_node(node_ptr node_to_be_replaced, node_ptr new_node) BOOST_NOEXCEPT;
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::replace_node(node_ptr,node_ptr,node_ptr)
-   static void replace_node(node_ptr node_to_be_replaced, node_ptr header, node_ptr new_node);
+   static void replace_node(node_ptr node_to_be_replaced, node_ptr header, node_ptr new_node) BOOST_NOEXCEPT;
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::unlink(node_ptr)
-   static void unlink(node_ptr node);
+   static void unlink(node_ptr node) BOOST_NOEXCEPT;
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::unlink_leftmost_without_rebalance
-   static node_ptr unlink_leftmost_without_rebalance(node_ptr header);
+   static node_ptr unlink_leftmost_without_rebalance(node_ptr header) BOOST_NOEXCEPT;
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::unique(const const_node_ptr&)
-   static bool unique(const_node_ptr node);
+   //! @copydoc ::boost::intrusive::bstree_algorithms::unique(const_node_ptr)
+   static bool unique(const_node_ptr node) BOOST_NOEXCEPT;
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::size(const const_node_ptr&)
-   static std::size_t size(const_node_ptr header);
+   //! @copydoc ::boost::intrusive::bstree_algorithms::size(const_node_ptr)
+   static std::size_t size(const_node_ptr header) BOOST_NOEXCEPT;
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::next_node(const node_ptr&)
-   static node_ptr next_node(node_ptr node);
+   //! @copydoc ::boost::intrusive::bstree_algorithms::next_node(node_ptr)
+   static node_ptr next_node(node_ptr node) BOOST_NOEXCEPT;
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::prev_node(const node_ptr&)
-   static node_ptr prev_node(node_ptr node);
+   //! @copydoc ::boost::intrusive::bstree_algorithms::prev_node(node_ptr)
+   static node_ptr prev_node(node_ptr node) BOOST_NOEXCEPT;
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::init(node_ptr)
-   static void init(node_ptr node);
+   static void init(node_ptr node) BOOST_NOEXCEPT;
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::init_header(node_ptr)
-   static void init_header(node_ptr header);
+   static void init_header(node_ptr header) BOOST_NOEXCEPT;
 
    #endif   //#ifdef BOOST_INTRUSIVE_DOXYGEN_INVOKED
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::erase(node_ptr,node_ptr)
    //! Additional notes: the previous node of z is splayed to speed up range deletions.
-   static void erase(node_ptr header, node_ptr z)
+   static void erase(node_ptr header, node_ptr z) BOOST_NOEXCEPT
    {
       //posibility 1
       if(NodeTraits::get_left(z)){
@@ -279,17 +279,17 @@ class splaytree_algorithms
    }
 
    #ifdef BOOST_INTRUSIVE_DOXYGEN_INVOKED
-   //! @copydoc ::boost::intrusive::bstree_algorithms::clone(const const_node_ptr&,node_ptr,Cloner,Disposer)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::clone(const_node_ptr,node_ptr,Cloner,Disposer)
    template <class Cloner, class Disposer>
    static void clone
       (const_node_ptr source_header, node_ptr target_header, Cloner cloner, Disposer disposer);
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::clear_and_dispose(const node_ptr&,Disposer)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::clear_and_dispose(node_ptr,Disposer)
    template<class Disposer>
-   static void clear_and_dispose(node_ptr header, Disposer disposer);
+   static void clear_and_dispose(node_ptr header, Disposer disposer) BOOST_NOEXCEPT;
 
    #endif   //#ifdef BOOST_INTRUSIVE_DOXYGEN_INVOKED
-   //! @copydoc ::boost::intrusive::bstree_algorithms::count(const const_node_ptr&,const KeyType&,KeyNodePtrCompare)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::count(const_node_ptr,const KeyType&,KeyNodePtrCompare)
    //! Additional notes: an element with key `key` is splayed.
    template<class KeyType, class KeyNodePtrCompare>
    static std::size_t count
@@ -304,14 +304,14 @@ class splaytree_algorithms
       return n;
    }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::count(const const_node_ptr&,const KeyType&,KeyNodePtrCompare)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::count(const_node_ptr,const KeyType&,KeyNodePtrCompare)
    //! Additional note: no splaying is performed
    template<class KeyType, class KeyNodePtrCompare>
    static std::size_t count
       (const_node_ptr header, const KeyType &key, KeyNodePtrCompare comp)
    {  return bstree_algo::count(header, key, comp);  }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::lower_bound(const const_node_ptr&,const KeyType&,KeyNodePtrCompare)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::lower_bound(const_node_ptr,const KeyType&,KeyNodePtrCompare)
    //! Additional notes: the first node of the range is splayed.
    template<class KeyType, class KeyNodePtrCompare>
    static node_ptr lower_bound
@@ -323,14 +323,14 @@ class splaytree_algorithms
       return y;
    }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::lower_bound(const const_node_ptr&,const KeyType&,KeyNodePtrCompare)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::lower_bound(const_node_ptr,const KeyType&,KeyNodePtrCompare)
    //! Additional note: no splaying is performed
    template<class KeyType, class KeyNodePtrCompare>
    static node_ptr lower_bound
       (const_node_ptr header, const KeyType &key, KeyNodePtrCompare comp)
    {  return bstree_algo::lower_bound(header, key, comp);  }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::upper_bound(const const_node_ptr&,const KeyType&,KeyNodePtrCompare)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::upper_bound(const_node_ptr,const KeyType&,KeyNodePtrCompare)
    //! Additional notes: the first node of the range is splayed.
    template<class KeyType, class KeyNodePtrCompare>
    static node_ptr upper_bound
@@ -342,14 +342,14 @@ class splaytree_algorithms
       return y;
    }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::upper_bound(const const_node_ptr&,const KeyType&,KeyNodePtrCompare)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::upper_bound(const_node_ptr,const KeyType&,KeyNodePtrCompare)
    //! Additional note: no splaying is performed
    template<class KeyType, class KeyNodePtrCompare>
    static node_ptr upper_bound
       (const_node_ptr header, const KeyType &key, KeyNodePtrCompare comp)
    {  return bstree_algo::upper_bound(header, key, comp);  }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::find(const const_node_ptr&, const KeyType&,KeyNodePtrCompare)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::find(const_node_ptr, const KeyType&,KeyNodePtrCompare)
    //! Additional notes: the found node of the lower bound is splayed.
    template<class KeyType, class KeyNodePtrCompare>
    static node_ptr find
@@ -359,14 +359,14 @@ class splaytree_algorithms
       return bstree_algo::find(header, key, comp);
    }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::find(const const_node_ptr&, const KeyType&,KeyNodePtrCompare)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::find(const_node_ptr, const KeyType&,KeyNodePtrCompare)
    //! Additional note: no splaying is performed
    template<class KeyType, class KeyNodePtrCompare>
    static node_ptr find
       (const_node_ptr header, const KeyType &key, KeyNodePtrCompare comp)
    {  return bstree_algo::find(header, key, comp);  }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::equal_range(const const_node_ptr&,const KeyType&,KeyNodePtrCompare)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::equal_range(const_node_ptr,const KeyType&,KeyNodePtrCompare)
    //! Additional notes: the first node of the range is splayed.
    template<class KeyType, class KeyNodePtrCompare>
    static std::pair<node_ptr, node_ptr> equal_range
@@ -378,14 +378,14 @@ class splaytree_algorithms
       return ret;
    }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::equal_range(const const_node_ptr&,const KeyType&,KeyNodePtrCompare)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::equal_range(const_node_ptr,const KeyType&,KeyNodePtrCompare)
    //! Additional note: no splaying is performed
    template<class KeyType, class KeyNodePtrCompare>
    static std::pair<node_ptr, node_ptr> equal_range
       (const_node_ptr header, const KeyType &key, KeyNodePtrCompare comp)
    {  return bstree_algo::equal_range(header, key, comp);  }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::lower_bound_range(const const_node_ptr&,const KeyType&,KeyNodePtrCompare)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::lower_bound_range(const_node_ptr,const KeyType&,KeyNodePtrCompare)
    //! Additional notes: the first node of the range is splayed.
    template<class KeyType, class KeyNodePtrCompare>
    static std::pair<node_ptr, node_ptr> lower_bound_range
@@ -397,14 +397,14 @@ class splaytree_algorithms
       return ret;
    }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::lower_bound_range(const const_node_ptr&,const KeyType&,KeyNodePtrCompare)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::lower_bound_range(const_node_ptr,const KeyType&,KeyNodePtrCompare)
    //! Additional note: no splaying is performed
    template<class KeyType, class KeyNodePtrCompare>
    static std::pair<node_ptr, node_ptr> lower_bound_range
       (const_node_ptr header, const KeyType &key, KeyNodePtrCompare comp)
    {  return bstree_algo::lower_bound_range(header, key, comp);  }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::bounded_range(const const_node_ptr&,const KeyType&,const KeyType&,KeyNodePtrCompare,bool,bool)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::bounded_range(const_node_ptr,const KeyType&,const KeyType&,KeyNodePtrCompare,bool,bool)
    //! Additional notes: the first node of the range is splayed.
    template<class KeyType, class KeyNodePtrCompare>
    static std::pair<node_ptr, node_ptr> bounded_range
@@ -418,7 +418,7 @@ class splaytree_algorithms
       return ret;
    }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::bounded_range(const const_node_ptr&,const KeyType&,const KeyType&,KeyNodePtrCompare,bool,bool)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::bounded_range(const_node_ptr,const KeyType&,const KeyType&,KeyNodePtrCompare,bool,bool)
    //! Additional note: no splaying is performed
    template<class KeyType, class KeyNodePtrCompare>
    static std::pair<node_ptr, node_ptr> bounded_range
@@ -459,7 +459,7 @@ class splaytree_algorithms
    //! @copydoc ::boost::intrusive::bstree_algorithms::insert_before(node_ptr,node_ptr,node_ptr)
    //! Additional note: the inserted node is splayed
    static node_ptr insert_before
-      (node_ptr header, node_ptr pos, node_ptr new_node)
+      (node_ptr header, node_ptr pos, node_ptr new_node) BOOST_NOEXCEPT
    {
       bstree_algo::insert_before(header, pos, new_node);
       splay_up(new_node, header);
@@ -468,7 +468,7 @@ class splaytree_algorithms
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::push_back(node_ptr,node_ptr)
    //! Additional note: the inserted node is splayed
-   static void push_back(node_ptr header, node_ptr new_node)
+   static void push_back(node_ptr header, node_ptr new_node) BOOST_NOEXCEPT
    {
       bstree_algo::push_back(header, new_node);
       splay_up(new_node, header);
@@ -476,13 +476,13 @@ class splaytree_algorithms
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::push_front(node_ptr,node_ptr)
    //! Additional note: the inserted node is splayed
-   static void push_front(node_ptr header, node_ptr new_node)
+   static void push_front(node_ptr header, node_ptr new_node) BOOST_NOEXCEPT
    {
       bstree_algo::push_front(header, new_node);
       splay_up(new_node, header);
    }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::insert_unique_check(const const_node_ptr&,const KeyType&,KeyNodePtrCompare,insert_commit_data&)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::insert_unique_check(const_node_ptr,const KeyType&,KeyNodePtrCompare,insert_commit_data&)
    //! Additional note: nodes with the given key are splayed
    template<class KeyType, class KeyNodePtrCompare>
    static std::pair<node_ptr, bool> insert_unique_check
@@ -493,7 +493,7 @@ class splaytree_algorithms
       return bstree_algo::insert_unique_check(header, key, comp, commit_data);
    }
 
-   //! @copydoc ::boost::intrusive::bstree_algorithms::insert_unique_check(const const_node_ptr&,const node_ptr&,const KeyType&,KeyNodePtrCompare,insert_commit_data&)
+   //! @copydoc ::boost::intrusive::bstree_algorithms::insert_unique_check(const_node_ptr,node_ptr,const KeyType&,KeyNodePtrCompare,insert_commit_data&)
    //! Additional note: nodes with the given key are splayed
    template<class KeyType, class KeyNodePtrCompare>
    static std::pair<node_ptr, bool> insert_unique_check
@@ -507,21 +507,21 @@ class splaytree_algorithms
    #ifdef BOOST_INTRUSIVE_DOXYGEN_INVOKED
    //! @copydoc ::boost::intrusive::bstree_algorithms::insert_unique_commit(node_ptr,node_ptr,const insert_commit_data&)
    static void insert_unique_commit
-      (node_ptr header, node_ptr new_value, const insert_commit_data &commit_data);
+      (node_ptr header, node_ptr new_value, const insert_commit_data &commit_data) BOOST_NOEXCEPT;
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::is_header
-   static bool is_header(const_node_ptr p);
+   static bool is_header(const_node_ptr p) BOOST_NOEXCEPT;
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::rebalance
-   static void rebalance(node_ptr header);
+   static void rebalance(node_ptr header) BOOST_NOEXCEPT;
 
    //! @copydoc ::boost::intrusive::bstree_algorithms::rebalance_subtree
-   static node_ptr rebalance_subtree(node_ptr old_root);
+   static node_ptr rebalance_subtree(node_ptr old_root) BOOST_NOEXCEPT;
 
    #endif   //#ifdef BOOST_INTRUSIVE_DOXYGEN_INVOKED
 
    // bottom-up splay, use data_ as parent for n    | complexity : logarithmic    | exception : nothrow
-   static void splay_up(node_ptr node, node_ptr header)
+   static void splay_up(node_ptr node, node_ptr header) BOOST_NOEXCEPT
    {  priv_splay_up<true>(node, header); }
 
    // top-down splay | complexity : logarithmic    | exception : strong, note A
@@ -535,7 +535,7 @@ class splaytree_algorithms
 
    // bottom-up splay, use data_ as parent for n    | complexity : logarithmic    | exception : nothrow
    template<bool SimpleSplay>
-   static void priv_splay_up(node_ptr node, node_ptr header)
+   static void priv_splay_up(node_ptr node, node_ptr header) BOOST_NOEXCEPT
    {
       // If (node == header) do a splay for the right most node instead
       // this is to boost performance of equal_range/count on equivalent containers in the case
@@ -660,7 +660,7 @@ class splaytree_algorithms
    }
 
    // break link to left child node and attach it to left tree pointed to by l   | complexity : constant | exception : nothrow
-   static void link_left(node_ptr & t, node_ptr & l)
+   static void link_left(node_ptr & t, node_ptr & l) BOOST_NOEXCEPT
    {
       //procedure link_left;
       //    t, l, right(l) := right(t), t, t
@@ -672,7 +672,7 @@ class splaytree_algorithms
    }
 
    // break link to right child node and attach it to right tree pointed to by r | complexity : constant | exception : nothrow
-   static void link_right(node_ptr & t, node_ptr & r)
+   static void link_right(node_ptr & t, node_ptr & r) BOOST_NOEXCEPT
    {
       //procedure link_right;
       //    t, r, left(r) := left(t), t, t
@@ -684,7 +684,7 @@ class splaytree_algorithms
    }
 
    // rotate n with its parent                     | complexity : constant    | exception : nothrow
-   static void rotate(node_ptr n)
+   static void rotate(node_ptr n) BOOST_NOEXCEPT
    {
       //procedure rotate_left;
       //    t, right(t), left(right(t)) := right(t), left(right(t)), t
@@ -752,3 +752,7 @@ struct get_node_checker<SplayTreeAlgorithms, ValueTraits, NodePtrCompare, ExtraC
 #include <boost/intrusive/detail/config_end.hpp>
 
 #endif //BOOST_INTRUSIVE_SPLAYTREE_ALGORITHMS_HPP
+
+/* splaytree_algorithms.hpp
+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
+*/

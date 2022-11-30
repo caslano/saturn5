@@ -1,195 +1,25 @@
-// Boost.Geometry (aka GGL, Generic Geometry Library)
+// Boost.Geometry
 
-// Copyright (c) 2017 Adam Wulkiewicz, Lodz, Poland.
+// Copyright (c) 2020, Oracle and/or its affiliates.
 
-// Copyright (c) 2016-2018 Oracle and/or its affiliates.
-// Contributed and/or modified by Vissarion Fisikopoulos, on behalf of Oracle
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
-// Use, modification and distribution is subject to the Boost Software License,
-// Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
+// Licensed under the Boost Software License version 1.0.
+// http://www.boost.org/users/license.html
 
 #ifndef BOOST_GEOMETRY_STRATEGIES_SPHERICAL_AREA_HPP
 #define BOOST_GEOMETRY_STRATEGIES_SPHERICAL_AREA_HPP
 
 
-#include <boost/geometry/formulas/area_formulas.hpp>
-#include <boost/geometry/srs/sphere.hpp>
-#include <boost/geometry/strategies/area.hpp>
-#include <boost/geometry/strategies/spherical/get_radius.hpp>
+#include <boost/config/pragma_message.hpp>
+BOOST_PRAGMA_MESSAGE("This include file is deprecated and will be removed in the future.")
 
 
-namespace boost { namespace geometry
-{
+#include <boost/geometry/strategy/spherical/area.hpp>
 
-namespace strategy { namespace area
-{
-
-
-/*!
-\brief Spherical area calculation
-\ingroup strategies
-\details Calculates area on the surface of a sphere using the trapezoidal rule
-\tparam RadiusTypeOrSphere \tparam_radius_or_sphere
-\tparam CalculationType \tparam_calculation
-
-\qbk{
-[heading See also]
-[link geometry.reference.algorithms.area.area_2_with_strategy area (with strategy)]
-}
-*/
-template
-<
-    typename RadiusTypeOrSphere = double,
-    typename CalculationType = void
->
-class spherical
-{
-    // Enables special handling of long segments
-    static const bool LongSegment = false;
-
-public:
-    template <typename Geometry>
-    struct result_type
-        : strategy::area::detail::result_type
-            <
-                Geometry,
-                CalculationType
-            >
-    {};
-
-    template <typename Geometry>
-    class state
-    {
-        friend class spherical;
-
-        typedef typename result_type<Geometry>::type return_type;
-
-    public:
-        inline state()
-            : m_sum(0)
-            , m_crosses_prime_meridian(0)
-        {}
-
-    private:
-        template <typename RadiusType>
-        inline return_type area(RadiusType const& r) const
-        {
-            return_type result;
-            return_type radius = r;
-
-            // Encircles pole
-            if(m_crosses_prime_meridian % 2 == 1)
-            {
-                size_t times_crosses_prime_meridian
-                        = 1 + (m_crosses_prime_meridian / 2);
-
-                result = return_type(2)
-                         * geometry::math::pi<return_type>()
-                         * times_crosses_prime_meridian
-                         - geometry::math::abs(m_sum);
-
-                if(geometry::math::sign<return_type>(m_sum) == 1)
-                {
-                    result = - result;
-                }
-
-            } else {
-                result =  m_sum;
-            }
-
-            result *= radius * radius;
-
-            return result;
-        }
-
-        return_type m_sum;
-
-        // Keep track if encircles some pole
-        size_t m_crosses_prime_meridian;
-    };
-
-public :
-
-    // For backward compatibility reasons the radius is set to 1
-    inline spherical()
-        : m_radius(1.0)
-    {}
-
-    template <typename RadiusOrSphere>
-    explicit inline spherical(RadiusOrSphere const& radius_or_sphere)
-        : m_radius(strategy_detail::get_radius
-                    <
-                        RadiusOrSphere
-                    >::apply(radius_or_sphere))
-    {}
-
-    template <typename PointOfSegment, typename Geometry>
-    inline void apply(PointOfSegment const& p1,
-                      PointOfSegment const& p2,
-                      state<Geometry>& st) const
-    {
-        if (! geometry::math::equals(get<0>(p1), get<0>(p2)))
-        {
-            typedef geometry::formula::area_formulas
-                <
-                    typename result_type<Geometry>::type
-                > area_formulas;
-
-            st.m_sum += area_formulas::template spherical<LongSegment>(p1, p2);
-
-            // Keep track whenever a segment crosses the prime meridian
-            if (area_formulas::crosses_prime_meridian(p1, p2))
-            {
-                st.m_crosses_prime_meridian++;
-            }
-        }
-    }
-
-    template <typename Geometry>
-    inline typename result_type<Geometry>::type
-        result(state<Geometry> const& st) const
-    {
-        return st.area(m_radius);
-    }
-
-private :
-    typename strategy_detail::get_radius
-        <
-            RadiusTypeOrSphere
-        >::type m_radius;
-};
-
-#ifndef DOXYGEN_NO_STRATEGY_SPECIALIZATIONS
-
-namespace services
-{
-
-
-template <>
-struct default_strategy<spherical_equatorial_tag>
-{
-    typedef strategy::area::spherical<> type;
-};
-
-// Note: spherical polar coordinate system requires "get_as_radian_equatorial"
-template <>
-struct default_strategy<spherical_polar_tag>
-{
-    typedef strategy::area::spherical<> type;
-};
-
-} // namespace services
-
-#endif // DOXYGEN_NO_STRATEGY_SPECIALIZATIONS
-
-
-}} // namespace strategy::area
-
-
-
-
-}} // namespace boost::geometry
 
 #endif // BOOST_GEOMETRY_STRATEGIES_SPHERICAL_AREA_HPP
+
+/* area.hpp
+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
+*/

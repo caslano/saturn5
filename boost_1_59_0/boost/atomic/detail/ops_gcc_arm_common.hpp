@@ -19,6 +19,8 @@
 #include <boost/cstdint.hpp>
 #include <boost/memory_order.hpp>
 #include <boost/atomic/detail/config.hpp>
+#include <boost/atomic/detail/fence_arch_operations.hpp>
+#include <boost/atomic/detail/header.hpp>
 
 #ifdef BOOST_HAS_PRAGMA_ONCE
 #pragma once
@@ -28,51 +30,7 @@ namespace boost {
 namespace atomics {
 namespace detail {
 
-// A memory barrier is effected using a "co-processor 15" instruction,
-// though a separate assembler mnemonic is available for it in v7.
-//
-// "Thumb 1" is a subset of the ARM instruction set that uses a 16-bit encoding.  It
-// doesn't include all instructions and in particular it doesn't include the co-processor
-// instruction used for the memory barrier or the load-locked/store-conditional
-// instructions.  So, if we're compiling in "Thumb 1" mode, we need to wrap all of our
-// asm blocks with code to temporarily change to ARM mode.
-//
-// You can only change between ARM and Thumb modes when branching using the bx instruction.
-// bx takes an address specified in a register.  The least significant bit of the address
-// indicates the mode, so 1 is added to indicate that the destination code is Thumb.
-// A temporary register is needed for the address and is passed as an argument to these
-// macros.  It must be one of the "low" registers accessible to Thumb code, specified
-// using the "l" attribute in the asm statement.
-//
-// Architecture v7 introduces "Thumb 2", which does include (almost?) all of the ARM
-// instruction set.  (Actually, there was an extension of v6 called v6T2 which supported
-// "Thumb 2" mode, but its architecture manual is no longer available, referring to v7.)
-// So in v7 we don't need to change to ARM mode; we can write "universal
-// assembler" which will assemble to Thumb 2 or ARM code as appropriate.  The only thing
-// we need to do to make this "universal" assembler mode work is to insert "IT" instructions
-// to annotate the conditional instructions.  These are ignored in other modes (e.g. v6),
-// so they can always be present.
-
-// A note about memory_order_consume. Technically, this architecture allows to avoid
-// unnecessary memory barrier after consume load since it supports data dependency ordering.
-// However, some compiler optimizations may break a seemingly valid code relying on data
-// dependency tracking by injecting bogus branches to aid out of order execution.
-// This may happen not only in Boost.Atomic code but also in user's code, which we have no
-// control of. See this thread: http://lists.boost.org/Archives/boost/2014/06/213890.php.
-// For this reason we promote memory_order_consume to memory_order_acquire.
-
-#if defined(__thumb__) && !defined(__thumb2__)
-#define BOOST_ATOMIC_DETAIL_ARM_ASM_START(TMPREG) "adr " #TMPREG ", 8f\n" "bx " #TMPREG "\n" ".arm\n" ".align 4\n" "8:\n"
-#define BOOST_ATOMIC_DETAIL_ARM_ASM_END(TMPREG)   "adr " #TMPREG ", 9f + 1\n" "bx " #TMPREG "\n" ".thumb\n" ".align 2\n" "9:\n"
-#define BOOST_ATOMIC_DETAIL_ARM_ASM_TMPREG_CONSTRAINT(var) "=&l" (var)
-#else
-// The tmpreg may be wasted in this case, which is non-optimal.
-#define BOOST_ATOMIC_DETAIL_ARM_ASM_START(TMPREG)
-#define BOOST_ATOMIC_DETAIL_ARM_ASM_END(TMPREG)
-#define BOOST_ATOMIC_DETAIL_ARM_ASM_TMPREG_CONSTRAINT(var) "=&r" (var)
-#endif
-
-struct gcc_arm_operations_base
+struct core_arch_operations_gcc_arm_base
 {
     static BOOST_CONSTEXPR_OR_CONST bool full_cas_based = false;
     static BOOST_CONSTEXPR_OR_CONST bool is_always_lock_free = true;
@@ -80,50 +38,19 @@ struct gcc_arm_operations_base
     static BOOST_FORCEINLINE void fence_before(memory_order order) BOOST_NOEXCEPT
     {
         if ((static_cast< unsigned int >(order) & static_cast< unsigned int >(memory_order_release)) != 0u)
-            hardware_full_fence();
+            fence_arch_operations::hardware_full_fence();
     }
 
     static BOOST_FORCEINLINE void fence_after(memory_order order) BOOST_NOEXCEPT
     {
         if ((static_cast< unsigned int >(order) & (static_cast< unsigned int >(memory_order_consume) | static_cast< unsigned int >(memory_order_acquire))) != 0u)
-            hardware_full_fence();
+            fence_arch_operations::hardware_full_fence();
     }
 
     static BOOST_FORCEINLINE void fence_after_store(memory_order order) BOOST_NOEXCEPT
     {
         if (order == memory_order_seq_cst)
-            hardware_full_fence();
-    }
-
-    static BOOST_FORCEINLINE void hardware_full_fence() BOOST_NOEXCEPT
-    {
-#if defined(BOOST_ATOMIC_DETAIL_ARM_HAS_DMB)
-        // Older binutils (supposedly, older than 2.21.1) didn't support symbolic or numeric arguments of the "dmb" instruction such as "ish" or "#11".
-        // As a workaround we have to inject encoded bytes of the instruction. There are two encodings for the instruction: ARM and Thumb. See ARM Architecture Reference Manual, A8.8.43.
-        // Since we cannot detect binutils version at compile time, we'll have to always use this hack.
-        __asm__ __volatile__
-        (
-#if defined(__thumb2__)
-            ".short 0xF3BF, 0x8F5B\n" // dmb ish
-#else
-            ".word 0xF57FF05B\n" // dmb ish
-#endif
-            :
-            :
-            : "memory"
-        );
-#else
-        uint32_t tmp;
-        __asm__ __volatile__
-        (
-            BOOST_ATOMIC_DETAIL_ARM_ASM_START(%0)
-            "mcr\tp15, 0, r0, c7, c10, 5\n"
-            BOOST_ATOMIC_DETAIL_ARM_ASM_END(%0)
-            : "=&l" (tmp)
-            :
-            : "memory"
-        );
-#endif
+            fence_arch_operations::hardware_full_fence();
     }
 };
 
@@ -131,4 +58,10 @@ struct gcc_arm_operations_base
 } // namespace atomics
 } // namespace boost
 
+#include <boost/atomic/detail/footer.hpp>
+
 #endif // BOOST_ATOMIC_DETAIL_OPS_GCC_ARM_COMMON_HPP_INCLUDED_
+
+/* ops_gcc_arm_common.hpp
+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
+*/

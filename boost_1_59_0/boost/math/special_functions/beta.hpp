@@ -20,8 +20,8 @@
 #include <boost/math/special_functions/expm1.hpp>
 #include <boost/math/special_functions/trunc.hpp>
 #include <boost/math/tools/roots.hpp>
-#include <boost/static_assert.hpp>
-#include <boost/config/no_tr1/cmath.hpp>
+#include <boost/math/tools/assert.hpp>
+#include <cmath>
 
 namespace boost{ namespace math{
 
@@ -514,7 +514,7 @@ T ibeta_power_terms(T a,
          if ((boost::math::isnormal)(bet))
             log_result -= log(bet);
          else
-            log_result += boost::math::lgamma(c, pol) - boost::math::lgamma(a) - boost::math::lgamma(c, pol);
+            log_result += boost::math::lgamma(c, pol) - boost::math::lgamma(a, pol) - boost::math::lgamma(b, pol);
          return exp(log_result);
       }
    }
@@ -549,7 +549,7 @@ T ibeta_series(T a, T b, T x, T s0, const Lanczos&, bool normalised, T* p_deriva
 
    T result;
 
-   BOOST_ASSERT((p_derivative == 0) || normalised);
+   BOOST_MATH_ASSERT((p_derivative == 0) || normalised);
 
    if(normalised)
    {
@@ -581,7 +581,7 @@ T ibeta_series(T a, T b, T x, T s0, const Lanczos&, bool normalised, T* p_deriva
          if(p_derivative)
          {
             *p_derivative = result * pow(y, b);
-            BOOST_ASSERT(*p_derivative >= 0);
+            BOOST_MATH_ASSERT(*p_derivative >= 0);
          }
       }
       else
@@ -603,7 +603,7 @@ T ibeta_series(T a, T b, T x, T s0, const Lanczos&, bool normalised, T* p_deriva
    if(result < tools::min_value<T>())
       return s0; // Safeguard: series can't cope with denorms.
    ibeta_series_t<T> s(a, b, x, result);
-   boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
+   std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
    result = boost::math::tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter, s0);
    policies::check_series_iterations<T>("boost::math::ibeta<%1%>(%1%, %1%, %1%) in ibeta_series (with lanczos)", max_iter, pol);
    return result;
@@ -617,7 +617,7 @@ T ibeta_series(T a, T b, T x, T s0, const boost::math::lanczos::undefined_lanczo
    BOOST_MATH_STD_USING
 
    T result;
-   BOOST_ASSERT((p_derivative == 0) || normalised);
+   BOOST_MATH_ASSERT((p_derivative == 0) || normalised);
 
    if(normalised)
    {
@@ -653,7 +653,7 @@ T ibeta_series(T a, T b, T x, T s0, const boost::math::lanczos::undefined_lanczo
       if(p_derivative)
       {
          *p_derivative = result * pow(y, b);
-         BOOST_ASSERT(*p_derivative >= 0);
+         BOOST_MATH_ASSERT(*p_derivative >= 0);
       }
    }
    else
@@ -664,7 +664,7 @@ T ibeta_series(T a, T b, T x, T s0, const boost::math::lanczos::undefined_lanczo
    if(result < tools::min_value<T>())
       return s0; // Safeguard: series can't cope with denorms.
    ibeta_series_t<T> s(a, b, x, result);
-   boost::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
+   std::uintmax_t max_iter = policies::get_max_series_iterations<Policy>();
    result = boost::math::tools::sum_series(s, boost::math::policies::get_epsilon<T, Policy>(), max_iter, s0);
    policies::check_series_iterations<T>("boost::math::ibeta<%1%>(%1%, %1%, %1%) in ibeta_series (without lanczos)", max_iter, pol);
    return result;
@@ -711,7 +711,7 @@ inline T ibeta_fraction2(T a, T b, T x, T y, const Policy& pol, bool normalised,
    if(p_derivative)
    {
       *p_derivative = result;
-      BOOST_ASSERT(*p_derivative >= 0);
+      BOOST_MATH_ASSERT(*p_derivative >= 0);
    }
    if(result == 0)
       return result;
@@ -736,7 +736,7 @@ T ibeta_a_step(T a, T b, T x, T y, int k, const Policy& pol, bool normalised, T*
    if(p_derivative)
    {
       *p_derivative = prefix;
-      BOOST_ASSERT(*p_derivative >= 0);
+      BOOST_MATH_ASSERT(*p_derivative >= 0);
    }
    prefix /= a;
    if(prefix == 0)
@@ -791,29 +791,29 @@ struct Pn_size
 {
    // This is likely to be enough for ~35-50 digit accuracy
    // but it's hard to quantify exactly:
-   BOOST_STATIC_CONSTANT(unsigned, value =
+   static constexpr unsigned value =
       ::boost::math::max_factorial<T>::value >= 100 ? 50
    : ::boost::math::max_factorial<T>::value >= ::boost::math::max_factorial<double>::value ? 30
-   : ::boost::math::max_factorial<T>::value >= ::boost::math::max_factorial<float>::value ? 15 : 1);
-   BOOST_STATIC_ASSERT(::boost::math::max_factorial<T>::value >= ::boost::math::max_factorial<float>::value);
+   : ::boost::math::max_factorial<T>::value >= ::boost::math::max_factorial<float>::value ? 15 : 1;
+   static_assert(::boost::math::max_factorial<T>::value >= ::boost::math::max_factorial<float>::value, "Type does not provide for 35-50 digits of accuracy.");
 };
 template <>
 struct Pn_size<float>
 {
-   BOOST_STATIC_CONSTANT(unsigned, value = 15); // ~8-15 digit accuracy
-   BOOST_STATIC_ASSERT(::boost::math::max_factorial<float>::value >= 30);
+   static constexpr unsigned value = 15; // ~8-15 digit accuracy
+   static_assert(::boost::math::max_factorial<float>::value >= 30, "Type does not provide for 8-15 digits of accuracy.");
 };
 template <>
 struct Pn_size<double>
 {
-   BOOST_STATIC_CONSTANT(unsigned, value = 30); // 16-20 digit accuracy
-   BOOST_STATIC_ASSERT(::boost::math::max_factorial<double>::value >= 60);
+   static constexpr unsigned value = 30; // 16-20 digit accuracy
+   static_assert(::boost::math::max_factorial<double>::value >= 60, "Type does not provide for 16-20 digits of accuracy.");
 };
 template <>
 struct Pn_size<long double>
 {
-   BOOST_STATIC_CONSTANT(unsigned, value = 50); // ~35-50 digit accuracy
-   BOOST_STATIC_ASSERT(::boost::math::max_factorial<long double>::value >= 100);
+   static constexpr unsigned value = 50; // ~35-50 digit accuracy
+   static_assert(::boost::math::max_factorial<long double>::value >= 100, "Type does not provide for ~35-50 digits of accuracy");
 };
 
 template <class T, class Policy>
@@ -928,8 +928,8 @@ T beta_small_b_large_a_series(T a, T b, T x, T y, T s0, T mult, const Policy& po
 // For integer arguments we can relate the incomplete beta to the
 // complement of the binomial distribution cdf and use this finite sum.
 //
-template <class T>
-T binomial_ccdf(T n, T k, T x, T y)
+template <class T, class Policy>
+T binomial_ccdf(T n, T k, T x, T y, const Policy& pol)
 {
    BOOST_MATH_STD_USING // ADL of std names
 
@@ -951,14 +951,14 @@ T binomial_ccdf(T n, T k, T x, T y)
       int start = itrunc(n * x);
       if(start <= k + 1)
          start = itrunc(k + 2);
-      result = pow(x, start) * pow(y, n - start) * boost::math::binomial_coefficient<T>(itrunc(n), itrunc(start));
+      result = pow(x, start) * pow(y, n - start) * boost::math::binomial_coefficient<T>(itrunc(n), itrunc(start), pol);
       if(result == 0)
       {
          // OK, starting slightly above the mode didn't work,
          // we'll have to sum the terms the old fashioned way:
          for(unsigned i = start - 1; i > k; --i)
          {
-            result += pow(x, (int)i) * pow(y, n - i) * boost::math::binomial_coefficient<T>(itrunc(n), itrunc(i));
+            result += pow(x, (int)i) * pow(y, n - i) * boost::math::binomial_coefficient<T>(itrunc(n), itrunc(i), pol);
          }
       }
       else
@@ -1006,7 +1006,7 @@ T ibeta_imp(T a, T b, T x, const Policy& pol, bool inv, bool normalised, T* p_de
    T fract;
    T y = 1 - x;
 
-   BOOST_ASSERT((p_derivative == 0) || normalised);
+   BOOST_MATH_ASSERT((p_derivative == 0) || normalised);
 
    if(p_derivative)
       *p_derivative = -1; // value not set.
@@ -1283,12 +1283,12 @@ T ibeta_imp(T a, T b, T x, const Policy& pol, bool inv, bool normalised, T* p_de
 
       if(b < 40)
       {
-         if((floor(a) == a) && (floor(b) == b) && (a < (std::numeric_limits<int>::max)() - 100) && (y != 1))
+         if((floor(a) == a) && (floor(b) == b) && (a < static_cast<T>((std::numeric_limits<int>::max)() - 100)) && (y != 1))
          {
             // relate to the binomial distribution and use a finite sum:
             T k = a - 1;
             T n = b + k;
-            fract = binomial_ccdf(n, k, x, y);
+            fract = binomial_ccdf(n, k, x, y, pol);
             if(!normalised)
                fract *= boost::math::beta(a, b, pol);
             BOOST_MATH_INSTRUMENT_VARIABLE(fract);
@@ -1434,7 +1434,7 @@ T ibeta_derivative_imp(T a, T b, T x, const Policy& pol)
 //
 template <class RT1, class RT2, class Policy>
 inline typename tools::promote_args<RT1, RT2>::type
-   beta(RT1 a, RT2 b, const Policy&, const boost::true_type*)
+   beta(RT1 a, RT2 b, const Policy&, const std::true_type*)
 {
    BOOST_FPU_EXCEPTION_GUARD
    typedef typename tools::promote_args<RT1, RT2>::type result_type;
@@ -1451,7 +1451,7 @@ inline typename tools::promote_args<RT1, RT2>::type
 }
 template <class RT1, class RT2, class RT3>
 inline typename tools::promote_args<RT1, RT2, RT3>::type
-   beta(RT1 a, RT2 b, RT3 x, const boost::false_type*)
+   beta(RT1 a, RT2 b, RT3 x, const std::false_type*)
 {
    return boost::math::beta(a, b, x, policies::policy<>());
 }
@@ -1593,3 +1593,7 @@ inline typename tools::promote_args<RT1, RT2, RT3>::type
 #include <boost/math/special_functions/detail/ibeta_inv_ab.hpp>
 
 #endif // BOOST_MATH_SPECIAL_BETA_HPP
+
+/* beta.hpp
+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
+*/

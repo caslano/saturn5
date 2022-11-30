@@ -65,10 +65,10 @@ namespace boost{ namespace math{ namespace detail{
 // when T is unsuitable to be passed to these routines:
 //
 template <class T, class Policy>
-inline T igamma_temme_large(T, T, const Policy& /* pol */, boost::integral_constant<int, 0> const *)
+inline T igamma_temme_large(T, T, const Policy& /* pol */, std::integral_constant<int, 0> const *)
 {
    // stub function, should never actually be called
-   BOOST_ASSERT(0);
+   BOOST_MATH_ASSERT(0);
    return 0;
 }
 //
@@ -76,7 +76,7 @@ inline T igamma_temme_large(T, T, const Policy& /* pol */, boost::integral_const
 // (80-bit long double, or 10^-20).
 //
 template <class T, class Policy>
-T igamma_temme_large(T a, T x, const Policy& pol, boost::integral_constant<int, 64> const *)
+T igamma_temme_large(T a, T x, const Policy& pol, std::integral_constant<int, 64> const *)
 {
    BOOST_MATH_STD_USING // ADL of std functions
    T sigma = (x - a) / a;
@@ -281,7 +281,7 @@ T igamma_temme_large(T a, T x, const Policy& pol, boost::integral_constant<int, 
 // (IEEE double precision or 10^-17).
 //
 template <class T, class Policy>
-T igamma_temme_large(T a, T x, const Policy& pol, boost::integral_constant<int, 53> const *)
+T igamma_temme_large(T a, T x, const Policy& pol, std::integral_constant<int, 53> const *)
 {
    BOOST_MATH_STD_USING // ADL of std functions
    T sigma = (x - a) / a;
@@ -423,7 +423,7 @@ T igamma_temme_large(T a, T x, const Policy& pol, boost::integral_constant<int, 
 // (IEEE float precision, or 10^-8)
 //
 template <class T, class Policy>
-T igamma_temme_large(T a, T x, const Policy& pol, boost::integral_constant<int, 24> const *)
+T igamma_temme_large(T a, T x, const Policy& pol, std::integral_constant<int, 24> const *)
 {
    BOOST_MATH_STD_USING // ADL of std functions
    T sigma = (x - a) / a;
@@ -479,7 +479,7 @@ T igamma_temme_large(T a, T x, const Policy& pol, boost::integral_constant<int, 
 // require many more terms in the polynomials.
 //
 template <class T, class Policy>
-T igamma_temme_large(T a, T x, const Policy& pol, boost::integral_constant<int, 113> const *)
+T igamma_temme_large(T a, T x, const Policy& pol, std::integral_constant<int, 113> const *)
 {
    BOOST_MATH_STD_USING // ADL of std functions
    T sigma = (x - a) / a;
@@ -776,3 +776,7 @@ T igamma_temme_large(T a, T x, const Policy& pol, boost::integral_constant<int, 
 
 #endif // BOOST_MATH_DETAIL_IGAMMA_LARGE
 
+
+/* igamma_large.hpp
+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
+*/
