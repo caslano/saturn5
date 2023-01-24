@@ -1,9 +1,0 @@
-// Copyright David Abrahams 2006. Distributed under the Boost
-// Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-# undef BOOST_concept_typename
-# undef BOOST_concept
-
-/* concept_undef.hpp
-c+9zzj0fz3m+zvOULAfI1cuq9hStT3Y17Gxsb3qnOdzS0LyjdWtbfntL28GO8c78rrbOojZvc6CxsLu9p7d3VV+ov2Jl3qoDqwcHG9f0D+aujPfH+vSesu7uoYV4bfXw++Lalu5YY6whltw40rVueCTm6lvfPtq44cONuZt8GwshdW+q3rgJV288NebZ4hsrhtS8pWxsD16z9b2xHVv3jW3auGPDxtGSbQd2xLf7dhRDqti+Bp/bFd/p21UMqWLnBrxy+7Jte9Z7da/mpRKiBmptRTwjRNyaxw88hzvgDhkBLaxF3DF3kRb3J7Rid5m70ijTqrRq93J3UmuINGpNWqvWrnU4urRurVfr11Zqqx1rvEPeYeeIti6yXhv1b9A2usfcW40xbZu23b3TnaZPZ+bl9G9wXm4xZLZBOviNtN7KHFbOjIJSYe7Mey9j3KabL6aPTW2hBtecuWCit3o25zenHvmunQov36X228nrJYyCubu+kdEYvw9z+YGvrv1Q+MIudks+2VBCQOiGnHXuWk/CXel6EuNcd6lrmbsEiq+7juPXae4dr8+o5KnRW+VbyS2uV/n7AzG8LFDhH/S94QKqoTi4NrfHpesAU/XKPikkLhe8uJyME/FY4Spw58E1RPI+LaD5NVdeUMvN9K8+M/2f5DTMAGR+Celikto/ZrZnqwtFxhDQPr2QkY0zFoF5C2UyzfOX+Q9ld85P
-*/
