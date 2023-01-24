@@ -1,0 +1,21 @@
+/*
+Copyright 2015 NumScale SAS
+Copyright 2015 LRI UMR 8623 CNRS/University Paris Sud XI
+
+Copyright 2015 Glen Joseph Fernandes
+(glenjofe@gmail.com)
+
+Distributed under the Boost Software License, Version 1.0.
+(http://www.boost.org/LICENSE_1_0.txt)
+*/
+#ifndef BOOST_ALIGN_DETAIL_ASSUME_ALIGNED_INTEL_HPP
+#define BOOST_ALIGN_DETAIL_ASSUME_ALIGNED_INTEL_HPP
+
+#define BOOST_ALIGN_ASSUME_ALIGNED(ptr, alignment) \
+__assume_aligned((ptr), (alignment))
+
+#endif
+
+/* assume_aligned_intel.hpp
+Mak/tsBfJYVkoBbAHl0aN0NmUC3wOx8pF3ucm0RQoFRAVoVkMfpBfz4bFiwe9lXyNPMVuXpW+iVhx1tW2kx4M7Gm32KPwk957oHyQY73+k2nwhGew47KPrvxLgBZSvNP+Q7ipD3q3SjBMn0ooWakh9s0DtGVZ1kYAYr+Fn8eNuGf7zHIH0cE3W2HABoNVRyxEYCjP5e5D8UjsXR/At1C3748VfE8KoSacA9FcTeeQuuwasXC1g1y66CzL3CNWBl7AxXjtcWABRAbMAx0cz01RtUPXjKfKoLJDPkMAVI7J5ihvKCQb/7cN4+qESkW8zyeWOrWzcFXnIZOkj3Um7HOjqXwV8vmZWe7P3XQuywonoZrmUdIg+bszvCRPHdMPqesChFBwWBUFo8fTC4GQUYGiYRr4LnxdQ9bQYRQD5OkIswr1sqa+AbFQU89GsZgRRVyQHyfbd8QElp4RBLAmZsIaCsWH5paSmI3Q+8vBJDjAAPK72qVB+b/HkD4cBGMs9UGnfNqkNMMVrZWkv+MVe2LnM8jx736Xf2M7OaWJMuOIyoEhBvIFRNntl3tzprAG4coa160GqoK/mRP+zxsNNF7KKlsaU8/nAKpQLIsWzM+hq6Pn+ak8Zd3/Q6bL7sRF/oDfNUOM1cJVrZEwix7tClOV6VpDZOvvq/K3wBIhWr6GhWeGQQJYFTJ3xtKh3OaCZDdE+OMsycMrJ3fNNYg
+*/

@@ -1,0 +1,19 @@
+/*!
+@file
+Defines `boost::hana::integral_constant`.
+
+@copyright Louis Dionne 2013-2017
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
+ */
+
+#ifndef BOOST_HANA_INTEGRAL_CONSTANT_HPP
+#define BOOST_HANA_INTEGRAL_CONSTANT_HPP
+
+#include <boost/hana/bool.hpp>
+
+#endif // !BOOST_HANA_INTEGRAL_CONSTANT_HPP
+
+/* integral_constant.hpp
+HVrIsvLY0hMPKe7Bae7J4xTC9C9UGHRL1rF8zuZOM82p0xns9n9Xzv6J36GV6rIqefCWg8GcBofs/eadi5q7kAoLcN3uHmUp64LkJlK8ZXE2kVpJnqN4eJNXS5Xey0RJKvw/gb9R7GK0pkwnno8gLDy9HqJuekGtdBf1WFiFr5zOfz8XTLOn+21RWKVEMPfc2bsHSxDzGNs/1h/F9/REyC8aAUh183C0e0sF1VYqHxNmAD3pilkr8QtNb+AYSXKsk9pab1FqqR2PrLJXYDCmtYnZLNGpc4/zckUNmx44FpGP4SR6h9v1CVqnWZcXZTHrjQ6YwNlhnjica5QSeP9t5v0pjSn1In/qdwZrHXkG2whDdprRYbBLbphvplgsJrtM/xCRkpKSnMw7BrdffHxaSkR6HPWRqFcZzNtNGshEuugv5f7DgTPx4MJfN96yunG7NJft5hU+Hv7SoAdEDUecm9ZUQ67R7gAa7dYkgyPFZrEabA4j0i6PG8FjJol8cSyOVCWDD2PteD2g/gQ1KZlcSqQZFfI6AmxW8Wbn/Zt9hKWob2/IivqifIPNbDD14h1ZmpgZFIkR6dgqZg1jBTXS28+jPWI8by2vE5KHynPpQtnMOIW3kDzFvNAz146DeQxydayXfGTI3un4RsR5rlGM6KueuXv6LSlHVqldeGhBLSD+tJxvNFvIdKdt5P0gzvawBShrT6kfiZBpR6J5
+*/

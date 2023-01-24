@@ -1,0 +1,149 @@
+/*!
+@file
+Defines `boost::hana::detail::type_foldl1`.
+
+@copyright Louis Dionne 2013-2017
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
+ */
+
+#ifndef BOOST_HANA_DETAIL_TYPE_FOLDL1_HPP
+#define BOOST_HANA_DETAIL_TYPE_FOLDL1_HPP
+
+#include <boost/hana/config.hpp>
+
+
+BOOST_HANA_NAMESPACE_BEGIN namespace detail {
+    template <unsigned n>
+    struct type_foldl1_t;
+
+    template <>
+    struct type_foldl1_t<0> {
+        template <
+            template <typename ...> class f,
+            typename state
+        >
+        using result = state;
+    };
+
+    template <>
+    struct type_foldl1_t<1> {
+        template <
+            template <typename ...> class f,
+            typename state,
+            typename x1
+        >
+        using result = typename f<state, x1>::type;
+    };
+
+    template <>
+    struct type_foldl1_t<2> {
+        template <
+            template <typename ...> class f,
+            typename state,
+            typename x1, typename x2
+        >
+        using result = typename f<typename f<state, x1>::type, x2>::type;
+    };
+
+    template <>
+    struct type_foldl1_t<3> {
+        template <
+            template <typename ...> class f,
+            typename state,
+            typename x1, typename x2, typename x3
+        >
+        using result = typename f<
+            typename f<
+                typename f<state, x1>::type,
+                x2
+            >::type,
+            x3
+        >::type;
+    };
+
+    template <>
+    struct type_foldl1_t<4> {
+        template <
+            template <typename ...> class f,
+            typename state,
+            typename x1, typename x2, typename x3, typename x4
+        >
+        using result = typename f<
+            typename f<
+                typename f<
+                    typename f<state, x1>::type,
+                    x2
+                >::type,
+                x3
+            >::type,
+            x4
+        >::type;
+    };
+
+    template <>
+    struct type_foldl1_t<5> {
+        template <
+            template <typename ...> class f,
+            typename state,
+            typename x1, typename x2, typename x3, typename x4, typename x5
+        >
+        using result = typename f<
+            typename f<
+                typename f<
+                    typename f<
+                        typename f<state, x1>::type,
+                        x2
+                    >::type,
+                    x3
+                >::type,
+                x4
+            >::type,
+            x5
+        >::type;
+    };
+
+    template <>
+    struct type_foldl1_t<6> {
+        template <
+            template <typename ...> class f,
+            typename state,
+            typename x1, typename x2, typename x3, typename x4, typename x5, typename x6,
+            typename ...xs
+        >
+        using result =
+            typename type_foldl1_t<(sizeof...(xs) > 6 ? 6 : sizeof...(xs))>::
+            template result<
+                f,
+                typename f<
+                    typename f<
+                        typename f<
+                            typename f<
+                                typename f<
+                                    typename f<state, x1>::type,
+                                    x2
+                                >::type,
+                                x3
+                            >::type,
+                            x4
+                        >::type,
+                        x5
+                    >::type,
+                    x6
+                >::type,
+                xs...
+            >;
+    };
+
+    template <template <typename ...> class f, typename x1, typename ...xn>
+    struct type_foldl1 {
+        using type = typename type_foldl1_t<(sizeof...(xn) > 6 ? 6 : sizeof...(xn))>
+                     ::template result<f, x1, xn...>;
+    };
+} BOOST_HANA_NAMESPACE_END
+
+#endif // !BOOST_HANA_DETAIL_TYPE_FOLDL1_HPP
+
+/* type_foldl1.hpp
+5PPOZfP5Xps2H7E5lk+x/MgG/yPmYmnPflyJQmLdM4I5TqaBLhq4fz9zmoZ3wqT1SrjkP0OnZBY6zUAhkbeG3qNWvG7gcbP8dDzDe6mbPmJ+mvbSkS3fAsqHPc2Wn05b0kzyM5qxpRiPoewkK83cLr0QvY97BrUjru45HXXX+UQOV3ejHl/zuTpq4yy62GsXoku4H3xGv5ZyP9hJX5ZzvmOoUjhm0dsd5YJUqizvSkbvLYKUyNUR+MI25Xy/wfZyZKQ6Jnl0a/mUFgeaC9CJZZOQRCn4NotxAnSHFLxpacbLH9S/Vdna0J+SaDlGdntGdJhDdIcquvEJu9eKjkFnCtHvshMHMeegNkiAd0fCf4IX6mV3H7xQp7nvtDgykxnq1CPfq4JU6b11meKwy+j93HpCuTAjllnmBS59pSY8BZKjgSrqNBTw/lkyzRHrJdMrJMotGqT0bkbpP1JK/yxO6VEqpduGULpbpfQfVUp3UHSzKaXvo5T+tULpmyilxRild1BKZ6Y6ZvApUx0zoKp6RtcJgJ9Qnq0L/YZ9p+A33sgBQmdTQoceonTOZnQ2IJ23XorOlcPonK3SOVulc7ZK51mMztlxOk9dpmhCQGd6JWfSBRxOypogFrX35cMeZqapEHNEkXagfHO5kHM9aPgBQ3N+hl7MN8en6KTY3JDiz29XDdgH2sNT/fkvqPbq0bSPP//92KdqnjK5CntH
+*/

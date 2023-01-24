@@ -1,0 +1,15 @@
+//Copyright (c) 2006-2009 Emil Dotchevski and Reverge Studios, Inc.
+
+//Distributed under the Boost Software License, Version 1.0. (See accompanying
+//file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_EXCEPTION_FA5836A2CADA11DC8CD47C8555D89593
+#define BOOST_EXCEPTION_FA5836A2CADA11DC8CD47C8555D89593
+
+#include <boost/exception/detail/exception_ptr.hpp>
+
+#endif
+
+/* exception_ptr.hpp
+Yd+u2RLV8zdeKy8bunK3U2zYUyZEugG90hzZDpLVfQ4LkZd4AKrvVWtq6hnNPJ76Js6FB4M2BNx+NM7pssLt90SKpouiIP7WPwn2jB/XqKzSLL35eLvSzVP/Rvy0jnQexxPWpd8/PwXeTevxkUf0DLjG0m3HVG+ndrHH1oloKot533Ze07FKjjWPUsXf4+35AeOtWeVx72Z176E/4xlULaCnQ9e5Jhn7qKiUCJPZMYdQONwRWnMY7rWyiu9rIvnL9H9US6WdSXg0gyjCCROI4+pr0vL/prAqw5pg2+hrYAsKIgIS0g3SjUpK1waMkhhdDhkloChdSo9uWNGjxkClR0lsg1EvAtLwUiOHn9+vc67rue77zznPOXd3nDzjtskH1SdXxCNjF18N9b4X6f3r7pQlq/ZEudoruXs0HT01J3d7Q844n378mwZEeQaatU8P5TmufH7QR5OdrNDCLrckNpuy8jergm6y/hX8pW/PmbUAQHqs54GZcip3ayr/UVnHFv/54BVI0VOem4PPIFVP+WIGH0LKnvLeX3ZT0ErOiB7XYRl8C2nP4zRY1nAX4n8t5S7GPyg4/sowIxOS05hKHNci6yop2JIHmcdfjqQ3LHspaCvq8q+LnJpy2pYh36XtjKuH6IoLps+Pa5/pqq2LX3Muupf6XVIjGi/BLMbtXJaYOiapNZJxsPx+D2+59/rrSbnlVVOuclO+l8z8
+*/

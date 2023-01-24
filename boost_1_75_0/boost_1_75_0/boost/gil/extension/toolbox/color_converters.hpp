@@ -1,0 +1,18 @@
+//
+// Copyright 2012 Christian Henning
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//
+#ifndef BOOST_GIL_EXTENSION_TOOLBOX_COLOR_CONVERTERS_HPP
+#define BOOST_GIL_EXTENSION_TOOLBOX_COLOR_CONVERTERS_HPP
+
+#include <boost/gil/extension/toolbox/color_converters/gray_to_rgba.hpp>
+#include <boost/gil/extension/toolbox/color_converters/rgb_to_luminance.hpp>
+
+#endif
+
+/* color_converters.hpp
+lTjdk5JUdbV8zl832eJufJxcVwAcamZQ+AjAhBrKDQHcEeA2AKQaik8SaShXywPAPZQvu5BcoSmWmSKKYdzdRRJGpXaH4iz8FIwnJZQBflZCV1WF8Q2YSiqUsYAXgG6UmKQJJLRcKGGkUqGEViWzEqaqKooWsSJ8gX4p3ShWJBE4S+VSiUiV7CJiGVaqZGilJ/xTEhmjSlZZRleVSJWqZFJUylqvKNUyWpUM5RkpQhlOi2QaBl0BK1tdopKzGMiSQypn4U+uoGiSBeFBlKBrW/bhdlAMyqWhrRgohnYdpiruzCpp2gW1RyBDjWYgwjpJhK6WaXxvoCMQEQAChbs7iShQRKGAbmNacHBh8Di4Fgo8gMAUjKuqOFMCBHYtdC1kxO6MmEUDjRKrqiyLyNBAjNUIEJBlFTKGILKjsBsZBgSVShgF6RIehCiSJQrjYRQsK6YECmgejAaEAac79JWMhxulIJPGjcL0wzhYMfTak3JnZXRV1ySAyKEMCalZXClPvfIQX1QtkSpUlqUuqNUuMIuW4ojKUgrdgzMrpWDclrqrivNhxqhFFJBTDSRmXBBdYWpBVRSPFGGQCEhHSS/d8fCVx0m1YbYQgsGkQ71FYw7z2h/NZ55YeJIIhBTNCEQymMgiTCG4oohAjFJh1kkErCoBTXAhiwMyaByMPvwDxYTownryg+RJBheiMC3wKEloggUaoUYF1aSkUEnD
+*/

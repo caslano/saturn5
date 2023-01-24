@@ -1,0 +1,16 @@
+// Copyright David Abrahams 2006.
+// Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+#ifndef BOOST_PARAMETER_AUX_PARENTHESIZED_TYPE_DWA2006414_HPP
+#define BOOST_PARAMETER_AUX_PARENTHESIZED_TYPE_DWA2006414_HPP
+
+#include <boost/parameter/aux_/preprocessor/impl/parenthesized_type.hpp>
+
+#endif  // include guard
+
+
+/* parenthesized_type.hpp
+2WukG13av7MyYoSPO1QfNRnIndR3L1i4HFzrMmuodVzq+R54cGg06ENEfhFwreLlVOihS9mJiJi4yxorLRRF+uUMPnMu1nOAAMWm9HL6m79Oxs2+X/n5+7S/wjnw0qkZz1aW6k2ohyyii6Dm/tQj5EvmFYvPD1OFwE3yCDWln8le8pIp8RYHpIn55B2a7+DeOLcgDZrSl7sxkOd+5UULvzm5KfLYyXtYSlwjpL8mK8KEOJu68EvqinSAYg9VOOOcAdf6RrmDbNxLIUinrjN4dn0LDZCvKy0oQxAmSlP2eEQA9JW6XX41VZu0/hYcmX5M8KjxoCCpZPjAnOkftf4+WC049JYceBw7atRNZdRN7NedRx9hQwd7mzo3HXlI6qe2b3TUB2utvje47KBABGC0B5JJPZLDWAIjcuUJE7LykC90g/VoJfyd5i10kTlIjGVOx9oZ34zUr2dXvg+jH27vQ0uPisHYSMLApO5nE8FKwQkN+lNyU41vEIJuahcJsE8P7A80gSBkJhJLBAQjjMVu6cQy84TlpJ5lw3geRH0AxdAp7yOzo41Df1jgkATKd7GYXK9CYeVm00OsOCgRSd6OfCYrbNGR6ZHbyQ4daZ1onXjRMGio2Yz2fK+rTVjjuOHZgS/vVuf1Ug6fFcVL27bYyZvULZ+CNWqt3WVS3F+jekC+FisVl2aJyZ+YRgdZmXn7Y25hdOrCtlanF3er
+*/

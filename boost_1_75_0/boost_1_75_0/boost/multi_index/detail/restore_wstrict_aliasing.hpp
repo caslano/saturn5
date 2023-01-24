@@ -1,0 +1,15 @@
+/* Copyright 2003-2016 Joaquin M Lopez Munoz.
+ * Distributed under the Boost Software License, Version 1.0.
+ * (See accompanying file LICENSE_1_0.txt or copy at
+ * http://www.boost.org/LICENSE_1_0.txt)
+ *
+ * See http://www.boost.org/libs/multi_index for library home page.
+ */
+
+#define BOOST_MULTI_INDEX_DETAIL_RESTORE_WSTRICT_ALIASING
+#include <boost/multi_index/detail/ignore_wstrict_aliasing.hpp>
+#undef BOOST_MULTI_INDEX_DETAIL_RESTORE_WSTRICT_ALIASING
+
+/* restore_wstrict_aliasing.hpp
+b7fIf96/sQn+M1/psyWc/xy8sTUn3sSUJnk9g+0k92n820Zx9qls+YAk7/HIdcyEpepyjG82WEQeNxs9ADaC/KKvIa9kL5yeJ+ylcwT5nYivJaJxwJIjJupGIpKleWFxbaCpQYSs2J7/1bcpYovbn12IBkAJwvAIntwNn+aTgNJnQnkfKr8FyvHTQUPda/S6uNEoHjqUuOS1FUrkBLXcvrSGw66TQcAbAGcoV+2dLa/F6LkAwFPoC+VFHexLAbAli+q4B7/ijw5GuP036WtQVW0xab+tSUK3vy8RAZlhhnJE7Lb/XMjmOcYDTG6BHueBdA6JLsTSQCTVqY76tZS7Hjvoofi1R9bqwmEnBhaVv1EdP0KZXC1FbPIdsk9xoA1Fon1phBToPkDyVVp8Vao3iIVtJ2RlpBVZJS1wC0mIH0TAJMnWY4A0gGpxjQmTe6ExR9qbBmMOefcE37TcOO8QNs8AOipPnDKJyI/vt5jYwC0RJ6YvTQw0PrgADbJqXGpugf4wVmuBJe2DCzRZRIEuixicqzomVlmMZNfAqoZklxBAnFsrlChk7TE2mXeDxLl7dTqMHTLvekMfUa5bPpaDE75HiPIkRqC42BvXa1ugDT+hpdhrL9lCaBYVOzuUrhv0gBpZTDakIwpMVh0fwutz3ezGCrf3VPER/iq9PJawfrLkrC3qTFokguZMUWeWYB/htYnrEWZPILiLkNvA
+*/

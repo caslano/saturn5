@@ -1,0 +1,21 @@
+/*!
+@file
+Defines `boost::hana::size`.
+
+@copyright Louis Dionne 2013-2017
+Distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE.md or copy at http://boost.org/LICENSE_1_0.txt)
+ */
+
+#ifndef BOOST_HANA_SIZE_HPP
+#define BOOST_HANA_SIZE_HPP
+
+#include <boost/hana/fwd/size.hpp>
+
+#include <boost/hana/length.hpp>
+
+#endif // !BOOST_HANA_SIZE_HPP
+
+/* size.hpp
+FBKaNNg0gN1zkk/pKjWmaHuzcuoCKrXNdJd0ATVhXtdmsF12UNTlevOBLKC7OtaOUrialEIvowxmgl2k1gox6cQpCGpBoLsIKoH0UEhxKowy3dSVdgoXdWVLhZ26srPCWl0pVTqWNOPsZDOs9CXWoZlySzGlYsGJA91FXdcH2LD9q00muZOzQKiX2EjZZUdQocnZGze21sbhlBGt2dYqKXsV+eo58gRkbNORWy5kAxHviGev+9q0JZ9NJm3aSURHm5QOv6E12iQVymSnLuUjg1WZIe5ACWW6G9pzmyD3oRLJ5QYrW8mn9JpdgJwEv1Kk+eUgbk0igsAScvnaJICDguS7HCnhRUkN3+Qc74Nl0SxIJk9HmQjRG20p5bnoPpiVI7q6bxJRRkhIFD/IdMdMcJWnVD6iBVRxRVWQ0sjDMTQQQSEhQaimrlSbhutWOCQUOyALlJSPe3UM/8ajEl219pwC0jJtWjRK9Rqogbiykcr9US/1epBDQtJO6Ggf1H2tJhuQzSx0ZUcu4VOmNMjEzEjZbSswM1we+7QzYkavgRal8iV1FNnHS4BWwudGtD4vBlqQSWiNMtOCPHYn0FKfAw4phdCUBjdmVVUK5bswdchkU6FLuCunj6HcSJ0w0re5skOk5pbCOVInRRYmkK90UBsF6vMClKl8qMsssWxrVGfz0NTWQFwAL556DfsF8W1yduXa6MZpEsc30qdm
+*/

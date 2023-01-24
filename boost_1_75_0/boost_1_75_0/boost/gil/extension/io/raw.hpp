@@ -1,0 +1,17 @@
+//
+// Copyright 2013 Christian Henning
+//
+// Distributed under the Boost Software License, Version 1.0
+// See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt
+//
+#ifndef BOOST_GIL_EXTENSION_IO_RAW_HPP
+#define BOOST_GIL_EXTENSION_IO_RAW_HPP
+
+#include <boost/gil/extension/io/raw/read.hpp>
+
+#endif
+
+/* raw.hpp
+ejEyFO9LU0rGOOihuGl/an1WMJEhiVFP6ptysQZ7L5ZtyU3pUv0D04d3ivf4wbvvbEenarJYkQ9OdTdG35j/kf5FnEqmf5EUTJ1uOZD3lDvH4VUaLg64QFp0NSTiI6FkGZSdfXOaIv0Hk9/dRG70JBNviQg3FIkXCH9fMOxHFsh0IZgIYo5P6sTzCdkxGRF7u16aze5T+mF4x0SVJQnEzseG0PQS8nFxI0u65rlL7zTzSVZBD2V0xkv07OSMab9bH/3CXJ2dxv5bx99qHz81x6zEu23l6PoR6WPPXTDtVHIraPOaq6Orp26lFPStl9HlDYgmAPIGQNbjeUB0xGAio1xr1Lx3LVKRHhF6tyanQK1lX5LiOITwb/brGHsj8OVF0Qqejdmb8IyK3FHbx2uyLPukiTPxwK7Za83kgW28gz83pALTm6R7q3bJbZy8vvkYHMoFDXzUxTZRP2eKuOsbtcOAuHL39O0BjHTzEZOsk7G5jAy0DNNA8sn92lf8kFz/o7H3bp/eBWlDxX1PZxx+KgyDyfvlqN2HKDwtpWWpeUmuYrPO+Og5KFBzNG0UnPSLtOCHVXgE+IvMdwS/lX4rVbyXIhLgv+BZ4ObsfxIMorXOoMpwjKhcuqoi7Jg1fiNhlL3EoGcxbrfI8vtdSOXVXle+03RNyF5/+0RXoNeVd2g7UAMidYPLZzwURNZ8EaDYF3knQzHV8SecPIqK
+*/

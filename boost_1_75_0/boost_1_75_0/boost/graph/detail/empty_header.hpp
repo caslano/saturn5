@@ -1,0 +1,14 @@
+#ifndef BOOST_GRAPH_DETAIL_EMPTY_HEADER_HPP_INCLUDED
+#define BOOST_GRAPH_DETAIL_EMPTY_HEADER_HPP_INCLUDED
+
+// Copyright 2018 Peter Dimov
+//
+// Use, modification and distribution are subject to the
+// Boost Software License, Version 1.0 (See accompanying file
+// LICENSE_1_0.txt or http://www.boost.org/LICENSE_1_0.txt)
+
+#endif // #ifndef BOOST_GRAPH_DETAIL_EMPTY_HEADER_HPP_INCLUDED
+
+/* empty_header.hpp
+1f49B8wxInN6mf2DRzR+lUZkju2CVHkRYE6Afnj4Io6/aCyLL+74MXq0Z0BsL93HWHfBZ3HDACQBxzLKCAvZSZAslchOhdrAVaq/XeHn5P78/PFXkfw81xXJJnenQpGXbkMWhPn5+34Zb+vUUqSrA/h5QOUn85Khji9vG4yhO/8phqZPHYyh734ZydDRXZF8ejqogP/pZC34MfTLryIzPhTUgj+9Q8vQRcH+DL0GtdWeu0th6LxnOUMn1TpPAUPpswO0rSr7etpWMkXhzm2R3GmjbUzM2kLcmfWVSnQep9r7d4ZeG/3viIx6au6X8am/K+ixkPOdXwB33lO5U8e1LW+yyhwc9duOInvykGR5HrfkBH48rfBpZwgFzhoWaHv5toHsaaNJEWBF0y1fqlTnYH3bocD/Tac2Ywxd1C/j8Q4t/OWfa9mzu0Nlj2oMiycBe8RZCnveeFplz2+QPfOe6a9v7Yq+vTxfq2+PqfrWkPW/61sbAK8Yd9S3f5+scHRKJEfb6ZBOtftoYxxd84/IXuEzqnQfqbeq3Ucb4+icfhnfoZxinCIr/gYcPahylPVvUMfWW/8Xlj4XwVJEQsPSE5MGshT6v6AWgWj6WqfKKaX/UxHYcIsWgRj6WL+Ml7/QIvDri5ylnN0ffdGfpU9BbbW59ygsPf8LxlI+jAsHtUiBCYc4XhimgB+OA5zLDkGYowcmiKMDjm4XDGFc
+*/

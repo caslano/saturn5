@@ -1,0 +1,23 @@
+/*
+Copyright 2010 Beman Dawes
+
+Copyright 2019 Glen Joseph Fernandes
+(glenjofe@gmail.com)
+
+Distributed under the Boost Software License, Version 1.0.
+(http://www.boost.org/LICENSE_1_0.txt)
+*/
+#ifndef BOOST_IO_DETAIL_QUOTED_MANIP_HPP
+#define BOOST_IO_DETAIL_QUOTED_MANIP_HPP
+
+#include <boost/config/header_deprecated.hpp>
+
+BOOST_HEADER_DEPRECATED("<boost/io/quoted.hpp>")
+
+#include <boost/io/quoted.hpp>
+
+#endif
+
+/* quoted_manip.hpp
+tPKyCquvwsSYiXoE32H/0DILP1T0YhzJu3XHOcUumb2WrTu1jdq7LnIMrdFmWXOKbr6ZXDIdzD48U8YyKlroQ93blbPTL3Gzlx5R49L8jsRnwnmx4u5/O9KyYSNG2lYybPUQyfcrxWCEeza2vFyYbCFAZ3lhpQoDT91E0jUTvySY8UfkL4377NOFp+s/HFmi/nXMWoaTBaSEjUajIyw0/cVyZLN7FTEJdvHF8Ij3uWfyuCDsfSs5DzZt0mMo40v8/N6WqemTUnomC21VnBxZvIQJ1nqOO6PXaWrxr6yymWelf6xiDpscTez4NvjHecg9uRccA8wMHs06dq8zcQ++HAuvTkl6Skl+1nSXD1OwrkgJqGy21opqadsK0KbffHUkqJm9EzeCGHswh8Hls25SjBXtTKLswmTlETvNk91dTsIrDDfsaqy4Hu1/bNhuNv/8jcEh/bkljoNIjPnsXrt1YDo9WRb683nAdr9Z9+Jm7ebO+IchWVYgZyZ/upYmvlHw9a0bw/a9yIs6ZiCRsRRlAMEjB+4rx0E1URdkeyO353CslNRGzOtLhwGEpU97o/H9ARZhQGHTpJPovM4ZplHyaRhruO2fbprJ2EjFrrIqX89rH9dc22dI13zqDuVIyHPxr21wa4Su4cdYCcymsoadVvFevdEG3nUtckq0Yo4DDzGP5PC2SI6tPxi57iLw+/krh5UGWLmfNA71i9f0
+*/

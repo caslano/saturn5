@@ -1,0 +1,28 @@
+// Copyright David Abrahams, Daniel Wallin 2003.
+// Copyright Cromwell D. Enage 2017.
+// Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+
+// No include guard.  This file is intended for multiple inclusion.
+
+#undef BOOST_PARAMETER_satisfies_begin
+#if (0 < BOOST_PARAMETER_EXPONENTIAL_OVERLOAD_THRESHOLD_ARITY)
+#undef BOOST_PARAMETER_function_call_op_overload_R
+#undef BOOST_PARAMETER_function_call_arg_pack_init
+#undef BOOST_PARAMETER_function_call_arg_list_R
+#undef BOOST_PARAMETER_make_arg_items_R
+#endif
+#undef BOOST_PARAMETER_template_args
+#undef BOOST_PARAMETER_forward_typedef
+#undef BOOST_PARAMETER_build_deduced_list
+#undef BOOST_PARAMETER_make_deduced_list
+#undef BOOST_PARAMETER_build_arg_list
+#undef BOOST_PARAMETER_make_arg_list
+#undef BOOST_PARAMETER_satisfies_end
+#undef BOOST_PARAMETER_right_angle
+
+
+/* no_perfect_forwarding_end.hpp
+vXT1iei/qIov0Y2g2EpmmpQRu313y836U4f0PacR0pFfpKJCuVwQ1kxvMBtKf5fI+M0yl1JJEvs7JOKf3N1O3nEPDf0zRHoQ93fWTh1aJYIVfIzL/hiYToTDZojzQxvEIjKV82XUK/w0bXeBWn+qKYQz1VCaQfaP2k2seTeT5RdoBJuoHrac+BaDBfNhgmGPPd44hVweq13kCiPVGG4ZZ6rYjdI6Pd059UvHz6zq0iJKnhgMJjEBB1frfvXoFu1nBVioh8nPANWJH+qQJMNRS07VKO+dN2Z/vy99TKnNAlhKwxNUY6EUjFbYvr3fTZszO5PiEv1Elmbhs4x/X5m3fBCUIdkMvxyPUY+paVfg+2G3L33p7FtK8LIBJyBNviC5uXLduQuCFxP4rjQ7D/lyN18C5lxBUpq5nLuFwGcPBTxK0exds0a2CipaglmPWcGZkGWqMBF6KjMKXKAkTB4WQn70sqLCEkHsrj6QTxmRxrmuM7FHKYd9Pe2ZFh2Yhgu74ju+/U4GScAV9FvlS5wmObqZjuazSsedtmPfJUnFnT7j3i0I/U6Gz7GbmxrjBdagNnwuxmXt6qWBwo1rk0FOPwybDRGkmzuUhJWf1SkKFJdxzIV9SU+PTvu+CdvtaJAytGz5nYiePDi2OeZiHlmvqlNQaTxsTcAkjnhaTPkJ2yfss/JyLw+DnlXBnJRm8zvujHq1OiZWBgXZT4ql
+*/
